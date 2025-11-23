@@ -9,9 +9,8 @@ import {
   IconMenu,
   IconX,
   IconShoppingCart,
-  IconInfo,
-  IconMail,
   IconGallery,
+  IconFlower,
 } from "@/components/ui/icons"
 import { cn } from "@/lib/utils"
 import { Button } from "../ui/button"
@@ -19,9 +18,8 @@ import { Button } from "../ui/button"
 const links = [
   { label: "Home", href: "/", icon: <IconHome /> },
   { label: "Shop", href: "/shop", icon: <IconShoppingBag /> },
+  { label: "Collections", href: "/collections", icon: <IconFlower /> },
   { label: "Inspiration", href: "/inspiration", icon: <IconGallery /> },
-  { label: "About", href: "/about", icon: <IconInfo /> },
-  { label: "Contact", href: "/contact", icon: <IconMail /> },
 ]
 
 export default function Nav() {

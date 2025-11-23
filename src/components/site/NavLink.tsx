@@ -16,7 +16,7 @@ export default function NavLink({ href, children, className, icon, ...props }: N
   const active = typeof href === "string" && pathname === href
 
   return (
-    <Button asChild variant="ghost" className={cn(active ? "bg-secondary text-secondary-foreground" : "hover:bg-secondary/50", className)}>
+    <Button asChild variant="ghost" className={cn(active ? "bg-secondary text-secondary-foreground hover:bg-secondary/80 hover:text-secondary-foreground" : "hover:bg-secondary/50 hover:text-foreground", className)}>
       <Link href={href} aria-current={active ? "page" : undefined} {...props}>
         {icon ? (
           <span className="inline-flex items-center" aria-hidden="true">
