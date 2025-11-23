@@ -11,6 +11,7 @@ import {
   IconShoppingCart,
   IconInfo,
   IconMail,
+  IconGallery,
 } from "@/components/ui/icons"
 import { cn } from "@/lib/utils"
 import { Button } from "../ui/button"
@@ -18,6 +19,7 @@ import { Button } from "../ui/button"
 const links = [
   { label: "Home", href: "/", icon: <IconHome /> },
   { label: "Shop", href: "/shop", icon: <IconShoppingBag /> },
+  { label: "Inspiration", href: "/inspiration", icon: <IconGallery /> },
   { label: "About", href: "/about", icon: <IconInfo /> },
   { label: "Contact", href: "/contact", icon: <IconMail /> },
 ]
