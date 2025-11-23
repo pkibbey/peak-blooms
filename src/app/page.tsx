@@ -7,12 +7,15 @@ export default function Home() {
   return (
     <>
       <Hero 
-        title="Bloom With Beauty"
-        subtitle="Handpicked flowers and seasonal bouquets — delivered with care."
-        cta={{
-          label: "Shop bouquets",
-          href: "/shop"
-        }}
+        title="The art of Bloom"
+        subtitle="Sourced for the discerning florist."
+        cta={
+          <Button asChild>
+            <Link href="/shop" className="inline-flex items-center gap-1">
+              Explore collections
+            </Link>
+          </Button>
+        }
       />
       <div className="flex min-h-screen flex-col items-center justify-start bg-zinc-50 font-sans py-16">
         <div className="w-full max-w-5xl px-6">

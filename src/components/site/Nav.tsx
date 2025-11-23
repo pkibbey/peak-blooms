@@ -62,7 +62,7 @@ export default function Nav() {
               onClick={() => setOpen((v) => !v)}
               className={cn(
                 "inline-flex h-9 w-9 items-center justify-center focus:outline-none focus-visible:ring-2 focus-visible:ring-ring md:hidden",
-                open ? "bg-accent/30" : "hover:bg-accent/10"
+                open ? "bg-secondary/30" : "hover:bg-secondary/10"
               )}
               variant="default"
             >

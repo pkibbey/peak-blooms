@@ -1,22 +1,15 @@
-import Link from "next/link"
-import { Button } from "@/components/ui/button"
-import { IconFlower } from "@/components/ui/icons"
 import { ReactNode } from "react"
 
 interface HeroProps {
   title: string
   subtitle: string
-  cta: {
-    label: string
-    href: string
-    icon?: ReactNode
-  }
+  cta: ReactNode
 }
 
 export default function Hero({ title, subtitle, cta }: HeroProps) {
   return (
     <section className="w-full bg-hero-gradient">
-      <div className="container mx-auto px-6 py-16 md:py-20">
+      <div className="max-w-5xl mx-auto px-6 py-16 md:py-20">
         <div className="flex flex-col md:flex-row gap-6">
           {/* Left section - Content */}
           <div className="flex flex-col justify-center md:w-2/3">
@@ -27,12 +20,7 @@ export default function Hero({ title, subtitle, cta }: HeroProps) {
               {subtitle}
             </p>
             <div className="mt-6">
-              <Button asChild>
-                <Link href={cta.href} className="inline-flex items-center gap-1">
-                  {cta.icon || <IconFlower aria-hidden="true" />}
-                  {cta.label}
-                </Link>
-              </Button>
+              {cta}
             </div>
           </div>
 
