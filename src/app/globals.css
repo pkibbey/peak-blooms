@@ -74,6 +74,8 @@
   --sidebar-accent-foreground: oklch(0.208 0.042 265.755);
   --sidebar-border: oklch(0.929 0.013 255.508);
   --sidebar-ring: oklch(0.704 0.04 256.788);
+  --hero-gradient-1: rgb(78, 102, 91);
+  --hero-gradient-2: rgb(45, 47, 56);
 }
 
 @layer base {
@@ -82,5 +84,11 @@
   }
   body {
     @apply bg-background text-foreground;
+  }
+}
+
+@layer utilities {
+  .bg-hero-gradient {
+    background: radial-gradient(circle at 33% 40%, var(--hero-gradient-1), var(--hero-gradient-2));
   }
 }
