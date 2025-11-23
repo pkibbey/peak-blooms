@@ -3,15 +3,11 @@
 ### 🚀 Core Features
 
 - [ ] Add user authentication
-- [ ] Add database to the app
 - [ ] Add admin section to be able to manage content
 - [ ] Hide prices for authenticated users
 - [ ] Add information for each flower (stem length, price, count per bunch, etc)
 - [ ] Add order history for accounts
-- [ ] Add account approval page 
-- [ ]
-- [ ]
-- [ ]
+- [ ] Add account approval page
 
 ### ✨ Future Ideas
 
@@ -23,6 +19,3 @@
 - [ ] Add tracking to learn how the users are using the site
 - [ ] Collect user contact email for newsletter (overstock or flash sales)
 - [ ] Signup for newsletter to get a percentage off your first order
-- [ ]
-- [ ]
-- [ ]
