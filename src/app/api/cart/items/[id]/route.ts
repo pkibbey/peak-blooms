@@ -8,9 +8,10 @@ import { NextRequest, NextResponse } from "next/server";
  */
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const session = await auth();
 
     if (!session?.user?.email) {
@@ -31,7 +32,7 @@ export async function PATCH(
     }
 
     const cartItem = await db.cartItem.update({
-      where: { id: params.id },
+      where: { id },
       data: { quantity },
       include: { product: true },
     });
@@ -52,9 +53,10 @@ export async function PATCH(
  */
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const session = await auth();
 
     if (!session?.user?.email) {
@@ -65,7 +67,7 @@ export async function DELETE(
     }
 
     await db.cartItem.delete({
-      where: { id: params.id },
+      where: { id },
     });
 
     return NextResponse.json(

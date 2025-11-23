@@ -47,7 +47,6 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   callbacks: {
     async session({ session, user }) {
       if (session.user) {
-        // @ts-expect-error - Adding custom properties
         session.user.id = user.id;
         // @ts-expect-error - Custom user properties
         session.user.approved = user.approved;
