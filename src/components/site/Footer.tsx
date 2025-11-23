@@ -12,7 +12,13 @@ export default function Footer() {
           {/* Brand & contact */}
           <div className="flex-1 min-w-[220px]">
             <Link href="/" className="inline-flex items-center gap-3 text-lg font-semibold mb-3">
-              <Image src="/logos/peakblooms.png" alt="Peak Blooms logo" width={128} height={49} />
+              <Image
+                src="/logos/peakblooms.png"
+                alt="Peak Blooms logo"
+                width={384}
+                height={44}
+                className="h-12 w-auto"
+              />
             </Link>
 
             <p className="mt-2 text-sm text-muted-foreground max-w-md">

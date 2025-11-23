@@ -36,7 +36,14 @@ export default function Nav() {
         <div className="flex h-16 items-center justify-between">
           <div className="flex items-center gap-6">
             <Link href="/" className="inline-flex items-center gap-3 text-lg font-semibold">
-              <Image src="/logos/peakblooms.png" alt="Peak Blooms logo" width={128} height={49} />
+              <Image 
+                src="/logos/peakblooms.png"
+                alt="Peak Blooms logo"
+                width={384}
+                height={44}
+                loading="eager"
+                className="h-8 w-auto"
+              />
             </Link>
 
             <nav className="hidden md:flex md:items-center md:gap-1 md:ml-2" aria-label="Primary">
