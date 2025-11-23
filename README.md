@@ -41,3 +41,7 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 - **Framework:** [Next.js](https://nextjs.org)
 - **Styling:** Tailwind CSS
 - **Font:** [Geist](https://vercel.com/font)
+
+## Conventions
+
+UI primitives are located in `src/components/ui/`. For consistent visual tokens, accessible keyboard/focus behavior, and predictable styling, use the shared `Button` component for all interactive controls and CTAs. To style a Next.js `Link` like a button, use the `Button` component's `asChild` API and place the `Link` inside it so routing semantics are preserved.

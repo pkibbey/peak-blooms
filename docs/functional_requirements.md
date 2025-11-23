@@ -49,6 +49,9 @@ Peak Blooms is a wholesale flower shop application designed to operate as a clea
 - **Global Navigation:** Persistent top-level menu.
 - **Interaction:** Menu items must be directly accessible; no hiding items in mouseover dropdowns.
 
+### UI Controls / Buttons
+- **Consistency requirement:** All primary, secondary, and interactive controls (CTAs, cart links, menu toggles, etc.) MUST use the shared `Button` primitive located at `src/components/ui/button.tsx`. This guarantees consistent visuals, behavior, and keyboard/focus accessibility across the application. Use `asChild` when wrapping Next.js `Link` to preserve routing semantics while applying button styling.
+
 ### Analytics & Lead Generation
 - **Usage Stats:** Collection of user behavior data to inform UI improvements.
 - **Lead Collection:** Mechanisms to capture details from potential new business leads (e.g., inquiry forms, newsletter signup for guests).

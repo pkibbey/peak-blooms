@@ -13,6 +13,7 @@ import {
   IconMail,
 } from "@/components/ui/icons"
 import { cn } from "@/lib/utils"
+import { Button } from "../ui/button"
 
 const links = [
   { label: "Home", href: "/", icon: <IconHome /> },
@@ -49,23 +50,24 @@ export default function Nav() {
 
           <div className="flex items-center gap-4">
             <div className="hidden md:block">
-              <Link href="/cart" className="inline-flex items-center gap-2 px-3 py-2 text-sm rounded-md hover:bg-accent/50">
+              <Link href="/cart" className="inline-flex items-center gap-1">
                 <IconShoppingCart aria-hidden="true" />
                 <span>Cart</span>
               </Link>
             </div>
 
-            <button
+            <Button
               aria-label={open ? "Close menu" : "Open menu"}
               aria-expanded={open}
               onClick={() => setOpen((v) => !v)}
               className={cn(
-                "inline-flex h-9 w-9 items-center justify-center rounded-md focus:outline-none focus-visible:ring-2 focus-visible:ring-ring md:hidden",
+                "inline-flex h-9 w-9 items-center justify-center focus:outline-none focus-visible:ring-2 focus-visible:ring-ring md:hidden",
                 open ? "bg-accent/30" : "hover:bg-accent/10"
               )}
+              variant="default"
             >
               {open ? <IconX aria-hidden="true" /> : <IconMenu aria-hidden="true" />}
-            </button>
+            </Button>
           </div>
         </div>
 
@@ -78,10 +80,12 @@ export default function Nav() {
                   {l.label}
                 </NavLink>
               ))}
-              <Link href="/cart" className="inline-flex items-center gap-2 px-4 py-2 text-sm rounded-md hover:bg-accent/50">
-                <IconShoppingCart aria-hidden="true" />
-                <span>Cart</span>
-              </Link>
+              <Button asChild variant="ghost">
+                <Link href="/cart" className="inline-flex items-center gap-1 px-4 py-2">
+                  <IconShoppingCart aria-hidden="true" />
+                  <span>Cart</span>
+                </Link>
+              </Button>
             </div>
           </div>
         )}

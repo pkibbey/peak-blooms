@@ -19,7 +19,7 @@ The site aims for a clean, professional, modern, and high-quality aesthetic that
 ## UI Components
 
 ### Cards (Products, Content)
-- **Shape:** Very subtle rounded corners (e.g., `rounded-sm` or `rounded-md` in Tailwind).
+- **Shape:** Very subtle rounded corners (`rounded-sm` in Tailwind).
 - **Depth:** Slight drop shadows to create a sense of depth and separation from the background (e.g., `shadow-sm` or `shadow-md`).
 - **Behavior:** Clean hover states that might slightly elevate the card or intensify the shadow.
 
