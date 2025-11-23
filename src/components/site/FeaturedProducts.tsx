@@ -1,36 +1,52 @@
+"use client";
+
 import { Button } from "@/components/ui/button";
 import { IconArrowRight } from "@/components/ui/icons";
 import Link from "next/link";
 import Image from "next/image";
+import { useEffect, useState } from "react";
 
-const products = [
-  {
-    name: "Green Fluffy",
-    subtitle: "Lush and voluminous",
-    image: "/featured-products/green-fluffy.jpg",
-    slug: "green-fluffy",
-  },
-  {
-    name: "Peach Flower",
-    subtitle: "Warm and inviting",
-    image: "/featured-products/peach-flower.jpg",
-    slug: "peach-flower",
-  },
-  {
-    name: "Pink Rose",
-    subtitle: "Elegant and romantic",
-    image: "/featured-products/pink-rose.jpg",
-    slug: "pink-rose",
-  },
-  {
-    name: "Playa Blanca",
-    subtitle: "Pristine white beauty",
-    image: "/featured-products/playa-blanca.jpg",
-    slug: "playa-blanca",
-  },
-];
+interface Product {
+  id: string;
+  name: string;
+  slug: string;
+  description?: string;
+  image?: string;
+  price: number;
+}
 
 export default function FeaturedProducts() {
+  const [products, setProducts] = useState<Product[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const response = await fetch("/api/products?featured=true");
+        if (response.ok) {
+          const data = await response.json();
+          setProducts(data);
+        }
+      } catch (error) {
+        console.error("Failed to fetch featured products:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchProducts();
+  }, []);
+
+  if (isLoading) {
+    return (
+      <div className="flex flex-col items-center justify-start bg-white py-16 font-sans">
+        <div className="w-full max-w-5xl px-6">
+          <p className="text-muted-foreground">Loading featured products...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="flex flex-col items-center justify-start bg-white py-16 font-sans">
       <div className="w-full max-w-5xl px-6">
@@ -54,13 +70,15 @@ export default function FeaturedProducts() {
             >
               {/* Image Container */}
               <div className="relative aspect-square overflow-hidden bg-zinc-200">
-                <Image
-                  src={product.image}
-                  alt={product.name}
-                  fill
-                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
-                  className="object-cover transition-transform duration-300 group-hover:scale-105"
-                />
+                {product.image && (
+                  <Image
+                    src={product.image}
+                    alt={product.name}
+                    fill
+                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
+                    className="object-cover transition-transform duration-300 group-hover:scale-105"
+                  />
+                )}
               </div>
 
               {/* Card Content */}
@@ -68,7 +86,7 @@ export default function FeaturedProducts() {
                 <div>
                   <h3 className="text-xl font-bold font-serif">{product.name}</h3>
                   <p className="mt-2 text-sm text-muted-foreground">
-                    {product.subtitle}
+                    {product.description}
                   </p>
                 </div>
 

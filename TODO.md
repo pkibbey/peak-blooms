@@ -3,6 +3,7 @@
 ### 🚀 Core Features
 
 - [ ] Add user authentication
+- [ ] Move the static data into the database
 - [ ] Add admin section to be able to manage content
 - [ ] Hide prices for authenticated users
 - [ ] Add information for each flower (stem length, price, count per bunch, etc)
