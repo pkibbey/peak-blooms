@@ -7,9 +7,10 @@ import { cn } from "@/lib/utils"
 type NavLinkProps = LinkProps & {
   children: React.ReactNode
   className?: string
+  icon?: React.ReactNode
 }
 
-export default function NavLink({ href, children, className, ...props }: NavLinkProps) {
+export default function NavLink({ href, children, className, icon, ...props }: NavLinkProps) {
   const pathname = usePathname()
   const active = typeof href === "string" && pathname === href
 
@@ -24,6 +25,12 @@ export default function NavLink({ href, children, className, ...props }: NavLink
       )}
       {...props}
     >
+      {icon ? (
+        <span className="inline-flex items-center mr-2" aria-hidden="true">
+          {icon}
+        </span>
+      ) : null}
+
       {children}
     </Link>
   )

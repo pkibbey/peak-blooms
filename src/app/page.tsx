@@ -1,3 +1,5 @@
+import { IconShoppingBag, IconInfo } from "@/components/ui/icons"
+
 export default function Home() {
   return (
     <div className="flex min-h-screen flex-col items-center justify-start bg-zinc-50 font-sans py-16">
@@ -7,8 +9,14 @@ export default function Home() {
           <p className="mt-2 text-muted-foreground">Handpicked flowers and seasonal bouquets — delivered with care.</p>
 
           <div className="mt-6 flex gap-3">
-            <a href="/shop" className="inline-block rounded-md bg-primary px-4 py-2 text-white">Shop bouquets</a>
-            <a href="/about" className="inline-block rounded-md border px-4 py-2">Learn more</a>
+            <a href="/shop" className="inline-block rounded-md bg-primary px-4 py-2 text-white inline-flex items-center">
+              <IconShoppingBag aria-hidden="true" className="mr-2" />
+              Shop bouquets
+            </a>
+            <a href="/about" className="inline-block rounded-md border px-4 py-2 inline-flex items-center gap-2">
+              <IconInfo aria-hidden="true" />
+              Learn more
+            </a>
           </div>
         </section>
       </div>
