@@ -1,8 +1,8 @@
 import Link from "next/link";
 import Image from "next/image";
-import { inspirationSets, type InspirationSet } from "@/components/site/FeaturedInspiration";
 import { notFound } from "next/navigation";
 import AddToCartButton from "@/components/site/AddToCartButton";
+import { db } from "@/lib/db";
 
 interface InspirationDetailPageProps {
   params: Promise<{
@@ -11,30 +11,36 @@ interface InspirationDetailPageProps {
 }
 
 export async function generateStaticParams() {
-  return inspirationSets.map((set) => ({
+  const sets = await db.inspirationSet.findMany({
+    select: { slug: true },
+  });
+  return sets.map((set) => ({
     slug: set.slug,
   }));
 }
 
-export function generateMetadata({ params }: InspirationDetailPageProps) {
-  const unwrappedParams = Promise.resolve(params);
-  return unwrappedParams.then((p) => {
-    const set = inspirationSets.find((s) => s.slug === p.slug);
-    if (!set) return {};
-    return {
-      title: `${set.name} - Inspirational Sets`,
-      description: set.subtitle,
-    };
+export async function generateMetadata({ params }: InspirationDetailPageProps) {
+  const { slug } = await params;
+  const set = await db.inspirationSet.findUnique({
+    where: { slug },
   });
+  if (!set) return {};
+  return {
+    title: `${set.name} - Inspirational Sets`,
+    description: set.subtitle,
+  };
 }
 
 export default async function InspirationDetailPage({
   params,
 }: InspirationDetailPageProps) {
   const { slug } = await params;
-  const set: InspirationSet | undefined = inspirationSets.find(
-    (s) => s.slug === slug
-  );
+  const set = await db.inspirationSet.findUnique({
+    where: { slug },
+    include: {
+      products: true,
+    },
+  });
 
   if (!set) {
     notFound();

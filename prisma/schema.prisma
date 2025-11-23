@@ -80,6 +80,20 @@ model Category {
   products  Product[]
 }
 
+model InspirationSet {
+  id              String    @id @default(cuid())
+  name            String
+  slug            String    @unique
+  subtitle        String
+  image           String
+  excerpt         String    @db.Text
+  inspirationText String    @db.Text
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  products        Product[]
+}
+
 model Product {
   id              String    @id @default(cuid())
   name            String
@@ -98,6 +112,7 @@ model Product {
   category        Category  @relation(fields: [categoryId], references: [id], onDelete: Cascade)
   cartItems       CartItem[]
   orderItems      OrderItem[]
+  inspirationSets InspirationSet[]
 
   @@index([categoryId])
   @@index([slug])

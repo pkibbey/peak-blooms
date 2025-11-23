@@ -56,6 +56,7 @@ export const ModelName = {
   VerificationToken: 'VerificationToken',
   User: 'User',
   Category: 'Category',
+  InspirationSet: 'InspirationSet',
   Product: 'Product',
   ShoppingCart: 'ShoppingCart',
   CartItem: 'CartItem',
@@ -141,6 +142,21 @@ export const CategoryScalarFieldEnum = {
 } as const
 
 export type CategoryScalarFieldEnum = (typeof CategoryScalarFieldEnum)[keyof typeof CategoryScalarFieldEnum]
+
+
+export const InspirationSetScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  slug: 'slug',
+  subtitle: 'subtitle',
+  image: 'image',
+  excerpt: 'excerpt',
+  inspirationText: 'inspirationText',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type InspirationSetScalarFieldEnum = (typeof InspirationSetScalarFieldEnum)[keyof typeof InspirationSetScalarFieldEnum]
 
 
 export const ProductScalarFieldEnum = {

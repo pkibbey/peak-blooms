@@ -65,6 +65,11 @@ export type User = Prisma.UserModel
  */
 export type Category = Prisma.CategoryModel
 /**
+ * Model InspirationSet
+ * 
+ */
+export type InspirationSet = Prisma.InspirationSetModel
+/**
  * Model Product
  * 
  */

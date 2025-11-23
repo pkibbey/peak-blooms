@@ -1,10 +1,12 @@
 import Link from "next/link";
 import Image from "next/image";
-import { inspirationSets } from "@/components/site/FeaturedInspiration";
 import { Button } from "@/components/ui/button";
 import { IconArrowRight } from "@/components/ui/icons";
+import { db } from "@/lib/db";
 
-export default function InspirationPage() {
+export default async function InspirationPage() {
+  const inspirationSets = await db.inspirationSet.findMany();
+
   return (
     <div className="flex flex-col items-center justify-start bg-white py-16 font-sans">
       <div className="w-full max-w-3xl px-6">

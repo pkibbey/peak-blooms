@@ -1,51 +1,16 @@
-"use client";
-
 import { Button } from "@/components/ui/button";
 import { IconArrowRight } from "@/components/ui/icons";
 import Link from "next/link";
 import Image from "next/image";
-import { useEffect, useState } from "react";
+import { db } from "@/lib/db";
 
-interface Product {
-  id: string;
-  name: string;
-  slug: string;
-  description?: string;
-  image?: string;
-  price: number;
-}
-
-export default function FeaturedProducts() {
-  const [products, setProducts] = useState<Product[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-
-  useEffect(() => {
-    const fetchProducts = async () => {
-      try {
-        const response = await fetch("/api/products?featured=true");
-        if (response.ok) {
-          const data = await response.json();
-          setProducts(data);
-        }
-      } catch (error) {
-        console.error("Failed to fetch featured products:", error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchProducts();
-  }, []);
-
-  if (isLoading) {
-    return (
-      <div className="flex flex-col items-center justify-start bg-white py-16 font-sans">
-        <div className="w-full max-w-5xl px-6">
-          <p className="text-muted-foreground">Loading featured products...</p>
-        </div>
-      </div>
-    );
-  }
+export default async function FeaturedProducts() {
+  const products = await db.product.findMany({
+    where: {
+      featured: true,
+    },
+    take: 4,
+  });
 
   return (
     <div className="flex flex-col items-center justify-start bg-white py-16 font-sans">

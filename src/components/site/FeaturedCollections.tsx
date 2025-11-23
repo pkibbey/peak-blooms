@@ -1,49 +1,11 @@
-"use client";
-
 import { Button } from "@/components/ui/button";
 import { IconArrowRight } from "@/components/ui/icons";
 import Link from "next/link";
 import Image from "next/image";
-import { useEffect, useState } from "react";
+import { db } from "@/lib/db";
 
-interface Category {
-  id: string;
-  name: string;
-  slug: string;
-  image?: string;
-}
-
-export default function FeaturedCollections() {
-  const [categories, setCategories] = useState<Category[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-
-  useEffect(() => {
-    const fetchCategories = async () => {
-      try {
-        const response = await fetch("/api/categories");
-        if (response.ok) {
-          const data = await response.json();
-          setCategories(data);
-        }
-      } catch (error) {
-        console.error("Failed to fetch categories:", error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchCategories();
-  }, []);
-
-  if (isLoading) {
-    return (
-      <div className="flex flex-col items-center justify-start bg-white py-16 font-sans">
-        <div className="w-full max-w-5xl px-6">
-          <p className="text-muted-foreground">Loading collections...</p>
-        </div>
-      </div>
-    );
-  }
+export default async function FeaturedCollections() {
+  const categories = await db.category.findMany();
 
   return (
     <div className="flex flex-col items-center justify-start bg-white py-16 font-sans">
