@@ -16,6 +16,10 @@ The site aims for a clean, professional, modern, and high-quality aesthetic that
 - **Elegant Green:** Used for primary actions (e.g., "Add to Cart"), success states, and nature-related highlights.
 - **Crimson:** Used for call-to-action buttons, alerts, or specific design highlights to add vibrancy and contrast.
 
+## Color Mode (Theme)
+
+This site intentionally uses a single, default light theme and will never offer a dark theme option. All design tokens, component styles, and layout choices should assume a consistent light appearance (white backgrounds, dark grey text, muted greys for borders) so photography and brand colors remain consistent across devices. Do not add a color-mode toggle or dark-mode-specific styles — the product's visual identity is intentionally single-theme and optimized for a bright, light-first experience.
+
 ## UI Components
 
 ### Cards (Products, Content)
