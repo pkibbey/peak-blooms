@@ -50,7 +50,7 @@ export default function FeaturedProducts() {
           {products.map((product) => (
             <div
               key={product.slug}
-              className="group flex flex-col overflow-hidden rounded-lg shadow-md transition-shadow hover:shadow-lg"
+              className="group flex flex-col overflow-hidden rounded-xs shadow-md transition-shadow hover:shadow-lg"
             >
               {/* Image Container */}
               <div className="relative aspect-square overflow-hidden bg-zinc-200">

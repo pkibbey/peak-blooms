@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import Hero from "@/components/site/Hero";
-import FeaturedCategories from "@/components/site/FeaturedCategories";
+import FeaturedCollections from "@/components/site/FeaturedCollections";
 import FeaturedProducts from "@/components/site/FeaturedProducts";
 
 export default function Home() {
@@ -18,7 +18,7 @@ export default function Home() {
           </Button>
         }
       />
-      <FeaturedCategories />
+      <FeaturedCollections />
       <FeaturedProducts />
     </>
   );

@@ -31,6 +31,7 @@
   --color-popover: var(--popover);
   --color-card-foreground: var(--card-foreground);
   --color-card: var(--card);
+  --radius-xs: calc(var(--radius) - 6px);
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
@@ -82,5 +83,9 @@
 @layer utilities {
   .bg-hero-gradient {
     background: radial-gradient(circle at 33% 40%, var(--hero-gradient-1), var(--hero-gradient-2));
+  }
+  /* extra-small radius utility (smaller than rounded-sm) */
+  .rounded-xs {
+    border-radius: var(--radius-xs);
   }
 }
