@@ -2,6 +2,7 @@ import { Button } from "@/components/ui/button";
 import { IconShoppingBag, IconInfo } from "@/components/ui/icons"
 import Link from "next/link";
 import Hero from "@/components/site/Hero";
+import FeaturedCategories from "@/components/site/FeaturedCategories";
 
 export default function Home() {
   return (
@@ -17,6 +18,7 @@ export default function Home() {
           </Button>
         }
       />
+      <FeaturedCategories />
       <div className="flex min-h-screen flex-col items-center justify-start bg-zinc-50 font-sans py-16">
         <div className="w-full max-w-5xl px-6">
           <section className="rounded-xl bg-white/80 p-8 shadow-lg">
