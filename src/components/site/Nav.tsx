@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import Image from "next/image"
 import Link from "next/link"
 import NavLink from "@/components/site/NavLink"
 import {
@@ -35,8 +36,7 @@ export default function Nav() {
         <div className="flex h-16 items-center justify-between">
           <div className="flex items-center gap-6">
             <Link href="/" className="inline-flex items-center gap-3 text-lg font-semibold">
-              <span className="inline-block h-8 w-8 rounded-full bg-gradient-to-br from-pink-400 via-rose-400 to-amber-400 shadow" />
-              <span className="hidden sm:inline">Peak Blooms</span>
+              <Image src="/logos/peakblooms.png" alt="Peak Blooms logo" width={128} height={49} />
             </Link>
 
             <nav className="hidden md:flex md:items-center md:gap-1 md:ml-2" aria-label="Primary">

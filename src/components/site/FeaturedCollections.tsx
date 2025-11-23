@@ -30,7 +30,7 @@ export default function FeaturedCollections() {
       <div className="w-full max-w-5xl px-6">
         <div className="mb-12 flex items-end justify-between">
           <div>
-            <h2 className="text-3xl font-extrabold">Featured Collections</h2>
+            <h2 className="text-3xl font-extrabold font-serif">Featured Collections</h2>
             <p className="mt-2 text-muted-foreground">
               Discover our curated selection of premium flower collections
             </p>
@@ -52,6 +52,8 @@ export default function FeaturedCollections() {
                   src={collection.image}
                   alt={collection.name}
                   fill
+                  loading="eager"
+                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                   className="object-cover transition-transform duration-300 group-hover:scale-105"
                 />
               </div>
@@ -59,7 +61,7 @@ export default function FeaturedCollections() {
               {/* Card Content */}
               <div className="flex flex-col justify-between bg-white p-6">
                 <div>
-                  <h3 className="text-xl font-bold">{collection.name}</h3>
+                  <h3 className="text-xl font-bold font-serif">{collection.name}</h3>
                   <p className="mt-2 text-sm text-muted-foreground">
                     {collection.subtitle}
                   </p>

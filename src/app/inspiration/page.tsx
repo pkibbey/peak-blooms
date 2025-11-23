@@ -10,7 +10,7 @@ export default function InspirationPage() {
       <div className="w-full max-w-3xl px-6">
         {/* Page Header */}
         <div className="mb-16">
-          <h1 className="text-4xl font-extrabold">Inspirational Sets</h1>
+          <h1 className="text-4xl font-extrabold font-serif">Inspirational Sets</h1>
           <p className="mt-4 text-lg text-muted-foreground">
             Curated flower arrangements designed by our artisans to inspire and delight. 
             Explore each set to discover the story behind the arrangement and order complete 

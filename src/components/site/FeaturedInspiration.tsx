@@ -83,7 +83,7 @@ export default function FeaturedInspiration() {
       <div className="w-full max-w-5xl px-6">
         <div className="mb-12 flex items-end justify-between">
           <div>
-            <h2 className="text-3xl font-extrabold">Inspirational Sets</h2>
+            <h2 className="text-3xl font-extrabold font-serif">Inspirational Sets</h2>
             <p className="mt-2 text-muted-foreground">
               Discover curated flower arrangements designed to inspire and delight
             </p>
@@ -118,7 +118,7 @@ export default function FeaturedInspiration() {
 
               {/* Content Container */}
               <div className="w-full md:w-1/3 flex flex-col justify-center">
-                <h3 className="text-2xl font-bold">{set.name}</h3>
+                <h3 className="text-2xl font-bold font-serif">{set.name}</h3>
                 <p className="mt-2 text-sm text-muted-foreground">
                   {set.subtitle}
                 </p>

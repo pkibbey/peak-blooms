@@ -1,6 +1,7 @@
 "use client"
 
 import Link from "next/link"
+import Image from "next/image"
 import { IconMail, IconShoppingBag, IconInfo, IconTwitter, IconInstagram, IconFacebook } from "@/components/ui/icons"
 
 export default function Footer() {
@@ -11,8 +12,7 @@ export default function Footer() {
           {/* Brand & contact */}
           <div className="flex-1 min-w-[220px]">
             <Link href="/" className="inline-flex items-center gap-3 text-lg font-semibold mb-3">
-              <span className="inline-block h-8 w-8 rounded-full bg-gradient-to-br from-pink-400 via-rose-400 to-amber-400 shadow" />
-              <span>Peak Blooms</span>
+              <Image src="/logos/peakblooms.png" alt="Peak Blooms logo" width={128} height={49} />
             </Link>
 
             <p className="mt-2 text-sm text-muted-foreground max-w-md">
@@ -21,17 +21,17 @@ export default function Footer() {
 
             <div className="mt-4 flex items-center gap-4 text-sm text-muted-foreground">
               <IconMail aria-hidden="true" />
-              <a href="mailto:hello@peakblooms.example" className="hover:underline">hello@peakblooms.example</a>
+              <a href="mailto:hello@peakblooms.com" className="hover:underline">hello@peakblooms.com</a>
             </div>
 
             <div className="mt-4 flex items-center gap-3">
-              <a href="https://twitter.com/" aria-label="Twitter" className="text-muted-foreground hover:text-foreground">
+              <a href="https://twitter.com/peakblooms" aria-label="Twitter" className="text-muted-foreground hover:text-foreground">
                 <IconTwitter />
               </a>
-              <a href="https://instagram.com/" aria-label="Instagram" className="text-muted-foreground hover:text-foreground">
+              <a href="https://instagram.com/peakblooms" aria-label="Instagram" className="text-muted-foreground hover:text-foreground">
                 <IconInstagram />
               </a>
-              <a href="https://facebook.com/" aria-label="Facebook" className="text-muted-foreground hover:text-foreground">
+              <a href="https://facebook.com/peakblooms" aria-label="Facebook" className="text-muted-foreground hover:text-foreground">
                 <IconFacebook />
               </a>
             </div>

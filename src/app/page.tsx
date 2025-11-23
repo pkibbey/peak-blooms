@@ -9,7 +9,7 @@ export default function Home() {
   return (
     <>
       <Hero 
-        title="The art of Bloom"
+        title="The art of bloom"
         subtitle="Sourced for the discerning florist."
         cta={
           <Button asChild>

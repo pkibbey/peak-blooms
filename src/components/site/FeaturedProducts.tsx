@@ -58,6 +58,7 @@ export default function FeaturedProducts() {
                   src={product.image}
                   alt={product.name}
                   fill
+                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
                   className="object-cover transition-transform duration-300 group-hover:scale-105"
                 />
               </div>
@@ -65,7 +66,7 @@ export default function FeaturedProducts() {
               {/* Card Content */}
               <div className="flex flex-col justify-between bg-white p-6">
                 <div>
-                  <h3 className="text-xl font-bold">{product.name}</h3>
+                  <h3 className="text-xl font-bold font-serif">{product.name}</h3>
                   <p className="mt-2 text-sm text-muted-foreground">
                     {product.subtitle}
                   </p>

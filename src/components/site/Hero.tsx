@@ -13,10 +13,10 @@ export default function Hero({ title, subtitle, cta }: HeroProps) {
         <div className="flex flex-col md:flex-row gap-6">
           {/* Left section - Content */}
           <div className="flex flex-col justify-center md:w-2/3">
-            <h1 className="text-4xl md:text-5xl font-extrabold text-white">
+            <h1 className="text-4xl md:text-5xl font-extrabold text-white font-serif">
               {title}
             </h1>
-            <p className="mt-4 text-lg text-white/80">
+            <p className="mt-3 text-lg text-white/80">
               {subtitle}
             </p>
             <div className="mt-6">
