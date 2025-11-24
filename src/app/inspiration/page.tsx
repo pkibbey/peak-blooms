@@ -32,7 +32,7 @@ export default async function InspirationPage() {
               {/* Image Container */}
               <div className="w-full md:w-1/2 flex-shrink-0">
                 <Link href={`/inspiration/${set.slug}`} className="block">
-                  <div className="relative aspect-square overflow-hidden rounded-xs shadow-md hover:shadow-lg transition-shadow">
+                  <div className="relative aspect-video overflow-hidden rounded-xs shadow-md hover:shadow-lg transition-shadow">
                     <Image
                       src={set.image}
                       alt={set.name}

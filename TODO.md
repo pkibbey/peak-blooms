@@ -20,3 +20,4 @@
 - [ ] Collect user contact email for newsletter (overstock or flash sales)
 - [ ] Signup for newsletter to get a percentage off your first order
 - [ ] Detect missing images that have failed to load and add tracking to this, so that the entry can be fixed
+- [ ] make sure that the data is not just hidden from the UI, but also not returned in the database calls for unauthenticated users also
