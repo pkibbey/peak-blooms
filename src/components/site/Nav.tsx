@@ -10,7 +10,7 @@ import {
   IconMenu,
   IconX,
   IconShoppingCart,
-  IconGallery,
+  IconRose,
   IconFlower,
 } from "@/components/ui/icons"
 import { cn } from "@/lib/utils"
@@ -20,7 +20,7 @@ const links = [
   { label: "Home", href: "/", icon: <IconHome /> },
   { label: "Shop", href: "/shop", icon: <IconShoppingBag /> },
   { label: "Collections", href: "/collections", icon: <IconFlower /> },
-  { label: "Inspiration", href: "/inspiration", icon: <IconGallery /> },
+  { label: "Inspiration", href: "/inspiration", icon: <IconRose /> },
 ]
 
 export default function Nav() {

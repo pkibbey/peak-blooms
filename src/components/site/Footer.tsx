@@ -2,7 +2,7 @@
 
 import Link from "next/link"
 import Image from "next/image"
-import { IconMail, IconShoppingBag, IconInfo, IconTwitter, IconInstagram, IconFacebook } from "@/components/ui/icons"
+import { IconMail, IconShoppingBag, IconInfo, IconInstagram, IconFacebook } from "@/components/ui/icons"
 
 export default function Footer() {
   return (
@@ -31,9 +31,6 @@ export default function Footer() {
             </div>
 
             <div className="mt-4 flex items-center gap-3">
-              <a href="https://twitter.com/peakblooms" aria-label="Twitter" className="text-muted-foreground hover:text-foreground">
-                <IconTwitter />
-              </a>
               <a href="https://instagram.com/peakblooms" aria-label="Instagram" className="text-muted-foreground hover:text-foreground">
                 <IconInstagram />
               </a>
@@ -50,7 +47,7 @@ export default function Footer() {
               <ul className="mt-3 text-sm text-muted-foreground space-y-2">
                 <li><Link href="/shop" className="hover:underline inline-flex items-center gap-2"><IconShoppingBag />Shop</Link></li>
                 <li><Link href="/collections" className="hover:underline">Collections</Link></li>
-                <li><Link href="/featured" className="hover:underline">Featured</Link></li>
+                <li><Link href="/inspiration" className="hover:underline">Inspiration</Link></li>
               </ul>
             </div>
 
