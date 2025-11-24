@@ -58,6 +58,7 @@ export const ModelName = {
   Category: 'Category',
   InspirationSet: 'InspirationSet',
   Product: 'Product',
+  ProductVariant: 'ProductVariant',
   ShoppingCart: 'ShoppingCart',
   CartItem: 'CartItem',
   Order: 'Order',
@@ -179,6 +180,20 @@ export const ProductScalarFieldEnum = {
 export type ProductScalarFieldEnum = (typeof ProductScalarFieldEnum)[keyof typeof ProductScalarFieldEnum]
 
 
+export const ProductVariantScalarFieldEnum = {
+  id: 'id',
+  productId: 'productId',
+  price: 'price',
+  stemLength: 'stemLength',
+  countPerBunch: 'countPerBunch',
+  stock: 'stock',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type ProductVariantScalarFieldEnum = (typeof ProductVariantScalarFieldEnum)[keyof typeof ProductVariantScalarFieldEnum]
+
+
 export const ShoppingCartScalarFieldEnum = {
   id: 'id',
   userId: 'userId',
@@ -195,7 +210,8 @@ export const CartItemScalarFieldEnum = {
   productId: 'productId',
   quantity: 'quantity',
   createdAt: 'createdAt',
-  updatedAt: 'updatedAt'
+  updatedAt: 'updatedAt',
+  productVariantId: 'productVariantId'
 } as const
 
 export type CartItemScalarFieldEnum = (typeof CartItemScalarFieldEnum)[keyof typeof CartItemScalarFieldEnum]
@@ -218,7 +234,8 @@ export const OrderItemScalarFieldEnum = {
   orderId: 'orderId',
   productId: 'productId',
   quantity: 'quantity',
-  price: 'price'
+  price: 'price',
+  productVariantId: 'productVariantId'
 } as const
 
 export type OrderItemScalarFieldEnum = (typeof OrderItemScalarFieldEnum)[keyof typeof OrderItemScalarFieldEnum]

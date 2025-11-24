@@ -6,6 +6,7 @@ import { IconArrowRight } from "@/components/ui/icons";
 import { FeaturedInInspirationSets } from "@/components/site/FeaturedInInspirationSets";
 import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
+import { ProductConfigurator } from "@/components/site/ProductConfigurator";
 
 interface ProductDetailPageProps {
   params: Promise<{
@@ -47,6 +48,7 @@ export default async function ProductDetailPage({
     include: {
       category: true,
       inspirationSets: true,
+      variants: true,
     },
   });
 
@@ -107,17 +109,6 @@ export default async function ProductDetailPage({
               </p>
             </div>
 
-            {/* Price */}
-            {showPrice ? (
-              <div className="text-3xl font-bold text-primary">
-                ${product.price.toFixed(2)}
-              </div>
-            ) : (
-              <div className="text-sm text-muted-foreground italic">
-                Sign in to view pricing
-              </div>
-            )}
-
             {/* Description */}
             <div>
               <p className="text-lg text-muted-foreground">
@@ -125,48 +116,8 @@ export default async function ProductDetailPage({
               </p>
             </div>
 
-            {/* Product Specs */}
-            {(product.stemLength || product.countPerBunch || product.stock > 0) && (
-              <div className="border-t border-b border-gray-200 py-6">
-                <div className="grid grid-cols-2 gap-4">
-                  {product.stemLength && (
-                    <div>
-                      <h3 className="text-sm font-semibold text-muted-foreground mb-1">
-                        Stem Length
-                      </h3>
-                      <p className="text-lg font-bold">
-                        {product.stemLength} cm
-                      </p>
-                    </div>
-                  )}
-                  {product.countPerBunch && (
-                    <div>
-                      <h3 className="text-sm font-semibold text-muted-foreground mb-1">
-                        Count per Bunch
-                      </h3>
-                      <p className="text-lg font-bold">
-                        {product.countPerBunch} stems
-                      </p>
-                    </div>
-                  )}
-                </div>
-              </div>
-            )}
-
-            {/* Add to Cart Button */}
-            {showPrice && product.stock > 0 ? (
-              <Button size="lg" className="w-full">
-                Add to Cart
-              </Button>
-            ) : !showPrice ? (
-              <Button size="lg" className="w-full" asChild>
-                <Link href="/auth/signin">Sign In to Purchase</Link>
-              </Button>
-            ) : (
-              <Button size="lg" className="w-full" disabled>
-                Out of Stock
-              </Button>
-            )}
+            {/* Product Configurator */}
+            <ProductConfigurator product={product} showPrice={showPrice} />
 
             {/* Related Links */}
             <div className="pt-4">

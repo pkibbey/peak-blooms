@@ -56,6 +56,7 @@ export async function getOrCreateCart() {
       items: {
         include: {
           product: true,
+          productVariant: true,
         },
       },
     },
@@ -70,6 +71,7 @@ export async function getOrCreateCart() {
         items: {
           include: {
             product: true,
+            productVariant: true,
           },
         },
       },
@@ -83,9 +85,14 @@ export async function getOrCreateCart() {
  * Calculate cart total
  */
 export function calculateCartTotal(
-  cartItems: Array<{ product: { price: number }; quantity: number }>
+  cartItems: Array<{
+    product: { price: number };
+    productVariant?: { price: number } | null;
+    quantity: number;
+  }>
 ) {
   return cartItems.reduce((total, item) => {
-    return total + item.product.price * item.quantity;
+    const price = item.productVariant?.price ?? item.product.price;
+    return total + price * item.quantity;
   }, 0);
 }

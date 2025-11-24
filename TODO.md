@@ -8,6 +8,7 @@
 - [ ] Add information for each flower (stem length, price, count per bunch, etc)
 - [ ] Add order history for accounts
 - [ ] Add account approval page
+- [ ] products on the inspiration pages should have small preview images in the table also
 
 ### ✨ Future Ideas
 

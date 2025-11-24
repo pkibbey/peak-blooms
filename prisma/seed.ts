@@ -21,6 +21,7 @@ async function main() {
   await prisma.cartItem.deleteMany({});
   await prisma.order.deleteMany({});
   await prisma.shoppingCart.deleteMany({});
+  await prisma.productVariant.deleteMany({});
   await prisma.product.deleteMany({});
   await prisma.category.deleteMany({});
   await prisma.inspirationSet.deleteMany({});
@@ -65,6 +66,13 @@ async function main() {
       countPerBunch: 8,
       categoryId: exoticBlooms.id,
       featured: true,
+      variants: {
+        create: [
+          { price: 65.0, stemLength: 45, countPerBunch: 8, stock: 100 },
+          { price: 75.0, stemLength: 55, countPerBunch: 8, stock: 50 },
+          { price: 120.0, stemLength: 45, countPerBunch: 16, stock: 20 },
+        ],
+      },
     },
   });
 
@@ -79,6 +87,12 @@ async function main() {
       countPerBunch: 6,
       categoryId: exoticBlooms.id,
       featured: true,
+      variants: {
+        create: [
+          { price: 55.0, stemLength: 40, countPerBunch: 6, stock: 80 },
+          { price: 65.0, stemLength: 50, countPerBunch: 6, stock: 40 },
+        ],
+      },
     },
   });
 
@@ -93,6 +107,13 @@ async function main() {
       countPerBunch: 5,
       categoryId: classicRoses.id,
       featured: false,
+      variants: {
+        create: [
+          { price: 75.0, stemLength: 50, countPerBunch: 5, stock: 100 },
+          { price: 90.0, stemLength: 60, countPerBunch: 5, stock: 60 },
+          { price: 140.0, stemLength: 50, countPerBunch: 10, stock: 30 },
+        ],
+      },
     },
   });
 
@@ -107,6 +128,12 @@ async function main() {
       countPerBunch: 10,
       categoryId: seasonalWildflowers.id,
       featured: false,
+      variants: {
+        create: [
+          { price: 45.0, stemLength: 35, countPerBunch: 10, stock: 150 },
+          { price: 55.0, stemLength: 45, countPerBunch: 10, stock: 75 },
+        ],
+      },
     },
   });
 

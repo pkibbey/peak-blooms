@@ -58,7 +58,7 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { productId, quantity = 1 } = body;
+    const { productId, productVariantId, quantity = 1 } = body;
 
     if (!productId || quantity < 1) {
       return NextResponse.json(
@@ -94,6 +94,7 @@ export async function POST(request: NextRequest) {
       where: {
         cartId: cart.id,
         productId,
+        productVariantId: productVariantId || null,
       },
     });
 
@@ -102,16 +103,17 @@ export async function POST(request: NextRequest) {
       cartItem = await db.cartItem.update({
         where: { id: existingItem.id },
         data: { quantity: existingItem.quantity + quantity },
-        include: { product: true },
+        include: { product: true, productVariant: true },
       });
     } else {
       cartItem = await db.cartItem.create({
         data: {
           cartId: cart.id,
           productId,
+          productVariantId: productVariantId || null,
           quantity,
         },
-        include: { product: true },
+        include: { product: true, productVariant: true },
       });
     }
 

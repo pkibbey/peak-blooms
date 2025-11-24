@@ -114,9 +114,27 @@ model Product {
   cartItems       CartItem[]
   orderItems      OrderItem[]
   inspirationSets InspirationSet[]
+  variants        ProductVariant[]
 
   @@index([categoryId])
   @@index([slug])
+}
+
+model ProductVariant {
+  id            String   @id @default(cuid())
+  productId     String
+  price         Float
+  stemLength    Int?     @map("stem_length")
+  countPerBunch Int?     @map("count_per_bunch")
+  stock         Int      @default(0)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  product       Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  cartItems     CartItem[]
+  orderItems    OrderItem[]
+
+  @@index([productId])
 }
 
 model ShoppingCart {
@@ -139,8 +157,10 @@ model CartItem {
 
   cart      ShoppingCart @relation(fields: [cartId], references: [id], onDelete: Cascade)
   product   Product      @relation(fields: [productId], references: [id], onDelete: Cascade)
+  productVariant ProductVariant? @relation(fields: [productVariantId], references: [id], onDelete: SetNull)
+  productVariantId String?
 
-  @@unique([cartId, productId])
+  @@unique([cartId, productId, productVariantId])
   @@index([cartId])
   @@index([productId])
 }
@@ -168,6 +188,8 @@ model OrderItem {
 
   order     Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
   product   Product @relation(fields: [productId], references: [id], onDelete: SetNull)
+  productVariant ProductVariant? @relation(fields: [productVariantId], references: [id], onDelete: SetNull)
+  productVariantId String?
 
   @@index([orderId])
 }
