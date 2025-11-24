@@ -2,7 +2,6 @@
 
 ### 🚀 Core Features
 
-- [ ] Add user authentication
 - [ ] Add admin section to be able to manage content
 - [ ] Hide prices for authenticated users
 - [ ] Add order history for accounts

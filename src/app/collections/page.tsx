@@ -59,7 +59,7 @@ export default async function CollectionsPage() {
                     href={`/collections/${collection.slug}`}
                     className="inline-flex items-center justify-center gap-2"
                   >
-                    Shop Now
+                    View Collection
                     <IconArrowRight aria-hidden="true" />
                   </Link>
                 </Button>
