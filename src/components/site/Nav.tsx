@@ -3,8 +3,7 @@
 import { useState } from "react"
 import Image from "next/image"
 import Link from "next/link"
-import { useSession, signOut } from "next-auth/react"
-import { useUserStatus } from "@/lib/useUserStatus"
+import { signOut } from "next-auth/react"
 import NavLink from "@/components/site/NavLink"
 import {
   IconHome,
@@ -25,10 +24,18 @@ const links = [
   { label: "Inspiration", href: "/inspiration", icon: <IconRose /> },
 ]
 
-export default function Nav() {
+interface NavProps {
+  user: {
+    role: "CUSTOMER" | "ADMIN";
+    approved: boolean;
+    email: string;
+    name?: string | null;
+  } | null;
+}
+
+export default function Nav({ user }: NavProps) {
   const [open, setOpen] = useState(false)
-  const { data: session } = useSession()
-  const { isApproved } = useUserStatus()
+  const isApproved = user?.approved === true
 
   return (
     <header className="sticky top-0 z-50 w-full bg-white/70 backdrop-blur-sm border-b border-b-border">
@@ -69,7 +76,7 @@ export default function Nav() {
               </div>
             )}
 
-            {session ? (
+            {user ? (
               <Button
                 variant="outline"
                 size="sm"
@@ -121,9 +128,9 @@ export default function Nav() {
                   </Link>
                 </Button>
               )}
-              {session ? (
+              {user ? (
                 <>
-                  {session.user?.role === "ADMIN" && (
+                  {user.role === "ADMIN" && (
                     <Button asChild variant="ghost">
                       <Link href="/admin" className="px-4 py-2">
                         Admin Dashboard

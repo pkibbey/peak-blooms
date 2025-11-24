@@ -1,8 +1,10 @@
 import Link from "next/link";
 import { db } from "@/lib/db";
 import { ProductCard } from "./ProductCard";
+import { getCurrentUser } from "@/lib/auth-utils";
 
 export default async function FeaturedProducts() {
+  const user = await getCurrentUser();
   const products = await db.product.findMany({
     where: {
       featured: true,
@@ -27,7 +29,7 @@ export default async function FeaturedProducts() {
 
         <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
           {products.map((product) => (
-            <ProductCard key={product.slug} product={product} />
+            <ProductCard key={product.slug} product={product} user={user} />
           ))}
         </div>
       </div>

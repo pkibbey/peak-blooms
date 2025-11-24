@@ -5,6 +5,7 @@ import { Toaster } from "sonner";
 import "./globals.css";
 import Nav from "@/components/site/Nav"
 import Footer from "@/components/site/Footer"
+import { getCurrentUser } from "@/lib/auth-utils";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -26,16 +27,24 @@ export const metadata: Metadata = {
   description: "Source premium wholesale flowers for your florist business. Curated selections, inspirational arrangements, and reliable B2B service for florist businesses.",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const currentUser = await getCurrentUser();
+  const user = currentUser ? {
+    role: currentUser.role,
+    approved: currentUser.approved,
+    email: currentUser.email,
+    name: currentUser.name,
+  } : null;
+
   return (
     <html lang="en">
       <body className={`${geistSans.variable} ${geistMono.variable} ${playfairDisplay.variable} antialiased`}>
         <SessionProvider>
-          <Nav />
+          <Nav user={user} />
 
           <main id="content" className="min-h-[calc(100vh-8rem)]">
             {children}

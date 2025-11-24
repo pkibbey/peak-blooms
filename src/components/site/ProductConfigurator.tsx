@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useUserStatus } from "@/lib/useUserStatus";
 import { Button } from "@/components/ui/button";
 import {
   Select,
@@ -32,12 +31,17 @@ interface Product {
 
 interface ProductConfiguratorProps {
   product: Product;
+  user?: {
+    approved: boolean;
+  } | null;
 }
 
 export function ProductConfigurator({
   product,
+  user,
 }: ProductConfiguratorProps) {
-  const { isSignedOut, isUnapproved } = useUserStatus();
+  const isSignedOut = !user;
+  const isUnapproved = user && !user.approved;
   const [selectedVariantId, setSelectedVariantId] = useState<string | null>(null);
   const [isAdding, setIsAdding] = useState(false);
 

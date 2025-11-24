@@ -2,17 +2,21 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { useUserStatus } from "@/lib/useUserStatus";
 import { Button } from "@/components/ui/button";
 import { IconArrowRight } from "@/components/ui/icons";
 import { ProductModel } from "@/generated/models";
 
 interface ProductCardProps {
   product: ProductModel;
+  user?: {
+    approved: boolean;
+  } | null;
 }
 
-export function ProductCard({ product }: ProductCardProps) {
-  const { isSignedOut, isUnapproved, isApproved } = useUserStatus();
+export function ProductCard({ product, user }: ProductCardProps) {
+  const isSignedOut = !user;
+  const isUnapproved = user && !user.approved;
+  const isApproved = user && user.approved;
 
   return (
     <div className="group flex flex-col overflow-hidden rounded-xs shadow-md transition-shadow hover:shadow-lg">

@@ -1,5 +1,6 @@
 import { db } from "@/lib/db";
 import { ProductCard } from "@/components/site/ProductCard";
+import { getCurrentUser } from "@/lib/auth-utils";
 
 export const metadata = {
   title: "Shop",
@@ -7,6 +8,7 @@ export const metadata = {
 };
 
 export default async function ShopPage() {
+  const user = await getCurrentUser();
   const products = await db.product.findMany({
     orderBy: {
       createdAt: "desc",
@@ -25,7 +27,7 @@ export default async function ShopPage() {
 
         <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
           {products.map((product) => (
-            <ProductCard key={product.slug} product={product} />
+            <ProductCard key={product.slug} product={product} user={user} />
           ))}
         </div>
       </div>

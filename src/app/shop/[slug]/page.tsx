@@ -6,6 +6,7 @@ import { IconArrowRight } from "@/components/ui/icons";
 import { FeaturedInInspirationSets } from "@/components/site/FeaturedInInspirationSets";
 import { db } from "@/lib/db";
 import { ProductConfigurator } from "@/components/site/ProductConfigurator";
+import { getCurrentUser } from "@/lib/auth-utils";
 
 interface ProductDetailPageProps {
   params: Promise<{
@@ -38,6 +39,7 @@ export default async function ProductDetailPage({
   params,
 }: ProductDetailPageProps) {
   const { slug } = await params;
+  const user = await getCurrentUser();
 
   const product = await db.product.findUnique({
     where: { slug },
@@ -113,7 +115,7 @@ export default async function ProductDetailPage({
             </div>
 
             {/* Product Configurator */}
-            <ProductConfigurator product={product} />
+            <ProductConfigurator product={product} user={user} />
           </div>
         </div>
 
