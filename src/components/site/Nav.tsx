@@ -3,6 +3,7 @@
 import { useState } from "react"
 import Image from "next/image"
 import Link from "next/link"
+import { useSession, signOut } from "next-auth/react"
 import NavLink from "@/components/site/NavLink"
 import {
   IconHome,
@@ -25,6 +26,8 @@ const links = [
 
 export default function Nav() {
   const [open, setOpen] = useState(false)
+  const { data: session } = useSession()
+  const [userMenuOpen, setUserMenuOpen] = useState(false)
 
   return (
     <header className="sticky top-0 z-50 w-full bg-white/70 backdrop-blur-sm border-b border-b-border">
@@ -63,6 +66,39 @@ export default function Nav() {
               </Link>
             </div>
 
+            {session ? (
+              <div className="relative hidden md:block">
+                <button
+                  onClick={() => setUserMenuOpen(!userMenuOpen)}
+                  className="inline-flex items-center gap-2 rounded px-3 py-2 text-sm hover:bg-secondary/10"
+                >
+                  <span>{session.user?.email}</span>
+                </button>
+                {userMenuOpen && (
+                  <div className="absolute right-0 mt-2 w-48 rounded-lg border border-border bg-white shadow-lg">
+                    {session.user?.role === "ADMIN" && (
+                      <Link
+                        href="/admin"
+                        className="block px-4 py-2 text-sm hover:bg-secondary/10 border-b border-b-border"
+                      >
+                        Admin Dashboard
+                      </Link>
+                    )}
+                    <button
+                      onClick={() => signOut({ callbackUrl: "/" })}
+                      className="w-full text-left px-4 py-2 text-sm hover:bg-secondary/10 text-destructive"
+                    >
+                      Sign Out
+                    </button>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <Button asChild size="sm" className="hidden md:inline-flex">
+                <Link href="/auth/signin">Sign In</Link>
+              </Button>
+            )}
+
             <Button
               aria-label={open ? "Close menu" : "Open menu"}
               aria-expanded={open}
@@ -93,6 +129,30 @@ export default function Nav() {
                   <span>Cart</span>
                 </Link>
               </Button>
+              {session ? (
+                <>
+                  {session.user?.role === "ADMIN" && (
+                    <Button asChild variant="ghost">
+                      <Link href="/admin" className="px-4 py-2">
+                        Admin Dashboard
+                      </Link>
+                    </Button>
+                  )}
+                  <Button
+                    variant="ghost"
+                    onClick={() => signOut({ callbackUrl: "/" })}
+                    className="text-destructive"
+                  >
+                    Sign Out
+                  </Button>
+                </>
+              ) : (
+                <Button asChild>
+                  <Link href="/auth/signin" className="px-4 py-2">
+                    Sign In
+                  </Link>
+                </Button>
+              )}
             </div>
           </div>
         )}

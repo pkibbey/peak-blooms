@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono, Playfair_Display } from "next/font/google";
+import { SessionProvider } from "next-auth/react";
 import "./globals.css";
 import Nav from "@/components/site/Nav"
 import Footer from "@/components/site/Footer"
@@ -32,13 +33,15 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${geistSans.variable} ${geistMono.variable} ${playfairDisplay.variable} antialiased`}>
-        <Nav />
+        <SessionProvider>
+          <Nav />
 
-        <main id="content" className="min-h-[calc(100vh-8rem)]">
-          {children}
-        </main>
+          <main id="content" className="min-h-[calc(100vh-8rem)]">
+            {children}
+          </main>
 
-        <Footer />
+          <Footer />
+        </SessionProvider>
       </body>
     </html>
   );

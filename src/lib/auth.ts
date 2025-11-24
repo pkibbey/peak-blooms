@@ -6,6 +6,26 @@ import { db } from "./db";
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
+// Determine email domain based on environment
+const emailFromDomain =
+  process.env.NODE_ENV === "development"
+    ? "onboarding@resend.dev"
+    : process.env.EMAIL_FROM_DOMAIN || "onboarding@resend.dev";
+
+declare module "next-auth" {
+  interface User {
+    id: string;
+    approved: boolean;
+    role: "CUSTOMER" | "ADMIN";
+  }
+
+  interface Session {
+    user: User & {
+      email: string;
+    };
+  }
+}
+
 export const { handlers, auth, signIn, signOut } = NextAuth({
   adapter: PrismaAdapter(db),
   providers: [
@@ -23,7 +43,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       async sendVerificationRequest({ identifier, url }) {
         try {
           await resend.emails.send({
-            from: "Peak Blooms <onboarding@resend.dev>", // Change to your verified domain
+            from: `Peak Blooms <${emailFromDomain}>`,
             to: identifier,
             subject: "Sign in to Peak Blooms",
             html: `
@@ -48,9 +68,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     async session({ session, user }) {
       if (session.user) {
         session.user.id = user.id;
-        // @ts-expect-error - Custom user properties
         session.user.approved = user.approved;
-        // @ts-expect-error - Custom user properties
         session.user.role = user.role;
       }
       return session;

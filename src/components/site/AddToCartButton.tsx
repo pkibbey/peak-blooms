@@ -1,23 +1,72 @@
 "use client";
 
+import { useState } from "react";
+import { useSession } from "next-auth/react";
 import { Button } from "@/components/ui/button";
 
 interface AddToCartButtonProps {
-  setName: string;
+  productId: string;
+  setName?: string;
 }
 
-export default function AddToCartButton({ setName }: AddToCartButtonProps) {
-  const handleAddToCart = () => {
-    // Placeholder: cart functionality will be implemented later
-    console.log(`Added all products from ${setName} to cart`);
-    alert(
-      `Added all products from "${setName}" to cart! (Placeholder functionality)`
-    );
+export default function AddToCartButton({ productId, setName }: AddToCartButtonProps) {
+  const { data: session } = useSession();
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const handleAddToCart = async () => {
+    if (!session) {
+      // Redirect to sign in if not authenticated
+      window.location.href = `/auth/signin?callbackUrl=${window.location.pathname}`;
+      return;
+    }
+
+    setLoading(true);
+    setError(null);
+
+    try {
+      const response = await fetch("/api/cart", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          productId,
+          quantity: 1,
+        }),
+      });
+
+      if (!response.ok) {
+        const data = await response.json();
+        throw new Error(data.error || "Failed to add to cart");
+      }
+
+      // Show success message
+      alert(
+        setName
+          ? `Added "${setName}" to cart!`
+          : "Added to cart!"
+      );
+
+      // Optionally redirect to cart
+      // window.location.href = "/cart";
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "Failed to add to cart";
+      setError(message);
+      alert(`Error: ${message}`);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
-    <Button size="lg" className="w-full md:w-auto" onClick={handleAddToCart}>
-      Add All to Cart
+    <Button
+      size="lg"
+      className="w-full md:w-auto"
+      onClick={handleAddToCart}
+      disabled={loading}
+    >
+      {loading ? "Adding..." : "Add to Cart"}
     </Button>
   );
 }

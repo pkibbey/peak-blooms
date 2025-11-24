@@ -1,5 +1,8 @@
+"use client";
+
 import Link from "next/link";
 import Image from "next/image";
+import { useSession } from "next-auth/react";
 import { Button } from "@/components/ui/button";
 import { IconArrowRight } from "@/components/ui/icons";
 import { ProductModel } from "@/generated/models";
@@ -9,7 +12,12 @@ interface ProductCardProps {
   hidePrice?: boolean;
 }
 
-export function ProductCard({ product, hidePrice = true }: ProductCardProps) {
+export function ProductCard({ product, hidePrice: initialHidePrice = true }: ProductCardProps) {
+  const { data: session } = useSession();
+  
+  // Show price if user is approved, otherwise hide
+  const hidePrice = session?.user?.approved ? false : initialHidePrice;
+
   return (
     <div className="group flex flex-col overflow-hidden rounded-xs shadow-md transition-shadow hover:shadow-lg">
       {/* Image Container */}
@@ -38,6 +46,11 @@ export function ProductCard({ product, hidePrice = true }: ProductCardProps) {
           {!hidePrice && (
             <div className="text-lg font-bold text-primary">
               ${product.price.toFixed(2)}
+            </div>
+          )}
+          {hidePrice && (
+            <div className="text-sm text-muted-foreground">
+              {session ? "Contact for pricing" : "Sign in for pricing"}
             </div>
           )}
           <Button asChild className="w-full">

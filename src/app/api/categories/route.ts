@@ -29,7 +29,16 @@ export async function GET() {
  */
 export async function POST(request: NextRequest) {
   try {
-    // TODO: Add authentication check for admin
+    const { auth } = await import("@/lib/auth");
+    const session = await auth();
+
+    if (!session || session.user.role !== "ADMIN") {
+      return NextResponse.json(
+        { error: "Unauthorized" },
+        { status: 401 }
+      );
+    }
+
     const body = await request.json();
 
     const { name, slug, image, description } = body;
