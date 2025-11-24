@@ -3,6 +3,7 @@ import Image from "next/image";
 import { notFound } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { IconArrowRight } from "@/components/ui/icons";
+import { FeaturedInInspirationSets } from "@/components/site/FeaturedInInspirationSets";
 import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
 
@@ -45,6 +46,7 @@ export default async function ProductDetailPage({
     where: { slug },
     include: {
       category: true,
+      inspirationSets: true,
     },
   });
 
@@ -151,19 +153,6 @@ export default async function ProductDetailPage({
               </div>
             )}
 
-            {/* Stock Status */}
-            <div className="text-sm">
-              {product.stock > 0 ? (
-                <span className="text-green-600 font-medium">
-                  ✓ In Stock ({product.stock} available)
-                </span>
-              ) : (
-                <span className="text-red-600 font-medium">
-                  Out of Stock
-                </span>
-              )}
-            </div>
-
             {/* Add to Cart Button */}
             {showPrice && product.stock > 0 ? (
               <Button size="lg" className="w-full">
@@ -194,15 +183,8 @@ export default async function ProductDetailPage({
           </div>
         </div>
 
-        {/* Back Button */}
-        <div className="mt-12 pt-8 border-t border-gray-200">
-          <Link
-            href="/shop"
-            className="text-sm font-medium text-primary hover:underline"
-          >
-            ← Back to shop
-          </Link>
-        </div>
+        {/* Featured in Inspiration Sets */}
+        <FeaturedInInspirationSets inspirationSets={product.inspirationSets} />
       </div>
     </div>
   );

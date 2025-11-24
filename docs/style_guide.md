@@ -16,6 +16,15 @@ The site aims for a clean, professional, modern, and high-quality aesthetic that
 - **Elegant Green:** Used for primary actions (e.g., "Add to Cart"), success states, and nature-related highlights.
 - **Crimson:** Used for call-to-action buttons, alerts, or specific design highlights to add vibrancy and contrast.
 
+### Potential analagous color scheme values
+- **Primary Color (#1F332E):** Use this for your footer, hero banner background (as you intended), or as the main background for darker sections. It conveys elegance and depth.
+
+- **Secondary Color (#374A47):** This slightly lighter, cool tone is excellent for button hovers, subtle borders, or secondary elements like feature boxes. It keeps the design cohesive yet offers variation.
+
+- **Accent Color (#B45F68):** This is your Call-to-Action (CTA) color. Use it sparingly for buttons, links, and important alerts to draw the user's eye, replicating the visual pop of the vibrant flowers.
+
+- **Neutral Color (#FAF7F0):** Use this soft off-white for all primary text and main content backgrounds to ensure readability and a warm, inviting feel.
+
 ## Color Mode (Theme)
 
 This site intentionally uses a single, default light theme and will never offer a dark theme option. All design tokens, component styles, and layout choices should assume a consistent light appearance (white backgrounds, dark grey text, muted greys for borders) so photography and brand colors remain consistent across devices. Do not add a color-mode toggle or dark-mode-specific styles — the product's visual identity is intentionally single-theme and optimized for a bright, light-first experience.
