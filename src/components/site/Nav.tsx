@@ -28,7 +28,7 @@ interface NavProps {
   user: {
     role: "CUSTOMER" | "ADMIN";
     approved: boolean;
-    email: string;
+    email: string | null;
     name?: string | null;
   } | null;
 }
