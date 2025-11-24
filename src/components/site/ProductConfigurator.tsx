@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useUserStatus } from "@/lib/useUserStatus";
 import { Button } from "@/components/ui/button";
 import {
   Select,
@@ -31,13 +32,12 @@ interface Product {
 
 interface ProductConfiguratorProps {
   product: Product;
-  showPrice: boolean;
 }
 
 export function ProductConfigurator({
   product,
-  showPrice,
 }: ProductConfiguratorProps) {
+  const { isSignedOut, isUnapproved } = useUserStatus();
   const [selectedVariantId, setSelectedVariantId] = useState<string | null>(null);
   const [isAdding, setIsAdding] = useState(false);
 
@@ -48,10 +48,6 @@ export function ProductConfigurator({
   const currentPrice = selectedVariantId
     ? product.variants.find((v) => v.id === selectedVariantId)?.price ?? product.price
     : product.price;
-
-  const currentStock = selectedVariantId
-    ? product.variants.find((v) => v.id === selectedVariantId)?.stock ?? 0
-    : product.stock;
 
   // Get unique stem lengths and counts from variants
   const stemLengths = Array.from(
@@ -93,8 +89,6 @@ export function ProductConfigurator({
   }, [selectedStemLength, selectedCount, hasVariants, product.variants]);
 
   const handleAddToCart = async () => {
-    if (!showPrice) return;
-    
     setIsAdding(true);
     try {
       const res = await fetch("/api/cart", {
@@ -122,13 +116,22 @@ export function ProductConfigurator({
   return (
     <div className="flex flex-col gap-6">
       {/* Price Display */}
-      {showPrice ? (
-        <div className="text-3xl font-bold text-primary">
-          ${currentPrice.toFixed(2)}
+      {isSignedOut ? (
+        <div className="flex flex-col gap-3">
+          <div className="text-sm text-muted-foreground italic">
+            Sign in to view pricing
+          </div>
+          <Button size="sm" asChild variant="outline">
+            <Link href="/auth/signin">Sign In</Link>
+          </Button>
+        </div>
+      ) : isUnapproved ? (
+        <div className="text-sm text-muted-foreground italic">
+          Your account is pending approval. Pricing will be available once approved.
         </div>
       ) : (
-        <div className="text-sm text-muted-foreground italic">
-          Sign in to view pricing
+        <div className="text-3xl font-bold text-primary">
+          ${currentPrice.toFixed(2)}
         </div>
       )}
 
@@ -208,7 +211,15 @@ export function ProductConfigurator({
         )}
 
       {/* Add to Cart Button */}
-      {showPrice && currentStock > 0 ? (
+      {isSignedOut ? (
+        <Button size="lg" className="w-full" asChild>
+          <Link href="/auth/signin">Sign In to Purchase</Link>
+        </Button>
+      ) : isUnapproved ? (
+        <Button size="lg" className="w-full" disabled>
+          Account Approval Needed
+        </Button>
+      ) : (
         <Button 
           size="lg" 
           className="w-full" 
@@ -216,14 +227,6 @@ export function ProductConfigurator({
           disabled={isAdding || (hasVariants && !selectedVariantId)}
         >
           {isAdding ? "Adding..." : "Add to Cart"}
-        </Button>
-      ) : !showPrice ? (
-        <Button size="lg" className="w-full" asChild>
-          <Link href="/auth/signin">Sign In to Purchase</Link>
-        </Button>
-      ) : (
-        <Button size="lg" className="w-full" disabled>
-          Out of Stock
         </Button>
       )}
     </div>

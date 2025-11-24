@@ -1,11 +1,11 @@
 import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
-import { getOrCreateCart, calculateCartTotal } from "@/lib/auth-utils";
+import { getOrCreateCart, calculateCartTotal, isApproved } from "@/lib/auth-utils";
 import { NextRequest, NextResponse } from "next/server";
 
 /**
  * GET /api/cart
- * Get current user's shopping cart
+ * Get current user's shopping cart (approved users only)
  */
 export async function GET() {
   try {
@@ -15,6 +15,15 @@ export async function GET() {
       return NextResponse.json(
         { error: "Unauthorized" },
         { status: 401 }
+      );
+    }
+
+    // Check if user is approved
+    const approved = await isApproved();
+    if (!approved) {
+      return NextResponse.json(
+        { error: "Your account is not approved for purchases" },
+        { status: 403 }
       );
     }
 
@@ -44,7 +53,7 @@ export async function GET() {
 
 /**
  * POST /api/cart
- * Add item to cart or update quantity
+ * Add item to cart or update quantity (approved users only)
  */
 export async function POST(request: NextRequest) {
   try {
@@ -54,6 +63,15 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         { error: "Unauthorized" },
         { status: 401 }
+      );
+    }
+
+    // Check if user is approved
+    const approved = await isApproved();
+    if (!approved) {
+      return NextResponse.json(
+        { error: "Your account is not approved for purchases" },
+        { status: 403 }
       );
     }
 

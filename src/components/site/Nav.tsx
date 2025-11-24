@@ -4,6 +4,7 @@ import { useState } from "react"
 import Image from "next/image"
 import Link from "next/link"
 import { useSession, signOut } from "next-auth/react"
+import { useUserStatus } from "@/lib/useUserStatus"
 import NavLink from "@/components/site/NavLink"
 import {
   IconHome,
@@ -27,6 +28,7 @@ const links = [
 export default function Nav() {
   const [open, setOpen] = useState(false)
   const { data: session } = useSession()
+  const { isApproved } = useUserStatus()
 
   return (
     <header className="sticky top-0 z-50 w-full bg-white/70 backdrop-blur-sm border-b border-b-border">
@@ -58,7 +60,7 @@ export default function Nav() {
           </div>
 
           <div className="flex items-center gap-4">
-            {session && (
+            {isApproved && (
               <div className="hidden md:block">
                 <Link href="/cart" className="inline-flex items-center gap-1">
                   <IconShoppingCart aria-hidden="true" />
@@ -111,7 +113,7 @@ export default function Nav() {
                   {l.label}
                 </NavLink>
               ))}
-              {session && (
+              {isApproved && (
                 <Button asChild variant="ghost">
                   <Link href="/cart" className="inline-flex items-center gap-1 px-4 py-2">
                     <IconShoppingCart aria-hidden="true" />

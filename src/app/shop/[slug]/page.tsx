@@ -4,7 +4,6 @@ import { notFound } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { IconArrowRight } from "@/components/ui/icons";
 import { FeaturedInInspirationSets } from "@/components/site/FeaturedInInspirationSets";
-import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { ProductConfigurator } from "@/components/site/ProductConfigurator";
 
@@ -39,9 +38,6 @@ export default async function ProductDetailPage({
   params,
 }: ProductDetailPageProps) {
   const { slug } = await params;
-  const session = await auth();
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const showPrice = !!(session?.user && (session.user as any).approved);
 
   const product = await db.product.findUnique({
     where: { slug },
@@ -117,7 +113,7 @@ export default async function ProductDetailPage({
             </div>
 
             {/* Product Configurator */}
-            <ProductConfigurator product={product} showPrice={showPrice} />
+            <ProductConfigurator product={product} />
           </div>
         </div>
 

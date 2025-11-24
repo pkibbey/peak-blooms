@@ -1,7 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { db } from "@/lib/db";
-import { auth } from "@/lib/auth";
 import { ProductCard } from "@/components/site/ProductCard";
 
 interface CollectionDetailPageProps {
@@ -35,8 +34,6 @@ export default async function CollectionDetailPage({
   params,
 }: CollectionDetailPageProps) {
   const { slug } = await params;
-  const session = await auth();
-  const showPrice = !!(session?.user && (session.user as any).approved);
 
   const category = await db.category.findUnique({
     where: { slug },
@@ -89,7 +86,7 @@ export default async function CollectionDetailPage({
           ) : (
             <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
               {category.products.map((product) => (
-                <ProductCard key={product.slug} product={product} hidePrice={!showPrice} />
+                <ProductCard key={product.slug} product={product} />
               ))}
             </div>
           )}

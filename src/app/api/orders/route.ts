@@ -1,10 +1,11 @@
 import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
+import { isApproved } from "@/lib/auth-utils";
 import { NextResponse } from "next/server";
 
 /**
  * GET /api/orders
- * Get current user's orders
+ * Get current user's orders (approved users only)
  */
 export async function GET() {
   try {
@@ -14,6 +15,15 @@ export async function GET() {
       return NextResponse.json(
         { error: "Unauthorized" },
         { status: 401 }
+      );
+    }
+
+    // Check if user is approved
+    const approved = await isApproved();
+    if (!approved) {
+      return NextResponse.json(
+        { error: "Your account is not approved for purchases" },
+        { status: 403 }
       );
     }
 
@@ -67,6 +77,15 @@ export async function POST() {
       );
     }
 
+    // Check if user is approved
+    const approved = await isApproved();
+    if (!approved) {
+      return NextResponse.json(
+        { error: "Your account is not approved for purchases" },
+        { status: 403 }
+      );
+    }
+
     const user = await db.user.findUnique({
       where: { email: session.user.email },
     });
@@ -75,14 +94,6 @@ export async function POST() {
       return NextResponse.json(
         { error: "User not found" },
         { status: 404 }
-      );
-    }
-
-    // Check if user is approved
-    if (!user.approved) {
-      return NextResponse.json(
-        { error: "Your account is not approved for purchases" },
-        { status: 403 }
       );
     }
 

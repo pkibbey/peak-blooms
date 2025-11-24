@@ -50,7 +50,7 @@ export default function Footer() {
             <div>
               <h4 className="text-sm font-medium">Shop</h4>
               <ul className="mt-3 text-sm text-muted-foreground space-y-2">
-                <li><Link href="/shop" className="hover:underline inline-flex items-center gap-2">Products</Link></li>
+                <li><Link href="/shop" className="hover:underline inline-flex items-center gap-2">Flowers</Link></li>
                 <li><Link href="/collections" className="hover:underline">Collections</Link></li>
                 <li><Link href="/inspiration" className="hover:underline">Inspiration</Link></li>
               </ul>
@@ -88,7 +88,6 @@ export default function Footer() {
           <div>© {new Date().getFullYear()} Peak Blooms. All rights reserved.</div>
           <div className="flex items-center gap-4">
             <Link href="/sitemap" className="hover:underline">Sitemap</Link>
-            <Link href="/contact" className="hover:underline">Contact</Link>
           </div>
         </div>
       </div>
