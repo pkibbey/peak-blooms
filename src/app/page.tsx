@@ -9,8 +9,8 @@ export default function Home() {
   return (
     <>
       <Hero 
-        title="The art of bloom"
-        subtitle="Sourced for the discerning florist."
+        title="Your premier flower distributor"
+        subtitle="We deliver the highest quality, freshest flowers at competitive prices to florists and retailers."
         cta={
           <Button asChild>
             <Link href="/shop" className="inline-flex items-center gap-1">
