@@ -30,14 +30,12 @@ export type ProductAvgAggregateOutputType = {
   price: number | null
   stemLength: number | null
   countPerBunch: number | null
-  stock: number | null
 }
 
 export type ProductSumAggregateOutputType = {
   price: number | null
   stemLength: number | null
   countPerBunch: number | null
-  stock: number | null
 }
 
 export type ProductMinAggregateOutputType = {
@@ -49,7 +47,6 @@ export type ProductMinAggregateOutputType = {
   price: number | null
   stemLength: number | null
   countPerBunch: number | null
-  stock: number | null
   categoryId: string | null
   featured: boolean | null
   createdAt: Date | null
@@ -65,7 +62,6 @@ export type ProductMaxAggregateOutputType = {
   price: number | null
   stemLength: number | null
   countPerBunch: number | null
-  stock: number | null
   categoryId: string | null
   featured: boolean | null
   createdAt: Date | null
@@ -81,7 +77,6 @@ export type ProductCountAggregateOutputType = {
   price: number
   stemLength: number
   countPerBunch: number
-  stock: number
   categoryId: number
   featured: number
   createdAt: number
@@ -94,14 +89,12 @@ export type ProductAvgAggregateInputType = {
   price?: true
   stemLength?: true
   countPerBunch?: true
-  stock?: true
 }
 
 export type ProductSumAggregateInputType = {
   price?: true
   stemLength?: true
   countPerBunch?: true
-  stock?: true
 }
 
 export type ProductMinAggregateInputType = {
@@ -113,7 +106,6 @@ export type ProductMinAggregateInputType = {
   price?: true
   stemLength?: true
   countPerBunch?: true
-  stock?: true
   categoryId?: true
   featured?: true
   createdAt?: true
@@ -129,7 +121,6 @@ export type ProductMaxAggregateInputType = {
   price?: true
   stemLength?: true
   countPerBunch?: true
-  stock?: true
   categoryId?: true
   featured?: true
   createdAt?: true
@@ -145,7 +136,6 @@ export type ProductCountAggregateInputType = {
   price?: true
   stemLength?: true
   countPerBunch?: true
-  stock?: true
   categoryId?: true
   featured?: true
   createdAt?: true
@@ -248,7 +238,6 @@ export type ProductGroupByOutputType = {
   price: number
   stemLength: number | null
   countPerBunch: number | null
-  stock: number
   categoryId: string
   featured: boolean
   createdAt: Date
@@ -287,7 +276,6 @@ export type ProductWhereInput = {
   price?: Prisma.FloatFilter<"Product"> | number
   stemLength?: Prisma.IntNullableFilter<"Product"> | number | null
   countPerBunch?: Prisma.IntNullableFilter<"Product"> | number | null
-  stock?: Prisma.IntFilter<"Product"> | number
   categoryId?: Prisma.StringFilter<"Product"> | string
   featured?: Prisma.BoolFilter<"Product"> | boolean
   createdAt?: Prisma.DateTimeFilter<"Product"> | Date | string
@@ -308,7 +296,6 @@ export type ProductOrderByWithRelationInput = {
   price?: Prisma.SortOrder
   stemLength?: Prisma.SortOrderInput | Prisma.SortOrder
   countPerBunch?: Prisma.SortOrderInput | Prisma.SortOrder
-  stock?: Prisma.SortOrder
   categoryId?: Prisma.SortOrder
   featured?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -332,7 +319,6 @@ export type ProductWhereUniqueInput = Prisma.AtLeast<{
   price?: Prisma.FloatFilter<"Product"> | number
   stemLength?: Prisma.IntNullableFilter<"Product"> | number | null
   countPerBunch?: Prisma.IntNullableFilter<"Product"> | number | null
-  stock?: Prisma.IntFilter<"Product"> | number
   categoryId?: Prisma.StringFilter<"Product"> | string
   featured?: Prisma.BoolFilter<"Product"> | boolean
   createdAt?: Prisma.DateTimeFilter<"Product"> | Date | string
@@ -353,7 +339,6 @@ export type ProductOrderByWithAggregationInput = {
   price?: Prisma.SortOrder
   stemLength?: Prisma.SortOrderInput | Prisma.SortOrder
   countPerBunch?: Prisma.SortOrderInput | Prisma.SortOrder
-  stock?: Prisma.SortOrder
   categoryId?: Prisma.SortOrder
   featured?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -377,7 +362,6 @@ export type ProductScalarWhereWithAggregatesInput = {
   price?: Prisma.FloatWithAggregatesFilter<"Product"> | number
   stemLength?: Prisma.IntNullableWithAggregatesFilter<"Product"> | number | null
   countPerBunch?: Prisma.IntNullableWithAggregatesFilter<"Product"> | number | null
-  stock?: Prisma.IntWithAggregatesFilter<"Product"> | number
   categoryId?: Prisma.StringWithAggregatesFilter<"Product"> | string
   featured?: Prisma.BoolWithAggregatesFilter<"Product"> | boolean
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Product"> | Date | string
@@ -393,7 +377,6 @@ export type ProductCreateInput = {
   price: number
   stemLength?: number | null
   countPerBunch?: number | null
-  stock?: number
   featured?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -413,7 +396,6 @@ export type ProductUncheckedCreateInput = {
   price: number
   stemLength?: number | null
   countPerBunch?: number | null
-  stock?: number
   categoryId: string
   featured?: boolean
   createdAt?: Date | string
@@ -433,7 +415,6 @@ export type ProductUpdateInput = {
   price?: Prisma.FloatFieldUpdateOperationsInput | number
   stemLength?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   countPerBunch?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  stock?: Prisma.IntFieldUpdateOperationsInput | number
   featured?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -453,7 +434,6 @@ export type ProductUncheckedUpdateInput = {
   price?: Prisma.FloatFieldUpdateOperationsInput | number
   stemLength?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   countPerBunch?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  stock?: Prisma.IntFieldUpdateOperationsInput | number
   categoryId?: Prisma.StringFieldUpdateOperationsInput | string
   featured?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -473,7 +453,6 @@ export type ProductCreateManyInput = {
   price: number
   stemLength?: number | null
   countPerBunch?: number | null
-  stock?: number
   categoryId: string
   featured?: boolean
   createdAt?: Date | string
@@ -489,7 +468,6 @@ export type ProductUpdateManyMutationInput = {
   price?: Prisma.FloatFieldUpdateOperationsInput | number
   stemLength?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   countPerBunch?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  stock?: Prisma.IntFieldUpdateOperationsInput | number
   featured?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -504,7 +482,6 @@ export type ProductUncheckedUpdateManyInput = {
   price?: Prisma.FloatFieldUpdateOperationsInput | number
   stemLength?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   countPerBunch?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  stock?: Prisma.IntFieldUpdateOperationsInput | number
   categoryId?: Prisma.StringFieldUpdateOperationsInput | string
   featured?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -530,7 +507,6 @@ export type ProductCountOrderByAggregateInput = {
   price?: Prisma.SortOrder
   stemLength?: Prisma.SortOrder
   countPerBunch?: Prisma.SortOrder
-  stock?: Prisma.SortOrder
   categoryId?: Prisma.SortOrder
   featured?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -541,7 +517,6 @@ export type ProductAvgOrderByAggregateInput = {
   price?: Prisma.SortOrder
   stemLength?: Prisma.SortOrder
   countPerBunch?: Prisma.SortOrder
-  stock?: Prisma.SortOrder
 }
 
 export type ProductMaxOrderByAggregateInput = {
@@ -553,7 +528,6 @@ export type ProductMaxOrderByAggregateInput = {
   price?: Prisma.SortOrder
   stemLength?: Prisma.SortOrder
   countPerBunch?: Prisma.SortOrder
-  stock?: Prisma.SortOrder
   categoryId?: Prisma.SortOrder
   featured?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -569,7 +543,6 @@ export type ProductMinOrderByAggregateInput = {
   price?: Prisma.SortOrder
   stemLength?: Prisma.SortOrder
   countPerBunch?: Prisma.SortOrder
-  stock?: Prisma.SortOrder
   categoryId?: Prisma.SortOrder
   featured?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -580,7 +553,6 @@ export type ProductSumOrderByAggregateInput = {
   price?: Prisma.SortOrder
   stemLength?: Prisma.SortOrder
   countPerBunch?: Prisma.SortOrder
-  stock?: Prisma.SortOrder
 }
 
 export type ProductScalarRelationFilter = {
@@ -676,14 +648,6 @@ export type FloatFieldUpdateOperationsInput = {
   divide?: number
 }
 
-export type IntFieldUpdateOperationsInput = {
-  set?: number
-  increment?: number
-  decrement?: number
-  multiply?: number
-  divide?: number
-}
-
 export type ProductCreateNestedOneWithoutVariantsInput = {
   create?: Prisma.XOR<Prisma.ProductCreateWithoutVariantsInput, Prisma.ProductUncheckedCreateWithoutVariantsInput>
   connectOrCreate?: Prisma.ProductCreateOrConnectWithoutVariantsInput
@@ -735,7 +699,6 @@ export type ProductCreateWithoutCategoryInput = {
   price: number
   stemLength?: number | null
   countPerBunch?: number | null
-  stock?: number
   featured?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -754,7 +717,6 @@ export type ProductUncheckedCreateWithoutCategoryInput = {
   price: number
   stemLength?: number | null
   countPerBunch?: number | null
-  stock?: number
   featured?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -802,7 +764,6 @@ export type ProductScalarWhereInput = {
   price?: Prisma.FloatFilter<"Product"> | number
   stemLength?: Prisma.IntNullableFilter<"Product"> | number | null
   countPerBunch?: Prisma.IntNullableFilter<"Product"> | number | null
-  stock?: Prisma.IntFilter<"Product"> | number
   categoryId?: Prisma.StringFilter<"Product"> | string
   featured?: Prisma.BoolFilter<"Product"> | boolean
   createdAt?: Prisma.DateTimeFilter<"Product"> | Date | string
@@ -818,7 +779,6 @@ export type ProductCreateWithoutInspirationSetsInput = {
   price: number
   stemLength?: number | null
   countPerBunch?: number | null
-  stock?: number
   featured?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -837,7 +797,6 @@ export type ProductUncheckedCreateWithoutInspirationSetsInput = {
   price: number
   stemLength?: number | null
   countPerBunch?: number | null
-  stock?: number
   categoryId: string
   featured?: boolean
   createdAt?: Date | string
@@ -877,7 +836,6 @@ export type ProductCreateWithoutVariantsInput = {
   price: number
   stemLength?: number | null
   countPerBunch?: number | null
-  stock?: number
   featured?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -896,7 +854,6 @@ export type ProductUncheckedCreateWithoutVariantsInput = {
   price: number
   stemLength?: number | null
   countPerBunch?: number | null
-  stock?: number
   categoryId: string
   featured?: boolean
   createdAt?: Date | string
@@ -931,7 +888,6 @@ export type ProductUpdateWithoutVariantsInput = {
   price?: Prisma.FloatFieldUpdateOperationsInput | number
   stemLength?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   countPerBunch?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  stock?: Prisma.IntFieldUpdateOperationsInput | number
   featured?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -950,7 +906,6 @@ export type ProductUncheckedUpdateWithoutVariantsInput = {
   price?: Prisma.FloatFieldUpdateOperationsInput | number
   stemLength?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   countPerBunch?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  stock?: Prisma.IntFieldUpdateOperationsInput | number
   categoryId?: Prisma.StringFieldUpdateOperationsInput | string
   featured?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -969,7 +924,6 @@ export type ProductCreateWithoutCartItemsInput = {
   price: number
   stemLength?: number | null
   countPerBunch?: number | null
-  stock?: number
   featured?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -988,7 +942,6 @@ export type ProductUncheckedCreateWithoutCartItemsInput = {
   price: number
   stemLength?: number | null
   countPerBunch?: number | null
-  stock?: number
   categoryId: string
   featured?: boolean
   createdAt?: Date | string
@@ -1023,7 +976,6 @@ export type ProductUpdateWithoutCartItemsInput = {
   price?: Prisma.FloatFieldUpdateOperationsInput | number
   stemLength?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   countPerBunch?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  stock?: Prisma.IntFieldUpdateOperationsInput | number
   featured?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1042,7 +994,6 @@ export type ProductUncheckedUpdateWithoutCartItemsInput = {
   price?: Prisma.FloatFieldUpdateOperationsInput | number
   stemLength?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   countPerBunch?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  stock?: Prisma.IntFieldUpdateOperationsInput | number
   categoryId?: Prisma.StringFieldUpdateOperationsInput | string
   featured?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1061,7 +1012,6 @@ export type ProductCreateWithoutOrderItemsInput = {
   price: number
   stemLength?: number | null
   countPerBunch?: number | null
-  stock?: number
   featured?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -1080,7 +1030,6 @@ export type ProductUncheckedCreateWithoutOrderItemsInput = {
   price: number
   stemLength?: number | null
   countPerBunch?: number | null
-  stock?: number
   categoryId: string
   featured?: boolean
   createdAt?: Date | string
@@ -1115,7 +1064,6 @@ export type ProductUpdateWithoutOrderItemsInput = {
   price?: Prisma.FloatFieldUpdateOperationsInput | number
   stemLength?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   countPerBunch?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  stock?: Prisma.IntFieldUpdateOperationsInput | number
   featured?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1134,7 +1082,6 @@ export type ProductUncheckedUpdateWithoutOrderItemsInput = {
   price?: Prisma.FloatFieldUpdateOperationsInput | number
   stemLength?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   countPerBunch?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  stock?: Prisma.IntFieldUpdateOperationsInput | number
   categoryId?: Prisma.StringFieldUpdateOperationsInput | string
   featured?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1153,7 +1100,6 @@ export type ProductCreateManyCategoryInput = {
   price: number
   stemLength?: number | null
   countPerBunch?: number | null
-  stock?: number
   featured?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -1168,7 +1114,6 @@ export type ProductUpdateWithoutCategoryInput = {
   price?: Prisma.FloatFieldUpdateOperationsInput | number
   stemLength?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   countPerBunch?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  stock?: Prisma.IntFieldUpdateOperationsInput | number
   featured?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1187,7 +1132,6 @@ export type ProductUncheckedUpdateWithoutCategoryInput = {
   price?: Prisma.FloatFieldUpdateOperationsInput | number
   stemLength?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   countPerBunch?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  stock?: Prisma.IntFieldUpdateOperationsInput | number
   featured?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1206,7 +1150,6 @@ export type ProductUncheckedUpdateManyWithoutCategoryInput = {
   price?: Prisma.FloatFieldUpdateOperationsInput | number
   stemLength?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   countPerBunch?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  stock?: Prisma.IntFieldUpdateOperationsInput | number
   featured?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1221,7 +1164,6 @@ export type ProductUpdateWithoutInspirationSetsInput = {
   price?: Prisma.FloatFieldUpdateOperationsInput | number
   stemLength?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   countPerBunch?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  stock?: Prisma.IntFieldUpdateOperationsInput | number
   featured?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1240,7 +1182,6 @@ export type ProductUncheckedUpdateWithoutInspirationSetsInput = {
   price?: Prisma.FloatFieldUpdateOperationsInput | number
   stemLength?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   countPerBunch?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  stock?: Prisma.IntFieldUpdateOperationsInput | number
   categoryId?: Prisma.StringFieldUpdateOperationsInput | string
   featured?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1259,7 +1200,6 @@ export type ProductUncheckedUpdateManyWithoutInspirationSetsInput = {
   price?: Prisma.FloatFieldUpdateOperationsInput | number
   stemLength?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   countPerBunch?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  stock?: Prisma.IntFieldUpdateOperationsInput | number
   categoryId?: Prisma.StringFieldUpdateOperationsInput | string
   featured?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1333,7 +1273,6 @@ export type ProductSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   price?: boolean
   stemLength?: boolean
   countPerBunch?: boolean
-  stock?: boolean
   categoryId?: boolean
   featured?: boolean
   createdAt?: boolean
@@ -1355,7 +1294,6 @@ export type ProductSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Exten
   price?: boolean
   stemLength?: boolean
   countPerBunch?: boolean
-  stock?: boolean
   categoryId?: boolean
   featured?: boolean
   createdAt?: boolean
@@ -1372,7 +1310,6 @@ export type ProductSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Exten
   price?: boolean
   stemLength?: boolean
   countPerBunch?: boolean
-  stock?: boolean
   categoryId?: boolean
   featured?: boolean
   createdAt?: boolean
@@ -1389,14 +1326,13 @@ export type ProductSelectScalar = {
   price?: boolean
   stemLength?: boolean
   countPerBunch?: boolean
-  stock?: boolean
   categoryId?: boolean
   featured?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type ProductOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "slug" | "description" | "image" | "price" | "stemLength" | "countPerBunch" | "stock" | "categoryId" | "featured" | "createdAt" | "updatedAt", ExtArgs["result"]["product"]>
+export type ProductOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "slug" | "description" | "image" | "price" | "stemLength" | "countPerBunch" | "categoryId" | "featured" | "createdAt" | "updatedAt", ExtArgs["result"]["product"]>
 export type ProductInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   category?: boolean | Prisma.CategoryDefaultArgs<ExtArgs>
   cartItems?: boolean | Prisma.Product$cartItemsArgs<ExtArgs>
@@ -1430,7 +1366,6 @@ export type $ProductPayload<ExtArgs extends runtime.Types.Extensions.InternalArg
     price: number
     stemLength: number | null
     countPerBunch: number | null
-    stock: number
     categoryId: string
     featured: boolean
     createdAt: Date
@@ -1871,7 +1806,6 @@ export interface ProductFieldRefs {
   readonly price: Prisma.FieldRef<"Product", 'Float'>
   readonly stemLength: Prisma.FieldRef<"Product", 'Int'>
   readonly countPerBunch: Prisma.FieldRef<"Product", 'Int'>
-  readonly stock: Prisma.FieldRef<"Product", 'Int'>
   readonly categoryId: Prisma.FieldRef<"Product", 'String'>
   readonly featured: Prisma.FieldRef<"Product", 'Boolean'>
   readonly createdAt: Prisma.FieldRef<"Product", 'DateTime'>

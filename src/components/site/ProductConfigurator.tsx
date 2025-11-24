@@ -1,7 +1,8 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useMemo } from "react";
 import { Button } from "@/components/ui/button";
+import AddToCartButton from "@/components/site/AddToCartButton";
 import {
   Select,
   SelectContent,
@@ -16,7 +17,6 @@ interface ProductVariant {
   price: number;
   stemLength: number | null;
   countPerBunch: number | null;
-  stock: number;
 }
 
 interface Product {
@@ -25,7 +25,6 @@ interface Product {
   price: number;
   stemLength: number | null;
   countPerBunch: number | null;
-  stock: number;
   variants: ProductVariant[];
 }
 
@@ -42,16 +41,13 @@ export function ProductConfigurator({
 }: ProductConfiguratorProps) {
   const isSignedOut = !user;
   const isUnapproved = user && !user.approved;
-  const [selectedVariantId, setSelectedVariantId] = useState<string | null>(null);
-  const [isAdding, setIsAdding] = useState(false);
+  // selectedVariantId derived below via useMemo
+  // note: AddToCartButton now handles its own loading state
 
   // Group variants by stem length and count per bunch
   const hasVariants = product.variants.length > 0;
 
   // If no variants, use base product details
-  const currentPrice = selectedVariantId
-    ? product.variants.find((v) => v.id === selectedVariantId)?.price ?? product.price
-    : product.price;
 
   // Get unique stem lengths and counts from variants
   const stemLengths = Array.from(
@@ -77,45 +73,24 @@ export function ProductConfigurator({
     counts.length > 0 ? counts[0].toString() : ""
   );
 
-  // Update selected variant based on dropdowns
-  useEffect(() => {
-    if (!hasVariants) return;
+  // Derive selectedVariantId from the chosen stem length / count
+  const selectedVariantId = useMemo(() => {
+    if (!hasVariants) return null;
 
     const variant = product.variants.find(
       (v) =>
-        (v.stemLength?.toString() === selectedStemLength ||
-          (!v.stemLength && !selectedStemLength)) &&
-        (v.countPerBunch?.toString() === selectedCount ||
-          (!v.countPerBunch && !selectedCount))
+        (v.stemLength?.toString() === selectedStemLength || (!v.stemLength && !selectedStemLength)) &&
+        (v.countPerBunch?.toString() === selectedCount || (!v.countPerBunch && !selectedCount))
     );
 
-    setSelectedVariantId(variant?.id ?? null);
+    return variant?.id ?? null;
   }, [selectedStemLength, selectedCount, hasVariants, product.variants]);
 
-  const handleAddToCart = async () => {
-    setIsAdding(true);
-    try {
-      const res = await fetch("/api/cart", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          productId: product.id,
-          productVariantId: selectedVariantId,
-          quantity: 1,
-        }),
-      });
+  // If no variants, use base product details
+  const currentPrice = selectedVariantId
+    ? product.variants.find((v) => v.id === selectedVariantId)?.price ?? product.price
+    : product.price;
 
-      if (!res.ok) throw new Error("Failed to add to cart");
-      
-      // Optional: Add toast notification here
-      alert("Added to cart!");
-    } catch (error) {
-      console.error(error);
-      alert("Failed to add to cart");
-    } finally {
-      setIsAdding(false);
-    }
-  };
 
   return (
     <div className="flex flex-col gap-6">
@@ -221,17 +196,14 @@ export function ProductConfigurator({
         </Button>
       ) : isUnapproved ? (
         <Button size="lg" className="w-full" disabled>
-          Account Approval Needed
+          Waiting on Account Approval
         </Button>
       ) : (
-        <Button 
-          size="lg" 
-          className="w-full" 
-          onClick={handleAddToCart}
-          disabled={isAdding || (hasVariants && !selectedVariantId)}
-        >
-          {isAdding ? "Adding..." : "Add to Cart"}
-        </Button>
+        <AddToCartButton
+          productId={product.id}
+          productVariantId={selectedVariantId}
+          disabled={hasVariants && !selectedVariantId}
+        />
       )}
     </div>
   );

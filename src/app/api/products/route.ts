@@ -60,7 +60,7 @@ export async function POST(request: NextRequest) {
 
     const body = await request.json();
 
-    const { name, slug, description, image, price, stemLength, countPerBunch, stock, categoryId, featured } = body;
+    const { name, slug, description, image, price, stemLength, countPerBunch, categoryId, featured } = body;
 
     if (!name || !slug || !price || !categoryId) {
       return NextResponse.json(
@@ -78,7 +78,6 @@ export async function POST(request: NextRequest) {
         price: parseFloat(price),
         stemLength: stemLength ? parseInt(stemLength) : null,
         countPerBunch: countPerBunch ? parseInt(countPerBunch) : null,
-        stock: parseInt(stock) || 0,
         categoryId,
         featured: featured === true,
       },

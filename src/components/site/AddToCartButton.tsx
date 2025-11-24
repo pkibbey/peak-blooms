@@ -6,10 +6,12 @@ import { Button } from "@/components/ui/button";
 
 interface AddToCartButtonProps {
   productId: string;
+  productVariantId?: string | null;
   setName?: string;
+  disabled?: boolean;
 }
 
-export default function AddToCartButton({ productId, setName }: AddToCartButtonProps) {
+export default function AddToCartButton({ productId, productVariantId, setName, disabled }: AddToCartButtonProps) {
   const { data: session } = useSession();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -32,6 +34,7 @@ export default function AddToCartButton({ productId, setName }: AddToCartButtonP
         },
         body: JSON.stringify({
           productId,
+          productVariantId: productVariantId || undefined,
           quantity: 1,
         }),
       });
@@ -60,13 +63,18 @@ export default function AddToCartButton({ productId, setName }: AddToCartButtonP
   };
 
   return (
-    <Button
+    <>
+      <Button
       size="lg"
       className="w-full md:w-auto"
       onClick={handleAddToCart}
-      disabled={loading}
+      disabled={loading || !!disabled}
     >
       {loading ? "Adding..." : "Add to Cart"}
-    </Button>
+      </Button>
+      {error ? (
+        <p className="mt-2 text-sm text-destructive">{error}</p>
+      ) : null}
+    </>
   );
 }

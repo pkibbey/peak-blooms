@@ -68,9 +68,9 @@ async function main() {
       featured: true,
       variants: {
         create: [
-          { price: 65.0, stemLength: 45, countPerBunch: 8, stock: 100 },
-          { price: 75.0, stemLength: 55, countPerBunch: 8, stock: 50 },
-          { price: 120.0, stemLength: 45, countPerBunch: 16, stock: 20 },
+          { price: 65.0, stemLength: 45, countPerBunch: 8 },
+          { price: 75.0, stemLength: 55, countPerBunch: 8 },
+          { price: 120.0, stemLength: 45, countPerBunch: 16 },
         ],
       },
     },
@@ -89,8 +89,8 @@ async function main() {
       featured: true,
       variants: {
         create: [
-          { price: 55.0, stemLength: 40, countPerBunch: 6, stock: 80 },
-          { price: 65.0, stemLength: 50, countPerBunch: 6, stock: 40 },
+          { price: 55.0, stemLength: 40, countPerBunch: 6 },
+          { price: 65.0, stemLength: 50, countPerBunch: 6 },
         ],
       },
     },
@@ -109,9 +109,9 @@ async function main() {
       featured: false,
       variants: {
         create: [
-          { price: 75.0, stemLength: 50, countPerBunch: 5, stock: 100 },
-          { price: 90.0, stemLength: 60, countPerBunch: 5, stock: 60 },
-          { price: 140.0, stemLength: 50, countPerBunch: 10, stock: 30 },
+          { price: 75.0, stemLength: 50, countPerBunch: 5 },
+          { price: 90.0, stemLength: 60, countPerBunch: 5 },
+          { price: 140.0, stemLength: 50, countPerBunch: 10 },
         ],
       },
     },
@@ -130,8 +130,8 @@ async function main() {
       featured: false,
       variants: {
         create: [
-          { price: 45.0, stemLength: 35, countPerBunch: 10, stock: 150 },
-          { price: 55.0, stemLength: 45, countPerBunch: 10, stock: 75 },
+          { price: 45.0, stemLength: 35, countPerBunch: 10 },
+          { price: 55.0, stemLength: 45, countPerBunch: 10 },
         ],
       },
     },

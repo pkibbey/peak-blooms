@@ -1,8 +1,9 @@
 import Link from "next/link";
 import Image from "next/image";
 import { notFound } from "next/navigation";
-import AddToCartButton from "@/components/site/AddToCartButton";
+import AddAllToCartButton from "@/components/site/AddAllToCartButton";
 import { db } from "@/lib/db";
+import { getCurrentUser } from "@/lib/auth-utils";
 
 interface InspirationDetailPageProps {
   params: Promise<{
@@ -35,10 +36,15 @@ export default async function InspirationDetailPage({
   params,
 }: InspirationDetailPageProps) {
   const { slug } = await params;
+  const user = await getCurrentUser();
   const set = await db.inspirationSet.findUnique({
     where: { slug },
     include: {
-      products: true,
+      products: {
+        include: {
+          variants: true,
+        },
+      },
     },
   });
 
@@ -84,7 +90,12 @@ export default async function InspirationDetailPage({
 
         {/* Add All to Cart Button */}
         <div className="mb-12">
-          <AddToCartButton setName={set.name} />
+          <AddAllToCartButton
+            productIds={set.products.map((p) => p.id)}
+            productVariantIds={set.products.map((p) => (p.variants?.[0]?.id ?? null))}
+            setName={set.name}
+            user={user}
+          />
         </div>
 
         {/* Products Section */}
@@ -97,6 +108,7 @@ export default async function InspirationDetailPage({
               <thead>
                 <tr className="bg-secondary/30 border-b border-gray-200">
                   <th className="text-left px-6 py-4 font-semibold">Product</th>
+                  <th className="text-left px-6 py-4 font-semibold">Variant</th>
                   <th className="text-left px-6 py-4 font-semibold">Status</th>
                 </tr>
               </thead>
@@ -115,6 +127,17 @@ export default async function InspirationDetailPage({
                       >
                         {product.name}
                       </Link>
+                    </td>
+                    <td className="px-6 py-4">
+                      {product.variants && product.variants.length > 0 ? (
+                        <div className="text-sm text-muted-foreground">
+                          {/* Display first variant details as representative */}
+                          <div className="font-medium">${product.variants[0].price.toFixed(2)}</div>
+                          <div className="text-xs">{product.variants[0].stemLength ? `${product.variants[0].stemLength}cm` : ""} {product.variants[0].countPerBunch ? `· ${product.variants[0].countPerBunch} stems` : ""}</div>
+                        </div>
+                      ) : (
+                        <div className="text-sm text-muted-foreground">${product.price.toFixed(2)}</div>
+                      )}
                     </td>
                     <td className="px-6 py-4">
                       <span className="inline-flex items-center gap-2 text-sm text-muted-foreground">

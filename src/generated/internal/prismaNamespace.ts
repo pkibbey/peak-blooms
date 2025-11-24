@@ -1431,7 +1431,6 @@ export const ProductScalarFieldEnum = {
   price: 'price',
   stemLength: 'stemLength',
   countPerBunch: 'countPerBunch',
-  stock: 'stock',
   categoryId: 'categoryId',
   featured: 'featured',
   createdAt: 'createdAt',
@@ -1447,7 +1446,6 @@ export const ProductVariantScalarFieldEnum = {
   price: 'price',
   stemLength: 'stemLength',
   countPerBunch: 'countPerBunch',
-  stock: 'stock',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const
