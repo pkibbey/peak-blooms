@@ -118,19 +118,6 @@ export default async function ProductDetailPage({
 
             {/* Product Configurator */}
             <ProductConfigurator product={product} showPrice={showPrice} />
-
-            {/* Related Links */}
-            <div className="pt-4">
-              <Button asChild variant="ghost" className="w-full">
-                <Link
-                  href={`/collections/${product.category.slug}`}
-                  className="inline-flex items-center justify-center gap-2"
-                >
-                  View More from {product.category.name}
-                  <IconArrowRight aria-hidden="true" />
-                </Link>
-              </Button>
-            </div>
           </div>
         </div>
 

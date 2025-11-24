@@ -2,7 +2,7 @@
 
 import Link from "next/link"
 import Image from "next/image"
-import { IconMail, IconShoppingBag, IconInfo, IconInstagram, IconFacebook } from "@/components/ui/icons"
+import { IconMail, IconInstagram, IconPhone } from "@/components/ui/icons"
 
 export default function Footer() {
   return (
@@ -17,7 +17,7 @@ export default function Footer() {
                 alt="Peak Blooms logo"
                 width={384}
                 height={44}
-                className="h-12 w-auto"
+                className="h-12 w-[209px]"
               />
             </Link>
 
@@ -30,12 +30,17 @@ export default function Footer() {
               <a href="mailto:hello@peakblooms.com" className="hover:underline">hello@peakblooms.com</a>
             </div>
 
+            <div className="mt-3 flex items-center gap-4 text-sm text-muted-foreground">
+              <IconPhone aria-hidden="true" />
+              <span>(619) 932-1139</span>
+            </div>
+
             <div className="mt-4 flex items-center gap-3">
               <a href="https://instagram.com/peakblooms" aria-label="Instagram" className="text-muted-foreground hover:text-foreground">
                 <IconInstagram />
               </a>
-              <a href="https://facebook.com/peakblooms" aria-label="Facebook" className="text-muted-foreground hover:text-foreground">
-                <IconFacebook />
+              <a href="https://instagram.com/peakblooms" className="text-sm text-muted-foreground hover:underline">
+                @peakblooms
               </a>
             </div>
           </div>

@@ -21,7 +21,7 @@ export function FeaturedInInspirationSets({
         Featured in These Collections
       </h2>
 
-      <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+      <div className="grid grid-cols-1 gap-6 sm:grid-cols-3">
         {inspirationSets.map((set) => (
           <div
             key={set.id}

@@ -27,7 +27,6 @@ const links = [
 export default function Nav() {
   const [open, setOpen] = useState(false)
   const { data: session } = useSession()
-  const [userMenuOpen, setUserMenuOpen] = useState(false)
 
   return (
     <header className="sticky top-0 z-50 w-full bg-white/70 backdrop-blur-sm border-b border-b-border">
@@ -45,7 +44,7 @@ export default function Nav() {
                 width={384}
                 height={44}
                 loading="eager"
-                className="h-8 w-auto"
+                className="h-8 w-[139px]"
               />
             </Link>
 
@@ -59,44 +58,33 @@ export default function Nav() {
           </div>
 
           <div className="flex items-center gap-4">
-            <div className="hidden md:block">
-              <Link href="/cart" className="inline-flex items-center gap-1">
-                <IconShoppingCart aria-hidden="true" />
-                <span>Cart</span>
-              </Link>
-            </div>
+            {session && (
+              <div className="hidden md:block">
+                <Link href="/cart" className="inline-flex items-center gap-1">
+                  <IconShoppingCart aria-hidden="true" />
+                  <span>Cart</span>
+                </Link>
+              </div>
+            )}
 
             {session ? (
-              <div className="relative hidden md:block">
-                <button
-                  onClick={() => setUserMenuOpen(!userMenuOpen)}
-                  className="inline-flex items-center gap-2 rounded px-3 py-2 text-sm hover:bg-secondary/10"
-                >
-                  <span>{session.user?.email}</span>
-                </button>
-                {userMenuOpen && (
-                  <div className="absolute right-0 mt-2 w-48 rounded-lg border border-border bg-white shadow-lg">
-                    {session.user?.role === "ADMIN" && (
-                      <Link
-                        href="/admin"
-                        className="block px-4 py-2 text-sm hover:bg-secondary/10 border-b border-b-border"
-                      >
-                        Admin Dashboard
-                      </Link>
-                    )}
-                    <button
-                      onClick={() => signOut({ callbackUrl: "/" })}
-                      className="w-full text-left px-4 py-2 text-sm hover:bg-secondary/10 text-destructive"
-                    >
-                      Sign Out
-                    </button>
-                  </div>
-                )}
-              </div>
-            ) : (
-              <Button asChild size="sm" className="hidden md:inline-flex">
-                <Link href="/auth/signin">Sign In</Link>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => signOut({ callbackUrl: "/" })}
+                className="hidden md:inline-flex"
+              >
+                Sign Out
               </Button>
+            ) : (
+              <div className="flex items-center gap-2">
+                <Button asChild size="sm" variant="outline" className="hidden md:inline-flex">
+                  <Link href="/auth/signin">Sign In</Link>
+                </Button>
+                <Button asChild size="sm" className="hidden md:inline-flex">
+                  <Link href="/auth/signup">Sign Up</Link>
+                </Button>
+              </div>
             )}
 
             <Button
@@ -123,12 +111,14 @@ export default function Nav() {
                   {l.label}
                 </NavLink>
               ))}
-              <Button asChild variant="ghost">
-                <Link href="/cart" className="inline-flex items-center gap-1 px-4 py-2">
-                  <IconShoppingCart aria-hidden="true" />
-                  <span>Cart</span>
-                </Link>
-              </Button>
+              {session && (
+                <Button asChild variant="ghost">
+                  <Link href="/cart" className="inline-flex items-center gap-1 px-4 py-2">
+                    <IconShoppingCart aria-hidden="true" />
+                    <span>Cart</span>
+                  </Link>
+                </Button>
+              )}
               {session ? (
                 <>
                   {session.user?.role === "ADMIN" && (
@@ -147,11 +137,18 @@ export default function Nav() {
                   </Button>
                 </>
               ) : (
-                <Button asChild>
-                  <Link href="/auth/signin" className="px-4 py-2">
-                    Sign In
-                  </Link>
-                </Button>
+                <>
+                  <Button asChild variant="ghost">
+                    <Link href="/auth/signin" className="px-4 py-2">
+                      Sign In
+                    </Link>
+                  </Button>
+                  <Button asChild>
+                    <Link href="/auth/signup" className="px-4 py-2">
+                      Sign Up
+                    </Link>
+                  </Button>
+                </>
               )}
             </div>
           </div>
