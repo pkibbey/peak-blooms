@@ -47,11 +47,7 @@ export default async function FeaturedCollections() {
                 <div>
                   <h3 className="text-xl font-bold font-serif">{collection.name}</h3>
                   <p className="mt-2 text-sm text-muted-foreground">
-                    {collection.name === "Classic Roses"
-                      ? "Timeless elegance and beauty"
-                      : collection.name === "Exotic Blooms"
-                        ? "Bold and vibrant arrangements"
-                        : "Nature's finest seasonal selections"}
+                    {collection.description}
                   </p>
                 </div>
 

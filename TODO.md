@@ -3,7 +3,6 @@
 ### 🚀 Core Features
 
 - [ ] Add user authentication
-- [ ] Move the static data into the database
 - [ ] Add admin section to be able to manage content
 - [ ] Hide prices for authenticated users
 - [ ] Add information for each flower (stem length, price, count per bunch, etc)
@@ -20,3 +19,4 @@
 - [ ] Add tracking to learn how the users are using the site
 - [ ] Collect user contact email for newsletter (overstock or flash sales)
 - [ ] Signup for newsletter to get a percentage off your first order
+- [ ] Detect missing images that have failed to load and add tracking to this, so that the entry can be fixed

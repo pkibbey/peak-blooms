@@ -4,41 +4,38 @@ import Link from "next/link";
 import Image from "next/image";
 import { db } from "@/lib/db";
 
-export default async function FeaturedProducts() {
-  const products = await db.product.findMany({
-    where: {
-      featured: true,
-    },
-    take: 4,
-  });
+export const metadata = {
+  title: "Collections",
+  description: "Browse our curated collection of premium flowers",
+};
+
+export default async function CollectionsPage() {
+  const categories = await db.category.findMany();
 
   return (
     <div className="flex flex-col items-center justify-start bg-white py-16 font-sans">
       <div className="w-full max-w-5xl px-6">
-        <div className="mb-12 flex items-end justify-between">
-          <div>
-            <h2 className="text-3xl font-extrabold font-serif">Featured Products</h2>
-            <p className="mt-2 text-muted-foreground">
-              Explore our handpicked selection of premium flowers
-            </p>
-          </div>
-          <Link href="/shop" className="text-sm font-medium text-primary hover:underline">
-            View all products →
-          </Link>
+        {/* Page Header */}
+        <div className="mb-12">
+          <h1 className="text-4xl font-extrabold font-serif">Collections</h1>
+          <p className="mt-2 text-lg text-muted-foreground">
+            Discover our curated selection of premium flower collections
+          </p>
         </div>
 
+        {/* Collections Grid */}
         <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
-          {products.map((product) => (
+          {categories.map((collection) => (
             <div
-              key={product.slug}
+              key={collection.slug}
               className="group flex flex-col overflow-hidden rounded-xs shadow-md transition-shadow hover:shadow-lg"
             >
               {/* Image Container */}
               <div className="relative aspect-square overflow-hidden bg-zinc-200">
-                {product.image && (
+                {collection.image && (
                   <Image
-                    src={product.image}
-                    alt={product.name}
+                    src={collection.image}
+                    alt={collection.name}
                     fill
                     sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
                     className="object-cover transition-transform duration-300 group-hover:scale-105"
@@ -49,18 +46,20 @@ export default async function FeaturedProducts() {
               {/* Card Content */}
               <div className="flex flex-col justify-between bg-white p-6">
                 <div>
-                  <h3 className="text-xl font-bold font-serif">{product.name}</h3>
+                  <h2 className="text-xl font-bold font-serif">
+                    {collection.name}
+                  </h2>
                   <p className="mt-2 text-sm text-muted-foreground">
-                    {product.description}
+                    {collection.description}
                   </p>
                 </div>
 
                 <Button asChild className="mt-6 w-full">
                   <Link
-                    href={`/shop/${product.slug}`}
+                    href={`/collections/${collection.slug}`}
                     className="inline-flex items-center justify-center gap-2"
                   >
-                    View Product
+                    Shop Now
                     <IconArrowRight aria-hidden="true" />
                   </Link>
                 </Button>

@@ -9,7 +9,7 @@ export default async function InspirationPage() {
 
   return (
     <div className="flex flex-col items-center justify-start bg-white py-16 font-sans">
-      <div className="w-full max-w-3xl px-6">
+      <div className="w-full max-w-5xl px-6">
         {/* Page Header */}
         <div className="mb-16">
           <h1 className="text-4xl font-extrabold font-serif">Inspirational Sets</h1>
@@ -46,7 +46,7 @@ export default async function InspirationPage() {
               {/* Content Container */}
               <div className="w-full md:w-1/2 flex flex-col justify-start">
                 <Link href={`/inspiration/${set.slug}`} className="group">
-                  <h2 className="text-3xl font-bold group-hover:text-primary transition-colors">
+                  <h2 className="text-3xl font-bold group-hover:text-primary transition-colors font-serif">
                     {set.name}
                   </h2>
                 </Link>

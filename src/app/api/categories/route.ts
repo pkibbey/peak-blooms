@@ -32,7 +32,7 @@ export async function POST(request: NextRequest) {
     // TODO: Add authentication check for admin
     const body = await request.json();
 
-    const { name, slug, image } = body;
+    const { name, slug, image, description } = body;
 
     if (!name || !slug) {
       return NextResponse.json(
@@ -46,6 +46,7 @@ export async function POST(request: NextRequest) {
         name,
         slug,
         image,
+        description,
       },
     });
 

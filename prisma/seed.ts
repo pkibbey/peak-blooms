@@ -31,6 +31,7 @@ async function main() {
       name: "Classic Roses",
       slug: "classic-roses",
       image: "/featured-categories/classic-roses.png",
+      description: "Timeless elegance and beauty in every bloom. Our classic rose collection features the most beloved varieties, perfect for traditional arrangements and timeless celebrations.",
     },
   });
 
@@ -39,6 +40,7 @@ async function main() {
       name: "Exotic Blooms",
       slug: "exotic-blooms",
       image: "/featured-categories/exotic-blooms.png",
+      description: "Bold and vibrant arrangements that bring drama and sophistication to any space. Discover unique textures and rich colors from around the world.",
     },
   });
 
@@ -47,6 +49,7 @@ async function main() {
       name: "Seasonal Wildflowers",
       slug: "seasonal-wildflowers",
       image: "/featured-categories/seasonal-wildflowers.png",
+      description: "Nature's finest seasonal selections capturing the essence of each time of year. Fresh, vibrant, and sustainably sourced for maximum impact.",
     },
   });
 

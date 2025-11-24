@@ -48,7 +48,7 @@ export default async function InspirationDetailPage({
 
   return (
     <div className="flex flex-col items-center justify-start bg-white py-16 font-sans">
-      <div className="w-full max-w-3xl px-6">
+      <div className="w-full max-w-5xl px-6">
         {/* Navigation Back Link */}
         <Link
           href="/inspiration"
@@ -58,7 +58,7 @@ export default async function InspirationDetailPage({
         </Link>
 
         {/* Featured Image */}
-        <div className="relative aspect-square overflow-hidden rounded-xs shadow-md mb-12">
+        <div className="relative aspect-video overflow-hidden rounded-xs shadow-md mb-12">
           <Image
             src={set.image}
             alt={set.name}
@@ -70,7 +70,7 @@ export default async function InspirationDetailPage({
 
         {/* Set Title and Subtitle */}
         <div className="mb-8">
-          <h1 className="text-4xl font-extrabold">{set.name}</h1>
+          <h1 className="text-4xl font-extrabold font-serif">{set.name}</h1>
           <p className="mt-2 text-lg text-muted-foreground">{set.subtitle}</p>
         </div>
 
