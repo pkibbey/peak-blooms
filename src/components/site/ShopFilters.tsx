@@ -10,6 +10,7 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { Button } from "@/components/ui/button"
+import { Label } from "@/components/ui/label"
 import { IconMenu, IconX } from "@/components/ui/icons"
 import { cn } from "@/lib/utils"
 
@@ -125,8 +126,8 @@ export default function ShopFilters({ categories, user }: ShopFiltersProps) {
     <div className="flex flex-col gap-4 md:gap-6">
       {/* Category Filter */}
       <div className="flex flex-col gap-2">
-        <label className="text-sm font-medium">Category</label>
-        <Select value={selectedCategory} onValueChange={handleCategoryChange}>
+        <Label className="text-sm font-medium">Category</Label>
+        <Select value={selectedCategory || "clear"} onValueChange={handleCategoryChange}>
           <SelectTrigger className="w-full">
             <SelectValue placeholder="All Categories" />
           </SelectTrigger>
@@ -144,8 +145,8 @@ export default function ShopFilters({ categories, user }: ShopFiltersProps) {
       {/* Color Filter */}
       {!loading && colors.length > 0 && (
         <div className="flex flex-col gap-2">
-          <label className="text-sm font-medium">Color</label>
-          <Select value={selectedColor} onValueChange={handleColorChange}>
+          <Label className="text-sm font-medium">Color</Label>
+          <Select value={selectedColor || "clear"} onValueChange={handleColorChange}>
             <SelectTrigger className="w-full">
               <SelectValue placeholder="All Colors" />
             </SelectTrigger>
@@ -164,8 +165,8 @@ export default function ShopFilters({ categories, user }: ShopFiltersProps) {
       {/* Stem Length Filter */}
       {!loading && stemLengths.length > 0 && (
         <div className="flex flex-col gap-2">
-          <label className="text-sm font-medium">Stem Length</label>
-          <Select value={selectedStemLength} onValueChange={handleStemLengthChange}>
+          <Label className="text-sm font-medium">Stem Length</Label>
+          <Select value={selectedStemLength || "clear"} onValueChange={handleStemLengthChange}>
             <SelectTrigger className="w-full">
               <SelectValue placeholder="All Lengths" />
             </SelectTrigger>
@@ -184,7 +185,7 @@ export default function ShopFilters({ categories, user }: ShopFiltersProps) {
       {/* Price Range Filter */}
       {isApproved && (
         <div className="flex flex-col gap-2">
-          <label className="text-sm font-medium">Price Range</label>
+          <Label className="text-sm font-medium">Price Range</Label>
           <Select
             value={
               selectedPriceMin && selectedPriceMax
@@ -244,10 +245,10 @@ export default function ShopFilters({ categories, user }: ShopFiltersProps) {
         <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
           {/* Category */}
           <div className="flex flex-col gap-2">
-            <label className="text-sm font-medium">Category</label>
-            <Select value={selectedCategory} onValueChange={handleCategoryChange}>
+            <Label className="text-sm font-medium">Category</Label>
+            <Select value={selectedCategory || "clear"} onValueChange={handleCategoryChange}>
               <SelectTrigger>
-                <SelectValue placeholder="All" />
+                <SelectValue placeholder="All Categories" />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="clear">All Categories</SelectItem>
@@ -263,10 +264,10 @@ export default function ShopFilters({ categories, user }: ShopFiltersProps) {
           {/* Color */}
           {!loading && colors.length > 0 && (
             <div className="flex flex-col gap-2">
-              <label className="text-sm font-medium">Color</label>
-              <Select value={selectedColor} onValueChange={handleColorChange}>
+              <Label className="text-sm font-medium">Color</Label>
+              <Select value={selectedColor || "clear"} onValueChange={handleColorChange}>
                 <SelectTrigger>
-                  <SelectValue placeholder="All" />
+                  <SelectValue placeholder="All Colors" />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="clear">All Colors</SelectItem>
@@ -283,10 +284,10 @@ export default function ShopFilters({ categories, user }: ShopFiltersProps) {
           {/* Stem Length */}
           {!loading && stemLengths.length > 0 && (
             <div className="flex flex-col gap-2">
-              <label className="text-sm font-medium">Stem Length</label>
-              <Select value={selectedStemLength} onValueChange={handleStemLengthChange}>
+              <Label className="text-sm font-medium">Stem Length</Label>
+              <Select value={selectedStemLength || "clear"} onValueChange={handleStemLengthChange}>
                 <SelectTrigger>
-                  <SelectValue placeholder="All" />
+                  <SelectValue placeholder="All Lengths" />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="clear">All Lengths</SelectItem>
@@ -303,7 +304,7 @@ export default function ShopFilters({ categories, user }: ShopFiltersProps) {
           {/* Price Range */}
           {isApproved && (
             <div className="flex flex-col gap-2">
-              <label className="text-sm font-medium">Price</label>
+              <Label className="text-sm font-medium">Price</Label>
               <Select
                 value={
                   selectedPriceMin && selectedPriceMax
@@ -328,7 +329,7 @@ export default function ShopFilters({ categories, user }: ShopFiltersProps) {
                 }}
               >
                 <SelectTrigger>
-                  <SelectValue placeholder="All" />
+                  <SelectValue placeholder="All Prices" />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="clear">All Prices</SelectItem>
@@ -345,7 +346,7 @@ export default function ShopFilters({ categories, user }: ShopFiltersProps) {
           {/* Clear Button */}
           {hasActiveFilters && (
             <div className="flex items-end">
-              <Button variant="outline" size="sm" onClick={handleClearFilters} className="w-full">
+              <Button variant="outline" size="lg" onClick={handleClearFilters} className="w-full">
                 Clear
               </Button>
             </div>

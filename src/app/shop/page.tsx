@@ -1,61 +1,78 @@
-"use client"
-
-import { useEffect, useState } from "react"
-import { useSearchParams } from "next/navigation"
+import { db } from "@/lib/db"
 import { ProductCard } from "@/components/site/ProductCard"
 import ShopFilters from "@/components/site/ShopFilters"
-import { useSession } from "next-auth/react"
+import { getCurrentUser } from "@/lib/auth-utils"
 
-export default function ShopPage() {
-  const { data: session } = useSession()
-  const searchParams = useSearchParams()
+interface ShopPageProps {
+  searchParams: Promise<Record<string, string | string[] | undefined>>
+}
 
-  const [products, setProducts] = useState<any[]>([])
-  const [categories, setCategories] = useState<any[]>([])
-  const [loading, setLoading] = useState(true)
+export const metadata = {
+  title: "Shop",
+  description: "Browse our full catalog of premium flowers",
+}
 
-  // Fetch categories
-  useEffect(() => {
-    const fetchCategories = async () => {
-      try {
-        const response = await fetch("/api/categories")
-        const data = await response.json()
-        setCategories(data)
-      } catch (error) {
-        console.error("Error fetching categories:", error)
-      }
+export default async function ShopPage({ searchParams }: ShopPageProps) {
+  const params = await searchParams
+  const user = await getCurrentUser()
+
+  // Get all categories
+  const categories = await db.category.findMany({
+    orderBy: { name: "asc" },
+  })
+
+  // Build filter conditions
+  const where: any = {}
+
+  const categoryId = typeof params.categoryId === "string" ? params.categoryId : undefined
+  const color = typeof params.color === "string" ? params.color : undefined
+  const stemLength = typeof params.stemLength === "string" ? params.stemLength : undefined
+  const priceMin = typeof params.priceMin === "string" ? params.priceMin : undefined
+  const priceMax = typeof params.priceMax === "string" ? params.priceMax : undefined
+
+  if (categoryId && categoryId !== "") {
+    where.categoryId = categoryId
+  }
+
+  if (color && color !== "") {
+    where.color = {
+      equals: color,
+      mode: "insensitive",
     }
+  }
 
-    fetchCategories()
-  }, [])
+  if (stemLength !== undefined && stemLength !== "") {
+    where.stemLength = parseInt(stemLength, 10)
+  }
 
-  // Fetch products with filters
-  useEffect(() => {
-    const fetchProducts = async () => {
-      setLoading(true)
-      try {
-        const queryString = searchParams.toString()
-        const url = `/api/products${queryString ? `?${queryString}` : ""}`
-        const response = await fetch(url)
-        const data = await response.json()
-        setProducts(data)
-      } catch (error) {
-        console.error("Error fetching products:", error)
-        setProducts([])
-      } finally {
-        setLoading(false)
-      }
+  if (priceMin !== undefined || priceMax !== undefined) {
+    where.price = {}
+    if (priceMin !== undefined && priceMin !== "") {
+      where.price.gte = parseFloat(priceMin)
     }
+    if (priceMax !== undefined && priceMax !== "") {
+      where.price.lte = parseFloat(priceMax)
+    }
+  }
 
-    fetchProducts()
-  }, [searchParams])
+  // Fetch filtered products
+  const products = await db.product.findMany({
+    where,
+    include: {
+      category: true,
+      variants: true,
+    },
+    orderBy: {
+      createdAt: "desc",
+    },
+  })
 
-  const user = session?.user
+  const userObj = user
     ? {
-        role: session.user.role as "CUSTOMER" | "ADMIN",
-        approved: (session.user as any).approved || false,
-        email: session.user.email,
-        name: session.user.name,
+        role: user.role as "CUSTOMER" | "ADMIN",
+        approved: user.approved || false,
+        email: user.email,
+        name: user.name,
       }
     : null
 
@@ -70,21 +87,17 @@ export default function ShopPage() {
         </div>
 
         {/* Filters */}
-        <ShopFilters categories={categories} user={user} />
+        <ShopFilters categories={categories} user={userObj} />
 
         {/* Products Grid */}
-        {loading ? (
-          <div className="flex justify-center items-center py-12">
-            <p className="text-muted-foreground">Loading products...</p>
-          </div>
-        ) : products.length === 0 ? (
+        {products.length === 0 ? (
           <div className="flex justify-center items-center py-12">
             <p className="text-muted-foreground">No products found matching your filters.</p>
           </div>
         ) : (
           <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
             {products.map((product) => (
-              <ProductCard key={product.slug} product={product} user={user} />
+              <ProductCard key={product.slug} product={product} user={userObj} />
             ))}
           </div>
         )}
