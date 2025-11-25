@@ -2,7 +2,7 @@ import { db } from "@/lib/db";
 import { NextRequest, NextResponse } from "next/server";
 
 /**
- * GET /api/inspiration
+ * GET /api/inspirations
  * Get all inspiration sets (collections)
  */
 export async function GET() {
@@ -22,7 +22,7 @@ export async function GET() {
 
     return NextResponse.json(inspirationSets);
   } catch (error) {
-    console.error("GET /api/inspiration error:", error);
+    console.error("GET /api/inspirations error:", error);
     return NextResponse.json(
       { error: "Failed to fetch inspiration sets" },
       { status: 500 }
@@ -31,7 +31,7 @@ export async function GET() {
 }
 
 /**
- * POST /api/inspiration
+ * POST /api/inspirations
  * Create a new inspiration set (admin only)
  */
 export async function POST(request: NextRequest) {
@@ -86,7 +86,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json(inspirationSet, { status: 201 });
   } catch (error) {
-    console.error("POST /api/inspiration error:", error);
+    console.error("POST /api/inspirations error:", error);
     return NextResponse.json(
       { error: "Failed to create inspiration set" },
       { status: 500 }

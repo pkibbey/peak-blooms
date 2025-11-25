@@ -2,8 +2,8 @@ import { db } from "@/lib/db";
 import { NextRequest, NextResponse } from "next/server";
 
 /**
- * GET /api/categories
- * Get all product categories
+ * GET /api/collections
+ * Get all product collections
  */
 export async function GET() {
   try {
@@ -15,17 +15,17 @@ export async function GET() {
 
     return NextResponse.json(categories);
   } catch (error) {
-    console.error("GET /api/categories error:", error);
+    console.error("GET /api/collections error:", error);
     return NextResponse.json(
-      { error: "Failed to fetch categories" },
+      { error: "Failed to fetch collections" },
       { status: 500 }
     );
   }
 }
 
 /**
- * POST /api/categories
- * Create a new category (admin only)
+ * POST /api/collections
+ * Create a new collection (admin only)
  */
 export async function POST(request: NextRequest) {
   try {
@@ -61,9 +61,9 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json(category, { status: 201 });
   } catch (error) {
-    console.error("POST /api/categories error:", error);
+    console.error("POST /api/collections error:", error);
     return NextResponse.json(
-      { error: "Failed to create category" },
+      { error: "Failed to create collection" },
       { status: 500 }
     );
   }

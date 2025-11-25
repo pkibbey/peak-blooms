@@ -58,7 +58,7 @@ export default async function ProductDetailPage({
         {/* Navigation Back Link */}
         <Link
           href="/shop"
-          className="text-sm font-medium text-primary hover:underline mb-8"
+          className="inline-block text-primary mb-4"
         >
           ← Back to shop
         </Link>

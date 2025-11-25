@@ -50,7 +50,7 @@ export default function Footer() {
               <ul className="mt-3 text-sm text-muted-foreground space-y-2">
                 <li><Link href="/shop" className="hover:underline inline-flex items-center gap-2">Flowers</Link></li>
                 <li><Link href="/collections" className="hover:underline">Collections</Link></li>
-                <li><Link href="/inspiration" className="hover:underline">Inspiration</Link></li>
+                <li><Link href="/inspirations" className="hover:underline">Inspirations</Link></li>
               </ul>
             </div>
 

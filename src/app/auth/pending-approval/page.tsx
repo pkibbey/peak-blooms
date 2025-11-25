@@ -53,7 +53,7 @@ async function InspirationSetsList() {
 
               <Button asChild className="mt-6 w-full">
                 <Link
-                  href={`/inspiration/${set.slug}`}
+                  href={`/inspirations/${set.slug}`}
                   className="inline-flex items-center justify-center gap-2"
                 >
                   View Collection
@@ -144,8 +144,8 @@ export default async function PendingApprovalPage({
             </div>
           </div>
 
-          {/* Inspiration Collections */}
-          <Suspense fallback={<div>Loading collections...</div>}>
+          {/* Inspirations */}
+          <Suspense fallback={<div>Loading inspirations...</div>}>
             <InspirationSetsList />
           </Suspense>
 

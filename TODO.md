@@ -4,11 +4,12 @@
 
 - [ ] Hide prices for authenticated users
 - [ ] Add order history for accounts
+- [ ] This shop assumes that the user only ever wants to add stem length or quanity of each flower, but what if they want to order multiple stem lenghts of the same thing?
 
 ### ✨ Future Ideas
 
-- [ ] Update logos
-- [ ] Update colour schemes
+- [ ] Update logos with proper graphics
+- [ ] Try our different colour schemes
 - [ ] Add price multiplier per account
 - [ ] Add ability to buy bulk boxlots for large scale event planners
 - [ ] Repeat customers / Bulk buying or repeat orders / Coupon code

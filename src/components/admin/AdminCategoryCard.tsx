@@ -28,7 +28,7 @@ export default function AdminCategoryCard({ category }: AdminCategoryCardProps) 
   const handleDelete = async () => {
     const productCount = category._count?.products || 0;
     const warningMessage = productCount > 0
-      ? `Are you sure you want to delete "${category.name}"? This will also delete ${productCount} product${productCount !== 1 ? "s" : ""} in this category. This action cannot be undone.`
+      ? `Are you sure you want to delete "${category.name}"? This will also delete ${productCount} product${productCount !== 1 ? "s" : ""} in this collection. This action cannot be undone.`
       : `Are you sure you want to delete "${category.name}"? This action cannot be undone.`;
 
     if (!window.confirm(warningMessage)) {
@@ -37,18 +37,18 @@ export default function AdminCategoryCard({ category }: AdminCategoryCardProps) 
 
     setIsDeleting(true);
     try {
-      const response = await fetch(`/api/categories/${category.id}`, {
+      const response = await fetch(`/api/collections/${category.id}`, {
         method: "DELETE",
       });
 
       if (response.ok) {
         router.refresh();
       } else {
-        console.error("Failed to delete category");
-        alert("Failed to delete category. Please try again.");
+        console.error("Failed to delete collection");
+        alert("Failed to delete collection. Please try again.");
       }
     } catch (error) {
-      console.error("Error deleting category:", error);
+      console.error("Error deleting collection:", error);
       alert("An error occurred. Please try again.");
     } finally {
       setIsDeleting(false);
@@ -56,7 +56,7 @@ export default function AdminCategoryCard({ category }: AdminCategoryCardProps) 
   };
 
   const handleNameUpdate = async (newName: string | number) => {
-    const response = await fetch(`/api/categories/${category.id}`, {
+    const response = await fetch(`/api/collections/${category.id}`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ name: newName }),
@@ -106,7 +106,7 @@ export default function AdminCategoryCard({ category }: AdminCategoryCardProps) 
       {/* Actions */}
       <div className="flex items-center gap-2">
         <Button size="sm" variant="outline" asChild>
-          <Link href={`/admin/categories/${category.id}/edit`}>Edit</Link>
+          <Link href={`/admin/collections/${category.id}/edit`}>Edit</Link>
         </Button>
         <Button
           size="sm"

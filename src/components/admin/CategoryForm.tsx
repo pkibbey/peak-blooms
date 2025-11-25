@@ -38,7 +38,7 @@ export default function CategoryForm({ category }: CategoryFormProps) {
     setError(null);
 
     try {
-      const url = isEditing ? `/api/categories/${category.id}` : "/api/categories";
+      const url = isEditing ? `/api/collections/${category.id}` : "/api/collections";
       const method = isEditing ? "PUT" : "POST";
 
       const response = await fetch(url, {
@@ -48,11 +48,11 @@ export default function CategoryForm({ category }: CategoryFormProps) {
       });
 
       if (response.ok) {
-        router.push("/admin/categories");
+        router.push("/admin/collections");
         router.refresh();
       } else {
         const data = await response.json();
-        setError(data.error || "Failed to save category");
+        setError(data.error || "Failed to save collection");
       }
     } catch (err) {
       setError("An error occurred. Please try again.");
@@ -92,7 +92,7 @@ export default function CategoryForm({ category }: CategoryFormProps) {
             value={formData.name}
             onChange={handleChange}
             className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm"
-            placeholder="Category name"
+            placeholder="Collection name"
           />
         </div>
 
@@ -114,7 +114,7 @@ export default function CategoryForm({ category }: CategoryFormProps) {
           onChange={handleChange}
           rows={4}
           className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm"
-          placeholder="Category description..."
+          placeholder="Collection description..."
         />
       </div>
 
@@ -149,10 +149,10 @@ export default function CategoryForm({ category }: CategoryFormProps) {
       {/* Actions */}
       <div className="flex gap-4">
         <Button type="submit" disabled={isSubmitting}>
-          {isSubmitting ? "Saving..." : isEditing ? "Update Category" : "Create Category"}
+          {isSubmitting ? "Saving..." : isEditing ? "Update Collection" : "Create Collection"}
         </Button>
         <Button type="button" variant="outline" asChild>
-          <Link href="/admin/categories">Cancel</Link>
+          <Link href="/admin/collections">Cancel</Link>
         </Button>
       </div>
     </form>

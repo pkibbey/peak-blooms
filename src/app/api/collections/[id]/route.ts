@@ -2,8 +2,8 @@ import { db } from "@/lib/db";
 import { NextRequest, NextResponse } from "next/server";
 
 /**
- * GET /api/categories/[id]
- * Get a single category by ID
+ * GET /api/collections/[id]
+ * Get a single collection by ID
  */
 export async function GET(
   request: NextRequest,
@@ -21,24 +21,24 @@ export async function GET(
 
     if (!category) {
       return NextResponse.json(
-        { error: "Category not found" },
+        { error: "Collection not found" },
         { status: 404 }
       );
     }
 
     return NextResponse.json(category);
   } catch (error) {
-    console.error("GET /api/categories/[id] error:", error);
+    console.error("GET /api/collections/[id] error:", error);
     return NextResponse.json(
-      { error: "Failed to fetch category" },
+      { error: "Failed to fetch collection" },
       { status: 500 }
     );
   }
 }
 
 /**
- * PUT /api/categories/[id]
- * Update a category (admin only)
+ * PUT /api/collections/[id]
+ * Update a collection (admin only)
  */
 export async function PUT(
   request: NextRequest,
@@ -67,7 +67,7 @@ export async function PUT(
 
     if (!existingCategory) {
       return NextResponse.json(
-        { error: "Category not found" },
+        { error: "Collection not found" },
         { status: 404 }
       );
     }
@@ -84,18 +84,18 @@ export async function PUT(
 
     return NextResponse.json(category);
   } catch (error) {
-    console.error("PUT /api/categories/[id] error:", error);
+    console.error("PUT /api/collections/[id] error:", error);
     return NextResponse.json(
-      { error: "Failed to update category" },
+      { error: "Failed to update collection" },
       { status: 500 }
     );
   }
 }
 
 /**
- * DELETE /api/categories/[id]
- * Delete a category (admin only)
- * Note: This will cascade delete all products in the category
+ * DELETE /api/collections/[id]
+ * Delete a collection (admin only)
+ * Note: This will cascade delete all products in the collection
  */
 export async function DELETE(
   request: NextRequest,
@@ -126,7 +126,7 @@ export async function DELETE(
 
     if (!existingCategory) {
       return NextResponse.json(
-        { error: "Category not found" },
+        { error: "Collection not found" },
         { status: 404 }
       );
     }
@@ -140,9 +140,9 @@ export async function DELETE(
       deletedProductCount: existingCategory._count.products,
     });
   } catch (error) {
-    console.error("DELETE /api/categories/[id] error:", error);
+    console.error("DELETE /api/collections/[id] error:", error);
     return NextResponse.json(
-      { error: "Failed to delete category" },
+      { error: "Failed to delete collection" },
       { status: 500 }
     );
   }

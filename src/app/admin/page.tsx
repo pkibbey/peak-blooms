@@ -45,24 +45,14 @@ export default async function AdminDashboard() {
             <div>
               <h2 className="text-xl font-semibold">Content Management</h2>
               <p className="mt-2 text-sm text-muted-foreground">
-                Manage products, categories, and collections
+                Manage products, collections, and inspirations
               </p>
             </div>
           </div>
 
           <div className="mt-6 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
             <div className="rounded-md border border-border p-4">
-              <h3 className="text-lg font-semibold">Categories</h3>
-              <p className="mt-1 text-sm text-muted-foreground">Organize products into categories</p>
-              <div className="mt-4 flex flex-col gap-2">
-                <Button asChild size="sm">
-                  <Link href="/admin/categories">Manage Categories</Link>
-                </Button>
-              </div>
-            </div>
-
-            <div className="rounded-md border border-border p-4">
-              <h3 className="text-lg font-semibold">Products</h3>
+              <h3 className="text-lg font-semibold">Shop</h3>
               <p className="mt-1 text-sm text-muted-foreground">Add, edit, and manage product listings</p>
               <div className="mt-4 flex flex-col gap-2">
                 <Button asChild size="sm">
@@ -71,13 +61,23 @@ export default async function AdminDashboard() {
               </div>
             </div>
 
-
             <div className="rounded-md border border-border p-4">
               <h3 className="text-lg font-semibold">Collections</h3>
-              <p className="mt-1 text-sm text-muted-foreground">Curate inspiration sets and collections</p>
+              <p className="mt-1 text-sm text-muted-foreground">Organize products into collections</p>
               <div className="mt-4 flex flex-col gap-2">
                 <Button asChild size="sm">
                   <Link href="/admin/collections">Manage Collections</Link>
+                </Button>
+              </div>
+            </div>
+
+
+            <div className="rounded-md border border-border p-4">
+              <h3 className="text-lg font-semibold">Inspirations</h3>
+              <p className="mt-1 text-sm text-muted-foreground">Curate inspiration sets</p>
+              <div className="mt-4 flex flex-col gap-2">
+                <Button asChild size="sm">
+                  <Link href="/admin/inspirations">Manage Inspirations</Link>
                 </Button>
               </div>
             </div>

@@ -3,13 +3,13 @@ import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import CollectionForm from "@/components/admin/CollectionForm";
+import CategoryForm from "@/components/admin/CategoryForm";
 
-interface EditCollectionPageProps {
+interface EditCategoryPageProps {
   params: Promise<{ id: string }>;
 }
 
-export default async function EditCollectionPage({ params }: EditCollectionPageProps) {
+export default async function EditCollectionPage({ params }: EditCategoryPageProps) {
   const session = await auth();
 
   if (!session?.user || session.user.role !== "ADMIN") {
@@ -18,26 +18,11 @@ export default async function EditCollectionPage({ params }: EditCollectionPageP
 
   const { id } = await params;
 
-  const [collection, products] = await Promise.all([
-    db.inspirationSet.findUnique({
-      where: { id },
-      include: {
-        products: {
-          select: { id: true },
-        },
-      },
-    }),
-    db.product.findMany({
-      include: {
-        category: {
-          select: { name: true },
-        },
-      },
-      orderBy: { name: "asc" },
-    }),
-  ]);
+  const category = await db.category.findUnique({
+    where: { id },
+  });
 
-  if (!collection) {
+  if (!category) {
     notFound();
   }
 
@@ -48,12 +33,12 @@ export default async function EditCollectionPage({ params }: EditCollectionPageP
           <Link href="/admin/collections" className="mb-4">← Back to Collections</Link>
           <h1 className="text-3xl font-bold">Edit Collection</h1>
           <p className="mt-2 text-muted-foreground">
-            Update &ldquo;{collection.name}&rdquo;
+            Update &ldquo;{category.name}&rdquo;
           </p>
         </div>
 
         <div className="rounded-lg border border-border p-6">
-          <CollectionForm products={products} collection={collection} />
+          <CategoryForm category={category} />
         </div>
       </div>
     </div>

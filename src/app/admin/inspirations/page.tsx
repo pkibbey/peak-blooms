@@ -3,23 +3,23 @@ import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import AdminCategoryCard from "@/components/admin/AdminCategoryCard";
+import AdminCollectionCard from "@/components/admin/AdminCollectionCard";
 
-export default async function AdminCategoriesPage() {
+export default async function AdminInspirationsPage() {
   const session = await auth();
 
   if (!session?.user || session.user.role !== "ADMIN") {
     redirect("/admin/unauthorized");
   }
 
-  const categories = await db.category.findMany({
+  const collections = await db.inspirationSet.findMany({
     include: {
-      _count: {
-        select: { products: true },
+      products: {
+        select: { id: true },
       },
     },
     orderBy: {
-      name: "asc",
+      createdAt: "desc",
     },
   });
 
@@ -28,26 +28,26 @@ export default async function AdminCategoriesPage() {
       <div className="mx-auto max-w-5xl px-4 py-12 sm:px-6 lg:px-8">
         <div className="mb-8 flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-bold">Categories</h1>
+            <h1 className="text-3xl font-bold">Inspirations</h1>
             <p className="mt-2 text-muted-foreground">
-              Organize products into categories ({categories.length} total)
+              Curate inspiration sets ({collections.length} total)
             </p>
           </div>
           <Button asChild>
-            <Link href="/admin/categories/new">Add Category</Link>
+            <Link href="/admin/inspirations/new">Add Inspiration</Link>
           </Button>
         </div>
 
-        {/* Categories List */}
+        {/* Inspirations List */}
         <div>
-          {categories.length === 0 ? (
+          {collections.length === 0 ? (
             <p className="text-muted-foreground">
-              No categories found. Add your first category to get started.
+              No inspirations found. Add your first inspiration to get started.
             </p>
           ) : (
             <div className="space-y-3">
-              {categories.map((category) => (
-                <AdminCategoryCard key={category.id} category={category} />
+              {collections.map((collection) => (
+                <AdminCollectionCard key={collection.id} collection={collection} />
               ))}
             </div>
           )}

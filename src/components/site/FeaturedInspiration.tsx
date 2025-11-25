@@ -19,10 +19,10 @@ export default async function FeaturedInspiration() {
             </p>
           </div>
           <Link
-            href="/inspiration"
+            href="/inspirations"
             className="text-sm font-medium text-primary hover:underline"
           >
-            View all inspiration →
+            View all inspirations →
           </Link>
         </div>
 
@@ -58,7 +58,7 @@ export default async function FeaturedInspiration() {
 
                 <Button asChild className="mt-6 w-full md:w-auto">
                   <Link
-                    href={`/inspiration/${set.slug}`}
+                    href={`/inspirations/${set.slug}`}
                     className="inline-flex items-center justify-center gap-2"
                   >
                     View Set

@@ -5,8 +5,8 @@ import { IconArrowRight } from "@/components/ui/icons";
 import { db } from "@/lib/db";
 
 export const metadata = {
-  title: "Peak Blooms - Inspiration",
-  description: "Explore our curated flower arrangements for inspiration",
+  title: "Peak Blooms - Inspirations",
+  description: "Explore our curated flower arrangements for inspiration and delight.",
 }
 
 export default async function InspirationPage() {
@@ -36,7 +36,7 @@ export default async function InspirationPage() {
             >
               {/* Image Container */}
               <div className="w-full md:w-1/2 flex-shrink-0">
-                <Link href={`/inspiration/${set.slug}`} className="block">
+                <Link href={`/inspirations/${set.slug}`} className="block">
                   <div className="relative aspect-video overflow-hidden rounded-xs shadow-md hover:shadow-lg transition-shadow">
                     <Image
                       src={set.image}
@@ -50,7 +50,7 @@ export default async function InspirationPage() {
 
               {/* Content Container */}
               <div className="w-full md:w-1/2 flex flex-col justify-start">
-                <Link href={`/inspiration/${set.slug}`} className="group">
+                <Link href={`/inspirations/${set.slug}`} className="group">
                   <h2 className="text-3xl font-bold group-hover:text-primary transition-colors font-serif">
                     {set.name}
                   </h2>
@@ -64,7 +64,7 @@ export default async function InspirationPage() {
 
                 <Button asChild className="mt-6 w-full md:w-auto">
                   <Link
-                    href={`/inspiration/${set.slug}`}
+                    href={`/inspirations/${set.slug}`}
                     className="inline-flex items-center justify-center gap-2"
                   >
                     View Set Details

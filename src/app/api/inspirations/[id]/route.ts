@@ -2,7 +2,7 @@ import { db } from "@/lib/db";
 import { NextRequest, NextResponse } from "next/server";
 
 /**
- * GET /api/inspiration/[id]
+ * GET /api/inspirations/[id]
  * Get a single inspiration set by ID
  */
 export async function GET(
@@ -32,7 +32,7 @@ export async function GET(
 
     return NextResponse.json(inspirationSet);
   } catch (error) {
-    console.error("GET /api/inspiration/[id] error:", error);
+    console.error("GET /api/inspirations/[id] error:", error);
     return NextResponse.json(
       { error: "Failed to fetch inspiration set" },
       { status: 500 }
@@ -41,7 +41,7 @@ export async function GET(
 }
 
 /**
- * PUT /api/inspiration/[id]
+ * PUT /api/inspirations/[id]
  * Update an inspiration set (admin only)
  */
 export async function PUT(
@@ -115,7 +115,7 @@ export async function PUT(
 
     return NextResponse.json(inspirationSet);
   } catch (error) {
-    console.error("PUT /api/inspiration/[id] error:", error);
+    console.error("PUT /api/inspirations/[id] error:", error);
     return NextResponse.json(
       { error: "Failed to update inspiration set" },
       { status: 500 }
@@ -124,7 +124,7 @@ export async function PUT(
 }
 
 /**
- * DELETE /api/inspiration/[id]
+ * DELETE /api/inspirations/[id]
  * Delete an inspiration set (admin only)
  */
 export async function DELETE(
@@ -162,7 +162,7 @@ export async function DELETE(
 
     return NextResponse.json({ success: true });
   } catch (error) {
-    console.error("DELETE /api/inspiration/[id] error:", error);
+    console.error("DELETE /api/inspirations/[id] error:", error);
     return NextResponse.json(
       { error: "Failed to delete inspiration set" },
       { status: 500 }

@@ -57,7 +57,7 @@ export default function CollectionForm({ products, collection }: CollectionFormP
     setError(null);
 
     try {
-      const url = isEditing ? `/api/inspiration/${collection.id}` : "/api/inspiration";
+      const url = isEditing ? `/api/inspirations/${collection.id}` : "/api/inspirations";
       const method = isEditing ? "PUT" : "POST";
 
       const response = await fetch(url, {
@@ -70,11 +70,11 @@ export default function CollectionForm({ products, collection }: CollectionFormP
       });
 
       if (response.ok) {
-        router.push("/admin/collections");
+        router.push("/admin/inspirations");
         router.refresh();
       } else {
         const data = await response.json();
-        setError(data.error || "Failed to save collection");
+        setError(data.error || "Failed to save inspiration");
       }
     } catch (err) {
       setError("An error occurred. Please try again.");
@@ -114,7 +114,7 @@ export default function CollectionForm({ products, collection }: CollectionFormP
             value={formData.name}
             onChange={handleChange}
             className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm"
-            placeholder="Collection name"
+            placeholder="Inspiration name"
           />
         </div>
 
@@ -196,13 +196,13 @@ export default function CollectionForm({ products, collection }: CollectionFormP
           onChange={handleChange}
           rows={6}
           className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm"
-          placeholder="The full story or description for the collection page..."
+          placeholder="The full story or description for the inspiration page..."
         />
       </div>
 
       {/* Products */}
       <div className="space-y-2">
-        <Label>Products in Collection</Label>
+        <Label>Products in Inspiration</Label>
         <ProductMultiSelect
           products={products}
           selectedIds={selectedProductIds}
@@ -213,10 +213,10 @@ export default function CollectionForm({ products, collection }: CollectionFormP
       {/* Actions */}
       <div className="flex gap-4">
         <Button type="submit" disabled={isSubmitting}>
-          {isSubmitting ? "Saving..." : isEditing ? "Update Collection" : "Create Collection"}
+          {isSubmitting ? "Saving..." : isEditing ? "Update Inspiration" : "Create Inspiration"}
         </Button>
         <Button type="button" variant="outline" asChild>
-          <Link href="/admin/collections">Cancel</Link>
+          <Link href="/admin/inspirations">Cancel</Link>
         </Button>
       </div>
     </form>

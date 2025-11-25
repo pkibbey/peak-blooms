@@ -20,7 +20,7 @@ import { Badge } from "../ui/badge"
 const links = [
   { label: "Shop", href: "/shop", icon: <IconShoppingBag /> },
   { label: "Collections", href: "/collections", icon: <IconFlower /> },
-  { label: "Inspiration", href: "/inspiration", icon: <IconRose /> },
+  { label: "Inspirations", href: "/inspirations", icon: <IconRose /> },
 ]
 
 interface NavProps {

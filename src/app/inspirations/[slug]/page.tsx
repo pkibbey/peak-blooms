@@ -57,10 +57,10 @@ export default async function InspirationDetailPage({
       <div className="w-full max-w-5xl px-6">
         {/* Navigation Back Link */}
         <Link
-          href="/inspiration"
+          href="/inspirations"
           className="text-sm font-medium text-primary hover:underline mb-8"
         >
-          ← Back to inspiration
+          ← Back to inspirations
         </Link>
 
         {/* Featured Image */}
@@ -188,10 +188,10 @@ export default async function InspirationDetailPage({
         {/* Back Button */}
         <div className="mt-12 pt-8 border-t border-gray-200">
           <Link
-            href="/inspiration"
+            href="/inspirations"
             className="text-sm font-medium text-primary hover:underline"
           >
-            ← Back to inspiration
+            ← Back to inspirations
           </Link>
         </div>
       </div>

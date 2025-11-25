@@ -51,7 +51,7 @@ export function FeaturedInInspirationSets({
 
               <Button asChild className="mt-6 w-full">
                 <Link
-                  href={`/inspiration/${set.slug}`}
+                  href={`/inspirations/${set.slug}`}
                   className="inline-flex items-center justify-center gap-2"
                 >
                   View Collection

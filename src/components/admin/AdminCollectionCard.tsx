@@ -32,18 +32,18 @@ export default function AdminCollectionCard({ collection }: AdminCollectionCardP
 
     setIsDeleting(true);
     try {
-      const response = await fetch(`/api/inspiration/${collection.id}`, {
+      const response = await fetch(`/api/inspirations/${collection.id}`, {
         method: "DELETE",
       });
 
       if (response.ok) {
         router.refresh();
       } else {
-        console.error("Failed to delete collection");
-        alert("Failed to delete collection. Please try again.");
+        console.error("Failed to delete inspiration");
+        alert("Failed to delete inspiration. Please try again.");
       }
     } catch (error) {
-      console.error("Error deleting collection:", error);
+      console.error("Error deleting inspiration:", error);
       alert("An error occurred. Please try again.");
     } finally {
       setIsDeleting(false);
@@ -51,7 +51,7 @@ export default function AdminCollectionCard({ collection }: AdminCollectionCardP
   };
 
   const handleNameUpdate = async (newName: string | number) => {
-    const response = await fetch(`/api/inspiration/${collection.id}`, {
+    const response = await fetch(`/api/inspirations/${collection.id}`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ name: newName }),
@@ -104,7 +104,7 @@ export default function AdminCollectionCard({ collection }: AdminCollectionCardP
       {/* Actions */}
       <div className="flex items-center gap-2">
         <Button size="sm" variant="outline" asChild>
-          <Link href={`/admin/collections/${collection.id}/edit`}>Edit</Link>
+          <Link href={`/admin/inspirations/${collection.id}/edit`}>Edit</Link>
         </Button>
         <Button
           size="sm"
