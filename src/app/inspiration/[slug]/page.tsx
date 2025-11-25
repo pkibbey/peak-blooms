@@ -107,6 +107,7 @@ export default async function InspirationDetailPage({
             <table className="w-full">
               <thead>
                 <tr className="bg-secondary/30 border-b border-gray-200">
+                  <th className="text-left px-6 py-4 font-semibold">Image</th>
                   <th className="text-left px-6 py-4 font-semibold">Product</th>
                   <th className="text-left px-6 py-4 font-semibold">Variant</th>
                   <th className="text-left px-6 py-4 font-semibold">Status</th>
@@ -120,6 +121,28 @@ export default async function InspirationDetailPage({
                       index % 2 === 0 ? "bg-white" : "bg-gray-50/50"
                     } hover:bg-secondary/20 transition-colors`}
                   >
+                    <td className="px-6 py-4">
+                      <Link
+                        href={`/shop/${product.slug}`}
+                        className="block"
+                      >
+                        {product.image ? (
+                          <div className="relative h-16 w-16 overflow-hidden rounded-sm bg-gray-100">
+                            <Image
+                              src={product.image}
+                              alt={product.name}
+                              fill
+                              className="object-cover"
+                              sizes="64px"
+                            />
+                          </div>
+                        ) : (
+                          <div className="h-16 w-16 rounded-sm bg-gray-200 flex items-center justify-center text-xs text-muted-foreground">
+                            No image
+                          </div>
+                        )}
+                      </Link>
+                    </td>
                     <td className="px-6 py-4">
                       <Link
                         href={`/shop/${product.slug}`}

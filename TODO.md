@@ -4,8 +4,8 @@
 
 - [ ] Add admin section to be able to manage content
 - [ ] Hide prices for authenticated users
+- [ ] Get full cart functionality working
 - [ ] Add order history for accounts
-- [ ] Add account approval page
 - [ ] products on the inspiration pages should have small preview images in the table also
 
 ### ✨ Future Ideas
