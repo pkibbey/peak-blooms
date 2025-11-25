@@ -4,6 +4,11 @@ import { Button } from "@/components/ui/button";
 import { IconArrowRight } from "@/components/ui/icons";
 import { db } from "@/lib/db";
 
+export const metadata = {
+  title: "Peak Blooms - Inspiration",
+  description: "Explore our curated flower arrangements for inspiration",
+}
+
 export default async function InspirationPage() {
   const inspirationSets = await db.inspirationSet.findMany();
 

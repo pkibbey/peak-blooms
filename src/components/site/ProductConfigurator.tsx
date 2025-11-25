@@ -96,13 +96,8 @@ export function ProductConfigurator({
     <div className="flex flex-col gap-6">
       {/* Price Display */}
       {isSignedOut ? (
-        <div className="flex flex-col gap-3">
-          <div className="text-sm text-muted-foreground italic">
-            Sign in to view pricing
-          </div>
-          <Button size="sm" asChild variant="outline">
-            <Link href="/auth/signin">Sign In</Link>
-          </Button>
+        <div className="text-sm text-muted-foreground italic">
+          Sign in to view pricing
         </div>
       ) : isUnapproved ? (
         <div className="text-sm text-muted-foreground italic">
@@ -192,7 +187,7 @@ export function ProductConfigurator({
       {/* Add to Cart Button */}
       {isSignedOut ? (
         <Button size="lg" className="w-full" asChild>
-          <Link href="/auth/signin">Sign In to Purchase</Link>
+          <Link href="/auth/signin">Sign in to view pricing</Link>
         </Button>
       ) : isUnapproved ? (
         <Button size="lg" className="w-full" disabled>

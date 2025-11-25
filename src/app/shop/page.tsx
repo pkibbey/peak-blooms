@@ -1,5 +1,6 @@
 import { db } from "@/lib/db"
 import { ProductCard } from "@/components/site/ProductCard"
+import type { ProductWhereInput } from "@/generated/models/Product"
 import ShopFilters from "@/components/site/ShopFilters"
 import { getCurrentUser } from "@/lib/auth-utils"
 
@@ -8,7 +9,7 @@ interface ShopPageProps {
 }
 
 export const metadata = {
-  title: "Shop",
+  title: "Peak Blooms - Shop",
   description: "Browse our full catalog of premium flowers",
 }
 
@@ -22,7 +23,7 @@ export default async function ShopPage({ searchParams }: ShopPageProps) {
   })
 
   // Build filter conditions
-  const where: any = {}
+  const where: ProductWhereInput = {}
 
   const categoryId = typeof params.categoryId === "string" ? params.categoryId : undefined
   const color = typeof params.color === "string" ? params.color : undefined
@@ -86,22 +87,28 @@ export default async function ShopPage({ searchParams }: ShopPageProps) {
           </p>
         </div>
 
-        {/* Filters */}
-        <ShopFilters categories={categories} user={userObj} />
+        <div className="flex flex-col md:flex-row md:items-start md:gap-8">
+          {/* Sidebar (filters) */}
+          <aside className="w-full md:w-72 lg:w-80">
+            <ShopFilters categories={categories} user={userObj} />
+          </aside>
 
-        {/* Products Grid */}
+          {/* Products Grid */}
         {products.length === 0 ? (
           <div className="flex justify-center items-center py-12">
             <p className="text-muted-foreground">No products found matching your filters.</p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
+          <div className="flex-1">
+            <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
             {products.map((product) => (
               <ProductCard key={product.slug} product={product} user={userObj} />
             ))}
+            </div>
           </div>
         )}
       </div>
+    </div>
     </div>
   )
 }

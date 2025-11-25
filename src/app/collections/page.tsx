@@ -5,7 +5,7 @@ import Image from "next/image";
 import { db } from "@/lib/db";
 
 export const metadata = {
-  title: "Collections",
+  title: "Peak Blooms - Collections",
   description: "Browse our curated collection of premium flowers",
 };
 
