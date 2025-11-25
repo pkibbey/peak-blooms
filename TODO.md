@@ -2,9 +2,7 @@
 
 ### 🚀 Core Features
 
-- [ ] Add admin section to be able to manage content
 - [ ] Hide prices for authenticated users
-- [ ] Get full cart functionality working
 - [ ] Add order history for accounts
 
 ### ✨ Future Ideas
@@ -20,3 +18,6 @@
 - [ ] Detect missing images that have failed to load and add tracking to this, so that the entry can be fixed
 - [ ] make sure that the data is not just hidden from the UI, but also not returned in the database calls for unauthenticated users also
 - [ ] remove "use client" from as many pages as possible, to load the site from the server for speed and security reasons
+- [ ] Add image upload for content management instead of url fields
+- [ ] Allow download of content as CSV, so that they can be edited offline and uploaded to modify the content
+- [ ] Go through the site and make sure that the components are separated well. Some of the files are pretty big, and could be split up a little to keep the code cleaner and make future changes more isolated

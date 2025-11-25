@@ -6,7 +6,6 @@ import Link from "next/link"
 import { signOut } from "next-auth/react"
 import NavLink from "@/components/site/NavLink"
 import {
-  IconHome,
   IconShoppingBag,
   IconMenu,
   IconX,
@@ -15,12 +14,10 @@ import {
   IconFlower,
   IconSettings,
 } from "@/components/ui/icons"
-import { cn } from "@/lib/utils"
 import { Button } from "../ui/button"
 import { Badge } from "../ui/badge"
 
 const links = [
-  { label: "Home", href: "/", icon: <IconHome /> },
   { label: "Shop", href: "/shop", icon: <IconShoppingBag /> },
   { label: "Collections", href: "/collections", icon: <IconFlower /> },
   { label: "Inspiration", href: "/inspiration", icon: <IconRose /> },
@@ -56,7 +53,7 @@ export default function Nav({ user, cartCount = 0 }: NavProps) {
                 width={384}
                 height={44}
                 loading="eager"
-                className="h-8 w-[139px]"
+                className="h-8 w-[139px] shrink-0"
               />
             </Link>
 
@@ -115,10 +112,8 @@ export default function Nav({ user, cartCount = 0 }: NavProps) {
               aria-label={open ? "Close menu" : "Open menu"}
               aria-expanded={open}
               onClick={() => setOpen((v) => !v)}
-              className={cn(
-                "inline-flex h-9 w-9 items-center justify-center focus:outline-none focus-visible:ring-2 focus-visible:ring-ring md:hidden",
-                open ? "bg-secondary/30" : "hover:bg-secondary/10"
-              )}
+              size="icon"
+              className="md:hidden"
               variant="default"
             >
               {open ? <IconX aria-hidden="true" /> : <IconMenu aria-hidden="true" />}

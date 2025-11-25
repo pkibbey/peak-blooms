@@ -5,6 +5,7 @@ import { signIn } from "next-auth/react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
 
 export default function SignInPage() {
   const searchParams = useSearchParams();
@@ -87,9 +88,7 @@ export default function SignInPage() {
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
-            <label htmlFor="email" className="block text-sm font-medium">
-              Email
-            </label>
+            <Label htmlFor="email">Email</Label>
             <input
               id="email"
               type="email"

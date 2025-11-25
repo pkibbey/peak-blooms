@@ -1,5 +1,5 @@
 import React from "react"
-import { ShoppingCart, ShoppingBag, Home, Menu, X, Info, Mail, Flower, ArrowRight, Instagram, Facebook, Rose, Phone, Settings } from "lucide-react"
+import { ShoppingCart, ShoppingBag, Home, Menu, X, Info, Mail, Flower, ArrowRight, Instagram, Facebook, Rose, Phone, Settings, Plus } from "lucide-react"
 
 // Small re-exports used across the UI so we have a single place to tweak sizing & classes
 export const IconSizeClass = "h-4 w-4"
@@ -10,10 +10,6 @@ export function IconShoppingCart(props: React.ComponentProps<typeof ShoppingCart
 
 export function IconShoppingBag(props: React.ComponentProps<typeof ShoppingBag>) {
   return <ShoppingBag {...props} className={[IconSizeClass, props.className].filter(Boolean).join(" ")} />
-}
-
-export function IconHome(props: React.ComponentProps<typeof Home>) {
-  return <Home {...props} className={[IconSizeClass, props.className].filter(Boolean).join(" ")} />
 }
 
 export function IconMenu(props: React.ComponentProps<typeof Menu>) {
@@ -58,6 +54,10 @@ export function IconPhone(props: React.ComponentProps<typeof Phone>) {
 
 export function IconSettings(props: React.ComponentProps<typeof Settings>) {
   return <Settings {...props} className={[IconSizeClass, props.className].filter(Boolean).join(" ")} />
+}
+
+export function IconPlus(props: React.ComponentProps<typeof Plus>) {
+  return <Plus {...props} className={[IconSizeClass, props.className].filter(Boolean).join(" ")} />
 }
 
 // intentionally no default export — use named icon exports

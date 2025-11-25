@@ -11,6 +11,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import Link from "next/link";
+import { Label } from "../ui/label";
 
 interface ProductVariant {
   id: string;
@@ -114,9 +115,7 @@ export function ProductConfigurator({
         <div className="grid grid-cols-2 gap-4 border-t border-b border-gray-200 py-6">
           {stemLengths.length > 0 && (
             <div className="space-y-2">
-              <label className="text-sm font-semibold text-muted-foreground">
-                Stem Length
-              </label>
+              <Label>Stem Length</Label>
               <Select
                 value={selectedStemLength}
                 onValueChange={setSelectedStemLength}
@@ -137,9 +136,7 @@ export function ProductConfigurator({
 
           {counts.length > 0 && (
             <div className="space-y-2">
-              <label className="text-sm font-semibold text-muted-foreground">
-                Count per Bunch
-              </label>
+              <Label>Count per Bunch</Label>
               <Select value={selectedCount} onValueChange={setSelectedCount}>
                 <SelectTrigger>
                   <SelectValue placeholder="Select count" />

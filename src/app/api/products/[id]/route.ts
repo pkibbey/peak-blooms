@@ -1,0 +1,167 @@
+import { db } from "@/lib/db";
+import { NextRequest, NextResponse } from "next/server";
+
+/**
+ * GET /api/products/[id]
+ * Get a single product by ID
+ */
+export async function GET(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  try {
+    const { id } = await params;
+
+    const product = await db.product.findUnique({
+      where: { id },
+      include: {
+        category: true,
+        variants: true,
+        inspirationSets: true,
+      },
+    });
+
+    if (!product) {
+      return NextResponse.json(
+        { error: "Product not found" },
+        { status: 404 }
+      );
+    }
+
+    return NextResponse.json(product);
+  } catch (error) {
+    console.error("GET /api/products/[id] error:", error);
+    return NextResponse.json(
+      { error: "Failed to fetch product" },
+      { status: 500 }
+    );
+  }
+}
+
+/**
+ * PUT /api/products/[id]
+ * Update a product (admin only)
+ */
+export async function PUT(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  try {
+    const { auth } = await import("@/lib/auth");
+    const session = await auth();
+
+    if (!session || session.user.role !== "ADMIN") {
+      return NextResponse.json(
+        { error: "Unauthorized" },
+        { status: 401 }
+      );
+    }
+
+    const { id } = await params;
+    const body = await request.json();
+
+    const {
+      name,
+      slug,
+      description,
+      image,
+      price,
+      color,
+      stemLength,
+      countPerBunch,
+      categoryId,
+      featured,
+    } = body;
+
+    // Check if product exists
+    const existingProduct = await db.product.findUnique({
+      where: { id },
+    });
+
+    if (!existingProduct) {
+      return NextResponse.json(
+        { error: "Product not found" },
+        { status: 404 }
+      );
+    }
+
+    const product = await db.product.update({
+      where: { id },
+      data: {
+        ...(name !== undefined && { name }),
+        ...(slug !== undefined && { slug }),
+        ...(description !== undefined && { description }),
+        ...(image !== undefined && { image }),
+        ...(price !== undefined && { price: parseFloat(price) }),
+        ...(color !== undefined && { color: color || null }),
+        ...(stemLength !== undefined && {
+          stemLength: stemLength ? parseInt(stemLength) : null,
+        }),
+        ...(countPerBunch !== undefined && {
+          countPerBunch: countPerBunch ? parseInt(countPerBunch) : null,
+        }),
+        ...(categoryId !== undefined && { categoryId }),
+        ...(featured !== undefined && { featured }),
+      },
+      include: {
+        category: true,
+        variants: true,
+      },
+    });
+
+    return NextResponse.json(product);
+  } catch (error) {
+    console.error("PUT /api/products/[id] error:", error);
+    return NextResponse.json(
+      { error: "Failed to update product" },
+      { status: 500 }
+    );
+  }
+}
+
+/**
+ * DELETE /api/products/[id]
+ * Delete a product (admin only)
+ */
+export async function DELETE(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  try {
+    const { auth } = await import("@/lib/auth");
+    const session = await auth();
+
+    if (!session || session.user.role !== "ADMIN") {
+      return NextResponse.json(
+        { error: "Unauthorized" },
+        { status: 401 }
+      );
+    }
+
+    const { id } = await params;
+
+    // Check if product exists
+    const existingProduct = await db.product.findUnique({
+      where: { id },
+    });
+
+    if (!existingProduct) {
+      return NextResponse.json(
+        { error: "Product not found" },
+        { status: 404 }
+      );
+    }
+
+    await db.product.delete({
+      where: { id },
+    });
+
+    return NextResponse.json({ success: true });
+  } catch (error) {
+    console.error("DELETE /api/products/[id] error:", error);
+    return NextResponse.json(
+      { error: "Failed to delete product" },
+      { status: 500 }
+    );
+  }
+}
