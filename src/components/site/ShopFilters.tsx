@@ -229,6 +229,7 @@ export default function ShopFilters({ categories, colors, stemLengths, user }: S
   return (
     <>
       {/* Desktop Filters - Horizontal Bar */}
+      <h3 className="hidden md:block text-lg font-semibold">Product Filters</h3>
       <div className="hidden md:block mb-6 bg-secondary/30 rounded-lg px-4 py-3">
         <div className="flex flex-wrap items-center gap-3">
           {/* Category Filter */}

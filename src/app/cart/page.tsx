@@ -1,5 +1,6 @@
 import { redirect } from "next/navigation"
 import { getCurrentUser } from "@/lib/auth-utils"
+import Cart from "@/components/site/Cart"
 
 export default async function CartPage() {
   const user = await getCurrentUser()
@@ -16,8 +17,8 @@ export default async function CartPage() {
 
   return (
     <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 py-10">
-      <h1 className="text-3xl font-bold mb-8">Shopping Cart</h1>
-      <p className="text-muted-foreground">Cart page coming soon...</p>
+      <h1 className="text-3xl font-bold font-serif mb-8">Shopping Cart</h1>
+      <Cart />
     </div>
   )
 }

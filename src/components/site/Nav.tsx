@@ -66,6 +66,13 @@ export default function Nav({ user, cartCount = 0 }: NavProps) {
                   {l.label}
                 </NavLink>
               ))}
+
+              {/* Admin link should appear inline with the primary nav when the user is an admin */}
+              {user?.role === "ADMIN" && (
+                <NavLink href="/admin" icon={<IconSettings />}>
+                  Admin
+                </NavLink>
+              )}
             </nav>
           </div>
 
@@ -80,15 +87,6 @@ export default function Nav({ user, cartCount = 0 }: NavProps) {
                       {cartCount}
                     </Badge>
                   )}
-                </Link>
-              </div>
-            )}
-
-            {user?.role === "ADMIN" && (
-              <div className="hidden md:block">
-                <Link href="/admin" className="inline-flex items-center gap-1">
-                  <IconSettings aria-hidden="true" />
-                  <span>Admin</span>
                 </Link>
               </div>
             )}
@@ -153,12 +151,9 @@ export default function Nav({ user, cartCount = 0 }: NavProps) {
               {user ? (
                 <>
                   {user.role === "ADMIN" && (
-                    <Button asChild variant="ghost">
-                      <Link href="/admin" className="px-4 py-2">
-                        <IconSettings aria-hidden="true" />
-                        Admin Dashboard
-                      </Link>
-                    </Button>
+                    <NavLink href="/admin" icon={<IconSettings />} className="px-4 py-2">
+                      Admin Dashboard
+                    </NavLink>
                   )}
                   <Button
                     variant="ghost"

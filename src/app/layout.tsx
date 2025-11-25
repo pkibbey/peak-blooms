@@ -40,12 +40,12 @@ export default async function RootLayout({
     name: currentUser.name,
   } : null;
 
-  // Fetch cart count for approved users
+  // Fetch cart count for approved users (count of unique items, not total quantity)
   let cartCount = 0;
   if (currentUser?.approved) {
     const cart = await getOrCreateCart();
     if (cart?.items) {
-      cartCount = cart.items.reduce((sum, item) => sum + (item.quantity ?? 0), 0);
+      cartCount = cart.items.length;
     }
   }
 
