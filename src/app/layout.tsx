@@ -46,7 +46,7 @@ export default async function RootLayout({
         <SessionProvider>
           <Nav user={user} />
 
-          <main id="content" className="min-h-[calc(100vh-8rem)]">
+          <main id="content">
             {children}
           </main>
 

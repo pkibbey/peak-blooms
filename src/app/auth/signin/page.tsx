@@ -8,7 +8,14 @@ import { Button } from "@/components/ui/button";
 
 export default function SignInPage() {
   const searchParams = useSearchParams();
-  const callbackUrl = searchParams.get("callbackUrl") || "/";
+  // If a caller passed a callbackUrl (e.g. /admin) keep it; otherwise send
+  // users through a short server-side redirect handler which will route
+  // admins to /admin and everyone else to home. This ensures admin users
+  // who sign in from the generic flow are taken to the dashboard.
+  const callbackUrl =
+    searchParams.get("callbackUrl") || `/auth/redirect?next=${encodeURIComponent(
+      "/"
+    )}`;
   const error = searchParams.get("error");
 
   const [email, setEmail] = useState("");
@@ -40,7 +47,7 @@ export default function SignInPage() {
 
   if (submitted) {
     return (
-      <div className="flex min-h-screen items-center justify-center px-4 py-12">
+      <div className="flex items-center justify-center px-4 py-12">
         <div className="w-full max-w-md space-y-6">
           <div className="space-y-2 text-center">
             <h1 className="text-2xl font-bold">Check your email</h1>
@@ -61,7 +68,7 @@ export default function SignInPage() {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center px-4 py-12">
+    <div className="flex items-center justify-center px-4 py-12">
       <div className="w-full max-w-md space-y-6">
         <div className="space-y-2 text-center">
           <h1 className="text-2xl font-bold">Sign in to Peak Blooms</h1>

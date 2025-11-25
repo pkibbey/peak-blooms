@@ -75,7 +75,7 @@ export default async function PendingApprovalPage({
   const email = params.email || "";
 
   return (
-    <div className="flex min-h-screen flex-col bg-white">
+    <div className="flex flex-col bg-white">
       <div className="flex flex-1 items-center justify-center px-4 py-16">
         <div className="w-full max-w-3xl space-y-8">
           {/* Header Section */}

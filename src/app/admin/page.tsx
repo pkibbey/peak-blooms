@@ -7,12 +7,12 @@ export default async function AdminDashboard() {
   const session = await auth();
 
   // Verify admin role
-  if (!session || session.user.role !== "ADMIN") {
+  if (!session?.user || session.user.role !== "ADMIN") {
     redirect("/admin/unauthorized");
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="bg-background">
       <div className="mx-auto max-w-5xl px-4 py-12 sm:px-6 lg:px-8">
         <div className="mb-8">
           <h1 className="text-3xl font-bold">Admin Dashboard</h1>

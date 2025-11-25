@@ -67,9 +67,16 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   callbacks: {
     async session({ session, user }) {
       if (session.user) {
-        session.user.id = user.id;
-        session.user.approved = user.approved;
-        session.user.role = user.role;
+        // Fetch fresh user data from database to ensure role/approved status is current
+        const freshUser = await db.user.findUnique({
+          where: { id: user.id },
+        });
+        
+        if (freshUser) {
+          session.user.id = freshUser.id;
+          session.user.approved = freshUser.approved;
+          session.user.role = freshUser.role;
+        }
       }
       return session;
     },

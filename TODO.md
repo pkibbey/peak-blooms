@@ -3,6 +3,7 @@
 ### 🚀 Core Features
 
 - [ ] Add admin section to be able to manage content
+	- [x] Add admin unauthorized page and redirect flow (implemented)
 - [ ] Hide prices for authenticated users
 - [ ] Add order history for accounts
 - [ ] Add account approval page
