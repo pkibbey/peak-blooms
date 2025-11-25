@@ -45,6 +45,7 @@ export type ProductMinAggregateOutputType = {
   description: string | null
   image: string | null
   price: number | null
+  color: string | null
   stemLength: number | null
   countPerBunch: number | null
   categoryId: string | null
@@ -60,6 +61,7 @@ export type ProductMaxAggregateOutputType = {
   description: string | null
   image: string | null
   price: number | null
+  color: string | null
   stemLength: number | null
   countPerBunch: number | null
   categoryId: string | null
@@ -75,6 +77,7 @@ export type ProductCountAggregateOutputType = {
   description: number
   image: number
   price: number
+  color: number
   stemLength: number
   countPerBunch: number
   categoryId: number
@@ -104,6 +107,7 @@ export type ProductMinAggregateInputType = {
   description?: true
   image?: true
   price?: true
+  color?: true
   stemLength?: true
   countPerBunch?: true
   categoryId?: true
@@ -119,6 +123,7 @@ export type ProductMaxAggregateInputType = {
   description?: true
   image?: true
   price?: true
+  color?: true
   stemLength?: true
   countPerBunch?: true
   categoryId?: true
@@ -134,6 +139,7 @@ export type ProductCountAggregateInputType = {
   description?: true
   image?: true
   price?: true
+  color?: true
   stemLength?: true
   countPerBunch?: true
   categoryId?: true
@@ -236,6 +242,7 @@ export type ProductGroupByOutputType = {
   description: string | null
   image: string | null
   price: number
+  color: string | null
   stemLength: number | null
   countPerBunch: number | null
   categoryId: string
@@ -274,6 +281,7 @@ export type ProductWhereInput = {
   description?: Prisma.StringNullableFilter<"Product"> | string | null
   image?: Prisma.StringNullableFilter<"Product"> | string | null
   price?: Prisma.FloatFilter<"Product"> | number
+  color?: Prisma.StringNullableFilter<"Product"> | string | null
   stemLength?: Prisma.IntNullableFilter<"Product"> | number | null
   countPerBunch?: Prisma.IntNullableFilter<"Product"> | number | null
   categoryId?: Prisma.StringFilter<"Product"> | string
@@ -294,6 +302,7 @@ export type ProductOrderByWithRelationInput = {
   description?: Prisma.SortOrderInput | Prisma.SortOrder
   image?: Prisma.SortOrderInput | Prisma.SortOrder
   price?: Prisma.SortOrder
+  color?: Prisma.SortOrderInput | Prisma.SortOrder
   stemLength?: Prisma.SortOrderInput | Prisma.SortOrder
   countPerBunch?: Prisma.SortOrderInput | Prisma.SortOrder
   categoryId?: Prisma.SortOrder
@@ -317,6 +326,7 @@ export type ProductWhereUniqueInput = Prisma.AtLeast<{
   description?: Prisma.StringNullableFilter<"Product"> | string | null
   image?: Prisma.StringNullableFilter<"Product"> | string | null
   price?: Prisma.FloatFilter<"Product"> | number
+  color?: Prisma.StringNullableFilter<"Product"> | string | null
   stemLength?: Prisma.IntNullableFilter<"Product"> | number | null
   countPerBunch?: Prisma.IntNullableFilter<"Product"> | number | null
   categoryId?: Prisma.StringFilter<"Product"> | string
@@ -337,6 +347,7 @@ export type ProductOrderByWithAggregationInput = {
   description?: Prisma.SortOrderInput | Prisma.SortOrder
   image?: Prisma.SortOrderInput | Prisma.SortOrder
   price?: Prisma.SortOrder
+  color?: Prisma.SortOrderInput | Prisma.SortOrder
   stemLength?: Prisma.SortOrderInput | Prisma.SortOrder
   countPerBunch?: Prisma.SortOrderInput | Prisma.SortOrder
   categoryId?: Prisma.SortOrder
@@ -360,6 +371,7 @@ export type ProductScalarWhereWithAggregatesInput = {
   description?: Prisma.StringNullableWithAggregatesFilter<"Product"> | string | null
   image?: Prisma.StringNullableWithAggregatesFilter<"Product"> | string | null
   price?: Prisma.FloatWithAggregatesFilter<"Product"> | number
+  color?: Prisma.StringNullableWithAggregatesFilter<"Product"> | string | null
   stemLength?: Prisma.IntNullableWithAggregatesFilter<"Product"> | number | null
   countPerBunch?: Prisma.IntNullableWithAggregatesFilter<"Product"> | number | null
   categoryId?: Prisma.StringWithAggregatesFilter<"Product"> | string
@@ -375,6 +387,7 @@ export type ProductCreateInput = {
   description?: string | null
   image?: string | null
   price: number
+  color?: string | null
   stemLength?: number | null
   countPerBunch?: number | null
   featured?: boolean
@@ -394,6 +407,7 @@ export type ProductUncheckedCreateInput = {
   description?: string | null
   image?: string | null
   price: number
+  color?: string | null
   stemLength?: number | null
   countPerBunch?: number | null
   categoryId: string
@@ -413,6 +427,7 @@ export type ProductUpdateInput = {
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   price?: Prisma.FloatFieldUpdateOperationsInput | number
+  color?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   stemLength?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   countPerBunch?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   featured?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -432,6 +447,7 @@ export type ProductUncheckedUpdateInput = {
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   price?: Prisma.FloatFieldUpdateOperationsInput | number
+  color?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   stemLength?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   countPerBunch?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   categoryId?: Prisma.StringFieldUpdateOperationsInput | string
@@ -451,6 +467,7 @@ export type ProductCreateManyInput = {
   description?: string | null
   image?: string | null
   price: number
+  color?: string | null
   stemLength?: number | null
   countPerBunch?: number | null
   categoryId: string
@@ -466,6 +483,7 @@ export type ProductUpdateManyMutationInput = {
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   price?: Prisma.FloatFieldUpdateOperationsInput | number
+  color?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   stemLength?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   countPerBunch?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   featured?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -480,6 +498,7 @@ export type ProductUncheckedUpdateManyInput = {
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   price?: Prisma.FloatFieldUpdateOperationsInput | number
+  color?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   stemLength?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   countPerBunch?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   categoryId?: Prisma.StringFieldUpdateOperationsInput | string
@@ -505,6 +524,7 @@ export type ProductCountOrderByAggregateInput = {
   description?: Prisma.SortOrder
   image?: Prisma.SortOrder
   price?: Prisma.SortOrder
+  color?: Prisma.SortOrder
   stemLength?: Prisma.SortOrder
   countPerBunch?: Prisma.SortOrder
   categoryId?: Prisma.SortOrder
@@ -526,6 +546,7 @@ export type ProductMaxOrderByAggregateInput = {
   description?: Prisma.SortOrder
   image?: Prisma.SortOrder
   price?: Prisma.SortOrder
+  color?: Prisma.SortOrder
   stemLength?: Prisma.SortOrder
   countPerBunch?: Prisma.SortOrder
   categoryId?: Prisma.SortOrder
@@ -541,6 +562,7 @@ export type ProductMinOrderByAggregateInput = {
   description?: Prisma.SortOrder
   image?: Prisma.SortOrder
   price?: Prisma.SortOrder
+  color?: Prisma.SortOrder
   stemLength?: Prisma.SortOrder
   countPerBunch?: Prisma.SortOrder
   categoryId?: Prisma.SortOrder
@@ -697,6 +719,7 @@ export type ProductCreateWithoutCategoryInput = {
   description?: string | null
   image?: string | null
   price: number
+  color?: string | null
   stemLength?: number | null
   countPerBunch?: number | null
   featured?: boolean
@@ -715,6 +738,7 @@ export type ProductUncheckedCreateWithoutCategoryInput = {
   description?: string | null
   image?: string | null
   price: number
+  color?: string | null
   stemLength?: number | null
   countPerBunch?: number | null
   featured?: boolean
@@ -762,6 +786,7 @@ export type ProductScalarWhereInput = {
   description?: Prisma.StringNullableFilter<"Product"> | string | null
   image?: Prisma.StringNullableFilter<"Product"> | string | null
   price?: Prisma.FloatFilter<"Product"> | number
+  color?: Prisma.StringNullableFilter<"Product"> | string | null
   stemLength?: Prisma.IntNullableFilter<"Product"> | number | null
   countPerBunch?: Prisma.IntNullableFilter<"Product"> | number | null
   categoryId?: Prisma.StringFilter<"Product"> | string
@@ -777,6 +802,7 @@ export type ProductCreateWithoutInspirationSetsInput = {
   description?: string | null
   image?: string | null
   price: number
+  color?: string | null
   stemLength?: number | null
   countPerBunch?: number | null
   featured?: boolean
@@ -795,6 +821,7 @@ export type ProductUncheckedCreateWithoutInspirationSetsInput = {
   description?: string | null
   image?: string | null
   price: number
+  color?: string | null
   stemLength?: number | null
   countPerBunch?: number | null
   categoryId: string
@@ -834,6 +861,7 @@ export type ProductCreateWithoutVariantsInput = {
   description?: string | null
   image?: string | null
   price: number
+  color?: string | null
   stemLength?: number | null
   countPerBunch?: number | null
   featured?: boolean
@@ -852,6 +880,7 @@ export type ProductUncheckedCreateWithoutVariantsInput = {
   description?: string | null
   image?: string | null
   price: number
+  color?: string | null
   stemLength?: number | null
   countPerBunch?: number | null
   categoryId: string
@@ -886,6 +915,7 @@ export type ProductUpdateWithoutVariantsInput = {
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   price?: Prisma.FloatFieldUpdateOperationsInput | number
+  color?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   stemLength?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   countPerBunch?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   featured?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -904,6 +934,7 @@ export type ProductUncheckedUpdateWithoutVariantsInput = {
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   price?: Prisma.FloatFieldUpdateOperationsInput | number
+  color?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   stemLength?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   countPerBunch?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   categoryId?: Prisma.StringFieldUpdateOperationsInput | string
@@ -922,6 +953,7 @@ export type ProductCreateWithoutCartItemsInput = {
   description?: string | null
   image?: string | null
   price: number
+  color?: string | null
   stemLength?: number | null
   countPerBunch?: number | null
   featured?: boolean
@@ -940,6 +972,7 @@ export type ProductUncheckedCreateWithoutCartItemsInput = {
   description?: string | null
   image?: string | null
   price: number
+  color?: string | null
   stemLength?: number | null
   countPerBunch?: number | null
   categoryId: string
@@ -974,6 +1007,7 @@ export type ProductUpdateWithoutCartItemsInput = {
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   price?: Prisma.FloatFieldUpdateOperationsInput | number
+  color?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   stemLength?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   countPerBunch?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   featured?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -992,6 +1026,7 @@ export type ProductUncheckedUpdateWithoutCartItemsInput = {
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   price?: Prisma.FloatFieldUpdateOperationsInput | number
+  color?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   stemLength?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   countPerBunch?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   categoryId?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1010,6 +1045,7 @@ export type ProductCreateWithoutOrderItemsInput = {
   description?: string | null
   image?: string | null
   price: number
+  color?: string | null
   stemLength?: number | null
   countPerBunch?: number | null
   featured?: boolean
@@ -1028,6 +1064,7 @@ export type ProductUncheckedCreateWithoutOrderItemsInput = {
   description?: string | null
   image?: string | null
   price: number
+  color?: string | null
   stemLength?: number | null
   countPerBunch?: number | null
   categoryId: string
@@ -1062,6 +1099,7 @@ export type ProductUpdateWithoutOrderItemsInput = {
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   price?: Prisma.FloatFieldUpdateOperationsInput | number
+  color?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   stemLength?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   countPerBunch?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   featured?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -1080,6 +1118,7 @@ export type ProductUncheckedUpdateWithoutOrderItemsInput = {
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   price?: Prisma.FloatFieldUpdateOperationsInput | number
+  color?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   stemLength?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   countPerBunch?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   categoryId?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1098,6 +1137,7 @@ export type ProductCreateManyCategoryInput = {
   description?: string | null
   image?: string | null
   price: number
+  color?: string | null
   stemLength?: number | null
   countPerBunch?: number | null
   featured?: boolean
@@ -1112,6 +1152,7 @@ export type ProductUpdateWithoutCategoryInput = {
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   price?: Prisma.FloatFieldUpdateOperationsInput | number
+  color?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   stemLength?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   countPerBunch?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   featured?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -1130,6 +1171,7 @@ export type ProductUncheckedUpdateWithoutCategoryInput = {
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   price?: Prisma.FloatFieldUpdateOperationsInput | number
+  color?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   stemLength?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   countPerBunch?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   featured?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -1148,6 +1190,7 @@ export type ProductUncheckedUpdateManyWithoutCategoryInput = {
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   price?: Prisma.FloatFieldUpdateOperationsInput | number
+  color?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   stemLength?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   countPerBunch?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   featured?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -1162,6 +1205,7 @@ export type ProductUpdateWithoutInspirationSetsInput = {
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   price?: Prisma.FloatFieldUpdateOperationsInput | number
+  color?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   stemLength?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   countPerBunch?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   featured?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -1180,6 +1224,7 @@ export type ProductUncheckedUpdateWithoutInspirationSetsInput = {
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   price?: Prisma.FloatFieldUpdateOperationsInput | number
+  color?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   stemLength?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   countPerBunch?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   categoryId?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1198,6 +1243,7 @@ export type ProductUncheckedUpdateManyWithoutInspirationSetsInput = {
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   price?: Prisma.FloatFieldUpdateOperationsInput | number
+  color?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   stemLength?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   countPerBunch?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   categoryId?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1271,6 +1317,7 @@ export type ProductSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   description?: boolean
   image?: boolean
   price?: boolean
+  color?: boolean
   stemLength?: boolean
   countPerBunch?: boolean
   categoryId?: boolean
@@ -1292,6 +1339,7 @@ export type ProductSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Exten
   description?: boolean
   image?: boolean
   price?: boolean
+  color?: boolean
   stemLength?: boolean
   countPerBunch?: boolean
   categoryId?: boolean
@@ -1308,6 +1356,7 @@ export type ProductSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Exten
   description?: boolean
   image?: boolean
   price?: boolean
+  color?: boolean
   stemLength?: boolean
   countPerBunch?: boolean
   categoryId?: boolean
@@ -1324,6 +1373,7 @@ export type ProductSelectScalar = {
   description?: boolean
   image?: boolean
   price?: boolean
+  color?: boolean
   stemLength?: boolean
   countPerBunch?: boolean
   categoryId?: boolean
@@ -1332,7 +1382,7 @@ export type ProductSelectScalar = {
   updatedAt?: boolean
 }
 
-export type ProductOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "slug" | "description" | "image" | "price" | "stemLength" | "countPerBunch" | "categoryId" | "featured" | "createdAt" | "updatedAt", ExtArgs["result"]["product"]>
+export type ProductOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "slug" | "description" | "image" | "price" | "color" | "stemLength" | "countPerBunch" | "categoryId" | "featured" | "createdAt" | "updatedAt", ExtArgs["result"]["product"]>
 export type ProductInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   category?: boolean | Prisma.CategoryDefaultArgs<ExtArgs>
   cartItems?: boolean | Prisma.Product$cartItemsArgs<ExtArgs>
@@ -1364,6 +1414,7 @@ export type $ProductPayload<ExtArgs extends runtime.Types.Extensions.InternalArg
     description: string | null
     image: string | null
     price: number
+    color: string | null
     stemLength: number | null
     countPerBunch: number | null
     categoryId: string
@@ -1804,6 +1855,7 @@ export interface ProductFieldRefs {
   readonly description: Prisma.FieldRef<"Product", 'String'>
   readonly image: Prisma.FieldRef<"Product", 'String'>
   readonly price: Prisma.FieldRef<"Product", 'Float'>
+  readonly color: Prisma.FieldRef<"Product", 'String'>
   readonly stemLength: Prisma.FieldRef<"Product", 'Int'>
   readonly countPerBunch: Prisma.FieldRef<"Product", 'Int'>
   readonly categoryId: Prisma.FieldRef<"Product", 'String'>

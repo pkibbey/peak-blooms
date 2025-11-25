@@ -1,5 +1,3 @@
-"use client";
-
 import Link from "next/link";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
@@ -14,7 +12,6 @@ interface ProductCardProps {
 }
 
 export function ProductCard({ product, user }: ProductCardProps) {
-  const isSignedOut = !user;
   const isUnapproved = user && !user.approved;
   const isApproved = user && user.approved;
 

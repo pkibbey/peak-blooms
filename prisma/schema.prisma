@@ -102,6 +102,7 @@ model Product {
   description     String?   @db.Text
   image           String?
   price           Float
+  color           String?
   stemLength      Int?      @map("stem_length")
   countPerBunch   Int?      @map("count_per_bunch")
   categoryId      String

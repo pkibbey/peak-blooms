@@ -4,13 +4,17 @@ import { NextRequest, NextResponse } from "next/server";
 /**
  * GET /api/products
  * Get all products (with optional filtering)
- * Query params: categoryId, featured
+ * Query params: categoryId, featured, color, stemLength, priceMin, priceMax
  */
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
     const categoryId = searchParams.get("categoryId");
     const featured = searchParams.get("featured");
+    const color = searchParams.get("color");
+    const stemLength = searchParams.get("stemLength");
+    const priceMin = searchParams.get("priceMin");
+    const priceMax = searchParams.get("priceMax");
 
     const where: Record<string, unknown> = {};
 
@@ -22,10 +26,32 @@ export async function GET(request: NextRequest) {
       where.featured = true;
     }
 
+    if (color && color !== "") {
+      where.color = {
+        equals: color,
+        mode: "insensitive",
+      };
+    }
+
+    if (stemLength !== null) {
+      where.stemLength = parseInt(stemLength as string, 10);
+    }
+
+    if (priceMin !== null || priceMax !== null) {
+      where.price = {};
+      if (priceMin !== null) {
+        (where.price as Record<string, unknown>).gte = parseFloat(priceMin as string);
+      }
+      if (priceMax !== null) {
+        (where.price as Record<string, unknown>).lte = parseFloat(priceMax as string);
+      }
+    }
+
     const products = await db.product.findMany({
       where,
       include: {
         category: true,
+        variants: true,
       },
       orderBy: {
         createdAt: "desc",
@@ -60,7 +86,7 @@ export async function POST(request: NextRequest) {
 
     const body = await request.json();
 
-    const { name, slug, description, image, price, stemLength, countPerBunch, categoryId, featured } = body;
+    const { name, slug, description, image, price, color, stemLength, countPerBunch, categoryId, featured } = body;
 
     if (!name || !slug || !price || !categoryId) {
       return NextResponse.json(
@@ -76,6 +102,7 @@ export async function POST(request: NextRequest) {
         description,
         image,
         price: parseFloat(price),
+        color: color || null,
         stemLength: stemLength ? parseInt(stemLength) : null,
         countPerBunch: countPerBunch ? parseInt(countPerBunch) : null,
         categoryId,
