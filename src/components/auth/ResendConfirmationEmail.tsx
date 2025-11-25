@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { IconMail } from "@/components/ui/icons";
 
@@ -12,7 +13,6 @@ export function ResendConfirmationEmail({
   email,
 }: ResendConfirmationEmailProps) {
   const [loading, setLoading] = useState(false);
-  const [sent, setSent] = useState(false);
   const [error, setError] = useState("");
 
   const handleResend = async () => {
@@ -38,8 +38,7 @@ export function ResendConfirmationEmail({
 
       const data = await response.json();
       console.log("Resend success response:", data);
-      setSent(true);
-      setTimeout(() => setSent(false), 3000);
+      toast.success(`Confirmation email sent to ${email}`);
     } catch (err) {
       console.error("Resend exception:", err);
       setError(
@@ -59,15 +58,10 @@ export function ResendConfirmationEmail({
         className="inline-flex items-center gap-2"
       >
         <IconMail aria-hidden="true" />
-        {loading ? "Sending..." : sent ? "Email Sent!" : "Resend Confirmation Email"}
+        Resend Confirmation Email
       </Button>
       {error && (
         <p className="text-sm text-destructive">{error}</p>
-      )}
-      {sent && (
-        <p className="text-sm text-green-600">
-          Confirmation email sent to {email}
-        </p>
       )}
     </div>
   );

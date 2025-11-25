@@ -112,7 +112,7 @@ export default function AdminCollectionCard({ collection }: AdminCollectionCardP
           onClick={handleDelete}
           disabled={isDeleting}
         >
-          {isDeleting ? "..." : "Delete"}
+          Delete
         </Button>
       </div>
     </div>

@@ -97,7 +97,7 @@ export default function AddAllToCartButton({ productIds, productVariantIds, setN
   return (
     <>
       <Button size="lg" className="w-full md:w-auto" onClick={handleAddAllToCart} disabled={loading}>
-        {loading ? "Adding..." : "Add All to Cart"}
+        Add All to Cart
       </Button>
       {error ? <p className="mt-2 text-sm text-destructive">{error}</p> : null}
     </>

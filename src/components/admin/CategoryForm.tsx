@@ -149,7 +149,7 @@ export default function CategoryForm({ category }: CategoryFormProps) {
       {/* Actions */}
       <div className="flex gap-4">
         <Button type="submit" disabled={isSubmitting}>
-          {isEditing ? "Update Collection" : "Create Collection"}
+          Save Collection
         </Button>
         <Button type="button" variant="outline" asChild>
           <Link href="/admin/collections">Cancel</Link>

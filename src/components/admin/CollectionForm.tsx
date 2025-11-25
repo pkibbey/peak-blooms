@@ -239,7 +239,7 @@ export default function CollectionForm({ products, collection }: CollectionFormP
       {/* Actions */}
       <div className="flex gap-4">
         <Button type="submit" disabled={isSubmitting}>
-          {isEditing ? "Update Inspiration" : "Create Inspiration"}
+          Save Inspiration
         </Button>
         <Button type="button" variant="outline" asChild>
           <Link href="/admin/inspirations">Cancel</Link>

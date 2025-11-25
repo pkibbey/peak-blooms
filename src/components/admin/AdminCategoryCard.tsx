@@ -114,7 +114,7 @@ export default function AdminCategoryCard({ category }: AdminCategoryCardProps) 
           onClick={handleDelete}
           disabled={isDeleting}
         >
-          {isDeleting ? "..." : "Delete"}
+          Delete
         </Button>
       </div>
     </div>

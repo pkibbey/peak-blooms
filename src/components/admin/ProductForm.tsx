@@ -360,7 +360,7 @@ export default function ProductForm({ categories, product }: ProductFormProps) {
       {/* Actions */}
       <div className="flex gap-4">
         <Button type="submit" disabled={isSubmitting}>
-          {isEditing ? "Update Product" : "Create Product"}
+          Save Product
         </Button>
         <Button type="button" variant="outline" asChild>
           <Link href="/admin/products">Cancel</Link>

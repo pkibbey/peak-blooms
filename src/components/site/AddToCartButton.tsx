@@ -73,7 +73,7 @@ export default function AddToCartButton({ productId, productVariantId, productNa
       onClick={handleAddToCart}
       disabled={loading || !!disabled}
     >
-      {loading ? "Adding..." : "Add to Cart"}
+      Add to Cart
       </Button>
       {error ? (
         <p className="mt-2 text-sm text-destructive">{error}</p>

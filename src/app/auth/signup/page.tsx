@@ -78,7 +78,7 @@ export default function SignUpPage() {
             />
           </div>
           <Button type="submit" disabled={loading} className="w-full">
-            {loading ? "Sending sign-up link..." : "Sign Up with Email"}
+            Sign Up with Email
           </Button>
         </form>
 

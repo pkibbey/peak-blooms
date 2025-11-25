@@ -101,7 +101,7 @@ export default function SignInPage() {
             />
           </div>
           <Button type="submit" disabled={loading} className="w-full">
-            {loading ? "Sending link..." : "Sign in with Email"}
+            Sign in with Email
           </Button>
         </form>
 
