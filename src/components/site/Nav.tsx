@@ -13,6 +13,7 @@ import {
   IconShoppingCart,
   IconRose,
   IconFlower,
+  IconSettings,
 } from "@/components/ui/icons"
 import { cn } from "@/lib/utils"
 import { Button } from "../ui/button"
@@ -76,6 +77,15 @@ export default function Nav({ user }: NavProps) {
               </div>
             )}
 
+            {user?.role === "ADMIN" && (
+              <div className="hidden md:block">
+                <Link href="/admin" className="inline-flex items-center gap-1">
+                  <IconSettings aria-hidden="true" />
+                  <span>Admin</span>
+                </Link>
+              </div>
+            )}
+
             {user ? (
               <Button
                 variant="outline"
@@ -133,6 +143,7 @@ export default function Nav({ user }: NavProps) {
                   {user.role === "ADMIN" && (
                     <Button asChild variant="ghost">
                       <Link href="/admin" className="px-4 py-2">
+                        <IconSettings aria-hidden="true" />
                         Admin Dashboard
                       </Link>
                     </Button>
