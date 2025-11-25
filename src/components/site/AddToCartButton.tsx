@@ -1,17 +1,20 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 
 interface AddToCartButtonProps {
   productId: string;
   productVariantId?: string | null;
-  setName?: string;
+  productName?: string;
   disabled?: boolean;
 }
 
-export default function AddToCartButton({ productId, productVariantId, setName, disabled }: AddToCartButtonProps) {
+export default function AddToCartButton({ productId, productVariantId, productName, disabled }: AddToCartButtonProps) {
+  const router = useRouter();
   const { data: session } = useSession();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -19,7 +22,7 @@ export default function AddToCartButton({ productId, productVariantId, setName, 
   const handleAddToCart = async () => {
     if (!session) {
       // Redirect to sign in if not authenticated
-      window.location.href = `/auth/signin?callbackUrl=${window.location.pathname}`;
+      router.push(`/auth/signin?callbackUrl=${window.location.pathname}`);
       return;
     }
 
@@ -45,18 +48,18 @@ export default function AddToCartButton({ productId, productVariantId, setName, 
       }
 
       // Show success message
-      alert(
-        setName
-          ? `Added "${setName}" to cart!`
+      toast.success(
+        productName
+          ? `Added "${productName}" to cart!`
           : "Added to cart!"
       );
 
-      // Optionally redirect to cart
-      // window.location.href = "/cart";
+      // Refresh the page to update cart count and other server components
+      router.refresh();
     } catch (err) {
       const message = err instanceof Error ? err.message : "Failed to add to cart";
       setError(message);
-      alert(`Error: ${message}`);
+      toast.error(message);
     } finally {
       setLoading(false);
     }

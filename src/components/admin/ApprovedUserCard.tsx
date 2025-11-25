@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 
 interface User {
@@ -16,6 +17,7 @@ interface ApprovedUserCardProps {
 }
 
 export default function ApprovedUserCard({ user }: ApprovedUserCardProps) {
+  const router = useRouter();
   const [unapproving, setUnapproving] = useState(false);
 
   const handleUnapprove = async () => {
@@ -28,8 +30,8 @@ export default function ApprovedUserCard({ user }: ApprovedUserCardProps) {
       });
 
       if (response.ok) {
-        // Reload the page to reflect changes
-        window.location.reload();
+        // Refresh to update the user list
+        router.refresh();
       } else {
         console.error("Failed to unapprove user");
       }

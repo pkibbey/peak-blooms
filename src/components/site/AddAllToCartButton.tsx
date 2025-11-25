@@ -1,7 +1,9 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 
 interface AddAllToCartButtonProps {
@@ -12,6 +14,7 @@ interface AddAllToCartButtonProps {
 }
 
 export default function AddAllToCartButton({ productIds, productVariantIds, setName, user }: AddAllToCartButtonProps) {
+  const router = useRouter();
   const { data: session } = useSession();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -19,13 +22,13 @@ export default function AddAllToCartButton({ productIds, productVariantIds, setN
   const handleAddAllToCart = async () => {
     if (!session && !user) {
       // If session isn't available client-side and server didn't pass a user, redirect to signin
-      window.location.href = `/auth/signin?callbackUrl=${window.location.pathname}`;
+      router.push(`/auth/signin?callbackUrl=${window.location.pathname}`);
       return;
     }
 
     if (!Array.isArray(productIds) || productIds.length === 0) {
       setError("No products to add to cart");
-      alert("No products to add to cart");
+      toast.error("No products to add to cart");
       return;
     }
 
@@ -48,15 +51,18 @@ export default function AddAllToCartButton({ productIds, productVariantIds, setN
         throw new Error(data.error || "Failed to add items to cart");
       }
 
-      alert(
+      toast.success(
         setName
           ? `Added all items from "${setName}" to your cart!`
           : `Added ${productIds.length} items to your cart!`
       );
+
+      // Refresh the page to update cart count and other server components
+      router.refresh();
     } catch (err) {
       const message = err instanceof Error ? err.message : "Failed to add items to cart";
       setError(message);
-      alert(`Error: ${message}`);
+      toast.error(message);
     } finally {
       setLoading(false);
     }
@@ -70,7 +76,7 @@ export default function AddAllToCartButton({ productIds, productVariantIds, setN
     return (
       <>
         <Button size="lg" className="w-full" asChild>
-          <a href="/auth/signin">Sign In to Purchase</a>
+          <a href="/auth/signin">Sign in to purchase all</a>
         </Button>
         {error ? <p className="mt-2 text-sm text-destructive">{error}</p> : null}
       </>

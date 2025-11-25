@@ -13,14 +13,63 @@ export const metadata = {
   description: "Browse our full catalog of premium flowers",
 }
 
+// Fetch filter options (colors and stem lengths) from database
+async function getFilterOptions() {
+  const [colors, stemLengths] = await Promise.all([
+    db.product.findMany({
+      where: {
+        color: {
+          not: null,
+        },
+      },
+      distinct: ["color"],
+      select: {
+        color: true,
+      },
+    }),
+    db.product.findMany({
+      where: {
+        stemLength: {
+          not: null,
+        },
+      },
+      distinct: ["stemLength"],
+      select: {
+        stemLength: true,
+      },
+      orderBy: {
+        stemLength: "asc",
+      },
+    }),
+  ])
+
+  const distinctColors = colors
+    .map((p) => p.color)
+    .filter((color): color is string => color !== null)
+    .sort()
+
+  const distinctStemLengths = stemLengths
+    .map((p) => p.stemLength)
+    .filter((length): length is number => length !== null)
+    .sort((a, b) => a - b)
+
+  return {
+    colors: distinctColors,
+    stemLengths: distinctStemLengths,
+  }
+}
+
 export default async function ShopPage({ searchParams }: ShopPageProps) {
   const params = await searchParams
   const user = await getCurrentUser()
 
-  // Get all categories
-  const categories = await db.category.findMany({
-    orderBy: { name: "asc" },
-  })
+  // Get all categories and filter options in parallel
+  const [categories, filterOptions] = await Promise.all([
+    db.category.findMany({
+      orderBy: { name: "asc" },
+    }),
+    getFilterOptions(),
+  ])
 
   // Build filter conditions
   const where: ProductWhereInput = {}
@@ -87,27 +136,26 @@ export default async function ShopPage({ searchParams }: ShopPageProps) {
           </p>
         </div>
 
-        <div className="flex flex-col md:flex-row md:items-start md:gap-8">
-          {/* Sidebar (filters) */}
-          <aside className="w-full md:w-72 lg:w-80">
-            <ShopFilters categories={categories} user={userObj} />
-          </aside>
+        {/* Filters - Horizontal Bar */}
+        <ShopFilters
+          categories={categories}
+          user={userObj}
+          colors={filterOptions.colors}
+          stemLengths={filterOptions.stemLengths}
+        />
 
-          {/* Products Grid */}
+        {/* Products Grid */}
         {products.length === 0 ? (
           <div className="flex justify-center items-center py-12">
             <p className="text-muted-foreground">No products found matching your filters.</p>
           </div>
         ) : (
-          <div className="flex-1">
-            <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+          <div className="grid grid-cols-2 gap-4 sm:gap-6 md:grid-cols-3 lg:grid-cols-4">
             {products.map((product) => (
               <ProductCard key={product.slug} product={product} user={userObj} />
             ))}
-            </div>
           </div>
         )}
-      </div>
     </div>
     </div>
   )

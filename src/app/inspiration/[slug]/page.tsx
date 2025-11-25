@@ -88,16 +88,6 @@ export default async function InspirationDetailPage({
           </p>
         </div>
 
-        {/* Add All to Cart Button */}
-        <div className="mb-12">
-          <AddAllToCartButton
-            productIds={set.products.map((p) => p.id)}
-            productVariantIds={set.products.map((p) => (p.variants?.[0]?.id ?? null))}
-            setName={set.name}
-            user={user}
-          />
-        </div>
-
         {/* Products Section */}
         <div>
           <h2 className="text-2xl font-bold mb-6">Flowers in This Set</h2>
@@ -183,6 +173,16 @@ export default async function InspirationDetailPage({
               </tbody>
             </table>
           </div>
+        </div>
+
+        {/* Add All to Cart Button */}
+        <div className="mt-12">
+          <AddAllToCartButton
+            productIds={set.products.map((p) => p.id)}
+            productVariantIds={set.products.map((p) => (p.variants?.[0]?.id ?? null))}
+            setName={set.name}
+            user={user}
+          />
         </div>
 
         {/* Back Button */}

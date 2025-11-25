@@ -197,6 +197,7 @@ export function ProductConfigurator({
         <AddToCartButton
           productId={product.id}
           productVariantId={selectedVariantId}
+          productName={product.name}
           disabled={hasVariants && !selectedVariantId}
         />
       )}

@@ -5,7 +5,7 @@ import { Toaster } from "sonner";
 import "./globals.css";
 import Nav from "@/components/site/Nav"
 import Footer from "@/components/site/Footer"
-import { getCurrentUser } from "@/lib/auth-utils";
+import { getCurrentUser, getOrCreateCart } from "@/lib/auth-utils";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -40,18 +40,27 @@ export default async function RootLayout({
     name: currentUser.name,
   } : null;
 
+  // Fetch cart count for approved users
+  let cartCount = 0;
+  if (currentUser?.approved) {
+    const cart = await getOrCreateCart();
+    if (cart?.items) {
+      cartCount = cart.items.reduce((sum, item) => sum + (item.quantity ?? 0), 0);
+    }
+  }
+
   return (
     <html lang="en">
       <body className={`${geistSans.variable} ${geistMono.variable} ${playfairDisplay.variable} antialiased`}>
         <SessionProvider>
-          <Nav user={user} />
+          <Nav user={user} cartCount={cartCount} />
 
           <main id="content">
             {children}
           </main>
 
           <Footer />
-          <Toaster />
+          <Toaster position="bottom-center" />
         </SessionProvider>
       </body>
     </html>

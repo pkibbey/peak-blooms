@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 
 interface User {
@@ -16,6 +17,7 @@ interface PendingUserCardProps {
 }
 
 export default function PendingUserCard({ user }: PendingUserCardProps) {
+  const router = useRouter();
   const [approving, setApproving] = useState<string | null>(null);
 
   const handleApprove = async () => {
@@ -28,8 +30,8 @@ export default function PendingUserCard({ user }: PendingUserCardProps) {
       });
 
       if (response.ok) {
-        // Reload the page to reflect changes
-        window.location.reload();
+        // Refresh to update the user list
+        router.refresh();
       } else {
         console.error("Failed to approve user");
       }

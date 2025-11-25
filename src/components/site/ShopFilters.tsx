@@ -1,6 +1,6 @@
 "use client"
 
-import { useCallback, useEffect, useState } from "react"
+import { useCallback, useState } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
 import {
   Select,
@@ -16,6 +16,8 @@ import { cn } from "@/lib/utils"
 
 interface ShopFiltersProps {
   categories: Array<{ id: string; name: string }>
+  colors: string[]
+  stemLengths: number[]
   user?: {
     role?: "CUSTOMER" | "ADMIN"
     approved?: boolean
@@ -32,13 +34,10 @@ const PRICE_RANGES = [
   { label: "$100+", min: 100, max: undefined },
 ]
 
-export default function ShopFilters({ categories, user }: ShopFiltersProps) {
+export default function ShopFilters({ categories, colors, stemLengths, user }: ShopFiltersProps) {
   const router = useRouter()
   const searchParams = useSearchParams()
 
-  const [colors, setColors] = useState<string[]>([])
-  const [stemLengths, setStemLengths] = useState<number[]>([])
-  const [loading, setLoading] = useState(true)
   const [mobileOpen, setMobileOpen] = useState(false)
 
   const isApproved = user?.approved === true
@@ -48,24 +47,6 @@ export default function ShopFilters({ categories, user }: ShopFiltersProps) {
   const selectedPriceMin = searchParams.get("priceMin")
   const selectedPriceMax = searchParams.get("priceMax")
   const selectedCategory = searchParams.get("categoryId") || ""
-
-  // Fetch filter options
-  useEffect(() => {
-    const fetchFilterOptions = async () => {
-      try {
-        const response = await fetch("/api/products/filters")
-        const data = await response.json()
-        setColors(data.colors || [])
-        setStemLengths(data.stemLengths || [])
-      } catch (error) {
-        console.error("Error fetching filter options:", error)
-      } finally {
-        setLoading(false)
-      }
-    }
-
-    fetchFilterOptions()
-  }, [])
 
   // Create query string based on current filters
   const createQueryString = useCallback(
@@ -122,8 +103,9 @@ export default function ShopFilters({ categories, user }: ShopFiltersProps) {
   const hasActiveFilters =
     selectedColor || selectedStemLength || selectedPriceMin || selectedPriceMax || selectedCategory
 
-  const FilterContent = (
-    <div className="flex flex-col gap-4 md:gap-6">
+  // Mobile vertical filter content (collapsible panel)
+  const MobileFilterContent = (
+    <div className="flex flex-col gap-4">
       {/* Category Filter */}
       <div className="flex flex-col gap-2">
         <Label className="text-sm font-medium">Category</Label>
@@ -143,7 +125,7 @@ export default function ShopFilters({ categories, user }: ShopFiltersProps) {
       </div>
 
       {/* Color Filter */}
-      {!loading && colors.length > 0 && (
+      {colors.length > 0 && (
         <div className="flex flex-col gap-2">
           <Label className="text-sm font-medium">Color</Label>
           <Select value={selectedColor || "clear"} onValueChange={handleColorChange}>
@@ -163,7 +145,7 @@ export default function ShopFilters({ categories, user }: ShopFiltersProps) {
       )}
 
       {/* Stem Length Filter */}
-      {!loading && stemLengths.length > 0 && (
+      {stemLengths.length > 0 && (
         <div className="flex flex-col gap-2">
           <Label className="text-sm font-medium">Stem Length</Label>
           <Select value={selectedStemLength || "clear"} onValueChange={handleStemLengthChange}>
@@ -213,12 +195,18 @@ export default function ShopFilters({ categories, user }: ShopFiltersProps) {
               <SelectValue placeholder="All Prices" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="clear">All Prices</SelectItem>
-              {PRICE_RANGES.map((range, idx) => (
-                <SelectItem key={idx} value={`${range.min || ""}-${range.max || ""}`}>
-                  {range.label}
-                </SelectItem>
-              ))}
+              {PRICE_RANGES.map((range, idx) => {
+                const value =
+                  range.min === undefined && range.max === undefined
+                    ? "clear"
+                    : `${range.min ?? ""}-${range.max ?? ""}`;
+
+                return (
+                  <SelectItem key={idx} value={value}>
+                    {range.label}
+                  </SelectItem>
+                );
+              })}
             </SelectContent>
           </Select>
         </div>
@@ -230,7 +218,7 @@ export default function ShopFilters({ categories, user }: ShopFiltersProps) {
           variant="outline"
           size="sm"
           onClick={handleClearFilters}
-          className="w-full md:w-auto"
+          className="w-full"
         >
           Clear Filters
         </Button>
@@ -240,14 +228,121 @@ export default function ShopFilters({ categories, user }: ShopFiltersProps) {
 
   return (
     <>
-      {/* Desktop Filters - Sidebar */}
-      <div className="hidden md:block mb-8 bg-secondary/30 rounded-lg p-6">
-        {FilterContent}
+      {/* Desktop Filters - Horizontal Bar */}
+      <div className="hidden md:block mb-6 bg-secondary/30 rounded-lg px-4 py-3">
+        <div className="flex flex-wrap items-center gap-3">
+          {/* Category Filter */}
+          <Select value={selectedCategory || "clear"} onValueChange={handleCategoryChange}>
+            <SelectTrigger className="w-auto min-w-[140px] h-9 text-sm">
+              <SelectValue placeholder="All Categories" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="clear">All Categories</SelectItem>
+              {categories.map((cat) => (
+                <SelectItem key={cat.id} value={cat.id}>
+                  {cat.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+
+          {/* Color Filter */}
+          {colors.length > 0 && (
+            <Select value={selectedColor || "clear"} onValueChange={handleColorChange}>
+              <SelectTrigger className="w-auto min-w-[120px] h-9 text-sm">
+                <SelectValue placeholder="All Colors" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="clear">All Colors</SelectItem>
+                {colors.map((color) => (
+                  <SelectItem key={color} value={color}>
+                    {color}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          )}
+
+          {/* Stem Length Filter */}
+          {stemLengths.length > 0 && (
+            <Select value={selectedStemLength || "clear"} onValueChange={handleStemLengthChange}>
+              <SelectTrigger className="w-auto min-w-[120px] h-9 text-sm">
+                <SelectValue placeholder="All Lengths" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="clear">All Lengths</SelectItem>
+                {stemLengths.map((length) => (
+                  <SelectItem key={length} value={length.toString()}>
+                    {length} in
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          )}
+
+          {/* Price Range Filter */}
+          {isApproved && (
+            <Select
+              value={
+                selectedPriceMin && selectedPriceMax
+                  ? `${selectedPriceMin}-${selectedPriceMax}`
+                  : selectedPriceMin
+                    ? `${selectedPriceMin}-`
+                    : selectedPriceMax
+                      ? `-${selectedPriceMax}`
+                      : "clear"
+              }
+              onValueChange={(value) => {
+                if (value === "clear") {
+                  handlePriceRangeChange(undefined, undefined)
+                } else {
+                  const newRange = PRICE_RANGES.find(
+                    (r) => `${r.min || ""}-${r.max || ""}` === value
+                  )
+                  if (newRange) {
+                    handlePriceRangeChange(newRange.min, newRange.max)
+                  }
+                }
+              }}
+            >
+              <SelectTrigger className="w-auto min-w-[120px] h-9 text-sm">
+                <SelectValue placeholder="All Prices" />
+              </SelectTrigger>
+              <SelectContent>
+                {PRICE_RANGES.map((range, idx) => {
+                  const value =
+                    range.min === undefined && range.max === undefined
+                      ? "clear"
+                      : `${range.min ?? ""}-${range.max ?? ""}`;
+
+                  return (
+                    <SelectItem key={idx} value={value}>
+                      {range.label}
+                    </SelectItem>
+                  );
+                })}
+              </SelectContent>
+            </Select>
+          )}
+
+          {/* Clear Filters Button */}
+          {hasActiveFilters && (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={handleClearFilters}
+              className="h-9 text-sm text-muted-foreground hover:text-foreground"
+            >
+              <IconX className="h-4 w-4 mr-1" />
+              Clear
+            </Button>
+          )}
+        </div>
       </div>
 
       {/* Mobile Filters - Hamburger Menu */}
-      <div className="md:hidden mb-6 flex justify-between items-center">
-        <h2 className="text-lg font-semibold">Filters</h2>
+      <div className="md:hidden mb-4 flex justify-between items-center">
+        <h2 className="text-base font-semibold">Filters</h2>
         <Button
           aria-label={mobileOpen ? "Close filters" : "Open filters"}
           aria-expanded={mobileOpen}
@@ -263,7 +358,7 @@ export default function ShopFilters({ categories, user }: ShopFiltersProps) {
       </div>
 
       {/* Mobile Filter Panel */}
-      {mobileOpen && <div className="md:hidden mb-6 bg-secondary/30 rounded-lg p-4">{FilterContent}</div>}
+      {mobileOpen && <div className="md:hidden mb-4 bg-secondary/30 rounded-lg p-4">{MobileFilterContent}</div>}
     </>
   )
 }

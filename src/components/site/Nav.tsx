@@ -17,6 +17,7 @@ import {
 } from "@/components/ui/icons"
 import { cn } from "@/lib/utils"
 import { Button } from "../ui/button"
+import { Badge } from "../ui/badge"
 
 const links = [
   { label: "Home", href: "/", icon: <IconHome /> },
@@ -32,9 +33,10 @@ interface NavProps {
     email: string | null;
     name?: string | null;
   } | null;
+  cartCount?: number;
 }
 
-export default function Nav({ user }: NavProps) {
+export default function Nav({ user, cartCount = 0 }: NavProps) {
   const [open, setOpen] = useState(false)
   const isApproved = user?.approved === true
 
@@ -70,9 +72,14 @@ export default function Nav({ user }: NavProps) {
           <div className="flex items-center gap-4">
             {isApproved && (
               <div className="hidden md:block">
-                <Link href="/cart" className="inline-flex items-center gap-1">
+                <Link href="/cart" className="inline-flex items-center gap-2">
                   <IconShoppingCart aria-hidden="true" />
                   <span>Cart</span>
+                  {cartCount > 0 && (
+                    <Badge variant="destructive">
+                      {cartCount}
+                    </Badge>
+                  )}
                 </Link>
               </div>
             )}
@@ -132,9 +139,14 @@ export default function Nav({ user }: NavProps) {
               ))}
               {isApproved && (
                 <Button asChild variant="ghost">
-                  <Link href="/cart" className="inline-flex items-center gap-1 px-4 py-2">
+                  <Link href="/cart" className="inline-flex items-center gap-2 px-4 py-2">
                     <IconShoppingCart aria-hidden="true" />
                     <span>Cart</span>
+                    {cartCount > 0 && (
+                      <Badge variant="destructive">
+                        {cartCount}
+                      </Badge>
+                    )}
                   </Link>
                 </Button>
               )}

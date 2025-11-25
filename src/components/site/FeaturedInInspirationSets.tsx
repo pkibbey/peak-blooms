@@ -41,7 +41,7 @@ export function FeaturedInInspirationSets({
             </div>
 
             {/* Card Content */}
-            <div className="flex flex-col justify-between bg-white p-6 flex-grow">
+            <div className="flex flex-col justify-between bg-white p-6 grow">
               <div>
                 <h3 className="text-xl font-bold font-serif">{set.name}</h3>
                 <p className="mt-2 text-sm text-muted-foreground line-clamp-2">
