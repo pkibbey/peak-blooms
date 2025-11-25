@@ -4,9 +4,20 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Checkbox } from "@/components/ui/checkbox";
 import SlugInput from "@/components/admin/SlugInput";
+import {
+  Select,
+  SelectTrigger,
+  SelectValue,
+  SelectContent,
+  SelectItem,
+} from "@/components/ui/select";
 import { Trash2, Plus } from "lucide-react";
 
 interface Category {
@@ -102,6 +113,7 @@ export default function ProductForm({ categories, product }: ProductFormProps) {
       });
 
       if (response.ok) {
+        toast.success(isEditing ? "Product updated successfully" : "Product created successfully");
         router.push("/admin/products");
         router.refresh();
       } else {
@@ -158,14 +170,13 @@ export default function ProductForm({ categories, product }: ProductFormProps) {
         {/* Name */}
         <div className="space-y-2">
           <Label htmlFor="name">Name *</Label>
-          <input
+          <Input
             id="name"
             name="name"
             type="text"
             required
             value={formData.name}
             onChange={handleChange}
-            className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm"
             placeholder="Product name"
           />
         </div>
@@ -181,13 +192,12 @@ export default function ProductForm({ categories, product }: ProductFormProps) {
       {/* Description */}
       <div className="space-y-2">
         <Label htmlFor="description">Description</Label>
-        <textarea
+        <Textarea
           id="description"
           name="description"
           value={formData.description}
           onChange={handleChange}
           rows={4}
-          className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm"
           placeholder="Product description..."
         />
       </div>
@@ -195,13 +205,11 @@ export default function ProductForm({ categories, product }: ProductFormProps) {
       {/* Image URL */}
       <div className="space-y-2">
         <Label htmlFor="image">Image URL</Label>
-        <input
+        <Input
           id="image"
           name="image"
-          type="url"
           value={formData.image}
           onChange={handleChange}
-          className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm"
           placeholder="https://example.com/image.jpg"
         />
         {formData.image && (
@@ -221,16 +229,15 @@ export default function ProductForm({ categories, product }: ProductFormProps) {
       </div>
 
       <div className="grid gap-6 md:grid-cols-2">
-                {/* Color */}
+        {/* Color */}
         <div className="space-y-2">
           <Label htmlFor="color">Color</Label>
-          <input
+          <Input
             id="color"
             name="color"
             type="text"
             value={formData.color}
             onChange={handleChange}
-            className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm"
             placeholder="e.g., Red, Pink, White"
           />
         </div>
@@ -238,21 +245,23 @@ export default function ProductForm({ categories, product }: ProductFormProps) {
         {/* Category */}
         <div className="space-y-2">
           <Label htmlFor="categoryId">Category *</Label>
-          <select
-            id="categoryId"
-            name="categoryId"
-            required
+          <Select
             value={formData.categoryId}
-            onChange={handleChange}
-            className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm"
+            onValueChange={(value) =>
+              setFormData((prev) => ({ ...prev, categoryId: value }))
+            }
           >
-            <option value="">Select a category</option>
-            {categories.map((cat) => (
-              <option key={cat.id} value={cat.id}>
-                {cat.name}
-              </option>
-            ))}
-          </select>
+            <SelectTrigger id="categoryId" className="w-full">
+              <SelectValue placeholder="Select a category" />
+            </SelectTrigger>
+            <SelectContent>
+              {categories.map((cat) => (
+                <SelectItem key={cat.id} value={cat.id}>
+                  {cat.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
       </div>
 
@@ -277,14 +286,13 @@ export default function ProductForm({ categories, product }: ProductFormProps) {
               {/* Price */}
               <div className="space-y-2">
                 <Label htmlFor={`variant-price-${index}`}>Price *</Label>
-                <input
+                <Input
                   id={`variant-price-${index}`}
                   type="number"
                   step="0.01"
                   min="0"
                   value={variant.price}
                   onChange={(e) => handleVariantChange(index, "price", e.target.value)}
-                  className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm"
                   placeholder="0.00"
                 />
               </div>
@@ -292,13 +300,12 @@ export default function ProductForm({ categories, product }: ProductFormProps) {
               {/* Stem Length */}
               <div className="space-y-2">
                 <Label htmlFor={`variant-stemLength-${index}`}>Stem Length (cm)</Label>
-                <input
+                <Input
                   id={`variant-stemLength-${index}`}
                   type="number"
                   min="0"
                   value={variant.stemLength}
                   onChange={(e) => handleVariantChange(index, "stemLength", e.target.value)}
-                  className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm"
                   placeholder="e.g., 50"
                 />
               </div>
@@ -306,13 +313,12 @@ export default function ProductForm({ categories, product }: ProductFormProps) {
               {/* Count Per Bunch */}
               <div className="space-y-2">
                 <Label htmlFor={`variant-countPerBunch-${index}`}>Stems Per Bunch</Label>
-                <input
+                <Input
                   id={`variant-countPerBunch-${index}`}
                   type="number"
                   min="0"
                   value={variant.countPerBunch}
                   onChange={(e) => handleVariantChange(index, "countPerBunch", e.target.value)}
-                  className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm"
                   placeholder="e.g., 10"
                 />
               </div>
@@ -338,14 +344,14 @@ export default function ProductForm({ categories, product }: ProductFormProps) {
 
       {/* Featured */}
       <div className="flex items-center gap-2">
-        <input
+        <Checkbox
           id="featured"
           name="featured"
           type="checkbox"
           checked={formData.featured}
           onChange={handleChange}
-          className="h-4 w-4 rounded border-border"
         />
+        
         <Label htmlFor="featured" className="cursor-pointer">
           Featured product (show on homepage)
         </Label>
@@ -354,7 +360,7 @@ export default function ProductForm({ categories, product }: ProductFormProps) {
       {/* Actions */}
       <div className="flex gap-4">
         <Button type="submit" disabled={isSubmitting}>
-          {isSubmitting ? "Saving..." : isEditing ? "Update Product" : "Create Product"}
+          {isEditing ? "Update Product" : "Create Product"}
         </Button>
         <Button type="button" variant="outline" asChild>
           <Link href="/admin/products">Cancel</Link>

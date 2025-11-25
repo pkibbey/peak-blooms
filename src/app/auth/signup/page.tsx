@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
 
 export default function SignUpPage() {
   const router = useRouter();
@@ -66,7 +67,7 @@ export default function SignUpPage() {
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
             <Label htmlFor="email">Email</Label>
-            <input
+            <Input
               id="email"
               type="email"
               value={email}

@@ -1,7 +1,9 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 
 interface InlineEditFieldProps {
   value: string | number;
@@ -44,9 +46,11 @@ export default function InlineEditField({
     setIsSaving(true);
     try {
       await onSave(newValue);
+      toast.success("Saved successfully");
       setIsEditing(false);
     } catch (error) {
       console.error("Failed to save:", error);
+      toast.error("Failed to save. Please try again.");
       setEditValue(String(value));
     } finally {
       setIsSaving(false);
@@ -69,18 +73,18 @@ export default function InlineEditField({
   if (isEditing) {
     return (
       <div className="flex items-center gap-2">
-        <input
+        <Input
           ref={inputRef}
           type={type}
           value={editValue}
           onChange={(e) => setEditValue(e.target.value)}
           onKeyDown={handleKeyDown}
-          className={`rounded border border-border bg-background px-2 py-1 text-sm ${className}`}
+          className={`${className}`}
           disabled={isSaving}
           step={type === "number" ? "0.01" : undefined}
         />
         <Button size="sm" onClick={handleSave} disabled={isSaving}>
-          {isSaving ? "..." : "Save"}
+          Save
         </Button>
         <Button size="sm" variant="outline" onClick={handleCancel} disabled={isSaving}>
           Cancel
@@ -90,12 +94,14 @@ export default function InlineEditField({
   }
 
   return (
-    <button
+    <Button
+      variant="ghost"
+      size="sm"
       onClick={() => setIsEditing(true)}
       className={`cursor-pointer rounded px-2 py-1 text-left hover:bg-muted ${className}`}
       title="Click to edit"
     >
       {displayFormatter ? displayFormatter(value) : value}
-    </button>
+    </Button>
   );
 }

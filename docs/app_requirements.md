@@ -94,6 +94,10 @@ useEffect(() => {
 }, []);
 ```
 
+### Buttons
+
+- **Button text must never change.** Button labels should remain static at all times. Loading or processing states are indicated only through the disabled state styling (opacity reduction, cursor: not-allowed, disabled pointer events). Do not change button text based on form state, submission status, or any other dynamic condition.
+
 ### Product Cards
 
 - Display price and variant specs (e.g., "50cm • 10 stems") visibly at all times for approved users

@@ -214,21 +214,21 @@ export function ProductCard({ product, user }: ProductCardProps) {
                       const isAvailable = availableLengthsForCount.includes(length);
                       const isSelected = selectedStemLength === length;
                       return (
-                        <button
+                        <Button
                           key={length}
                           onClick={() => handleStemLengthChange(length)}
                           disabled={!isAvailable}
-                          className={cn(
-                            "px-2 py-1 text-xs rounded-sm border transition-colors",
+                          size="sm"
+                          variant={isSelected ? "default" : isAvailable ? "outline" : "ghost"}
+                          className={cn("px-2 py-1 text-xs rounded-sm border transition-colors",
                             isSelected
-                              ? "bg-primary text-primary-foreground border-primary"
+                              ? "border-primary"
                               : isAvailable
                                 ? "bg-white text-muted-foreground border-gray-200 hover:border-primary"
-                                : "bg-gray-100 text-gray-400 border-gray-100 cursor-not-allowed"
-                          )}
+                                : "bg-gray-100 text-gray-400 border-gray-100 cursor-not-allowed")}
                         >
                           {length}cm
-                        </button>
+                        </Button>
                       );
                     })}
                   </div>
@@ -246,21 +246,21 @@ export function ProductCard({ product, user }: ProductCardProps) {
                       const isAvailable = availableCountsForLength.includes(count);
                       const isSelected = selectedCount === count;
                       return (
-                        <button
+                        <Button
                           key={count}
                           onClick={() => handleCountChange(count)}
                           disabled={!isAvailable}
-                          className={cn(
-                            "px-2 py-1 text-xs rounded-sm border transition-colors",
+                          size="sm"
+                          variant={isSelected ? "default" : isAvailable ? "outline" : "ghost"}
+                          className={cn("px-2 py-1 text-xs rounded-sm border transition-colors",
                             isSelected
-                              ? "bg-primary text-primary-foreground border-primary"
+                              ? "border-primary"
                               : isAvailable
                                 ? "bg-white text-muted-foreground border-gray-200 hover:border-primary"
-                                : "bg-gray-100 text-gray-400 border-gray-100 cursor-not-allowed"
-                          )}
+                                : "bg-gray-100 text-gray-400 border-gray-100 cursor-not-allowed")}
                         >
                           {count} stems
-                        </button>
+                        </Button>
                       );
                     })}
                   </div>

@@ -1,7 +1,6 @@
 import { redirect } from "next/navigation";
 import { auth } from "@/lib/auth";
 import Link from "next/link";
-import { IconPlus } from "@/components/ui/icons";
 import { Button } from "@/components/ui/button";
 
 export default async function AdminDashboard() {

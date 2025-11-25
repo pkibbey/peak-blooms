@@ -4,8 +4,11 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import SlugInput from "@/components/admin/SlugInput";
 import ProductMultiSelect from "@/components/admin/ProductMultiSelect";
 
@@ -93,6 +96,7 @@ export default function CollectionForm({ products, collection }: CollectionFormP
       });
 
       if (response.ok) {
+        toast.success(isEditing ? "Inspiration updated successfully" : "Inspiration created successfully");
         router.push("/admin/inspirations");
         router.refresh();
       } else {
@@ -129,14 +133,13 @@ export default function CollectionForm({ products, collection }: CollectionFormP
         {/* Name */}
         <div className="space-y-2">
           <Label htmlFor="name">Name *</Label>
-          <input
+          <Input
             id="name"
             name="name"
             type="text"
             required
             value={formData.name}
             onChange={handleChange}
-            className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm"
             placeholder="Inspiration name"
           />
         </div>
@@ -152,14 +155,13 @@ export default function CollectionForm({ products, collection }: CollectionFormP
       {/* Subtitle */}
       <div className="space-y-2">
         <Label htmlFor="subtitle">Subtitle *</Label>
-        <input
+        <Input
           id="subtitle"
           name="subtitle"
           type="text"
           required
           value={formData.subtitle}
           onChange={handleChange}
-          className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm"
           placeholder="A short, catchy subtitle"
         />
       </div>
@@ -167,14 +169,12 @@ export default function CollectionForm({ products, collection }: CollectionFormP
       {/* Image URL */}
       <div className="space-y-2">
         <Label htmlFor="image">Image URL *</Label>
-        <input
+        <Input
           id="image"
           name="image"
-          type="url"
           required
           value={formData.image}
           onChange={handleChange}
-          className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm"
           placeholder="https://example.com/image.jpg"
         />
         {formData.image && (
@@ -196,14 +196,13 @@ export default function CollectionForm({ products, collection }: CollectionFormP
       {/* Excerpt */}
       <div className="space-y-2">
         <Label htmlFor="excerpt">Short Excerpt *</Label>
-        <textarea
+        <Textarea
           id="excerpt"
           name="excerpt"
           required
           value={formData.excerpt}
           onChange={handleChange}
           rows={3}
-          className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm"
           placeholder="A brief description for previews and cards..."
         />
       </div>
@@ -211,14 +210,13 @@ export default function CollectionForm({ products, collection }: CollectionFormP
       {/* Inspiration Text */}
       <div className="space-y-2">
         <Label htmlFor="inspirationText">Full Inspiration Text *</Label>
-        <textarea
+        <Textarea
           id="inspirationText"
           name="inspirationText"
           required
           value={formData.inspirationText}
           onChange={handleChange}
           rows={6}
-          className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm"
           placeholder="The full story or description for the inspiration page..."
         />
       </div>
@@ -241,7 +239,7 @@ export default function CollectionForm({ products, collection }: CollectionFormP
       {/* Actions */}
       <div className="flex gap-4">
         <Button type="submit" disabled={isSubmitting}>
-          {isSubmitting ? "Saving..." : isEditing ? "Update Inspiration" : "Create Inspiration"}
+          {isEditing ? "Update Inspiration" : "Create Inspiration"}
         </Button>
         <Button type="button" variant="outline" asChild>
           <Link href="/admin/inspirations">Cancel</Link>

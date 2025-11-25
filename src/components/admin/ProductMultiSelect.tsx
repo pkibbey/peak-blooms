@@ -2,6 +2,9 @@
 
 import { useState } from "react";
 import { Label } from "../ui/label";
+import { Input } from "@/components/ui/input";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Button } from "@/components/ui/button";
 import {
   Select,
   SelectContent,
@@ -142,26 +145,16 @@ export default function ProductMultiSelect({
           {selectedCount} product{selectedCount !== 1 ? "s" : ""} selected
         </p>
         <div className="flex gap-2">
-          <button
-            type="button"
-            onClick={handleSelectAll}
-            disabled={disabled}
-            className="text-sm text-primary hover:underline disabled:opacity-50"
-          >
+          <Button size="sm" variant="link" onClick={handleSelectAll} disabled={disabled} className="text-sm">
             Select visible
-          </button>
-          <button
-            type="button"
-            onClick={handleDeselectAll}
-            disabled={disabled}
-            className="text-sm text-muted-foreground hover:text-foreground disabled:opacity-50"
-          >
+          </Button>
+          <Button size="sm" variant="ghost" onClick={handleDeselectAll} disabled={disabled} className="text-sm text-muted-foreground">
             Deselect visible
-          </button>
+          </Button>
         </div>
       </div>
 
-      <input
+      <Input
         type="text"
         placeholder="Search products..."
         value={searchTerm}
@@ -189,12 +182,11 @@ export default function ProductMultiSelect({
                       disabled ? "cursor-not-allowed opacity-50" : ""
                     }`}
                   >
-                    <input
-                      type="checkbox"
+                    <Checkbox
                       checked={isSelected}
                       onChange={() => handleToggle(product.id)}
                       disabled={disabled}
-                      className="h-4 w-4 rounded border-border"
+                      className="h-4 w-4 rounded"
                     />
                     <div className="min-w-0 flex-1">
                       <p className="truncate font-medium">{product.name}</p>

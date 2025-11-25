@@ -72,7 +72,8 @@ export async function POST(request: NextRequest) {
       cart = await db.shoppingCart.create({ data: { userId: user.id } });
     }
 
-    const operations: any[] = [];
+    // Build operations array for transaction
+    const operations: Promise<unknown>[] = [];
 
     // Check for existing items then build create/update ops
     for (let i = 0; i < productIds.length; i++) {
@@ -111,8 +112,10 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    // Run all updates/creates in a transaction
-    const results = await db.$transaction(operations);
+    // Execute all operations in a transaction for ACID compliance
+    // This ensures all items are added/updated together or all fail together
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const results = await db.$transaction(operations as any);
 
     return NextResponse.json(results, { status: 201 });
   } catch (error) {

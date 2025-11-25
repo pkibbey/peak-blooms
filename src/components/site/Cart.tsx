@@ -8,6 +8,7 @@ import { toast } from "sonner"
 import { Minus, Plus, Trash2, ShoppingBag } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Label } from "@/components/ui/label"
+import { Input } from "@/components/ui/input"
 
 import { useDebouncedCallback } from "@/lib/useDebouncedCallback"
 
@@ -49,7 +50,9 @@ export default function Cart() {
 
   // Debounced API call for quantity updates
   const debouncedQuantityUpdate = useDebouncedCallback(
-    async (itemId: string, quantity: number) => {
+    async (...args: readonly unknown[]) => {
+      const itemId = args[0] as string
+      const quantity = args[1] as number
       setUpdatingItems((prev) => new Set(prev).add(itemId))
 
       try {
@@ -79,9 +82,10 @@ export default function Cart() {
     800
   )
 
+  // Fetch cart on mount only. Dependency array is intentionally empty because
+  // fetchCart is defined in component scope and captures latest state via closure.
   useEffect(() => {
     fetchCart()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   const fetchCart = async () => {
@@ -286,7 +290,7 @@ export default function Cart() {
                       >
                         <Minus className="h-4 w-4" />
                       </Button>
-                      <input
+                      <Input
                         type="number"
                         min="1"
                         value={item.quantity}

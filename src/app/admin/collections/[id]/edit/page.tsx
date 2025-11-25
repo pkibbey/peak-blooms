@@ -2,7 +2,6 @@ import { redirect, notFound } from "next/navigation";
 import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
 import Link from "next/link";
-import { Button } from "@/components/ui/button";
 import CategoryForm from "@/components/admin/CategoryForm";
 
 interface EditCategoryPageProps {

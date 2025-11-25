@@ -2,7 +2,6 @@ import { redirect } from "next/navigation";
 import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
 import Link from "next/link";
-import { Button } from "@/components/ui/button";
 import CollectionForm from "@/components/admin/CollectionForm";
 
 export default async function NewInspirationPage() {

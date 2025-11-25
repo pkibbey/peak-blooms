@@ -169,23 +169,25 @@ export function ProductConfigurator({
                 {stemLengths.map((length) => {
                   const isAvailable = availableLengthsForCount.includes(length);
                   const isSelected = selectedStemLength === length.toString();
-                  return (
-                    <button
-                      key={length}
-                      onClick={() => handleStemLengthChange(length.toString())}
-                      disabled={!isAvailable}
-                      className={cn(
-                        "px-4 py-2 text-sm rounded-sm border transition-colors",
-                        isSelected
-                          ? "bg-primary text-primary-foreground border-primary"
-                          : isAvailable
-                            ? "bg-white text-muted-foreground border-gray-200 hover:border-primary"
-                            : "bg-gray-100 text-gray-400 border-gray-100 cursor-not-allowed"
-                      )}
-                    >
-                      {length} cm
-                    </button>
-                  );
+                      return (
+                        <Button
+                          key={length}
+                          size="sm"
+                          onClick={() => handleStemLengthChange(length.toString())}
+                          disabled={!isAvailable}
+                          variant={isSelected ? "default" : isAvailable ? "outline" : "ghost"}
+                          className={cn(
+                            "px-4 py-2 text-sm rounded-sm border transition-colors",
+                            isSelected
+                              ? "border-primary"
+                              : isAvailable
+                                ? "bg-white text-muted-foreground border-gray-200 hover:border-primary"
+                                : "bg-gray-100 text-gray-400 border-gray-100 cursor-not-allowed"
+                          )}
+                        >
+                          {length} cm
+                        </Button>
+                      );
                 })}
               </div>
             </div>
@@ -198,23 +200,25 @@ export function ProductConfigurator({
                 {counts.map((count) => {
                   const isAvailable = availableCountsForLength.includes(count);
                   const isSelected = selectedCount === count.toString();
-                  return (
-                    <button
-                      key={count}
-                      onClick={() => handleCountChange(count.toString())}
-                      disabled={!isAvailable}
-                      className={cn(
-                        "px-4 py-2 text-sm rounded-sm border transition-colors",
-                        isSelected
-                          ? "bg-primary text-primary-foreground border-primary"
-                          : isAvailable
-                            ? "bg-white text-muted-foreground border-gray-200 hover:border-primary"
-                            : "bg-gray-100 text-gray-400 border-gray-100 cursor-not-allowed"
-                      )}
-                    >
-                      {count} stems
-                    </button>
-                  );
+                      return (
+                        <Button
+                          key={count}
+                          size="sm"
+                          onClick={() => handleCountChange(count.toString())}
+                          disabled={!isAvailable}
+                          variant={isSelected ? "default" : isAvailable ? "outline" : "ghost"}
+                          className={cn(
+                            "px-4 py-2 text-sm rounded-sm border transition-colors",
+                            isSelected
+                              ? "border-primary"
+                              : isAvailable
+                                ? "bg-white text-muted-foreground border-gray-200 hover:border-primary"
+                                : "bg-gray-100 text-gray-400 border-gray-100 cursor-not-allowed"
+                          )}
+                        >
+                          {count} stems
+                        </Button>
+                      );
                 })}
               </div>
             </div>

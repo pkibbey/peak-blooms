@@ -1,5 +1,5 @@
 import React from "react"
-import { ShoppingCart, ShoppingBag, Home, Menu, X, Info, Mail, Flower, ArrowRight, Instagram, Facebook, Rose, Phone, Settings, Plus } from "lucide-react"
+import { ShoppingCart, ShoppingBag, Menu, X, Info, Mail, Flower, ArrowRight, Instagram, Facebook, Rose, Phone, Settings, Plus } from "lucide-react"
 
 // Small re-exports used across the UI so we have a single place to tweak sizing & classes
 export const IconSizeClass = "h-4 w-4"

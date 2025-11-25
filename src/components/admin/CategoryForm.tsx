@@ -4,8 +4,11 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import SlugInput from "@/components/admin/SlugInput";
 
 interface CategoryFormProps {
@@ -48,6 +51,7 @@ export default function CategoryForm({ category }: CategoryFormProps) {
       });
 
       if (response.ok) {
+        toast.success(isEditing ? "Category updated successfully" : "Category created successfully");
         router.push("/admin/collections");
         router.refresh();
       } else {
@@ -84,14 +88,13 @@ export default function CategoryForm({ category }: CategoryFormProps) {
         {/* Name */}
         <div className="space-y-2">
           <Label htmlFor="name">Name *</Label>
-          <input
+          <Input
             id="name"
             name="name"
             type="text"
             required
             value={formData.name}
             onChange={handleChange}
-            className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm"
             placeholder="Collection name"
           />
         </div>
@@ -107,13 +110,12 @@ export default function CategoryForm({ category }: CategoryFormProps) {
       {/* Description */}
       <div className="space-y-2">
         <Label htmlFor="description">Description</Label>
-        <textarea
+        <Textarea
           id="description"
           name="description"
           value={formData.description}
           onChange={handleChange}
           rows={4}
-          className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm"
           placeholder="Collection description..."
         />
       </div>
@@ -121,13 +123,11 @@ export default function CategoryForm({ category }: CategoryFormProps) {
       {/* Image URL */}
       <div className="space-y-2">
         <Label htmlFor="image">Image URL</Label>
-        <input
+        <Input
           id="image"
           name="image"
-          type="url"
           value={formData.image}
           onChange={handleChange}
-          className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm"
           placeholder="https://example.com/image.jpg"
         />
         {formData.image && (
@@ -149,7 +149,7 @@ export default function CategoryForm({ category }: CategoryFormProps) {
       {/* Actions */}
       <div className="flex gap-4">
         <Button type="submit" disabled={isSubmitting}>
-          {isSubmitting ? "Saving..." : isEditing ? "Update Collection" : "Create Collection"}
+          {isEditing ? "Update Collection" : "Create Collection"}
         </Button>
         <Button type="button" variant="outline" asChild>
           <Link href="/admin/collections">Cancel</Link>

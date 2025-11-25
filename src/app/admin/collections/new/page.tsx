@@ -1,7 +1,6 @@
 import { redirect } from "next/navigation";
 import { auth } from "@/lib/auth";
 import Link from "next/link";
-import { Button } from "@/components/ui/button";
 import CategoryForm from "@/components/admin/CategoryForm";
 
 export default async function NewCollectionPage() {
