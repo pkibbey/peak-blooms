@@ -1,9 +1,8 @@
-"use client";
-
-import { useEffect, useState } from "react";
-import { useSession } from "next-auth/react";
-import { useRouter } from "next/navigation";
-import { Button } from "@/components/ui/button";
+import { redirect } from "next/navigation";
+import { auth } from "@/lib/auth";
+import { db } from "@/lib/db";
+import PendingUserCard from "@/components/admin/PendingUserCard";
+import ApprovedUserCard from "@/components/admin/ApprovedUserCard";
 
 interface User {
   id: string;
@@ -13,100 +12,33 @@ interface User {
   createdAt: string;
 }
 
-export default function UsersPage() {
-  const { data: session, status } = useSession();
-  const router = useRouter();
-  const [users, setUsers] = useState<User[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [approving, setApproving] = useState<string | null>(null);
+export default async function UsersPage() {
+  const session = await auth();
 
-  // Check authorization
-  useEffect(() => {
-    if (status === "unauthenticated" || (status === "authenticated" && session?.user?.role !== "ADMIN")) {
-      router.push("/admin/unauthorized");
-    }
-  }, [status, session, router]);
+  // Check authorization on the server
+  if (!session?.user || session.user.role !== "ADMIN") {
+    redirect("/admin/unauthorized");
+  }
 
-  useEffect(() => {
-    if (status !== "authenticated" || session?.user?.role !== "ADMIN") {
-      return;
-    }
-
-    const fetchUsers = async () => {
-      try {
-        const response = await fetch("/api/admin/users");
-        if (response.ok) {
-          const data = await response.json();
-          setUsers(data);
-        } else {
-          console.error("Failed to fetch users");
-        }
-      } catch (error) {
-        console.error("Error fetching users:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchUsers();
-  }, [status, session]);
-
-  const handleApprove = async (userId: string) => {
-    setApproving(userId);
-    try {
-      const response = await fetch(`/api/admin/users/${userId}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ approved: true }),
-      });
-
-      if (response.ok) {
-        setUsers((prevUsers) =>
-          prevUsers.map((user) =>
-            user.id === userId ? { ...user, approved: true } : user
-          )
-        );
-      } else {
-        console.error("Failed to approve user");
-      }
-    } catch (error) {
-      console.error("Error approving user:", error);
-    } finally {
-      setApproving(null);
-    }
-  };
-
-  const handleReject = async (userId: string) => {
-    setApproving(userId);
-    try {
-      const response = await fetch(`/api/admin/users/${userId}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ approved: false }),
-      });
-
-      if (response.ok) {
-        setUsers((prevUsers) =>
-          prevUsers.filter((user) => user.id !== userId)
-        );
-      } else {
-        console.error("Failed to reject user");
-      }
-    } catch (error) {
-      console.error("Error rejecting user:", error);
-    } finally {
-      setApproving(null);
-    }
-  };
-
-  if (status === "loading" || loading) {
-    return (
-      <div className="bg-background">
-        <div className="mx-auto max-w-5xl px-4 py-12">
-          <p className="text-muted-foreground">Loading users...</p>
-        </div>
-      </div>
-    );
+  // Fetch users directly from database on the server
+  let users: User[] = [];
+  try {
+    const dbUsers = await db.user.findMany({
+      select: {
+        id: true,
+        email: true,
+        name: true,
+        approved: true,
+        createdAt: true,
+      },
+      orderBy: [{ approved: "asc" }, { createdAt: "desc" }],
+    });
+    users = dbUsers.map(user => ({
+      ...user,
+      createdAt: user.createdAt.toISOString(),
+    }));
+  } catch (error) {
+    console.error("Error fetching users:", error);
   }
 
   const pendingUsers = users.filter((u) => !u.approved);
@@ -134,36 +66,7 @@ export default function UsersPage() {
           ) : (
             <div className="space-y-3">
               {pendingUsers.map((user) => (
-                <div
-                  key={user.id}
-                  className="flex items-center justify-between rounded-lg border border-border p-4"
-                >
-                  <div className="min-w-0 flex-1">
-                    <p className="font-medium">{user.name || "No name"}</p>
-                    <p className="text-sm text-muted-foreground">{user.email}</p>
-                    <p className="text-xs text-muted-foreground">
-                      Signed up:{" "}
-                      {new Date(user.createdAt).toLocaleDateString()}
-                    </p>
-                  </div>
-                  <div className="ml-4 flex gap-2">
-                    <Button
-                      size="sm"
-                      onClick={() => handleApprove(user.id)}
-                      disabled={approving === user.id}
-                    >
-                      Approve
-                    </Button>
-                    <Button
-                      size="sm"
-                      variant="destructive"
-                      onClick={() => handleReject(user.id)}
-                      disabled={approving === user.id}
-                    >
-                      Reject
-                    </Button>
-                  </div>
-                </div>
+                <PendingUserCard key={user.id} user={user} />
               ))}
             </div>
           )}
@@ -181,19 +84,7 @@ export default function UsersPage() {
           ) : (
             <div className="space-y-3">
               {approvedUsers.map((user) => (
-                <div
-                  key={user.id}
-                  className="flex items-center justify-between rounded-lg border border-border p-4"
-                >
-                  <div className="min-w-0 flex-1">
-                    <p className="font-medium">{user.name || "No name"}</p>
-                    <p className="text-sm text-muted-foreground">{user.email}</p>
-                    <p className="text-xs text-muted-foreground">
-                      Approved:{" "}
-                      {new Date(user.createdAt).toLocaleDateString()}
-                    </p>
-                  </div>
-                </div>
+                <ApprovedUserCard key={user.id} user={user} />
               ))}
             </div>
           )}

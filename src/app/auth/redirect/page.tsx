@@ -8,8 +8,8 @@ interface RedirectPageProps {
 export default async function AuthRedirectPage({ searchParams }: RedirectPageProps) {
   const session = await auth();
 
-  // If a signed-in admin with approved status reaches this route, send them to the admin dashboard.
-  if (session?.user?.role === "ADMIN" && session?.user?.approved) {
+  // If a signed-in admin reaches this route, send them to the admin dashboard.
+  if (session?.user?.role === "ADMIN") {
     return redirect("/admin");
   }
 

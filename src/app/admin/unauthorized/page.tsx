@@ -1,9 +1,15 @@
+import { redirect } from "next/navigation";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { auth } from "@/lib/auth";
 
 export default async function UnauthorizedPage() {
   const session = await auth();
+
+  // If an authorized admin hits this page, redirect them to the dashboard
+  if (session?.user?.role === "ADMIN") {
+    redirect("/admin");
+  }
 
   const isSignedIn = !!session?.user;
 
