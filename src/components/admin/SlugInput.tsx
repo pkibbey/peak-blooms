@@ -25,9 +25,12 @@ export default function SlugInput({
         .toLowerCase()
         .replace(/[^a-z0-9]+/g, "-")
         .replace(/^-+|-+$/g, "");
-      onSlugChange(generatedSlug);
+      
+      if (slug !== generatedSlug) {
+        onSlugChange(generatedSlug);
+      }
     }
-  }, [name, isManualEdit, onSlugChange]);
+  }, [name, isManualEdit, onSlugChange, slug]);
 
   const handleSlugChange = (value: string) => {
     setIsManualEdit(true);

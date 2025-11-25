@@ -52,38 +52,25 @@ export default async function AdminDashboard() {
 
           <div className="mt-6 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
             <div className="rounded-md border border-border p-4">
-              <h3 className="text-lg font-semibold">Products</h3>
-              <p className="mt-1 text-sm text-muted-foreground">Add, edit, and manage product listings</p>
-              <div className="mt-4 flex flex-col gap-2">
-                <Button asChild size="sm">
-                  <Link href="/admin/products">Manage Products</Link>
-                </Button>
-                <Button asChild size="sm" variant="outline">
-                  <Link href="/admin/products/new">
-                    <span className="inline-flex items-center">
-                      <IconPlus className="mr-2" />Add Product
-                    </span>
-                  </Link>
-                </Button>
-              </div>
-            </div>
-
-            <div className="rounded-md border border-border p-4">
               <h3 className="text-lg font-semibold">Categories</h3>
               <p className="mt-1 text-sm text-muted-foreground">Organize products into categories</p>
               <div className="mt-4 flex flex-col gap-2">
                 <Button asChild size="sm">
                   <Link href="/admin/categories">Manage Categories</Link>
                 </Button>
-                <Button asChild size="sm" variant="outline">
-                  <Link href="/admin/categories/new">
-                    <span className="inline-flex items-center">
-                      <IconPlus className="mr-2" />Add Category
-                    </span>
-                  </Link>
+              </div>
+            </div>
+
+            <div className="rounded-md border border-border p-4">
+              <h3 className="text-lg font-semibold">Products</h3>
+              <p className="mt-1 text-sm text-muted-foreground">Add, edit, and manage product listings</p>
+              <div className="mt-4 flex flex-col gap-2">
+                <Button asChild size="sm">
+                  <Link href="/admin/products">Manage Products</Link>
                 </Button>
               </div>
             </div>
+
 
             <div className="rounded-md border border-border p-4">
               <h3 className="text-lg font-semibold">Collections</h3>
@@ -91,13 +78,6 @@ export default async function AdminDashboard() {
               <div className="mt-4 flex flex-col gap-2">
                 <Button asChild size="sm">
                   <Link href="/admin/collections">Manage Collections</Link>
-                </Button>
-                <Button asChild size="sm" variant="outline">
-                  <Link href="/admin/collections/new">
-                    <span className="inline-flex items-center">
-                      <IconPlus className="mr-2" />Add Collection
-                    </span>
-                  </Link>
                 </Button>
               </div>
             </div>
