@@ -1,8 +1,6 @@
 import Link from "next/link";
 import Image from "next/image";
 import { notFound } from "next/navigation";
-import { Button } from "@/components/ui/button";
-import { IconArrowRight } from "@/components/ui/icons";
 import { FeaturedInInspirationSets } from "@/components/site/FeaturedInInspirationSets";
 import { db } from "@/lib/db";
 import { ProductConfigurator } from "@/components/site/ProductConfigurator";
