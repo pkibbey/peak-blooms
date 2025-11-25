@@ -31,7 +31,7 @@ async function main() {
     data: {
       name: "Classic Roses",
       slug: "classic-roses",
-      image: "/featured-categories/classic-roses.png",
+      image: "/categories/classic-roses.png",
       description: "Timeless elegance and beauty in every bloom. Our classic rose collection features the most beloved varieties, perfect for traditional arrangements and timeless celebrations.",
     },
   });
@@ -40,7 +40,7 @@ async function main() {
     data: {
       name: "Exotic Blooms",
       slug: "exotic-blooms",
-      image: "/featured-categories/exotic-blooms.png",
+      image: "/categories/exotic-blooms.png",
       description: "Bold and vibrant arrangements that bring drama and sophistication to any space. Discover unique textures and rich colors from around the world.",
     },
   });
@@ -49,7 +49,7 @@ async function main() {
     data: {
       name: "Seasonal Wildflowers",
       slug: "seasonal-wildflowers",
-      image: "/featured-categories/seasonal-wildflowers.png",
+      image: "/categories/seasonal-wildflowers.png",
       description: "Nature's finest seasonal selections capturing the essence of each time of year. Fresh, vibrant, and sustainably sourced for maximum impact.",
     },
   });
@@ -60,7 +60,7 @@ async function main() {
       name: "Green Fluffy",
       slug: "green-fluffy",
       description: "Lush and voluminous",
-      image: "/featured-products/green-fluffy.jpg",
+      image: "/products/green-fluffy.jpg",
       price: 65.0,
       stemLength: 45,
       countPerBunch: 8,
@@ -81,7 +81,7 @@ async function main() {
       name: "Peach Flower",
       slug: "peach-flower",
       description: "Warm and inviting",
-      image: "/featured-products/peach-flower.jpg",
+      image: "/products/peach-flower.jpg",
       price: 55.0,
       stemLength: 40,
       countPerBunch: 6,
@@ -101,7 +101,7 @@ async function main() {
       name: "Pink Rose",
       slug: "pink-rose",
       description: "Elegant and romantic",
-      image: "/featured-products/pink-rose.jpg",
+      image: "/products/pink-rose.jpg",
       price: 75.0,
       stemLength: 50,
       countPerBunch: 5,
@@ -122,7 +122,7 @@ async function main() {
       name: "Playa Blanca",
       slug: "playa-blanca",
       description: "Pristine white beauty",
-      image: "/featured-products/playa-blanca.jpg",
+      image: "/products/playa-blanca.jpg",
       price: 45.0,
       stemLength: 35,
       countPerBunch: 10,
@@ -144,7 +144,7 @@ async function main() {
       name: "Sunset Romance",
       slug: "sunset-romance",
       subtitle: "Warm hues for evening celebrations",
-      image: "/featured-products/peach-flower.jpg",
+      image: "/products/peach-flower.jpg",
       excerpt:
         "A stunning combination of warm peach and amber tones that evoke the magical hour just before dusk. Perfect for evening receptions and intimate celebrations.",
       inspirationText:
@@ -160,7 +160,7 @@ async function main() {
       name: "Romantic Elegance",
       slug: "romantic-elegance",
       subtitle: "Timeless pink and white arrangement",
-      image: "/featured-products/pink-rose.jpg",
+      image: "/products/pink-rose.jpg",
       excerpt:
         "A classic combination that exudes sophistication and grace. The soft pink roses paired with lush greenery create an arrangement that transcends trends.",
       inspirationText:
@@ -176,7 +176,7 @@ async function main() {
       name: "Pure Serenity",
       slug: "pure-serenity",
       subtitle: "Pristine white and green sanctuary",
-      image: "/featured-products/playa-blanca.jpg",
+      image: "/products/playa-blanca.jpg",
       excerpt:
         "Simplicity meets sophistication in this minimalist arrangement. The pristine white blooms paired with lush greenery create a calming, elegant presence.",
       inspirationText:
@@ -192,7 +192,7 @@ async function main() {
       name: "Lush Garden",
       slug: "lush-garden",
       subtitle: "Abundant greenery with vibrant accents",
-      image: "/featured-products/green-fluffy.jpg",
+      image: "/products/green-fluffy.jpg",
       excerpt:
         "Nature's bounty meets artful arrangement. This set celebrates the beauty of layered textures and verdant tones for creating immersive botanical spaces.",
       inspirationText:

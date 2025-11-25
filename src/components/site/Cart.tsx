@@ -263,12 +263,12 @@ export default function Cart() {
   }
 
   const getProductImage = (item: CartItem) => {
-    // Use imageUrl from product if available, otherwise fallback to featured-products
+    // Use imageUrl from product if available, otherwise fallback to a default placeholder
     if (item.product.imageUrl) {
       return item.product.imageUrl
     }
     // Fallback to a default placeholder
-    return "/featured-products/pink-rose.jpg"
+    return "/products/pink-rose.jpg"
   }
 
   if (loading) {
