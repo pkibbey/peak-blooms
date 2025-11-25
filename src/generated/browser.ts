@@ -53,6 +53,11 @@ export type InspirationSet = Prisma.InspirationSetModel
  */
 export type Product = Prisma.ProductModel
 /**
+ * Model InspirationSetProduct
+ * 
+ */
+export type InspirationSetProduct = Prisma.InspirationSetProductModel
+/**
  * Model ProductVariant
  * 
  */

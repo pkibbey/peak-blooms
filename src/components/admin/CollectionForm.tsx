@@ -9,12 +9,25 @@ import { Label } from "@/components/ui/label";
 import SlugInput from "@/components/admin/SlugInput";
 import ProductMultiSelect from "@/components/admin/ProductMultiSelect";
 
+interface ProductVariant {
+  id: string;
+  price: number;
+  stemLength: number | null;
+  countPerBunch: number | null;
+}
+
 interface Product {
   id: string;
   name: string;
   category?: {
     name: string;
   };
+  variants?: ProductVariant[];
+}
+
+interface ProductSelection {
+  productId: string;
+  productVariantId: string | null;
 }
 
 interface CollectionFormProps {
@@ -27,7 +40,10 @@ interface CollectionFormProps {
     image: string;
     excerpt: string;
     inspirationText: string;
-    products: Array<{ id: string }>;
+    products: Array<{ 
+      productId: string; 
+      productVariantId: string | null;
+    }>;
   };
 }
 
@@ -45,7 +61,14 @@ export default function CollectionForm({ products, collection }: CollectionFormP
   });
 
   const [selectedProductIds, setSelectedProductIds] = useState<string[]>(
-    collection?.products?.map((p) => p.id) || []
+    collection?.products?.map((p) => p.productId) || []
+  );
+
+  const [productSelections, setProductSelections] = useState<ProductSelection[]>(
+    collection?.products?.map((p) => ({
+      productId: p.productId,
+      productVariantId: p.productVariantId,
+    })) || []
   );
 
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -65,7 +88,7 @@ export default function CollectionForm({ products, collection }: CollectionFormP
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           ...formData,
-          productIds: selectedProductIds,
+          productSelections: productSelections,
         }),
       });
 
@@ -203,10 +226,15 @@ export default function CollectionForm({ products, collection }: CollectionFormP
       {/* Products */}
       <div className="space-y-2">
         <Label>Products in Inspiration</Label>
+        <p className="text-xs text-muted-foreground mb-2">
+          Select products and choose a specific variant for each (used when adding all to cart)
+        </p>
         <ProductMultiSelect
           products={products}
           selectedIds={selectedProductIds}
           onChange={setSelectedProductIds}
+          productSelections={productSelections}
+          onSelectionsChange={setProductSelections}
         />
       </div>
 

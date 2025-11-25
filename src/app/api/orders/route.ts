@@ -104,6 +104,7 @@ export async function POST() {
         items: {
           include: {
             product: true,
+            productVariant: true,
           },
         },
       },
@@ -116,10 +117,11 @@ export async function POST() {
       );
     }
 
-    // Calculate total
+    // Calculate total using variant pricing (required)
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const total = cart.items.reduce((sum: number, item: any) => {
-      return sum + item.product.price * item.quantity;
+      const price = item.productVariant?.price ?? 0;
+      return sum + price * item.quantity;
     }, 0);
 
     // Create order with items
@@ -132,8 +134,9 @@ export async function POST() {
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           create: cart.items.map((item: any) => ({
             productId: item.productId,
+            productVariantId: item.productVariantId,
             quantity: item.quantity,
-            price: item.product.price,
+            price: item.productVariant?.price ?? 0,
           })),
         },
       },
@@ -141,6 +144,7 @@ export async function POST() {
         items: {
           include: {
             product: true,
+            productVariant: true,
           },
         },
       },

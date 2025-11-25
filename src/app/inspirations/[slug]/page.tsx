@@ -42,7 +42,12 @@ export default async function InspirationDetailPage({
     include: {
       products: {
         include: {
-          variants: true,
+          product: {
+            include: {
+              variants: true,
+            },
+          },
+          productVariant: true,
         },
       },
     },
@@ -51,6 +56,14 @@ export default async function InspirationDetailPage({
   if (!set) {
     notFound();
   }
+
+  // Extract products with their selected variants from the join table
+  const productsWithVariants = set.products.map((sp) => ({
+    ...sp.product,
+    selectedVariant: sp.productVariant,
+    // Use the selected variant or fall back to first variant
+    displayVariant: sp.productVariant ?? sp.product.variants[0] ?? null,
+  }));
 
   return (
     <div className="flex flex-col items-center justify-start bg-white py-16 font-sans">
@@ -104,7 +117,7 @@ export default async function InspirationDetailPage({
                 </tr>
               </thead>
               <tbody>
-                {set.products.map((product, index) => (
+                {productsWithVariants.map((product, index) => (
                   <tr
                     key={product.slug}
                     className={`border-b border-gray-200 ${
@@ -142,14 +155,17 @@ export default async function InspirationDetailPage({
                       </Link>
                     </td>
                     <td className="px-6 py-4">
-                      {product.variants && product.variants.length > 0 ? (
+                      {product.displayVariant ? (
                         <div className="text-sm text-muted-foreground">
-                          {/* Display first variant details as representative */}
-                          <div className="font-medium">${product.variants[0].price.toFixed(2)}</div>
-                          <div className="text-xs">{product.variants[0].stemLength ? `${product.variants[0].stemLength}cm` : ""} {product.variants[0].countPerBunch ? `· ${product.variants[0].countPerBunch} stems` : ""}</div>
+                          <div className="font-medium">${product.displayVariant.price.toFixed(2)}</div>
+                          <div className="text-xs">
+                            {product.displayVariant.stemLength ? `${product.displayVariant.stemLength}cm` : ""}
+                            {product.displayVariant.stemLength && product.displayVariant.countPerBunch ? " · " : ""}
+                            {product.displayVariant.countPerBunch ? `${product.displayVariant.countPerBunch} stems` : ""}
+                          </div>
                         </div>
                       ) : (
-                        <div className="text-sm text-muted-foreground">${product.price.toFixed(2)}</div>
+                        <div className="text-sm text-muted-foreground">No variant</div>
                       )}
                     </td>
                     <td className="px-6 py-4">
@@ -178,8 +194,8 @@ export default async function InspirationDetailPage({
         {/* Add All to Cart Button */}
         <div className="mt-12">
           <AddAllToCartButton
-            productIds={set.products.map((p) => p.id)}
-            productVariantIds={set.products.map((p) => (p.variants?.[0]?.id ?? null))}
+            productIds={productsWithVariants.map((p) => p.id)}
+            productVariantIds={productsWithVariants.map((p) => p.displayVariant?.id ?? null)}
             setName={set.name}
             user={user}
           />

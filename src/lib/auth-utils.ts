@@ -82,17 +82,17 @@ export async function getOrCreateCart() {
 }
 
 /**
- * Calculate cart total
+ * Calculate cart total (variant pricing required)
  */
 export function calculateCartTotal(
   cartItems: Array<{
-    product: { price: number };
     productVariant?: { price: number } | null;
     quantity: number;
   }>
 ) {
   return cartItems.reduce((total, item) => {
-    const price = item.productVariant?.price ?? item.product.price;
+    // Variant is required for pricing
+    const price = item.productVariant?.price ?? 0;
     return total + price * item.quantity;
   }, 0);
 }

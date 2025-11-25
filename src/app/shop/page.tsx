@@ -27,7 +27,8 @@ async function getFilterOptions() {
         color: true,
       },
     }),
-    db.product.findMany({
+    // Get stem lengths from variants
+    db.productVariant.findMany({
       where: {
         stemLength: {
           not: null,
@@ -49,7 +50,7 @@ async function getFilterOptions() {
     .sort()
 
   const distinctStemLengths = stemLengths
-    .map((p) => p.stemLength)
+    .map((v) => v.stemLength)
     .filter((length): length is number => length !== null)
     .sort((a, b) => a - b)
 
@@ -91,17 +92,30 @@ export default async function ShopPage({ searchParams }: ShopPageProps) {
     }
   }
 
+  // Filter by variant properties (stemLength, price)
   if (stemLength !== undefined && stemLength !== "") {
-    where.stemLength = parseInt(stemLength, 10)
+    where.variants = {
+      some: {
+        stemLength: parseInt(stemLength, 10),
+      },
+    }
   }
 
   if (priceMin !== undefined || priceMax !== undefined) {
-    where.price = {}
+    const priceFilter: { gte?: number; lte?: number } = {}
     if (priceMin !== undefined && priceMin !== "") {
-      where.price.gte = parseFloat(priceMin)
+      priceFilter.gte = parseFloat(priceMin)
     }
     if (priceMax !== undefined && priceMax !== "") {
-      where.price.lte = parseFloat(priceMax)
+      priceFilter.lte = parseFloat(priceMax)
+    }
+    // Merge with existing variants filter or create new one
+    where.variants = {
+      ...where.variants,
+      some: {
+        ...(where.variants?.some || {}),
+        price: priceFilter,
+      },
     }
   }
 

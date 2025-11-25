@@ -2,10 +2,12 @@ import Link from "next/link";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { IconArrowRight } from "@/components/ui/icons";
-import { InspirationSetModel } from "@/generated/models";
+import { InspirationSetModel, InspirationSetProductModel } from "@/generated/models";
 
 interface FeaturedInInspirationSetsProps {
-  inspirationSets: InspirationSetModel[];
+  inspirationSets: (InspirationSetProductModel & {
+    inspirationSet: InspirationSetModel;
+  })[];
 }
 
 export function FeaturedInInspirationSets({
@@ -15,6 +17,14 @@ export function FeaturedInInspirationSets({
     return null;
   }
 
+  // Extract unique inspiration sets from the join table entries
+  const uniqueSets = inspirationSets.reduce((acc, isp) => {
+    if (!acc.find(s => s.id === isp.inspirationSet.id)) {
+      acc.push(isp.inspirationSet);
+    }
+    return acc;
+  }, [] as InspirationSetModel[]);
+
   return (
     <div className="mt-12 pt-8">
       <h2 className="text-2xl font-bold font-serif mb-8">
@@ -22,7 +32,7 @@ export function FeaturedInInspirationSets({
       </h2>
 
       <div className="grid grid-cols-1 gap-6 sm:grid-cols-3">
-        {inspirationSets.map((set) => (
+        {uniqueSets.map((set) => (
           <div
             key={set.id}
             className="group flex flex-col overflow-hidden rounded-xs shadow-md transition-shadow hover:shadow-lg"

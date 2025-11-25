@@ -1,11 +1,13 @@
 "use client";
 
+import { useState, useMemo, useCallback } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { IconArrowRight } from "@/components/ui/icons";
 import { ProductModel, ProductVariantModel } from "@/generated/models";
 import AddToCartButton from "@/components/site/AddToCartButton";
+import { cn } from "@/lib/utils";
 
 interface ProductCardProps {
   product: ProductModel & {
@@ -21,34 +23,157 @@ export function ProductCard({ product, user }: ProductCardProps) {
   const isApproved = user && user.approved;
   const isSignedOut = !user;
 
-  // Get the first variant if variants exist, otherwise use base product
-  const variants = product.variants ?? [];
+  // Get variants data - memoize to prevent dependency issues
+  const variants = useMemo(() => product.variants ?? [], [product.variants]);
   const hasVariants = variants.length > 0;
-  const defaultVariant = hasVariants ? variants[0] : null;
 
-  // Determine the display price
-  const displayPrice = defaultVariant?.price ?? product.price;
+  // Get unique stem lengths and counts from variants
+  const stemLengths = useMemo(
+    () =>
+      Array.from(
+        new Set(
+          variants
+            .map((v) => v.stemLength)
+            .filter((l): l is number => l !== null)
+        )
+      ).sort((a, b) => a - b),
+    [variants]
+  );
 
-  // Check if there are multiple prices across variants
-  const hasMultiplePrices =
-    hasVariants && new Set(variants.map((v) => v.price)).size > 1;
+  const counts = useMemo(
+    () =>
+      Array.from(
+        new Set(
+          variants
+            .map((v) => v.countPerBunch)
+            .filter((c): c is number => c !== null)
+        )
+      ).sort((a, b) => a - b),
+    [variants]
+  );
 
-  // Build variant specs string (e.g., "50cm • 10 stems")
-  const variantSpecs = defaultVariant
+  // State for selected options - initialize from first values in computed arrays
+  const [selectedStemLength, setSelectedStemLength] = useState<number | null>(
+    () => {
+      const lengths = Array.from(
+        new Set(
+          (product.variants ?? [])
+            .map((v) => v.stemLength)
+            .filter((l): l is number => l !== null)
+        )
+      ).sort((a, b) => a - b);
+      return lengths.length > 0 ? lengths[0] : null;
+    }
+  );
+  const [selectedCount, setSelectedCount] = useState<number | null>(
+    () => {
+      const cnts = Array.from(
+        new Set(
+          (product.variants ?? [])
+            .map((v) => v.countPerBunch)
+            .filter((c): c is number => c !== null)
+        )
+      ).sort((a, b) => a - b);
+      return cnts.length > 0 ? cnts[0] : null;
+    }
+  );
+
+  // Compute available counts for the currently selected stem length
+  const availableCountsForLength = useMemo(() => {
+    if (selectedStemLength === null) return counts;
+    return Array.from(
+      new Set(
+        variants
+          .filter((v) => v.stemLength === selectedStemLength)
+          .map((v) => v.countPerBunch)
+          .filter((c): c is number => c !== null)
+      )
+    ).sort((a, b) => a - b);
+  }, [selectedStemLength, variants, counts]);
+
+  // Compute available stem lengths for the currently selected count
+  const availableLengthsForCount = useMemo(() => {
+    if (selectedCount === null) return stemLengths;
+    return Array.from(
+      new Set(
+        variants
+          .filter((v) => v.countPerBunch === selectedCount)
+          .map((v) => v.stemLength)
+          .filter((l): l is number => l !== null)
+      )
+    ).sort((a, b) => a - b);
+  }, [selectedCount, variants, stemLengths]);
+
+  // Handler for stem length selection - auto-adjusts count if needed
+  const handleStemLengthChange = useCallback((length: number) => {
+    setSelectedStemLength(length);
+    // Check if current count is available for the new stem length
+    const availableCounts = Array.from(
+      new Set(
+        variants
+          .filter((v) => v.stemLength === length)
+          .map((v) => v.countPerBunch)
+          .filter((c): c is number => c !== null)
+      )
+    ).sort((a, b) => a - b);
+    if (selectedCount !== null && !availableCounts.includes(selectedCount) && availableCounts.length > 0) {
+      setSelectedCount(availableCounts[0]);
+    }
+  }, [variants, selectedCount]);
+
+  // Handler for count selection - auto-adjusts stem length if needed
+  const handleCountChange = useCallback((count: number) => {
+    setSelectedCount(count);
+    // Check if current stem length is available for the new count
+    const availableLengths = Array.from(
+      new Set(
+        variants
+          .filter((v) => v.countPerBunch === count)
+          .map((v) => v.stemLength)
+          .filter((l): l is number => l !== null)
+      )
+    ).sort((a, b) => a - b);
+    if (selectedStemLength !== null && !availableLengths.includes(selectedStemLength) && availableLengths.length > 0) {
+      setSelectedStemLength(availableLengths[0]);
+    }
+  }, [variants, selectedStemLength]);
+
+  // Derive selectedVariantId from the chosen stem length / count
+  const selectedVariant = useMemo(() => {
+    if (!hasVariants) return null;
+
+    const variant = variants.find(
+      (v) =>
+        (v.stemLength === selectedStemLength ||
+          (v.stemLength === null && selectedStemLength === null)) &&
+        (v.countPerBunch === selectedCount ||
+          (v.countPerBunch === null && selectedCount === null))
+    );
+
+    return variant ?? variants[0];
+  }, [selectedStemLength, selectedCount, hasVariants, variants]);
+
+  // Determine the display price based on selected variant (variants required)
+  const displayPrice = selectedVariant?.price ?? variants[0]?.price ?? 0;
+
+  // Build variant specs string from selected variant (variants required)
+  const variantSpecs = selectedVariant
     ? [
-        defaultVariant.stemLength ? `${defaultVariant.stemLength}cm` : null,
-        defaultVariant.countPerBunch
-          ? `${defaultVariant.countPerBunch} stems`
+        selectedVariant.stemLength ? `${selectedVariant.stemLength}cm` : null,
+        selectedVariant.countPerBunch
+          ? `${selectedVariant.countPerBunch} stems`
           : null,
       ]
         .filter(Boolean)
         .join(" • ")
-    : [
-        product.stemLength ? `${product.stemLength}cm` : null,
-        product.countPerBunch ? `${product.countPerBunch} stems` : null,
+    : variants[0]
+    ? [
+        variants[0].stemLength ? `${variants[0].stemLength}cm` : null,
+        variants[0].countPerBunch ? `${variants[0].countPerBunch} stems` : null,
       ]
         .filter(Boolean)
-        .join(" • ");
+        .join(" • ")
+    : "";
 
   return (
     <div className="group flex flex-col overflow-hidden rounded-xs shadow-md transition-shadow hover:shadow-lg">
@@ -75,11 +200,80 @@ export function ProductCard({ product, user }: ProductCardProps) {
         </div>
 
         <div className="mt-6 flex flex-col gap-3">
+          {/* Variant Selectors - only show for approved users with variants */}
+          {isApproved && hasVariants && (stemLengths.length >= 1 || counts.length >= 1) && (
+            <div className="flex flex-col gap-2">
+              {/* Stem Length Options */}
+              {stemLengths.length >= 1 && (
+                <div>
+                  <span className="text-xs font-medium text-muted-foreground mb-1 block">
+                    Length
+                  </span>
+                  <div className="flex flex-wrap gap-1">
+                    {stemLengths.map((length) => {
+                      const isAvailable = availableLengthsForCount.includes(length);
+                      const isSelected = selectedStemLength === length;
+                      return (
+                        <button
+                          key={length}
+                          onClick={() => handleStemLengthChange(length)}
+                          disabled={!isAvailable}
+                          className={cn(
+                            "px-2 py-1 text-xs rounded-sm border transition-colors",
+                            isSelected
+                              ? "bg-primary text-primary-foreground border-primary"
+                              : isAvailable
+                                ? "bg-white text-muted-foreground border-gray-200 hover:border-primary"
+                                : "bg-gray-100 text-gray-400 border-gray-100 cursor-not-allowed"
+                          )}
+                        >
+                          {length}cm
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+
+              {/* Count Per Bunch Options */}
+              {counts.length >= 1 && (
+                <div>
+                  <span className="text-xs font-medium text-muted-foreground mb-1 block">
+                    Count
+                  </span>
+                  <div className="flex flex-wrap gap-1">
+                    {counts.map((count) => {
+                      const isAvailable = availableCountsForLength.includes(count);
+                      const isSelected = selectedCount === count;
+                      return (
+                        <button
+                          key={count}
+                          onClick={() => handleCountChange(count)}
+                          disabled={!isAvailable}
+                          className={cn(
+                            "px-2 py-1 text-xs rounded-sm border transition-colors",
+                            isSelected
+                              ? "bg-primary text-primary-foreground border-primary"
+                              : isAvailable
+                                ? "bg-white text-muted-foreground border-gray-200 hover:border-primary"
+                                : "bg-gray-100 text-gray-400 border-gray-100 cursor-not-allowed"
+                          )}
+                        >
+                          {count} stems
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+
           {/* Pricing Section */}
           {isApproved && (
             <div>
               <div className="text-lg font-bold text-primary">
-                {hasMultiplePrices && "From "}${displayPrice.toFixed(2)}
+                ${displayPrice.toFixed(2)}
               </div>
               {variantSpecs && (
                 <div className="text-sm text-muted-foreground">
@@ -98,7 +292,7 @@ export function ProductCard({ product, user }: ProductCardProps) {
           {isApproved && (
             <AddToCartButton
               productId={product.id}
-              productVariantId={defaultVariant?.id}
+              productVariantId={selectedVariant?.id}
               productName={product.name}
             />
           )}

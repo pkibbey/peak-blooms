@@ -17,7 +17,11 @@ export async function GET(
       include: {
         category: true,
         variants: true,
-        inspirationSets: true,
+        inspirationSets: {
+          include: {
+            inspirationSet: true,
+          },
+        },
       },
     });
 
@@ -40,7 +44,7 @@ export async function GET(
 
 /**
  * PUT /api/products/[id]
- * Update a product (admin only)
+ * Update a product with variants (admin only)
  */
 export async function PUT(
   request: NextRequest,
@@ -65,12 +69,10 @@ export async function PUT(
       slug,
       description,
       image,
-      price,
       color,
-      stemLength,
-      countPerBunch,
       categoryId,
       featured,
+      variants,
     } = body;
 
     // Check if product exists
@@ -85,28 +87,50 @@ export async function PUT(
       );
     }
 
-    const product = await db.product.update({
-      where: { id },
-      data: {
-        ...(name !== undefined && { name }),
-        ...(slug !== undefined && { slug }),
-        ...(description !== undefined && { description }),
-        ...(image !== undefined && { image }),
-        ...(price !== undefined && { price: parseFloat(price) }),
-        ...(color !== undefined && { color: color || null }),
-        ...(stemLength !== undefined && {
-          stemLength: stemLength ? parseInt(stemLength) : null,
-        }),
-        ...(countPerBunch !== undefined && {
-          countPerBunch: countPerBunch ? parseInt(countPerBunch) : null,
-        }),
-        ...(categoryId !== undefined && { categoryId }),
-        ...(featured !== undefined && { featured }),
-      },
-      include: {
-        category: true,
-        variants: true,
-      },
+    // If variants are provided, validate at least one exists
+    if (variants !== undefined) {
+      if (!Array.isArray(variants) || variants.length === 0) {
+        return NextResponse.json(
+          { error: "At least one variant is required" },
+          { status: 400 }
+        );
+      }
+    }
+
+    // Use transaction to update product and replace variants
+    const product = await db.$transaction(async (tx) => {
+      // If variants provided, delete existing and recreate
+      if (variants !== undefined) {
+        await tx.productVariant.deleteMany({
+          where: { productId: id },
+        });
+      }
+
+      return tx.product.update({
+        where: { id },
+        data: {
+          ...(name !== undefined && { name }),
+          ...(slug !== undefined && { slug }),
+          ...(description !== undefined && { description }),
+          ...(image !== undefined && { image }),
+          ...(color !== undefined && { color: color || null }),
+          ...(categoryId !== undefined && { categoryId }),
+          ...(featured !== undefined && { featured }),
+          ...(variants !== undefined && {
+            variants: {
+              create: variants.map((v: { price: number; stemLength?: number | null; countPerBunch?: number | null }) => ({
+                price: v.price,
+                stemLength: v.stemLength ?? null,
+                countPerBunch: v.countPerBunch ?? null,
+              })),
+            },
+          }),
+        },
+        include: {
+          category: true,
+          variants: true,
+        },
+      });
     });
 
     return NextResponse.json(product);

@@ -20,6 +20,14 @@ export default async function EditProductPage({ params }: EditProductPageProps) 
   const [product, categories] = await Promise.all([
     db.product.findUnique({
       where: { id },
+      include: {
+        variants: {
+          orderBy: [
+            { stemLength: "asc" },
+            { countPerBunch: "asc" },
+          ],
+        },
+      },
     }),
     db.category.findMany({
       orderBy: { name: "asc" },

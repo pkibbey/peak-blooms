@@ -3,15 +3,9 @@
 import { useState, useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import AddToCartButton from "@/components/site/AddToCartButton";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import Link from "next/link";
 import { Label } from "../ui/label";
+import { cn } from "@/lib/utils";
 
 interface ProductVariant {
   id: string;
@@ -23,9 +17,6 @@ interface ProductVariant {
 interface Product {
   id: string;
   name: string;
-  price: number;
-  stemLength: number | null;
-  countPerBunch: number | null;
   variants: ProductVariant[];
 }
 
@@ -74,6 +65,72 @@ export function ProductConfigurator({
     counts.length > 0 ? counts[0].toString() : ""
   );
 
+  // Compute available counts for the currently selected stem length
+  const availableCountsForLength = useMemo(() => {
+    if (!selectedStemLength) return counts;
+    const length = parseInt(selectedStemLength);
+    return Array.from(
+      new Set(
+        product.variants
+          .filter((v) => v.stemLength === length)
+          .map((v) => v.countPerBunch)
+          .filter((c): c is number => c !== null)
+      )
+    ).sort((a, b) => a - b);
+  }, [selectedStemLength, product.variants, counts]);
+
+  // Compute available stem lengths for the currently selected count
+  const availableLengthsForCount = useMemo(() => {
+    if (!selectedCount) return stemLengths;
+    const count = parseInt(selectedCount);
+    return Array.from(
+      new Set(
+        product.variants
+          .filter((v) => v.countPerBunch === count)
+          .map((v) => v.stemLength)
+          .filter((l): l is number => l !== null)
+      )
+    ).sort((a, b) => a - b);
+  }, [selectedCount, product.variants, stemLengths]);
+
+  // Handler for stem length selection - auto-adjusts count if needed
+  const handleStemLengthChange = (value: string) => {
+    setSelectedStemLength(value);
+    const length = parseInt(value);
+    // Check if current count is available for the new stem length
+    const availableCounts = Array.from(
+      new Set(
+        product.variants
+          .filter((v) => v.stemLength === length)
+          .map((v) => v.countPerBunch)
+          .filter((c): c is number => c !== null)
+      )
+    ).sort((a, b) => a - b);
+    const currentCount = selectedCount ? parseInt(selectedCount) : null;
+    if (currentCount !== null && !availableCounts.includes(currentCount) && availableCounts.length > 0) {
+      setSelectedCount(availableCounts[0].toString());
+    }
+  };
+
+  // Handler for count selection - auto-adjusts stem length if needed
+  const handleCountChange = (value: string) => {
+    setSelectedCount(value);
+    const count = parseInt(value);
+    // Check if current stem length is available for the new count
+    const availableLengths = Array.from(
+      new Set(
+        product.variants
+          .filter((v) => v.countPerBunch === count)
+          .map((v) => v.stemLength)
+          .filter((l): l is number => l !== null)
+      )
+    ).sort((a, b) => a - b);
+    const currentLength = selectedStemLength ? parseInt(selectedStemLength) : null;
+    if (currentLength !== null && !availableLengths.includes(currentLength) && availableLengths.length > 0) {
+      setSelectedStemLength(availableLengths[0].toString());
+    }
+  };
+
   // Derive selectedVariantId from the chosen stem length / count
   const selectedVariantId = useMemo(() => {
     if (!hasVariants) return null;
@@ -87,15 +144,85 @@ export function ProductConfigurator({
     return variant?.id ?? null;
   }, [selectedStemLength, selectedCount, hasVariants, product.variants]);
 
-  // If no variants, use base product details
+  // Variants are always required, get price from selected or first variant
   const currentPrice = selectedVariantId
-    ? product.variants.find((v) => v.id === selectedVariantId)?.price ?? product.price
-    : product.price;
+    ? product.variants.find((v) => v.id === selectedVariantId)?.price ?? product.variants[0]?.price ?? 0
+    : product.variants[0]?.price ?? 0;
 
+  // Build variant summary string
+  const variantSummary = [
+    selectedStemLength ? `${selectedStemLength} cm` : null,
+    selectedCount ? `${selectedCount} stems` : null,
+  ]
+    .filter(Boolean)
+    .join(" • ");
 
   return (
     <div className="flex flex-col gap-6">
-      {/* Price Display */}
+      {/* Variant Selectors */}
+      {hasVariants && (stemLengths.length >= 1 || counts.length >= 1) && (
+        <div className="flex flex-col gap-4">
+          {stemLengths.length >= 1 && (
+            <div className="space-y-2">
+              <Label>Stem Length</Label>
+              <div className="flex flex-wrap gap-2">
+                {stemLengths.map((length) => {
+                  const isAvailable = availableLengthsForCount.includes(length);
+                  const isSelected = selectedStemLength === length.toString();
+                  return (
+                    <button
+                      key={length}
+                      onClick={() => handleStemLengthChange(length.toString())}
+                      disabled={!isAvailable}
+                      className={cn(
+                        "px-4 py-2 text-sm rounded-sm border transition-colors",
+                        isSelected
+                          ? "bg-primary text-primary-foreground border-primary"
+                          : isAvailable
+                            ? "bg-white text-muted-foreground border-gray-200 hover:border-primary"
+                            : "bg-gray-100 text-gray-400 border-gray-100 cursor-not-allowed"
+                      )}
+                    >
+                      {length} cm
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+
+          {counts.length >= 1 && (
+            <div className="space-y-2">
+              <Label>Stem Count</Label>
+              <div className="flex flex-wrap gap-2">
+                {counts.map((count) => {
+                  const isAvailable = availableCountsForLength.includes(count);
+                  const isSelected = selectedCount === count.toString();
+                  return (
+                    <button
+                      key={count}
+                      onClick={() => handleCountChange(count.toString())}
+                      disabled={!isAvailable}
+                      className={cn(
+                        "px-4 py-2 text-sm rounded-sm border transition-colors",
+                        isSelected
+                          ? "bg-primary text-primary-foreground border-primary"
+                          : isAvailable
+                            ? "bg-white text-muted-foreground border-gray-200 hover:border-primary"
+                            : "bg-gray-100 text-gray-400 border-gray-100 cursor-not-allowed"
+                      )}
+                    >
+                      {count} stems
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Price Display & Variant Summary */}
       {isSignedOut ? (
         <div className="text-sm text-muted-foreground italic">
           Sign in to view pricing
@@ -105,81 +232,17 @@ export function ProductConfigurator({
           Your account is pending approval. Pricing will be available once approved.
         </div>
       ) : (
-        <div className="text-3xl font-bold text-primary">
-          ${currentPrice.toFixed(2)}
-        </div>
-      )}
-
-      {/* Variant Selectors */}
-      {hasVariants && (
-        <div className="grid grid-cols-2 gap-4 border-t border-b border-gray-200 py-6">
-          {stemLengths.length > 0 && (
-            <div className="space-y-2">
-              <Label>Stem Length</Label>
-              <Select
-                value={selectedStemLength}
-                onValueChange={setSelectedStemLength}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Select length" />
-                </SelectTrigger>
-                <SelectContent>
-                  {stemLengths.map((length) => (
-                    <SelectItem key={length} value={length.toString()}>
-                      {length} cm
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-          )}
-
-          {counts.length > 0 && (
-            <div className="space-y-2">
-              <Label>Count per Bunch</Label>
-              <Select value={selectedCount} onValueChange={setSelectedCount}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Select count" />
-                </SelectTrigger>
-                <SelectContent>
-                  {counts.map((count) => (
-                    <SelectItem key={count} value={count.toString()}>
-                      {count} stems
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-          )}
-        </div>
-      )}
-
-      {/* Static Specs (if no variants) */}
-      {!hasVariants &&
-        (product.stemLength || product.countPerBunch) && (
-          <div className="border-t border-b border-gray-200 py-6">
-            <div className="grid grid-cols-2 gap-4">
-              {product.stemLength && (
-                <div>
-                  <h3 className="text-sm font-semibold text-muted-foreground mb-1">
-                    Stem Length
-                  </h3>
-                  <p className="text-lg font-bold">{product.stemLength} cm</p>
-                </div>
-              )}
-              {product.countPerBunch && (
-                <div>
-                  <h3 className="text-sm font-semibold text-muted-foreground mb-1">
-                    Count per Bunch
-                  </h3>
-                  <p className="text-lg font-bold">
-                    {product.countPerBunch} stems
-                  </p>
-                </div>
-              )}
-            </div>
+        <div>
+          <div className="text-3xl font-bold text-primary">
+            ${currentPrice.toFixed(2)}
           </div>
-        )}
+          {variantSummary && (
+            <div className="text-lg text-muted-foreground mt-1">
+              {variantSummary}
+            </div>
+          )}
+        </div>
+      )}
 
       {/* Add to Cart Button */}
       {isSignedOut ? (

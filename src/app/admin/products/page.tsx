@@ -15,6 +15,12 @@ export default async function AdminProductsPage() {
   const products = await db.product.findMany({
     include: {
       category: true,
+      variants: {
+        select: {
+          id: true,
+          price: true,
+        },
+      },
     },
     orderBy: {
       createdAt: "desc",

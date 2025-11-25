@@ -14,7 +14,8 @@ export async function GET() {
           color: true,
         },
       }),
-      db.product.findMany({
+      // Get stem lengths from variants instead of products
+      db.productVariant.findMany({
         where: {
           stemLength: {
             not: null,
@@ -36,7 +37,7 @@ export async function GET() {
       .sort()
 
     const distinctStemLengths = stemLengths
-      .map((p) => p.stemLength)
+      .map((v) => v.stemLength)
       .filter((length): length is number => length !== null)
       .sort((a, b) => a - b)
 

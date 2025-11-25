@@ -2,9 +2,9 @@
 
 ### 🚀 Core Features
 
-- [ ] Hide prices for authenticated users
 - [ ] Add order history for accounts
 - [ ] This shop assumes that the user only ever wants to add stem length or quanity of each flower, but what if they want to order multiple stem lenghts of the same thing?
+- [ ] Product filters should be updated to use sliders or multiselect boxes, dependant on their value type
 
 ### ✨ Future Ideas
 

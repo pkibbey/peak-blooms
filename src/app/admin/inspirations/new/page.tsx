@@ -17,6 +17,7 @@ export default async function NewInspirationPage() {
       category: {
         select: { name: true },
       },
+      variants: true,
     },
     orderBy: { name: "asc" },
   });

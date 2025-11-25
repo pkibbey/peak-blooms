@@ -2,6 +2,20 @@
 
 import { useState } from "react";
 import { Label } from "../ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+
+interface ProductVariant {
+  id: string;
+  price: number;
+  stemLength: number | null;
+  countPerBunch: number | null;
+}
 
 interface Product {
   id: string;
@@ -9,12 +23,21 @@ interface Product {
   category?: {
     name: string;
   };
+  variants?: ProductVariant[];
+}
+
+interface ProductSelection {
+  productId: string;
+  productVariantId: string | null;
 }
 
 interface ProductMultiSelectProps {
   products: Product[];
   selectedIds: string[];
   onChange: (selectedIds: string[]) => void;
+  // New props for variant selection
+  productSelections?: ProductSelection[];
+  onSelectionsChange?: (selections: ProductSelection[]) => void;
   disabled?: boolean;
 }
 
@@ -22,6 +45,8 @@ export default function ProductMultiSelect({
   products,
   selectedIds,
   onChange,
+  productSelections = [],
+  onSelectionsChange,
   disabled = false,
 }: ProductMultiSelectProps) {
   const [searchTerm, setSearchTerm] = useState("");
@@ -36,9 +61,30 @@ export default function ProductMultiSelect({
     
     if (selectedIds.includes(productId)) {
       onChange(selectedIds.filter((id) => id !== productId));
+      // Also remove from selections
+      if (onSelectionsChange) {
+        onSelectionsChange(productSelections.filter(s => s.productId !== productId));
+      }
     } else {
       onChange([...selectedIds, productId]);
+      // Add to selections with first variant or null
+      if (onSelectionsChange) {
+        const product = products.find(p => p.id === productId);
+        const firstVariantId = product?.variants?.[0]?.id ?? null;
+        onSelectionsChange([...productSelections, { productId, productVariantId: firstVariantId }]);
+      }
     }
+  };
+
+  const handleVariantChange = (productId: string, variantId: string | null) => {
+    if (disabled || !onSelectionsChange) return;
+    
+    const updatedSelections = productSelections.map(s => 
+      s.productId === productId 
+        ? { ...s, productVariantId: variantId }
+        : s
+    );
+    onSelectionsChange(updatedSelections);
   };
 
   const handleSelectAll = () => {
@@ -46,12 +92,42 @@ export default function ProductMultiSelect({
     const filteredIds = filteredProducts.map((p) => p.id);
     const newSelected = [...new Set([...selectedIds, ...filteredIds])];
     onChange(newSelected);
+    
+    // Add selections for newly added products
+    if (onSelectionsChange) {
+      const existingProductIds = new Set(productSelections.map(s => s.productId));
+      const newSelections = filteredProducts
+        .filter(p => !existingProductIds.has(p.id))
+        .map(p => ({ 
+          productId: p.id, 
+          productVariantId: p.variants?.[0]?.id ?? null 
+        }));
+      onSelectionsChange([...productSelections, ...newSelections]);
+    }
   };
 
   const handleDeselectAll = () => {
     if (disabled) return;
     const filteredIds = new Set(filteredProducts.map((p) => p.id));
     onChange(selectedIds.filter((id) => !filteredIds.has(id)));
+    
+    // Remove from selections
+    if (onSelectionsChange) {
+      onSelectionsChange(productSelections.filter(s => !filteredIds.has(s.productId)));
+    }
+  };
+
+  const getSelectedVariantId = (productId: string): string | null => {
+    const selection = productSelections.find(s => s.productId === productId);
+    return selection?.productVariantId ?? null;
+  };
+
+  const formatVariantLabel = (variant: ProductVariant): string => {
+    const parts = [];
+    if (variant.stemLength) parts.push(`${variant.stemLength}cm`);
+    if (variant.countPerBunch) parts.push(`${variant.countPerBunch} stems`);
+    parts.push(`$${variant.price.toFixed(2)}`);
+    return parts.join(" • ");
   };
 
   const selectedCount = selectedIds.length;
@@ -94,7 +170,7 @@ export default function ProductMultiSelect({
         disabled={disabled}
       />
 
-      <div className="max-h-64 overflow-y-auto rounded-md border border-border">
+      <div className="max-h-96 overflow-y-auto rounded-md border border-border">
         {filteredProducts.length === 0 ? (
           <p className="p-4 text-center text-sm text-muted-foreground">
             No products found
@@ -103,10 +179,13 @@ export default function ProductMultiSelect({
           <ul className="divide-y divide-border">
             {filteredProducts.map((product) => {
               const isSelected = selectedIds.includes(product.id);
+              const hasVariants = product.variants && product.variants.length > 0;
+              const selectedVariantId = getSelectedVariantId(product.id);
+              
               return (
-                <li key={product.id}>
+                <li key={product.id} className="p-3">
                   <Label
-                    className={`flex cursor-pointer items-center gap-3 p-3 hover:bg-muted ${
+                    className={`flex cursor-pointer items-center gap-3 ${
                       disabled ? "cursor-not-allowed opacity-50" : ""
                     }`}
                   >
@@ -126,6 +205,29 @@ export default function ProductMultiSelect({
                       )}
                     </div>
                   </Label>
+                  
+                  {/* Variant Selector - shown when product is selected and has variants */}
+                  {isSelected && hasVariants && onSelectionsChange && (
+                    <div className="mt-2 ml-7">
+                      <Select
+                        value={selectedVariantId ?? "none"}
+                        onValueChange={(value) => handleVariantChange(product.id, value === "none" ? null : value)}
+                        disabled={disabled}
+                      >
+                        <SelectTrigger className="h-8 text-xs">
+                          <SelectValue placeholder="Select variant" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="none">No specific variant</SelectItem>
+                          {product.variants!.map((variant) => (
+                            <SelectItem key={variant.id} value={variant.id}>
+                              {formatVariantLabel(variant)}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  )}
                 </li>
               );
             })}

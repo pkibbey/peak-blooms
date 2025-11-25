@@ -17,7 +17,13 @@ export async function GET(
       include: {
         products: {
           include: {
-            category: true,
+            product: {
+              include: {
+                category: true,
+                variants: true,
+              },
+            },
+            productVariant: true,
           },
         },
       },
@@ -38,6 +44,12 @@ export async function GET(
       { status: 500 }
     );
   }
+}
+
+// Type for product selection with optional variant
+interface ProductSelection {
+  productId: string;
+  productVariantId?: string | null;
 }
 
 /**
@@ -69,7 +81,8 @@ export async function PUT(
       image,
       excerpt,
       inspirationText,
-      productIds,
+      productSelections, // New: array of { productId, productVariantId }
+      productIds, // Legacy support: array of product IDs
     } = body;
 
     // Check if inspiration set exists
@@ -94,11 +107,30 @@ export async function PUT(
     if (excerpt !== undefined) updateData.excerpt = excerpt;
     if (inspirationText !== undefined) updateData.inspirationText = inspirationText;
 
-    // Handle product associations
-    if (productIds !== undefined) {
-      updateData.products = {
-        set: productIds.map((productId: string) => ({ id: productId })),
-      };
+    // Handle product associations with variants
+    if (productSelections !== undefined || productIds !== undefined) {
+      // Delete existing products first
+      await db.inspirationSetProduct.deleteMany({
+        where: { inspirationSetId: id },
+      });
+
+      // Handle both new format (productSelections) and legacy format (productIds)
+      let selections: ProductSelection[] = [];
+      if (productSelections && productSelections.length > 0) {
+        selections = productSelections;
+      } else if (productIds && productIds.length > 0) {
+        selections = productIds.map((pid: string) => ({ productId: pid, productVariantId: null }));
+      }
+
+      // Create new product associations
+      if (selections.length > 0) {
+        updateData.products = {
+          create: selections.map((sel: ProductSelection) => ({
+            productId: sel.productId,
+            productVariantId: sel.productVariantId || null,
+          })),
+        };
+      }
     }
 
     const inspirationSet = await db.inspirationSet.update({
@@ -107,7 +139,12 @@ export async function PUT(
       include: {
         products: {
           include: {
-            category: true,
+            product: {
+              include: {
+                category: true,
+              },
+            },
+            productVariant: true,
           },
         },
       },

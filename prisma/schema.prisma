@@ -92,7 +92,7 @@ model InspirationSet {
   createdAt       DateTime  @default(now())
   updatedAt       DateTime  @updatedAt
 
-  products        Product[]
+  products        InspirationSetProduct[]
 }
 
 model Product {
@@ -101,10 +101,7 @@ model Product {
   slug            String    @unique
   description     String?   @db.Text
   image           String?
-  price           Float
   color           String?
-  stemLength      Int?      @map("stem_length")
-  countPerBunch   Int?      @map("count_per_bunch")
   categoryId      String
   featured        Boolean   @default(false)
   createdAt       DateTime  @default(now())
@@ -113,11 +110,28 @@ model Product {
   category        Category  @relation(fields: [categoryId], references: [id], onDelete: Cascade)
   cartItems       CartItem[]
   orderItems      OrderItem[]
-  inspirationSets InspirationSet[]
+  inspirationSets InspirationSetProduct[]
   variants        ProductVariant[]
 
   @@index([categoryId])
   @@index([slug])
+}
+
+// Explicit join table for InspirationSet <-> Product with variant support
+model InspirationSetProduct {
+  id                String           @id @default(cuid())
+  inspirationSetId  String
+  productId         String
+  productVariantId  String?
+  createdAt         DateTime         @default(now())
+
+  inspirationSet    InspirationSet   @relation(fields: [inspirationSetId], references: [id], onDelete: Cascade)
+  product           Product          @relation(fields: [productId], references: [id], onDelete: Cascade)
+  productVariant    ProductVariant?  @relation(fields: [productVariantId], references: [id], onDelete: SetNull)
+
+  @@unique([inspirationSetId, productId])
+  @@index([inspirationSetId])
+  @@index([productId])
 }
 
 model ProductVariant {
@@ -129,9 +143,10 @@ model ProductVariant {
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
 
-  product       Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
-  cartItems     CartItem[]
-  orderItems    OrderItem[]
+  product                Product               @relation(fields: [productId], references: [id], onDelete: Cascade)
+  cartItems              CartItem[]
+  orderItems             OrderItem[]
+  inspirationSetProducts InspirationSetProduct[]
 
   @@index([productId])
 }

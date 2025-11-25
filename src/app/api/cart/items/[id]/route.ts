@@ -4,8 +4,9 @@ import { NextRequest, NextResponse } from "next/server";
 
 /**
  * PATCH /api/cart/items/[id]
- * Update cart item quantity and/or variant
- * Body: { quantity?: number, productVariantId?: string | null }
+ * Update cart item quantity only
+ * Body: { quantity: number }
+ * Note: Variant changes are no longer supported - users must remove and re-add items
  */
 export async function PATCH(
   request: NextRequest,
@@ -23,35 +24,25 @@ export async function PATCH(
     }
 
     const body = await request.json();
-    const { quantity, productVariantId } = body;
+    const { quantity } = body;
 
-    // Build update data - only include provided fields
-    const updateData: Record<string, unknown> = {};
-    
-    if (quantity !== undefined) {
-      if (quantity < 1) {
-        return NextResponse.json(
-          { error: "Quantity must be at least 1" },
-          { status: 400 }
-        );
-      }
-      updateData.quantity = quantity;
-    }
-
-    if (productVariantId !== undefined) {
-      updateData.productVariantId = productVariantId || null;
-    }
-
-    if (Object.keys(updateData).length === 0) {
+    if (quantity === undefined) {
       return NextResponse.json(
-        { error: "No fields to update" },
+        { error: "Quantity is required" },
+        { status: 400 }
+      );
+    }
+
+    if (quantity < 1) {
+      return NextResponse.json(
+        { error: "Quantity must be at least 1" },
         { status: 400 }
       );
     }
 
     const cartItem = await db.cartItem.update({
       where: { id },
-      data: updateData,
+      data: { quantity },
       include: { product: true, productVariant: true },
     });
 

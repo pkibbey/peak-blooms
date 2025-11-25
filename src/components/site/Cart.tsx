@@ -8,13 +8,6 @@ import { toast } from "sonner"
 import { Minus, Plus, Trash2, ShoppingBag } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Label } from "@/components/ui/label"
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select"
 
 import { useDebouncedCallback } from "@/lib/useDebouncedCallback"
 
@@ -22,20 +15,12 @@ interface CartProduct {
   id: string
   name: string
   slug: string
-  price: number
   imageUrl: string | null
 }
 
 interface CartVariant {
   id: string
   name: string
-  price: number
-  stemLength: number | null
-  countPerBunch: number | null
-}
-
-interface ProductVariant {
-  id: string
   price: number
   stemLength: number | null
   countPerBunch: number | null
@@ -61,7 +46,6 @@ export default function Cart() {
   const [cart, setCart] = useState<CartData | null>(null)
   const [loading, setLoading] = useState(true)
   const [updatingItems, setUpdatingItems] = useState<Set<string>>(new Set())
-  const [variantsCache, setVariantsCache] = useState<Record<string, ProductVariant[]>>({})
 
   // Debounced API call for quantity updates
   const debouncedQuantityUpdate = useDebouncedCallback(
@@ -108,31 +92,11 @@ export default function Cart() {
       }
       const data = await response.json()
       setCart(data)
-      
-      // Preload variants for all products in cart
-      data.items.forEach((item: CartItem) => {
-        if (!variantsCache[item.productId]) {
-          fetchVariants(item.productId)
-        }
-      })
     } catch (error) {
       console.error("Error fetching cart:", error)
       toast.error("Failed to load cart")
     } finally {
       setLoading(false)
-    }
-  }
-
-  const fetchVariants = async (productId: string) => {
-    try {
-      const response = await fetch(`/api/products/${productId}/variants`)
-      if (!response.ok) {
-        throw new Error("Failed to fetch variants")
-      }
-      const variants = await response.json()
-      setVariantsCache((prev) => ({ ...prev, [productId]: variants }))
-    } catch (error) {
-      console.error("Error fetching variants:", error)
     }
   }
 
@@ -146,7 +110,8 @@ export default function Cart() {
         item.id === itemId ? { ...item, quantity: newQuantity } : item
       )
       const newTotal = updatedItems.reduce((total, item) => {
-        const price = item.productVariant?.price ?? item.product.price
+        // Variant is required for pricing
+        const price = item.productVariant?.price ?? 0
         return total + price * item.quantity
       }, 0)
       return { ...prev, items: updatedItems, total: newTotal }
@@ -154,66 +119,6 @@ export default function Cart() {
 
     // Debounced API call
     debouncedQuantityUpdate(itemId, newQuantity)
-  }
-
-  const updateVariant = async (itemId: string, newVariantId: string | null) => {
-    setUpdatingItems((prev) => new Set(prev).add(itemId))
-
-    // Find the new variant to update price optimistically
-    const cartItem = cart?.items.find((item) => item.id === itemId)
-    if (!cartItem) return
-
-    const newVariant = variantsCache[cartItem.productId]?.find(
-      (v) => v.id === newVariantId
-    )
-
-    // Optimistic update
-    setCart((prev) => {
-      if (!prev) return prev
-      const updatedItems = prev.items.map((item) => {
-        if (item.id === itemId) {
-          return {
-            ...item,
-            productVariantId: newVariantId,
-            productVariant: newVariant
-              ? { ...newVariant, name: "" }
-              : null,
-          }
-        }
-        return item
-      })
-      const newTotal = updatedItems.reduce((total, item) => {
-        const price = item.productVariant?.price ?? item.product.price
-        return total + price * item.quantity
-      }, 0)
-      return { ...prev, items: updatedItems, total: newTotal }
-    })
-
-    try {
-      const response = await fetch(`/api/cart/items/${itemId}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ productVariantId: newVariantId }),
-      })
-
-      if (!response.ok) {
-        throw new Error("Failed to update variant")
-      }
-
-      toast.success("Variant updated")
-      router.refresh()
-    } catch (error) {
-      console.error("Error updating variant:", error)
-      toast.error("Failed to update variant")
-      // Revert on error
-      fetchCart()
-    } finally {
-      setUpdatingItems((prev) => {
-        const next = new Set(prev)
-        next.delete(itemId)
-        return next
-      })
-    }
   }
 
   const removeItem = async (itemId: string, productName: string) => {
@@ -224,7 +129,8 @@ export default function Cart() {
       if (!prev) return prev
       const updatedItems = prev.items.filter((item) => item.id !== itemId)
       const newTotal = updatedItems.reduce((total, item) => {
-        const price = item.productVariant?.price ?? item.product.price
+        // Variant is required for pricing
+        const price = item.productVariant?.price ?? 0
         return total + price * item.quantity
       }, 0)
       return { ...prev, items: updatedItems, total: newTotal }
@@ -262,14 +168,10 @@ export default function Cart() {
     }).format(price)
   }
 
-  const getProductImage = (item: CartItem) => {
-    // Use imageUrl from product if available, otherwise fallback to a default placeholder
-    if (item.product.imageUrl) {
-      return item.product.imageUrl
-    }
-    // Fallback to a default placeholder
-    return "/products/pink-rose.jpg"
-  }
+  // Return the product image url or null when no image is available.
+  // Cart items should not render a fallback image — instead we show an
+  // empty colored square when the item has no image.
+  const getProductImage = (item: CartItem) => item.product.imageUrl ?? null
 
   if (loading) {
     return (
@@ -299,10 +201,20 @@ export default function Cart() {
       {/* Cart Items */}
       <div className="lg:col-span-2 space-y-4">
         {cart.items.map((item) => {
-          const price = item.productVariant?.price ?? item.product.price
+          // Variant is required for pricing
+          const price = item.productVariant?.price ?? 0
           const lineTotal = price * item.quantity
           const isUpdating = updatingItems.has(item.id)
-          const variants = variantsCache[item.productId] || []
+
+          // Build variant specs string
+          const variantSpecs = item.productVariant
+            ? [
+                item.productVariant.stemLength ? `${item.productVariant.stemLength}cm` : null,
+                item.productVariant.countPerBunch ? `${item.productVariant.countPerBunch} stems` : null,
+              ]
+                .filter(Boolean)
+                .join(" • ")
+            : null
 
           return (
             <div
@@ -316,13 +228,18 @@ export default function Cart() {
                 href={`/shop/${item.product.slug}`}
                 className="relative h-24 w-24 shrink-0 overflow-hidden rounded-xs bg-neutral-100"
               >
-                <Image
-                  src={getProductImage(item)}
-                  alt={item.product.name}
-                  fill
-                  className="object-cover"
-                  sizes="96px"
-                />
+                {getProductImage(item) ? (
+                  <Image
+                    src={getProductImage(item)!}
+                    alt={item.product.name}
+                    fill
+                    className="object-cover"
+                    sizes="96px"
+                  />
+                ) : (
+                  // No fallback image — render an empty colored square
+                  <div className="h-full w-full bg-muted" />
+                )}
               </Link>
 
               {/* Product Details */}
@@ -337,107 +254,21 @@ export default function Cart() {
                     </Link>
                     <p className="text-sm text-muted-foreground mt-1">
                       {formatPrice(price)} each
+                      {variantSpecs && ` • ${variantSpecs}`}
                     </p>
                   </div>
                   <p className="font-medium">{formatPrice(lineTotal)}</p>
                 </div>
 
-                {/* Variant Selectors */}
-                {variants.length > 0 && (
-                  <div className="mt-3 grid grid-cols-2 gap-3">
-                    {/* Stem Length Selector */}
-                    {variants.some((v) => v.stemLength !== null) && (() => {
-                      const uniqueStemLengths = Array.from(
-                        new Set(variants.map((v) => v.stemLength).filter((l): l is number => l !== null))
-                      ).sort((a, b) => a - b)
-                      
-                      // Get current variant's stem length
-                      const currentVariant = variants.find((v) => v.id === item.productVariantId)
-                      const currentStemLength = currentVariant?.stemLength?.toString() || uniqueStemLengths[0]?.toString() || ""
-                      
-                      return (
-                        <div>
-                          <Label className="text-xs font-semibold text-muted-foreground mb-1 block">
-                            Stem Length
-                          </Label>
-                          <Select
-                            value={currentStemLength}
-                            onValueChange={(newStemLength) => {
-                              // Find variant with this stem length and current count per bunch
-                              const currentCount = currentVariant?.countPerBunch
-                              const matchingVariant = variants.find(
-                                (v) => v.stemLength?.toString() === newStemLength && 
-                                       (currentCount === null || v.countPerBunch === currentCount)
-                              ) || variants.find((v) => v.stemLength?.toString() === newStemLength)
-                              
-                              if (matchingVariant) {
-                                updateVariant(item.id, matchingVariant.id)
-                              }
-                            }}
-                            disabled={isUpdating}
-                          >
-                            <SelectTrigger className="h-8 text-sm">
-                              <SelectValue />
-                            </SelectTrigger>
-                            <SelectContent>
-                              {uniqueStemLengths.map((length) => (
-                                <SelectItem key={length} value={length.toString()}>
-                                  {length}cm
-                                </SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
-                        </div>
-                      )
-                    })()}
-
-                    {/* Count Per Bunch Selector */}
-                    {variants.some((v) => v.countPerBunch !== null) && (() => {
-                      const uniqueCounts = Array.from(
-                        new Set(variants.map((v) => v.countPerBunch).filter((c): c is number => c !== null))
-                      ).sort((a, b) => a - b)
-                      
-                      // Get current variant's count per bunch
-                      const currentVariant = variants.find((v) => v.id === item.productVariantId)
-                      const currentCount = currentVariant?.countPerBunch?.toString() || uniqueCounts[0]?.toString() || ""
-                      
-                      return (
-                        <div>
-                          <Label className="text-xs font-semibold text-muted-foreground mb-1 block">
-                            Count Per Bunch
-                          </Label>
-                          <Select
-                            value={currentCount}
-                            onValueChange={(newCount) => {
-                              // Find variant with this count and current stem length
-                              const currentStemLength = currentVariant?.stemLength
-                              const matchingVariant = variants.find(
-                                (v) => v.countPerBunch?.toString() === newCount && 
-                                       (currentStemLength === null || v.stemLength === currentStemLength)
-                              ) || variants.find((v) => v.countPerBunch?.toString() === newCount)
-                              
-                              if (matchingVariant) {
-                                updateVariant(item.id, matchingVariant.id)
-                              }
-                            }}
-                            disabled={isUpdating}
-                          >
-                            <SelectTrigger className="h-8 text-sm">
-                              <SelectValue />
-                            </SelectTrigger>
-                            <SelectContent>
-                              {uniqueCounts.map((count) => (
-                                <SelectItem key={count} value={count.toString()}>
-                                  {count} stems
-                                </SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
-                        </div>
-                      )
-                    })()}
-                  </div>
-                )}
+                {/* View Options Link */}
+                <div className="mt-2">
+                  <Link
+                    href={`/shop/${item.product.slug}`}
+                    className="text-xs text-primary hover:underline"
+                  >
+                    View similar options →
+                  </Link>
+                </div>
 
                 {/* Quantity Controls */}
                 <div className="flex items-end justify-between gap-4 mt-auto pt-2">

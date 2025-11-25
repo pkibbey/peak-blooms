@@ -6,19 +6,21 @@ import Link from "next/link";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import InlineEditField from "./InlineEditField";
 
 interface Product {
   id: string;
   name: string;
   slug: string;
-  price: number;
   featured: boolean;
   image: string | null;
   category: {
     id: string;
     name: string;
   };
+  variants: {
+    id: string;
+    price: number;
+  }[];
 }
 
 interface AdminProductCardProps {
@@ -78,19 +80,14 @@ export default function AdminProductCard({ product }: AdminProductCardProps) {
     }
   };
 
-  const handlePriceUpdate = async (newPrice: string | number) => {
-    const response = await fetch(`/api/products/${product.id}`, {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ price: newPrice }),
-    });
-
-    if (!response.ok) {
-      throw new Error("Failed to update price");
-    }
-
-    router.refresh();
-  };
+  // Calculate price range from variants
+  const prices = product.variants.map((v) => v.price);
+  const minPrice = prices.length > 0 ? Math.min(...prices) : 0;
+  const maxPrice = prices.length > 0 ? Math.max(...prices) : 0;
+  const priceDisplay =
+    minPrice === maxPrice
+      ? `$${minPrice.toFixed(2)}`
+      : `$${minPrice.toFixed(2)} - $${maxPrice.toFixed(2)}`;
 
   return (
     <div className="flex items-center gap-4 rounded-lg border border-border p-4">
@@ -123,14 +120,10 @@ export default function AdminProductCard({ product }: AdminProductCardProps) {
         </div>
         <p className="text-sm text-muted-foreground">{product.category.name}</p>
         <div className="mt-1 flex items-center gap-4">
-          <span className="text-sm text-muted-foreground">Price:</span>
-          <InlineEditField
-            value={product.price}
-            onSave={handlePriceUpdate}
-            type="number"
-            className="w-24"
-            displayFormatter={(val) => `$${Number(val).toFixed(2)}`}
-          />
+          <span className="text-sm font-medium">{priceDisplay}</span>
+          <span className="text-xs text-muted-foreground">
+            ({product.variants.length} variant{product.variants.length !== 1 ? "s" : ""})
+          </span>
         </div>
       </div>
 

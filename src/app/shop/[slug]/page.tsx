@@ -43,7 +43,11 @@ export default async function ProductDetailPage({
     where: { slug },
     include: {
       category: true,
-      inspirationSets: true,
+      inspirationSets: {
+        include: {
+          inspirationSet: true,
+        },
+      },
       variants: true,
     },
   });

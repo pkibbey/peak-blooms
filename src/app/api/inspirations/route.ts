@@ -11,7 +11,12 @@ export async function GET() {
       include: {
         products: {
           include: {
-            category: true,
+            product: {
+              include: {
+                category: true,
+              },
+            },
+            productVariant: true,
           },
         },
       },
@@ -28,6 +33,12 @@ export async function GET() {
       { status: 500 }
     );
   }
+}
+
+// Type for product selection with optional variant
+interface ProductSelection {
+  productId: string;
+  productVariantId?: string | null;
 }
 
 /**
@@ -55,7 +66,8 @@ export async function POST(request: NextRequest) {
       image,
       excerpt,
       inspirationText,
-      productIds,
+      productSelections, // New: array of { productId, productVariantId }
+      productIds, // Legacy support: array of product IDs (uses first variant)
     } = body;
 
     if (!name || !slug || !subtitle || !image || !excerpt || !inspirationText) {
@@ -63,6 +75,14 @@ export async function POST(request: NextRequest) {
         { error: "Missing required fields" },
         { status: 400 }
       );
+    }
+
+    // Handle both new format (productSelections) and legacy format (productIds)
+    let selections: ProductSelection[] = [];
+    if (productSelections && productSelections.length > 0) {
+      selections = productSelections;
+    } else if (productIds && productIds.length > 0) {
+      selections = productIds.map((id: string) => ({ productId: id, productVariantId: null }));
     }
 
     const inspirationSet = await db.inspirationSet.create({
@@ -73,14 +93,22 @@ export async function POST(request: NextRequest) {
         image,
         excerpt,
         inspirationText,
-        ...(productIds && productIds.length > 0 && {
+        ...(selections.length > 0 && {
           products: {
-            connect: productIds.map((id: string) => ({ id })),
+            create: selections.map((sel: ProductSelection) => ({
+              productId: sel.productId,
+              productVariantId: sel.productVariantId || null,
+            })),
           },
         }),
       },
       include: {
-        products: true,
+        products: {
+          include: {
+            product: true,
+            productVariant: true,
+          },
+        },
       },
     });
 

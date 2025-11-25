@@ -33,18 +33,30 @@ export async function GET(request: NextRequest) {
       };
     }
 
-    if (stemLength !== null) {
-      where.stemLength = parseInt(stemLength as string, 10);
+    // Filter by variant properties (stemLength, price)
+    const variantsFilter: Record<string, unknown> = {};
+    
+    if (stemLength !== null && stemLength !== "") {
+      variantsFilter.stemLength = parseInt(stemLength as string, 10);
     }
 
     if (priceMin !== null || priceMax !== null) {
-      where.price = {};
-      if (priceMin !== null) {
-        (where.price as Record<string, unknown>).gte = parseFloat(priceMin as string);
+      const priceFilter: Record<string, unknown> = {};
+      if (priceMin !== null && priceMin !== "") {
+        priceFilter.gte = parseFloat(priceMin as string);
       }
-      if (priceMax !== null) {
-        (where.price as Record<string, unknown>).lte = parseFloat(priceMax as string);
+      if (priceMax !== null && priceMax !== "") {
+        priceFilter.lte = parseFloat(priceMax as string);
       }
+      if (Object.keys(priceFilter).length > 0) {
+        variantsFilter.price = priceFilter;
+      }
+    }
+
+    if (Object.keys(variantsFilter).length > 0) {
+      where.variants = {
+        some: variantsFilter,
+      };
     }
 
     const products = await db.product.findMany({
@@ -70,7 +82,7 @@ export async function GET(request: NextRequest) {
 
 /**
  * POST /api/products
- * Create a new product (admin only)
+ * Create a new product with variants (admin only)
  */
 export async function POST(request: NextRequest) {
   try {
@@ -86,11 +98,18 @@ export async function POST(request: NextRequest) {
 
     const body = await request.json();
 
-    const { name, slug, description, image, price, color, stemLength, countPerBunch, categoryId, featured } = body;
+    const { name, slug, description, image, color, categoryId, featured, variants } = body;
 
-    if (!name || !slug || !price || !categoryId) {
+    if (!name || !slug || !categoryId) {
       return NextResponse.json(
         { error: "Missing required fields" },
+        { status: 400 }
+      );
+    }
+
+    if (!variants || !Array.isArray(variants) || variants.length === 0) {
+      return NextResponse.json(
+        { error: "At least one variant is required" },
         { status: 400 }
       );
     }
@@ -101,15 +120,20 @@ export async function POST(request: NextRequest) {
         slug,
         description,
         image,
-        price: parseFloat(price),
         color: color || null,
-        stemLength: stemLength ? parseInt(stemLength) : null,
-        countPerBunch: countPerBunch ? parseInt(countPerBunch) : null,
         categoryId,
         featured: featured === true,
+        variants: {
+          create: variants.map((v: { price: number; stemLength?: number | null; countPerBunch?: number | null }) => ({
+            price: v.price,
+            stemLength: v.stemLength ?? null,
+            countPerBunch: v.countPerBunch ?? null,
+          })),
+        },
       },
       include: {
         category: true,
+        variants: true,
       },
     });
 

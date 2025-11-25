@@ -61,9 +61,6 @@ async function main() {
       slug: "green-fluffy",
       description: "Lush and voluminous",
       image: "/products/green-fluffy.jpg",
-      price: 65.0,
-      stemLength: 45,
-      countPerBunch: 8,
       categoryId: exoticBlooms.id,
       featured: true,
       variants: {
@@ -82,9 +79,6 @@ async function main() {
       slug: "peach-flower",
       description: "Warm and inviting",
       image: "/products/peach-flower.jpg",
-      price: 55.0,
-      stemLength: 40,
-      countPerBunch: 6,
       categoryId: exoticBlooms.id,
       featured: true,
       variants: {
@@ -102,9 +96,6 @@ async function main() {
       slug: "pink-rose",
       description: "Elegant and romantic",
       image: "/products/pink-rose.jpg",
-      price: 75.0,
-      stemLength: 50,
-      countPerBunch: 5,
       categoryId: classicRoses.id,
       featured: false,
       variants: {
@@ -123,9 +114,6 @@ async function main() {
       slug: "playa-blanca",
       description: "Pristine white beauty",
       image: "/products/playa-blanca.jpg",
-      price: 45.0,
-      stemLength: 35,
-      countPerBunch: 10,
       categoryId: seasonalWildflowers.id,
       featured: false,
       variants: {
@@ -139,7 +127,8 @@ async function main() {
 
   console.log("✨ Creating inspiration sets...");
 
-  await prisma.inspirationSet.create({
+  // First create the inspiration sets without products
+  const sunsetRomance = await prisma.inspirationSet.create({
     data: {
       name: "Sunset Romance",
       slug: "sunset-romance",
@@ -149,13 +138,10 @@ async function main() {
         "A stunning combination of warm peach and amber tones that evoke the magical hour just before dusk. Perfect for evening receptions and intimate celebrations.",
       inspirationText:
         "This arrangement draws inspiration from the golden hour's fleeting beauty. I combined soft peach flowers with deeper amber accents to create depth and warmth. The voluminous textures balance the delicate blooms, making this set ideal for florists seeking to create memorable moments at sunset celebrations.",
-      products: {
-        connect: [{ slug: "peach-flower" }, { slug: "green-fluffy" }],
-      },
     },
   });
 
-  await prisma.inspirationSet.create({
+  const romanticElegance = await prisma.inspirationSet.create({
     data: {
       name: "Romantic Elegance",
       slug: "romantic-elegance",
@@ -165,13 +151,10 @@ async function main() {
         "A classic combination that exudes sophistication and grace. The soft pink roses paired with lush greenery create an arrangement that transcends trends.",
       inspirationText:
         "Inspired by classic wedding aesthetics, I curated this set to appeal to traditionalists while maintaining modern elegance. The pink roses provide focal depth, while the abundant green creates visual balance. This set works beautifully for both intimate and grand celebrations, offering versatility for florists managing diverse client needs.",
-      products: {
-        connect: [{ slug: "pink-rose" }, { slug: "green-fluffy" }],
-      },
     },
   });
 
-  await prisma.inspirationSet.create({
+  const pureSerenity = await prisma.inspirationSet.create({
     data: {
       name: "Pure Serenity",
       slug: "pure-serenity",
@@ -181,13 +164,10 @@ async function main() {
         "Simplicity meets sophistication in this minimalist arrangement. The pristine white blooms paired with lush greenery create a calming, elegant presence.",
       inspirationText:
         "This set embodies the belief that less is often more. The pure white flowers demand attention without noise, creating a serene focal point. Paired with generous green elements, it speaks to clients seeking understated luxury. Perfect for modern minimalist spaces and those who appreciate refined simplicity.",
-      products: {
-        connect: [{ slug: "playa-blanca" }, { slug: "green-fluffy" }],
-      },
     },
   });
 
-  await prisma.inspirationSet.create({
+  const lushGarden = await prisma.inspirationSet.create({
     data: {
       name: "Lush Garden",
       slug: "lush-garden",
@@ -197,11 +177,51 @@ async function main() {
         "Nature's bounty meets artful arrangement. This set celebrates the beauty of layered textures and verdant tones for creating immersive botanical spaces.",
       inspirationText:
         "I created this set for designers seeking volume and texture-rich arrangements. The primary focus on lush greenery provides an excellent base for clients who prefer to add their own focal flowers, or stands beautifully on its own for those appreciating organic abundance. It's perfect for installations and large-scale projects.",
-      products: {
-        connect: [{ slug: "green-fluffy" }, { slug: "peach-flower" }],
-      },
     },
   });
+
+  // Fetch the products to get their IDs
+  const peachFlower = await prisma.product.findUnique({ where: { slug: "peach-flower" }, include: { variants: true } });
+  const greenFluffy = await prisma.product.findUnique({ where: { slug: "green-fluffy" }, include: { variants: true } });
+  const pinkRose = await prisma.product.findUnique({ where: { slug: "pink-rose" }, include: { variants: true } });
+  const playaBlanca = await prisma.product.findUnique({ where: { slug: "playa-blanca" }, include: { variants: true } });
+
+  // Create the inspiration set product associations with variants
+  if (peachFlower && greenFluffy) {
+    await prisma.inspirationSetProduct.createMany({
+      data: [
+        { inspirationSetId: sunsetRomance.id, productId: peachFlower.id, productVariantId: peachFlower.variants[0]?.id ?? null },
+        { inspirationSetId: sunsetRomance.id, productId: greenFluffy.id, productVariantId: greenFluffy.variants[0]?.id ?? null },
+      ],
+    });
+  }
+
+  if (pinkRose && greenFluffy) {
+    await prisma.inspirationSetProduct.createMany({
+      data: [
+        { inspirationSetId: romanticElegance.id, productId: pinkRose.id, productVariantId: pinkRose.variants[0]?.id ?? null },
+        { inspirationSetId: romanticElegance.id, productId: greenFluffy.id, productVariantId: greenFluffy.variants[0]?.id ?? null },
+      ],
+    });
+  }
+
+  if (playaBlanca && greenFluffy) {
+    await prisma.inspirationSetProduct.createMany({
+      data: [
+        { inspirationSetId: pureSerenity.id, productId: playaBlanca.id, productVariantId: playaBlanca.variants[0]?.id ?? null },
+        { inspirationSetId: pureSerenity.id, productId: greenFluffy.id, productVariantId: greenFluffy.variants[0]?.id ?? null },
+      ],
+    });
+  }
+
+  if (greenFluffy && peachFlower) {
+    await prisma.inspirationSetProduct.createMany({
+      data: [
+        { inspirationSetId: lushGarden.id, productId: greenFluffy.id, productVariantId: greenFluffy.variants[0]?.id ?? null },
+        { inspirationSetId: lushGarden.id, productId: peachFlower.id, productVariantId: peachFlower.variants[0]?.id ?? null },
+      ],
+    });
+  }
 
   console.log("✅ Database seeded successfully!");
 }

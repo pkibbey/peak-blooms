@@ -23,7 +23,10 @@ export default async function EditInspirationPage({ params }: EditCollectionPage
       where: { id },
       include: {
         products: {
-          select: { id: true },
+          select: { 
+            productId: true,
+            productVariantId: true,
+          },
         },
       },
     }),
@@ -32,6 +35,7 @@ export default async function EditInspirationPage({ params }: EditCollectionPage
         category: {
           select: { name: true },
         },
+        variants: true,
       },
       orderBy: { name: "asc" },
     }),

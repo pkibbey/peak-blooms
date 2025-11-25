@@ -7,10 +7,18 @@ import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import SlugInput from "@/components/admin/SlugInput";
+import { Trash2, Plus } from "lucide-react";
 
 interface Category {
   id: string;
   name: string;
+}
+
+interface ProductVariant {
+  id?: string;
+  price: string;
+  stemLength: string;
+  countPerBunch: string;
 }
 
 interface ProductFormProps {
@@ -21,12 +29,15 @@ interface ProductFormProps {
     slug: string;
     description: string | null;
     image: string | null;
-    price: number;
     color: string | null;
-    stemLength: number | null;
-    countPerBunch: number | null;
     categoryId: string;
     featured: boolean;
+    variants?: {
+      id: string;
+      price: number;
+      stemLength: number | null;
+      countPerBunch: number | null;
+    }[];
   };
 }
 
@@ -39,12 +50,22 @@ export default function ProductForm({ categories, product }: ProductFormProps) {
     slug: product?.slug || "",
     description: product?.description || "",
     image: product?.image || "",
-    price: product?.price?.toString() || "",
     color: product?.color || "",
-    stemLength: product?.stemLength?.toString() || "",
-    countPerBunch: product?.countPerBunch?.toString() || "",
     categoryId: product?.categoryId || "",
     featured: product?.featured || false,
+  });
+
+  const [variants, setVariants] = useState<ProductVariant[]>(() => {
+    if (product?.variants && product.variants.length > 0) {
+      return product.variants.map((v) => ({
+        id: v.id,
+        price: v.price.toString(),
+        stemLength: v.stemLength?.toString() || "",
+        countPerBunch: v.countPerBunch?.toString() || "",
+      }));
+    }
+    // Start with one empty variant for new products
+    return [{ price: "", stemLength: "", countPerBunch: "" }];
   });
 
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -55,6 +76,14 @@ export default function ProductForm({ categories, product }: ProductFormProps) {
     setIsSubmitting(true);
     setError(null);
 
+    // Validate at least one variant with a price
+    const validVariants = variants.filter((v) => v.price.trim() !== "");
+    if (validVariants.length === 0) {
+      setError("At least one variant with a price is required");
+      setIsSubmitting(false);
+      return;
+    }
+
     try {
       const url = isEditing ? `/api/products/${product.id}` : "/api/products";
       const method = isEditing ? "PUT" : "POST";
@@ -64,9 +93,11 @@ export default function ProductForm({ categories, product }: ProductFormProps) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           ...formData,
-          price: parseFloat(formData.price),
-          stemLength: formData.stemLength ? parseInt(formData.stemLength) : null,
-          countPerBunch: formData.countPerBunch ? parseInt(formData.countPerBunch) : null,
+          variants: validVariants.map((v) => ({
+            price: parseFloat(v.price),
+            stemLength: v.stemLength ? parseInt(v.stemLength) : null,
+            countPerBunch: v.countPerBunch ? parseInt(v.countPerBunch) : null,
+          })),
         }),
       });
 
@@ -93,6 +124,26 @@ export default function ProductForm({ categories, product }: ProductFormProps) {
       ...prev,
       [name]: type === "checkbox" ? (e.target as HTMLInputElement).checked : value,
     }));
+  };
+
+  const handleVariantChange = (
+    index: number,
+    field: keyof ProductVariant,
+    value: string
+  ) => {
+    setVariants((prev) =>
+      prev.map((v, i) => (i === index ? { ...v, [field]: value } : v))
+    );
+  };
+
+  const addVariant = () => {
+    setVariants((prev) => [...prev, { price: "", stemLength: "", countPerBunch: "" }]);
+  };
+
+  const removeVariant = (index: number) => {
+    if (variants.length > 1) {
+      setVariants((prev) => prev.filter((_, i) => i !== index));
+    }
   };
 
   return (
@@ -170,20 +221,17 @@ export default function ProductForm({ categories, product }: ProductFormProps) {
       </div>
 
       <div className="grid gap-6 md:grid-cols-2">
-        {/* Price */}
+                {/* Color */}
         <div className="space-y-2">
-          <Label htmlFor="price">Price *</Label>
+          <Label htmlFor="color">Color</Label>
           <input
-            id="price"
-            name="price"
-            type="number"
-            required
-            step="0.01"
-            min="0"
-            value={formData.price}
+            id="color"
+            name="color"
+            type="text"
+            value={formData.color}
             onChange={handleChange}
             className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm"
-            placeholder="0.00"
+            placeholder="e.g., Red, Pink, White"
           />
         </div>
 
@@ -208,49 +256,83 @@ export default function ProductForm({ categories, product }: ProductFormProps) {
         </div>
       </div>
 
-      <div className="grid gap-6 md:grid-cols-3">
-        {/* Color */}
-        <div className="space-y-2">
-          <Label htmlFor="color">Color</Label>
-          <input
-            id="color"
-            name="color"
-            type="text"
-            value={formData.color}
-            onChange={handleChange}
-            className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm"
-            placeholder="e.g., Red, Pink, White"
-          />
+      {/* Variants Section */}
+      <div className="space-y-4">
+        <div className="flex items-center justify-between">
+          <Label>Variants *</Label>
+          <Button type="button" variant="outline" size="sm" onClick={addVariant}>
+            <Plus className="h-4 w-4 mr-1" />
+            Add Variant
+          </Button>
         </div>
+        <p className="text-sm text-muted-foreground">
+          At least one variant is required. Each variant defines pricing and specifications.
+        </p>
+        <div className="space-y-3">
+          {variants.map((variant, index) => (
+            <div
+              key={index}
+              className="grid gap-4 md:grid-cols-4 items-end p-4 border border-border rounded-md bg-muted/30"
+            >
+              {/* Price */}
+              <div className="space-y-2">
+                <Label htmlFor={`variant-price-${index}`}>Price *</Label>
+                <input
+                  id={`variant-price-${index}`}
+                  type="number"
+                  step="0.01"
+                  min="0"
+                  value={variant.price}
+                  onChange={(e) => handleVariantChange(index, "price", e.target.value)}
+                  className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm"
+                  placeholder="0.00"
+                />
+              </div>
 
-        {/* Stem Length */}
-        <div className="space-y-2">
-          <Label htmlFor="stemLength">Stem Length (cm)</Label>
-          <input
-            id="stemLength"
-            name="stemLength"
-            type="number"
-            min="0"
-            value={formData.stemLength}
-            onChange={handleChange}
-            className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm"
-            placeholder="e.g., 50"
-          />
-        </div>
+              {/* Stem Length */}
+              <div className="space-y-2">
+                <Label htmlFor={`variant-stemLength-${index}`}>Stem Length (cm)</Label>
+                <input
+                  id={`variant-stemLength-${index}`}
+                  type="number"
+                  min="0"
+                  value={variant.stemLength}
+                  onChange={(e) => handleVariantChange(index, "stemLength", e.target.value)}
+                  className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm"
+                  placeholder="e.g., 50"
+                />
+              </div>
 
-        {/* Count Per Bunch */}
-        <div className="space-y-2">
-          <Label htmlFor="countPerBunch">Stems Per Bunch</Label>
-          <input
-            id="countPerBunch"
-            name="countPerBunch"
-            type="number"
-            min="0"
-            value={formData.countPerBunch}
-            onChange={handleChange}
-            className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm"
-            placeholder="e.g., 10"
-          />
+              {/* Count Per Bunch */}
+              <div className="space-y-2">
+                <Label htmlFor={`variant-countPerBunch-${index}`}>Stems Per Bunch</Label>
+                <input
+                  id={`variant-countPerBunch-${index}`}
+                  type="number"
+                  min="0"
+                  value={variant.countPerBunch}
+                  onChange={(e) => handleVariantChange(index, "countPerBunch", e.target.value)}
+                  className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm"
+                  placeholder="e.g., 10"
+                />
+              </div>
+
+              {/* Remove Button */}
+              <div>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => removeVariant(index)}
+                  disabled={variants.length === 1}
+                  className="w-full border-destructive text-destructive hover:bg-destructive hover:text-white disabled:opacity-50"
+                >
+                  <Trash2 className="h-4 w-4 mr-1" />
+                  Remove
+                </Button>
+              </div>
+            </div>
+          ))}
         </div>
       </div>
 
