@@ -4,6 +4,14 @@ import { notFound } from "next/navigation";
 import AddAllToCartButton from "@/components/site/AddAllToCartButton";
 import { db } from "@/lib/db";
 import { getCurrentUser } from "@/lib/auth-utils";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 
 interface InspirationDetailPageProps {
   params: Promise<{
@@ -106,31 +114,23 @@ export default async function InspirationDetailPage({
           <h2 className="text-2xl font-bold mb-6">Flowers in This Set</h2>
 
           {/* Product Checklist Table */}
-          <div className="overflow-x-auto border border-gray-200 rounded-xs">
-            <table className="w-full">
-              <thead>
-                <tr className="bg-secondary/30 border-b border-gray-200">
-                  <th className="text-left px-6 py-4 font-semibold">Image</th>
-                  <th className="text-left px-6 py-4 font-semibold">Product</th>
-                  <th className="text-left px-6 py-4 font-semibold">Variant</th>
-                  <th className="text-left px-6 py-4 font-semibold">Status</th>
-                </tr>
-              </thead>
-              <tbody>
-                {productsWithVariants.map((product, index) => (
-                  <tr
-                    key={product.slug}
-                    className={`border-b border-gray-200 ${
-                      index % 2 === 0 ? "bg-white" : "bg-gray-50/50"
-                    } hover:bg-secondary/20 transition-colors`}
-                  >
-                    <td className="px-6 py-4">
-                      <Link
-                        href={`/shop/${product.slug}`}
-                        className="block"
-                      >
+          <div className="rounded-md border">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Image</TableHead>
+                  <TableHead>Product</TableHead>
+                  <TableHead>Variant</TableHead>
+                  <TableHead>Status</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {productsWithVariants.map((product) => (
+                  <TableRow key={product.slug}>
+                    <TableCell>
+                      <Link href={`/shop/${product.slug}`} className="block">
                         {product.image ? (
-                          <div className="relative h-16 w-16 overflow-hidden rounded-sm bg-gray-100">
+                          <div className="relative h-16 w-16 overflow-hidden rounded-sm bg-muted">
                             <Image
                               src={product.image}
                               alt={product.name}
@@ -140,35 +140,46 @@ export default async function InspirationDetailPage({
                             />
                           </div>
                         ) : (
-                          <div className="h-16 w-16 rounded-sm bg-gray-200 flex items-center justify-center text-xs text-muted-foreground">
+                          <div className="h-16 w-16 rounded-sm bg-muted flex items-center justify-center text-xs text-muted-foreground">
                             No image
                           </div>
                         )}
                       </Link>
-                    </td>
-                    <td className="px-6 py-4">
+                    </TableCell>
+                    <TableCell>
                       <Link
                         href={`/shop/${product.slug}`}
                         className="text-primary font-medium hover:underline"
                       >
                         {product.name}
                       </Link>
-                    </td>
-                    <td className="px-6 py-4">
+                    </TableCell>
+                    <TableCell>
                       {product.displayVariant ? (
                         <div className="text-sm text-muted-foreground">
-                          <div className="font-medium">${product.displayVariant.price.toFixed(2)}</div>
+                          <div className="font-medium">
+                            ${product.displayVariant.price.toFixed(2)}
+                          </div>
                           <div className="text-xs">
-                            {product.displayVariant.stemLength ? `${product.displayVariant.stemLength}cm` : ""}
-                            {product.displayVariant.stemLength && product.displayVariant.countPerBunch ? " · " : ""}
-                            {product.displayVariant.countPerBunch ? `${product.displayVariant.countPerBunch} stems` : ""}
+                            {product.displayVariant.stemLength
+                              ? `${product.displayVariant.stemLength}cm`
+                              : ""}
+                            {product.displayVariant.stemLength &&
+                            product.displayVariant.countPerBunch
+                              ? " · "
+                              : ""}
+                            {product.displayVariant.countPerBunch
+                              ? `${product.displayVariant.countPerBunch} stems`
+                              : ""}
                           </div>
                         </div>
                       ) : (
-                        <div className="text-sm text-muted-foreground">No variant</div>
+                        <div className="text-sm text-muted-foreground">
+                          No variant
+                        </div>
                       )}
-                    </td>
-                    <td className="px-6 py-4">
+                    </TableCell>
+                    <TableCell>
                       <span className="inline-flex items-center gap-2 text-sm text-muted-foreground">
                         <svg
                           className="h-5 w-5 text-primary"
@@ -183,11 +194,11 @@ export default async function InspirationDetailPage({
                         </svg>
                         Included
                       </span>
-                    </td>
-                  </tr>
+                    </TableCell>
+                  </TableRow>
                 ))}
-              </tbody>
-            </table>
+              </TableBody>
+            </Table>
           </div>
         </div>
 
