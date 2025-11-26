@@ -46,7 +46,7 @@ export default async function EditInspirationPage({ params }: EditInspirationPag
 
   return (
     <div className="bg-background">
-      <div className="mx-auto max-w-3xl px-4 py-12 sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-5xl px-4 py-12 sm:px-6 lg:px-8">
         <div className="mb-8">
           <Link href="/admin/inspirations" className="mb-4">← Back to Inspirations</Link>
           <h1 className="text-3xl font-bold">Edit Inspiration</h1>

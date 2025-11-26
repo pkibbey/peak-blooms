@@ -12,9 +12,9 @@ export default async function NewCollectionPage() {
 
   return (
     <div className="bg-background">
-      <div className="mx-auto max-w-3xl px-4 py-12 sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-5xl px-4 py-12 sm:px-6 lg:px-8">
         <div className="mb-8">
-          <Link href="/admin/collections" className="mb-4">← Back to Collections</Link>
+          <Link href="/admin/collections" className="text-primary inline-block mb-4">← Back to Collections</Link>
           <h1 className="text-3xl font-bold">Add New Collection</h1>
           <p className="mt-2 text-muted-foreground">
             Create a new product collection

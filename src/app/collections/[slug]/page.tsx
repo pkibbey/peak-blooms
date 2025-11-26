@@ -56,12 +56,7 @@ export default async function CollectionDetailPage({
     <div className="flex flex-col items-center justify-start bg-white py-16 font-sans">
       <div className="w-full max-w-5xl px-6">
         {/* Navigation Back Link */}
-        <Link
-          href="/collections"
-          className="text-sm font-medium text-primary hover:underline mb-8"
-        >
-          ← Back to collections
-        </Link>
+        <Link href="/admin/collections" className="text-sm text-primary inline-block mb-4">← Back to Collections</Link>
 
         {/* Collection Header */}
         <div className="mb-12">
@@ -96,12 +91,7 @@ export default async function CollectionDetailPage({
 
         {/* Back Button */}
         <div className="mt-12 pt-8 border-t border-gray-200">
-          <Link
-            href="/collections"
-            className="text-sm font-medium text-primary hover:underline"
-          >
-            ← Back to collections
-          </Link>
+          <Link href="/admin/collections" className="text-sm text-primary inline-block mb-4">← Back to Collections</Link>
         </div>
       </div>
     </div>

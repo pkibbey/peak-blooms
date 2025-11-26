@@ -4,6 +4,7 @@
 
 - [ ] Add order history for accounts
 - [ ] Product filters should be updated to use sliders or multiselect boxes, dependant on their value type
+- [ ] Make Back button consistent style in a reusebale component, and position it consistently on pages (see "Back to Collections" for a good reference of how it should look and feel)
 
 ### ✨ Future Ideas
 
