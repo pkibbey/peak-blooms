@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
@@ -38,11 +37,56 @@ interface ProductsTableProps {
 type SortColumn = "name" | "collection" | "price" | "variants" | "featured";
 type SortDirection = "asc" | "desc";
 
+interface SortIndicatorProps {
+  sortColumn: SortColumn;
+  column: SortColumn;
+  sortDirection: SortDirection;
+}
+
+const SortIndicator = ({
+  sortColumn,
+  column,
+  sortDirection,
+}: SortIndicatorProps) => {
+  if (sortColumn !== column) {
+    return <span className="ml-1 text-muted-foreground/50">↕</span>;
+  }
+  return <span className="ml-1">{sortDirection === "asc" ? "↑" : "↓"}</span>;
+};
+
+interface SortableHeaderProps {
+  column: SortColumn;
+  children: React.ReactNode;
+  sortColumn: SortColumn;
+  sortDirection: SortDirection;
+  onSort: (column: SortColumn) => void;
+}
+
+const SortableHeader = ({
+  column,
+  children,
+  sortColumn,
+  sortDirection,
+  onSort,
+}: SortableHeaderProps) => (
+  <TableHead
+    className="cursor-pointer hover:bg-muted/50 transition-colors select-none"
+    onClick={() => onSort(column)}
+  >
+    <span className="inline-flex items-center">
+      {children}
+      <SortIndicator
+        sortColumn={sortColumn}
+        column={column}
+        sortDirection={sortDirection}
+      />
+    </span>
+  </TableHead>
+);
+
 export default function ProductsTable({ products }: ProductsTableProps) {
-  const router = useRouter();
   const [sortColumn, setSortColumn] = useState<SortColumn>("name");
   const [sortDirection, setSortDirection] = useState<SortDirection>("asc");
-  const [deletingId, setDeletingId] = useState<string | null>(null);
 
   const handleSort = (column: SortColumn) => {
     if (sortColumn === column) {
@@ -50,35 +94,6 @@ export default function ProductsTable({ products }: ProductsTableProps) {
     } else {
       setSortColumn(column);
       setSortDirection("asc");
-    }
-  };
-
-  const handleDelete = async (product: Product) => {
-    if (
-      !window.confirm(
-        `Are you sure you want to delete "${product.name}"? This action cannot be undone.`
-      )
-    ) {
-      return;
-    }
-
-    setDeletingId(product.id);
-    try {
-      const response = await fetch(`/api/products/${product.id}`, {
-        method: "DELETE",
-      });
-
-      if (response.ok) {
-        router.refresh();
-      } else {
-        console.error("Failed to delete product");
-        alert("Failed to delete product. Please try again.");
-      }
-    } catch (error) {
-      console.error("Error deleting product:", error);
-      alert("An error occurred. Please try again.");
-    } finally {
-      setDeletingId(null);
     }
   };
 
@@ -112,35 +127,6 @@ export default function ProductsTable({ products }: ProductsTableProps) {
     }
   });
 
-  const SortIndicator = ({ column }: { column: SortColumn }) => {
-    if (sortColumn !== column) {
-      return <span className="ml-1 text-muted-foreground/50">↕</span>;
-    }
-    return (
-      <span className="ml-1">
-        {sortDirection === "asc" ? "↑" : "↓"}
-      </span>
-    );
-  };
-
-  const SortableHeader = ({
-    column,
-    children,
-  }: {
-    column: SortColumn;
-    children: React.ReactNode;
-  }) => (
-    <TableHead
-      className="cursor-pointer hover:bg-muted/50 transition-colors select-none"
-      onClick={() => handleSort(column)}
-    >
-      <span className="inline-flex items-center">
-        {children}
-        <SortIndicator column={column} />
-      </span>
-    </TableHead>
-  );
-
   if (products.length === 0) {
     return (
       <p className="text-muted-foreground">
@@ -155,11 +141,46 @@ export default function ProductsTable({ products }: ProductsTableProps) {
         <TableHeader>
           <TableRow>
             <TableHead>Image</TableHead>
-            <SortableHeader column="name">Name</SortableHeader>
-            <SortableHeader column="collection">Collection</SortableHeader>
-            <SortableHeader column="price">Price</SortableHeader>
-            <SortableHeader column="variants">Variants</SortableHeader>
-            <SortableHeader column="featured">Featured</SortableHeader>
+            <SortableHeader
+              column="name"
+              sortColumn={sortColumn}
+              sortDirection={sortDirection}
+              onSort={handleSort}
+            >
+              Name
+            </SortableHeader>
+            <SortableHeader
+              column="collection"
+              sortColumn={sortColumn}
+              sortDirection={sortDirection}
+              onSort={handleSort}
+            >
+              Collection
+            </SortableHeader>
+            <SortableHeader
+              column="price"
+              sortColumn={sortColumn}
+              sortDirection={sortDirection}
+              onSort={handleSort}
+            >
+              Price
+            </SortableHeader>
+            <SortableHeader
+              column="variants"
+              sortColumn={sortColumn}
+              sortDirection={sortDirection}
+              onSort={handleSort}
+            >
+              Variants
+            </SortableHeader>
+            <SortableHeader
+              column="featured"
+              sortColumn={sortColumn}
+              sortDirection={sortDirection}
+              onSort={handleSort}
+            >
+              Featured
+            </SortableHeader>
             <TableHead>Actions</TableHead>
           </TableRow>
         </TableHeader>
@@ -233,14 +254,6 @@ export default function ProductsTable({ products }: ProductsTableProps) {
                       <Link href={`/admin/products/${product.id}/edit`}>
                         Edit
                       </Link>
-                    </Button>
-                    <Button
-                      size="sm"
-                      variant="destructive"
-                      onClick={() => handleDelete(product)}
-                      disabled={deletingId === product.id}
-                    >
-                      {deletingId === product.id ? "..." : "Delete"}
                     </Button>
                   </div>
                 </TableCell>
