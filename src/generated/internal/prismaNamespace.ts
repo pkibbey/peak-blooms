@@ -389,9 +389,9 @@ export const ModelName = {
   VerificationToken: 'VerificationToken',
   User: 'User',
   Collection: 'Collection',
-  InspirationSet: 'InspirationSet',
+  Inspiration: 'Inspiration',
   Product: 'Product',
-  InspirationSetProduct: 'InspirationSetProduct',
+  InspirationProduct: 'InspirationProduct',
   ProductVariant: 'ProductVariant',
   ShoppingCart: 'ShoppingCart',
   CartItem: 'CartItem',
@@ -412,7 +412,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "account" | "session" | "verificationToken" | "user" | "collection" | "inspirationSet" | "product" | "inspirationSetProduct" | "productVariant" | "shoppingCart" | "cartItem" | "order" | "orderItem"
+    modelProps: "account" | "session" | "verificationToken" | "user" | "collection" | "inspiration" | "product" | "inspirationProduct" | "productVariant" | "shoppingCart" | "cartItem" | "order" | "orderItem"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -786,77 +786,77 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
-    InspirationSet: {
-      payload: Prisma.$InspirationSetPayload<ExtArgs>
-      fields: Prisma.InspirationSetFieldRefs
+    Inspiration: {
+      payload: Prisma.$InspirationPayload<ExtArgs>
+      fields: Prisma.InspirationFieldRefs
       operations: {
         findUnique: {
-          args: Prisma.InspirationSetFindUniqueArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$InspirationSetPayload> | null
+          args: Prisma.InspirationFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$InspirationPayload> | null
         }
         findUniqueOrThrow: {
-          args: Prisma.InspirationSetFindUniqueOrThrowArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$InspirationSetPayload>
+          args: Prisma.InspirationFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$InspirationPayload>
         }
         findFirst: {
-          args: Prisma.InspirationSetFindFirstArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$InspirationSetPayload> | null
+          args: Prisma.InspirationFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$InspirationPayload> | null
         }
         findFirstOrThrow: {
-          args: Prisma.InspirationSetFindFirstOrThrowArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$InspirationSetPayload>
+          args: Prisma.InspirationFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$InspirationPayload>
         }
         findMany: {
-          args: Prisma.InspirationSetFindManyArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$InspirationSetPayload>[]
+          args: Prisma.InspirationFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$InspirationPayload>[]
         }
         create: {
-          args: Prisma.InspirationSetCreateArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$InspirationSetPayload>
+          args: Prisma.InspirationCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$InspirationPayload>
         }
         createMany: {
-          args: Prisma.InspirationSetCreateManyArgs<ExtArgs>
+          args: Prisma.InspirationCreateManyArgs<ExtArgs>
           result: BatchPayload
         }
         createManyAndReturn: {
-          args: Prisma.InspirationSetCreateManyAndReturnArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$InspirationSetPayload>[]
+          args: Prisma.InspirationCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$InspirationPayload>[]
         }
         delete: {
-          args: Prisma.InspirationSetDeleteArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$InspirationSetPayload>
+          args: Prisma.InspirationDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$InspirationPayload>
         }
         update: {
-          args: Prisma.InspirationSetUpdateArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$InspirationSetPayload>
+          args: Prisma.InspirationUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$InspirationPayload>
         }
         deleteMany: {
-          args: Prisma.InspirationSetDeleteManyArgs<ExtArgs>
+          args: Prisma.InspirationDeleteManyArgs<ExtArgs>
           result: BatchPayload
         }
         updateMany: {
-          args: Prisma.InspirationSetUpdateManyArgs<ExtArgs>
+          args: Prisma.InspirationUpdateManyArgs<ExtArgs>
           result: BatchPayload
         }
         updateManyAndReturn: {
-          args: Prisma.InspirationSetUpdateManyAndReturnArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$InspirationSetPayload>[]
+          args: Prisma.InspirationUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$InspirationPayload>[]
         }
         upsert: {
-          args: Prisma.InspirationSetUpsertArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$InspirationSetPayload>
+          args: Prisma.InspirationUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$InspirationPayload>
         }
         aggregate: {
-          args: Prisma.InspirationSetAggregateArgs<ExtArgs>
-          result: runtime.Types.Utils.Optional<Prisma.AggregateInspirationSet>
+          args: Prisma.InspirationAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateInspiration>
         }
         groupBy: {
-          args: Prisma.InspirationSetGroupByArgs<ExtArgs>
-          result: runtime.Types.Utils.Optional<Prisma.InspirationSetGroupByOutputType>[]
+          args: Prisma.InspirationGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.InspirationGroupByOutputType>[]
         }
         count: {
-          args: Prisma.InspirationSetCountArgs<ExtArgs>
-          result: runtime.Types.Utils.Optional<Prisma.InspirationSetCountAggregateOutputType> | number
+          args: Prisma.InspirationCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.InspirationCountAggregateOutputType> | number
         }
       }
     }
@@ -934,77 +934,77 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
-    InspirationSetProduct: {
-      payload: Prisma.$InspirationSetProductPayload<ExtArgs>
-      fields: Prisma.InspirationSetProductFieldRefs
+    InspirationProduct: {
+      payload: Prisma.$InspirationProductPayload<ExtArgs>
+      fields: Prisma.InspirationProductFieldRefs
       operations: {
         findUnique: {
-          args: Prisma.InspirationSetProductFindUniqueArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$InspirationSetProductPayload> | null
+          args: Prisma.InspirationProductFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$InspirationProductPayload> | null
         }
         findUniqueOrThrow: {
-          args: Prisma.InspirationSetProductFindUniqueOrThrowArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$InspirationSetProductPayload>
+          args: Prisma.InspirationProductFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$InspirationProductPayload>
         }
         findFirst: {
-          args: Prisma.InspirationSetProductFindFirstArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$InspirationSetProductPayload> | null
+          args: Prisma.InspirationProductFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$InspirationProductPayload> | null
         }
         findFirstOrThrow: {
-          args: Prisma.InspirationSetProductFindFirstOrThrowArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$InspirationSetProductPayload>
+          args: Prisma.InspirationProductFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$InspirationProductPayload>
         }
         findMany: {
-          args: Prisma.InspirationSetProductFindManyArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$InspirationSetProductPayload>[]
+          args: Prisma.InspirationProductFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$InspirationProductPayload>[]
         }
         create: {
-          args: Prisma.InspirationSetProductCreateArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$InspirationSetProductPayload>
+          args: Prisma.InspirationProductCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$InspirationProductPayload>
         }
         createMany: {
-          args: Prisma.InspirationSetProductCreateManyArgs<ExtArgs>
+          args: Prisma.InspirationProductCreateManyArgs<ExtArgs>
           result: BatchPayload
         }
         createManyAndReturn: {
-          args: Prisma.InspirationSetProductCreateManyAndReturnArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$InspirationSetProductPayload>[]
+          args: Prisma.InspirationProductCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$InspirationProductPayload>[]
         }
         delete: {
-          args: Prisma.InspirationSetProductDeleteArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$InspirationSetProductPayload>
+          args: Prisma.InspirationProductDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$InspirationProductPayload>
         }
         update: {
-          args: Prisma.InspirationSetProductUpdateArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$InspirationSetProductPayload>
+          args: Prisma.InspirationProductUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$InspirationProductPayload>
         }
         deleteMany: {
-          args: Prisma.InspirationSetProductDeleteManyArgs<ExtArgs>
+          args: Prisma.InspirationProductDeleteManyArgs<ExtArgs>
           result: BatchPayload
         }
         updateMany: {
-          args: Prisma.InspirationSetProductUpdateManyArgs<ExtArgs>
+          args: Prisma.InspirationProductUpdateManyArgs<ExtArgs>
           result: BatchPayload
         }
         updateManyAndReturn: {
-          args: Prisma.InspirationSetProductUpdateManyAndReturnArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$InspirationSetProductPayload>[]
+          args: Prisma.InspirationProductUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$InspirationProductPayload>[]
         }
         upsert: {
-          args: Prisma.InspirationSetProductUpsertArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$InspirationSetProductPayload>
+          args: Prisma.InspirationProductUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$InspirationProductPayload>
         }
         aggregate: {
-          args: Prisma.InspirationSetProductAggregateArgs<ExtArgs>
-          result: runtime.Types.Utils.Optional<Prisma.AggregateInspirationSetProduct>
+          args: Prisma.InspirationProductAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateInspirationProduct>
         }
         groupBy: {
-          args: Prisma.InspirationSetProductGroupByArgs<ExtArgs>
-          result: runtime.Types.Utils.Optional<Prisma.InspirationSetProductGroupByOutputType>[]
+          args: Prisma.InspirationProductGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.InspirationProductGroupByOutputType>[]
         }
         count: {
-          args: Prisma.InspirationSetProductCountArgs<ExtArgs>
-          result: runtime.Types.Utils.Optional<Prisma.InspirationSetProductCountAggregateOutputType> | number
+          args: Prisma.InspirationProductCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.InspirationProductCountAggregateOutputType> | number
         }
       }
     }
@@ -1482,7 +1482,7 @@ export const CollectionScalarFieldEnum = {
 export type CollectionScalarFieldEnum = (typeof CollectionScalarFieldEnum)[keyof typeof CollectionScalarFieldEnum]
 
 
-export const InspirationSetScalarFieldEnum = {
+export const InspirationScalarFieldEnum = {
   id: 'id',
   name: 'name',
   slug: 'slug',
@@ -1494,7 +1494,7 @@ export const InspirationSetScalarFieldEnum = {
   updatedAt: 'updatedAt'
 } as const
 
-export type InspirationSetScalarFieldEnum = (typeof InspirationSetScalarFieldEnum)[keyof typeof InspirationSetScalarFieldEnum]
+export type InspirationScalarFieldEnum = (typeof InspirationScalarFieldEnum)[keyof typeof InspirationScalarFieldEnum]
 
 
 export const ProductScalarFieldEnum = {
@@ -1513,15 +1513,15 @@ export const ProductScalarFieldEnum = {
 export type ProductScalarFieldEnum = (typeof ProductScalarFieldEnum)[keyof typeof ProductScalarFieldEnum]
 
 
-export const InspirationSetProductScalarFieldEnum = {
+export const InspirationProductScalarFieldEnum = {
   id: 'id',
-  inspirationSetId: 'inspirationSetId',
+  inspirationId: 'inspirationId',
   productId: 'productId',
   productVariantId: 'productVariantId',
   createdAt: 'createdAt'
 } as const
 
-export type InspirationSetProductScalarFieldEnum = (typeof InspirationSetProductScalarFieldEnum)[keyof typeof InspirationSetProductScalarFieldEnum]
+export type InspirationProductScalarFieldEnum = (typeof InspirationProductScalarFieldEnum)[keyof typeof InspirationProductScalarFieldEnum]
 
 
 export const ProductVariantScalarFieldEnum = {
@@ -1788,9 +1788,9 @@ export type GlobalOmitConfig = {
   verificationToken?: Prisma.VerificationTokenOmit
   user?: Prisma.UserOmit
   collection?: Prisma.CollectionOmit
-  inspirationSet?: Prisma.InspirationSetOmit
+  inspiration?: Prisma.InspirationOmit
   product?: Prisma.ProductOmit
-  inspirationSetProduct?: Prisma.InspirationSetProductOmit
+  inspirationProduct?: Prisma.InspirationProductOmit
   productVariant?: Prisma.ProductVariantOmit
   shoppingCart?: Prisma.ShoppingCartOmit
   cartItem?: Prisma.CartItemOmit

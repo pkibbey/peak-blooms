@@ -12,7 +12,7 @@ export default async function AdminInspirationsPage() {
     redirect("/admin/unauthorized");
   }
 
-  const collections = await db.inspirationSet.findMany({
+  const inspirations = await db.inspiration.findMany({
     include: {
       products: {
         select: { id: true },
@@ -30,7 +30,7 @@ export default async function AdminInspirationsPage() {
           <div>
             <h1 className="text-3xl font-bold">Inspirations</h1>
             <p className="mt-2 text-muted-foreground">
-              Curate inspiration sets ({collections.length} total)
+              Curate inspirations ({inspirations.length} total)
             </p>
           </div>
           <Button asChild>
@@ -40,14 +40,14 @@ export default async function AdminInspirationsPage() {
 
         {/* Inspirations List */}
         <div>
-          {collections.length === 0 ? (
+          {inspirations.length === 0 ? (
             <p className="text-muted-foreground">
               No inspirations found. Add your first inspiration to get started.
             </p>
           ) : (
             <div className="space-y-3">
-              {collections.map((collection) => (
-                <AdminInspirationCard key={collection.id} inspiration={collection} />
+              {inspirations.map((inspiration) => (
+                <AdminInspirationCard key={inspiration.id} inspiration={inspiration} />
               ))}
             </div>
           )}

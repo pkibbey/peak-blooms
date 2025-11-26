@@ -24,7 +24,7 @@ async function main() {
   await prisma.productVariant.deleteMany({});
   await prisma.product.deleteMany({});
   await prisma.collection.deleteMany({});
-  await prisma.inspirationSet.deleteMany({});
+  await prisma.inspiration.deleteMany({});
 
   // Create collections
   const classicRoses = await prisma.collection.create({
@@ -125,10 +125,10 @@ async function main() {
     },
   });
 
-  console.log("✨ Creating inspiration sets...");
+  console.log("✨ Creating inspirations...");
 
-  // First create the inspiration sets without products
-  const sunsetRomance = await prisma.inspirationSet.create({
+  // First create the inspirations without products
+  const sunsetRomance = await prisma.inspiration.create({
     data: {
       name: "Sunset Romance",
       slug: "sunset-romance",
@@ -141,7 +141,7 @@ async function main() {
     },
   });
 
-  const romanticElegance = await prisma.inspirationSet.create({
+  const romanticElegance = await prisma.inspiration.create({
     data: {
       name: "Romantic Elegance",
       slug: "romantic-elegance",
@@ -154,7 +154,7 @@ async function main() {
     },
   });
 
-  const pureSerenity = await prisma.inspirationSet.create({
+  const pureSerenity = await prisma.inspiration.create({
     data: {
       name: "Pure Serenity",
       slug: "pure-serenity",
@@ -167,7 +167,7 @@ async function main() {
     },
   });
 
-  const lushGarden = await prisma.inspirationSet.create({
+  const lushGarden = await prisma.inspiration.create({
     data: {
       name: "Lush Garden",
       slug: "lush-garden",
@@ -186,39 +186,39 @@ async function main() {
   const pinkRose = await prisma.product.findUnique({ where: { slug: "pink-rose" }, include: { variants: true } });
   const playaBlanca = await prisma.product.findUnique({ where: { slug: "playa-blanca" }, include: { variants: true } });
 
-  // Create the inspiration set product associations with variants
+  // Create the inspiration product associations with variants
   if (peachFlower && greenFluffy) {
-    await prisma.inspirationSetProduct.createMany({
+    await prisma.inspirationProduct.createMany({
       data: [
-        { inspirationSetId: sunsetRomance.id, productId: peachFlower.id, productVariantId: peachFlower.variants[0]?.id ?? null },
-        { inspirationSetId: sunsetRomance.id, productId: greenFluffy.id, productVariantId: greenFluffy.variants[0]?.id ?? null },
+        { inspirationId: sunsetRomance.id, productId: peachFlower.id, productVariantId: peachFlower.variants[0]?.id ?? null },
+        { inspirationId: sunsetRomance.id, productId: greenFluffy.id, productVariantId: greenFluffy.variants[0]?.id ?? null },
       ],
     });
   }
 
   if (pinkRose && greenFluffy) {
-    await prisma.inspirationSetProduct.createMany({
+    await prisma.inspirationProduct.createMany({
       data: [
-        { inspirationSetId: romanticElegance.id, productId: pinkRose.id, productVariantId: pinkRose.variants[0]?.id ?? null },
-        { inspirationSetId: romanticElegance.id, productId: greenFluffy.id, productVariantId: greenFluffy.variants[0]?.id ?? null },
+        { inspirationId: romanticElegance.id, productId: pinkRose.id, productVariantId: pinkRose.variants[0]?.id ?? null },
+        { inspirationId: romanticElegance.id, productId: greenFluffy.id, productVariantId: greenFluffy.variants[0]?.id ?? null },
       ],
     });
   }
 
   if (playaBlanca && greenFluffy) {
-    await prisma.inspirationSetProduct.createMany({
+    await prisma.inspirationProduct.createMany({
       data: [
-        { inspirationSetId: pureSerenity.id, productId: playaBlanca.id, productVariantId: playaBlanca.variants[0]?.id ?? null },
-        { inspirationSetId: pureSerenity.id, productId: greenFluffy.id, productVariantId: greenFluffy.variants[0]?.id ?? null },
+        { inspirationId: pureSerenity.id, productId: playaBlanca.id, productVariantId: playaBlanca.variants[0]?.id ?? null },
+        { inspirationId: pureSerenity.id, productId: greenFluffy.id, productVariantId: greenFluffy.variants[0]?.id ?? null },
       ],
     });
   }
 
   if (greenFluffy && peachFlower) {
-    await prisma.inspirationSetProduct.createMany({
+    await prisma.inspirationProduct.createMany({
       data: [
-        { inspirationSetId: lushGarden.id, productId: greenFluffy.id, productVariantId: greenFluffy.variants[0]?.id ?? null },
-        { inspirationSetId: lushGarden.id, productId: peachFlower.id, productVariantId: peachFlower.variants[0]?.id ?? null },
+        { inspirationId: lushGarden.id, productId: greenFluffy.id, productVariantId: greenFluffy.variants[0]?.id ?? null },
+        { inspirationId: lushGarden.id, productId: peachFlower.id, productVariantId: peachFlower.variants[0]?.id ?? null },
       ],
     });
   }

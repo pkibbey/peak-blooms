@@ -28,7 +28,7 @@ export default async function NewInspirationPage() {
           <Link href="/admin/inspirations" className="mb-4">← Back to Inspirations</Link>
           <h1 className="text-3xl font-bold">Add New Inspiration</h1>
           <p className="mt-2 text-muted-foreground">
-            Create a new inspiration set
+            Create a new inspiration
           </p>
         </div>
 

@@ -4,11 +4,11 @@ import { db } from "@/lib/db";
 import Link from "next/link";
 import InspirationForm from "@/components/admin/InspirationForm";
 
-interface EditCollectionPageProps {
+interface EditInspirationPageProps {
   params: Promise<{ id: string }>;
 }
 
-export default async function EditInspirationPage({ params }: EditCollectionPageProps) {
+export default async function EditInspirationPage({ params }: EditInspirationPageProps) {
   const session = await auth();
 
   if (!session?.user || session.user.role !== "ADMIN") {
@@ -17,8 +17,8 @@ export default async function EditInspirationPage({ params }: EditCollectionPage
 
   const { id } = await params;
 
-  const [collection, products] = await Promise.all([
-    db.inspirationSet.findUnique({
+  const [inspiration, products] = await Promise.all([
+    db.inspiration.findUnique({
       where: { id },
       include: {
         products: {
@@ -40,7 +40,7 @@ export default async function EditInspirationPage({ params }: EditCollectionPage
     }),
   ]);
 
-  if (!collection) {
+  if (!inspiration) {
     notFound();
   }
 
@@ -51,12 +51,12 @@ export default async function EditInspirationPage({ params }: EditCollectionPage
           <Link href="/admin/inspirations" className="mb-4">← Back to Inspirations</Link>
           <h1 className="text-3xl font-bold">Edit Inspiration</h1>
           <p className="mt-2 text-muted-foreground">
-            Update &ldquo;{collection.name}&rdquo;
+            Update &ldquo;{inspiration.name}&rdquo;
           </p>
         </div>
 
         <div className="rounded-lg border border-border p-6">
-          <InspirationForm products={products} inspiration={collection} />
+          <InspirationForm products={products} inspiration={inspiration} />
         </div>
       </div>
     </div>

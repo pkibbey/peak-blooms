@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from "next/server";
 
 /**
  * GET /api/inspirations/[id]
- * Get a single inspiration set by ID
+ * Get a single inspiration by ID
  */
 export async function GET(
   request: NextRequest,
@@ -12,7 +12,7 @@ export async function GET(
   try {
     const { id } = await params;
 
-    const inspirationSet = await db.inspirationSet.findUnique({
+    const inspiration = await db.inspiration.findUnique({
       where: { id },
       include: {
         products: {
@@ -29,18 +29,18 @@ export async function GET(
       },
     });
 
-    if (!inspirationSet) {
+    if (!inspiration) {
       return NextResponse.json(
-        { error: "Inspiration set not found" },
+        { error: "Inspiration not found" },
         { status: 404 }
       );
     }
 
-    return NextResponse.json(inspirationSet);
+    return NextResponse.json(inspiration);
   } catch (error) {
     console.error("GET /api/inspirations/[id] error:", error);
     return NextResponse.json(
-      { error: "Failed to fetch inspiration set" },
+      { error: "Failed to fetch inspiration" },
       { status: 500 }
     );
   }
@@ -54,7 +54,7 @@ interface ProductSelection {
 
 /**
  * PUT /api/inspirations/[id]
- * Update an inspiration set (admin only)
+ * Update an inspiration (admin only)
  */
 export async function PUT(
   request: NextRequest,
@@ -85,14 +85,14 @@ export async function PUT(
       productIds, // Legacy support: array of product IDs
     } = body;
 
-    // Check if inspiration set exists
-    const existingSet = await db.inspirationSet.findUnique({
+    // Check if inspiration exists
+    const existingInspiration = await db.inspiration.findUnique({
       where: { id },
     });
 
-    if (!existingSet) {
+    if (!existingInspiration) {
       return NextResponse.json(
-        { error: "Inspiration set not found" },
+        { error: "Inspiration not found" },
         { status: 404 }
       );
     }
@@ -110,8 +110,8 @@ export async function PUT(
     // Handle product associations with variants
     if (productSelections !== undefined || productIds !== undefined) {
       // Delete existing products first
-      await db.inspirationSetProduct.deleteMany({
-        where: { inspirationSetId: id },
+      await db.inspirationProduct.deleteMany({
+        where: { inspirationId: id },
       });
 
       // Handle both new format (productSelections) and legacy format (productIds)
@@ -133,7 +133,7 @@ export async function PUT(
       }
     }
 
-    const inspirationSet = await db.inspirationSet.update({
+    const inspiration = await db.inspiration.update({
       where: { id },
       data: updateData,
       include: {
@@ -150,11 +150,11 @@ export async function PUT(
       },
     });
 
-    return NextResponse.json(inspirationSet);
+    return NextResponse.json(inspiration);
   } catch (error) {
     console.error("PUT /api/inspirations/[id] error:", error);
     return NextResponse.json(
-      { error: "Failed to update inspiration set" },
+      { error: "Failed to update inspiration" },
       { status: 500 }
     );
   }
@@ -162,7 +162,7 @@ export async function PUT(
 
 /**
  * DELETE /api/inspirations/[id]
- * Delete an inspiration set (admin only)
+ * Delete an inspiration (admin only)
  */
 export async function DELETE(
   request: NextRequest,
@@ -181,19 +181,19 @@ export async function DELETE(
 
     const { id } = await params;
 
-    // Check if inspiration set exists
-    const existingSet = await db.inspirationSet.findUnique({
+    // Check if inspiration exists
+    const existingInspiration = await db.inspiration.findUnique({
       where: { id },
     });
 
-    if (!existingSet) {
+    if (!existingInspiration) {
       return NextResponse.json(
-        { error: "Inspiration set not found" },
+        { error: "Inspiration not found" },
         { status: 404 }
       );
     }
 
-    await db.inspirationSet.delete({
+    await db.inspiration.delete({
       where: { id },
     });
 
@@ -201,7 +201,7 @@ export async function DELETE(
   } catch (error) {
     console.error("DELETE /api/inspirations/[id] error:", error);
     return NextResponse.json(
-      { error: "Failed to delete inspiration set" },
+      { error: "Failed to delete inspiration" },
       { status: 500 }
     );
   }

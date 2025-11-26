@@ -1,7 +1,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { notFound } from "next/navigation";
-import { FeaturedInInspirationSets } from "@/components/site/FeaturedInInspirationSets";
+import { FeaturedInInspirations } from "@/components/site/FeaturedInInspirations";
 import { db } from "@/lib/db";
 import { ProductConfigurator } from "@/components/site/ProductConfigurator";
 import { getCurrentUser } from "@/lib/auth-utils";
@@ -43,9 +43,9 @@ export default async function ProductDetailPage({
     where: { slug },
     include: {
       collection: true,
-      inspirationSets: {
+      inspirations: {
         include: {
-          inspirationSet: true,
+          inspiration: true,
         },
       },
       variants: true,
@@ -121,8 +121,8 @@ export default async function ProductDetailPage({
           </div>
         </div>
 
-        {/* Featured in Inspiration Sets */}
-        <FeaturedInInspirationSets inspirationSets={product.inspirationSets} />
+        {/* Featured in Inspirations */}
+        <FeaturedInInspirations inspirations={product.inspirations} />
       </div>
     </div>
   );

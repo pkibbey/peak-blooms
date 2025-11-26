@@ -81,7 +81,7 @@ model Collection {
   products    Product[]
 }
 
-model InspirationSet {
+model Inspiration {
   id              String    @id @default(cuid())
   name            String
   slug            String    @unique
@@ -92,7 +92,7 @@ model InspirationSet {
   createdAt       DateTime  @default(now())
   updatedAt       DateTime  @updatedAt
 
-  products        InspirationSetProduct[]
+  products        InspirationProduct[]
 }
 
 model Product {
@@ -110,27 +110,27 @@ model Product {
   collection      Collection  @relation(fields: [collectionId], references: [id], onDelete: Cascade)
   cartItems       CartItem[]
   orderItems      OrderItem[]
-  inspirationSets InspirationSetProduct[]
+  inspirations    InspirationProduct[]
   variants        ProductVariant[]
 
   @@index([collectionId])
   @@index([slug])
 }
 
-// Explicit join table for InspirationSet <-> Product with variant support
-model InspirationSetProduct {
+// Explicit join table for Inspiration <-> Product with variant support
+model InspirationProduct {
   id                String           @id @default(cuid())
-  inspirationSetId  String
+  inspirationId     String
   productId         String
   productVariantId  String?
   createdAt         DateTime         @default(now())
 
-  inspirationSet    InspirationSet   @relation(fields: [inspirationSetId], references: [id], onDelete: Cascade)
+  inspiration       Inspiration      @relation(fields: [inspirationId], references: [id], onDelete: Cascade)
   product           Product          @relation(fields: [productId], references: [id], onDelete: Cascade)
   productVariant    ProductVariant?  @relation(fields: [productVariantId], references: [id], onDelete: SetNull)
 
-  @@unique([inspirationSetId, productId])
-  @@index([inspirationSetId])
+  @@unique([inspirationId, productId])
+  @@index([inspirationId])
   @@index([productId])
 }
 
@@ -146,7 +146,7 @@ model ProductVariant {
   product                Product               @relation(fields: [productId], references: [id], onDelete: Cascade)
   cartItems              CartItem[]
   orderItems             OrderItem[]
-  inspirationSetProducts InspirationSetProduct[]
+  inspirationProducts    InspirationProduct[]
 
   @@index([productId])
 }

@@ -3,11 +3,11 @@ import { NextRequest, NextResponse } from "next/server";
 
 /**
  * GET /api/inspirations
- * Get all inspiration sets (collections)
+ * Get all inspirations
  */
 export async function GET() {
   try {
-    const inspirations = await db.inspirationSet.findMany({
+    const inspirations = await db.inspiration.findMany({
       include: {
         products: {
           include: {
@@ -29,7 +29,7 @@ export async function GET() {
   } catch (error) {
     console.error("GET /api/inspirations error:", error);
     return NextResponse.json(
-      { error: "Failed to fetch inspiration sets" },
+      { error: "Failed to fetch inspirations" },
       { status: 500 }
     );
   }
@@ -43,7 +43,7 @@ interface ProductSelection {
 
 /**
  * POST /api/inspirations
- * Create a new inspiration set (admin only)
+ * Create a new inspiration (admin only)
  */
 export async function POST(request: NextRequest) {
   try {
@@ -85,7 +85,7 @@ export async function POST(request: NextRequest) {
       selections = productIds.map((id: string) => ({ productId: id, productVariantId: null }));
     }
 
-    const inspirationSet = await db.inspirationSet.create({
+    const inspiration = await db.inspiration.create({
       data: {
         name,
         slug,
@@ -112,11 +112,11 @@ export async function POST(request: NextRequest) {
       },
     });
 
-    return NextResponse.json(inspirationSet, { status: 201 });
+    return NextResponse.json(inspiration, { status: 201 });
   } catch (error) {
     console.error("POST /api/inspirations error:", error);
     return NextResponse.json(
-      { error: "Failed to create inspiration set" },
+      { error: "Failed to create inspiration" },
       { status: 500 }
     );
   }

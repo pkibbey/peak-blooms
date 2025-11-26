@@ -20,23 +20,23 @@ interface InspirationDetailPageProps {
 }
 
 export async function generateStaticParams() {
-  const sets = await db.inspirationSet.findMany({
+  const inspirations = await db.inspiration.findMany({
     select: { slug: true },
   });
-  return sets.map((set) => ({
-    slug: set.slug,
+  return inspirations.map((inspiration) => ({
+    slug: inspiration.slug,
   }));
 }
 
 export async function generateMetadata({ params }: InspirationDetailPageProps) {
   const { slug } = await params;
-  const set = await db.inspirationSet.findUnique({
+  const inspiration = await db.inspiration.findUnique({
     where: { slug },
   });
-  if (!set) return {};
+  if (!inspiration) return {};
   return {
-    title: `${set.name} - Inspirational Sets`,
-    description: set.subtitle,
+    title: `${inspiration.name} - Inspirations`,
+    description: inspiration.subtitle,
   };
 }
 
@@ -45,7 +45,7 @@ export default async function InspirationDetailPage({
 }: InspirationDetailPageProps) {
   const { slug } = await params;
   const user = await getCurrentUser();
-  const set = await db.inspirationSet.findUnique({
+  const inspiration = await db.inspiration.findUnique({
     where: { slug },
     include: {
       products: {
@@ -61,12 +61,12 @@ export default async function InspirationDetailPage({
     },
   });
 
-  if (!set) {
+  if (!inspiration) {
     notFound();
   }
 
   // Extract products with their selected variants from the join table
-  const productsWithVariants = set.products.map((sp) => ({
+  const productsWithVariants = inspiration.products.map((sp) => ({
     ...sp.product,
     selectedVariant: sp.productVariant,
     // Use the selected variant or fall back to first variant
@@ -87,8 +87,8 @@ export default async function InspirationDetailPage({
         {/* Featured Image */}
         <div className="relative aspect-video overflow-hidden rounded-xs shadow-md mb-12">
           <Image
-            src={set.image}
-            alt={set.name}
+            src={inspiration.image}
+            alt={inspiration.name}
             fill
             className="object-cover"
             priority
@@ -97,15 +97,15 @@ export default async function InspirationDetailPage({
 
         {/* Set Title and Subtitle */}
         <div className="mb-8">
-          <h1 className="text-4xl font-extrabold font-serif">{set.name}</h1>
-          <p className="mt-2 text-lg text-muted-foreground">{set.subtitle}</p>
+          <h1 className="text-4xl font-extrabold font-serif">{inspiration.name}</h1>
+          <p className="mt-2 text-lg text-muted-foreground">{inspiration.subtitle}</p>
         </div>
 
         {/* Inspiration Text */}
         <div className="mb-12 p-6 bg-secondary/30 rounded-xs">
           <h2 className="text-lg font-semibold mb-4">The Story</h2>
           <p className="text-base leading-relaxed text-gray-700">
-            {set.inspirationText}
+            {inspiration.inspirationText}
           </p>
         </div>
 
@@ -207,7 +207,7 @@ export default async function InspirationDetailPage({
           <AddAllToCartButton
             productIds={productsWithVariants.map((p) => p.id)}
             productVariantIds={productsWithVariants.map((p) => p.displayVariant?.id ?? null)}
-            setName={set.name}
+            setName={inspiration.name}
             user={user}
           />
         </div>

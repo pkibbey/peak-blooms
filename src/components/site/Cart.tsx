@@ -16,7 +16,7 @@ interface CartProduct {
   id: string
   name: string
   slug: string
-  imageUrl: string | null
+  image: string | null
 }
 
 interface CartVariant {
@@ -172,11 +172,6 @@ export default function Cart() {
     }).format(price)
   }
 
-  // Return the product image url or null when no image is available.
-  // Cart items should not render a fallback image — instead we show an
-  // empty colored square when the item has no image.
-  const getProductImage = (item: CartItem) => item.product.imageUrl ?? null
-
   if (loading) {
     return (
       <div className="flex items-center justify-center py-12">
@@ -232,9 +227,9 @@ export default function Cart() {
                 href={`/shop/${item.product.slug}`}
                 className="relative h-24 w-24 shrink-0 overflow-hidden rounded-xs bg-neutral-100"
               >
-                {getProductImage(item) ? (
+                {item.product.image ? (
                   <Image
-                    src={getProductImage(item)!}
+                    src={item.product.image}
                     alt={item.product.name}
                     fill
                     className="object-cover"

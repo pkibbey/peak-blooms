@@ -10,10 +10,10 @@ interface PendingApprovalPageProps {
   searchParams: Promise<{ email?: string }>;
 }
 
-async function InspirationSetsList() {
-  const inspirationSets = await db.inspirationSet.findMany();
+async function InspirationsList() {
+  const inspirations = await db.inspiration.findMany();
 
-  if (!inspirationSets || inspirationSets.length === 0) {
+  if (!inspirations || inspirations.length === 0) {
     return null;
   }
 
@@ -24,17 +24,17 @@ async function InspirationSetsList() {
       </h2>
 
       <div className="grid grid-cols-1 gap-6 sm:grid-cols-3">
-        {inspirationSets.map((set) => (
+        {inspirations.map((inspiration) => (
           <div
-            key={set.id}
+            key={inspiration.id}
             className="group flex flex-col overflow-hidden rounded-xs shadow-md transition-shadow hover:shadow-lg"
           >
             {/* Image Container */}
             <div className="relative aspect-square overflow-hidden bg-zinc-200">
-              {set.image && (
+              {inspiration.image && (
                 <Image
-                  src={set.image}
-                  alt={set.name}
+                  src={inspiration.image}
+                  alt={inspiration.name}
                   fill
                   sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
                   className="object-cover transition-transform duration-300 group-hover:scale-105"
@@ -45,15 +45,15 @@ async function InspirationSetsList() {
             {/* Card Content */}
             <div className="flex flex-col justify-between bg-white p-6 grow">
               <div>
-                <h3 className="text-xl font-bold font-serif">{set.name}</h3>
+                <h3 className="text-xl font-bold font-serif">{inspiration.name}</h3>
                 <p className="mt-2 text-sm text-muted-foreground line-clamp-2">
-                  {set.subtitle}
+                  {inspiration.subtitle}
                 </p>
               </div>
 
               <Button asChild className="mt-6 w-full">
                 <Link
-                  href={`/inspirations/${set.slug}`}
+                  href={`/inspirations/${inspiration.slug}`}
                   className="inline-flex items-center justify-center gap-2"
                 >
                   View Inspiration
@@ -146,7 +146,7 @@ export default async function PendingApprovalPage({
 
           {/* Inspirations */}
           <Suspense fallback={<div>Loading inspirations...</div>}>
-            <InspirationSetsList />
+            <InspirationsList />
           </Suspense>
 
           {/* Return to Home */}

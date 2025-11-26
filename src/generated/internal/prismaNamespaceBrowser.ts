@@ -56,9 +56,9 @@ export const ModelName = {
   VerificationToken: 'VerificationToken',
   User: 'User',
   Collection: 'Collection',
-  InspirationSet: 'InspirationSet',
+  Inspiration: 'Inspiration',
   Product: 'Product',
-  InspirationSetProduct: 'InspirationSetProduct',
+  InspirationProduct: 'InspirationProduct',
   ProductVariant: 'ProductVariant',
   ShoppingCart: 'ShoppingCart',
   CartItem: 'CartItem',
@@ -147,7 +147,7 @@ export const CollectionScalarFieldEnum = {
 export type CollectionScalarFieldEnum = (typeof CollectionScalarFieldEnum)[keyof typeof CollectionScalarFieldEnum]
 
 
-export const InspirationSetScalarFieldEnum = {
+export const InspirationScalarFieldEnum = {
   id: 'id',
   name: 'name',
   slug: 'slug',
@@ -159,7 +159,7 @@ export const InspirationSetScalarFieldEnum = {
   updatedAt: 'updatedAt'
 } as const
 
-export type InspirationSetScalarFieldEnum = (typeof InspirationSetScalarFieldEnum)[keyof typeof InspirationSetScalarFieldEnum]
+export type InspirationScalarFieldEnum = (typeof InspirationScalarFieldEnum)[keyof typeof InspirationScalarFieldEnum]
 
 
 export const ProductScalarFieldEnum = {
@@ -178,15 +178,15 @@ export const ProductScalarFieldEnum = {
 export type ProductScalarFieldEnum = (typeof ProductScalarFieldEnum)[keyof typeof ProductScalarFieldEnum]
 
 
-export const InspirationSetProductScalarFieldEnum = {
+export const InspirationProductScalarFieldEnum = {
   id: 'id',
-  inspirationSetId: 'inspirationSetId',
+  inspirationId: 'inspirationId',
   productId: 'productId',
   productVariantId: 'productVariantId',
   createdAt: 'createdAt'
 } as const
 
-export type InspirationSetProductScalarFieldEnum = (typeof InspirationSetProductScalarFieldEnum)[keyof typeof InspirationSetProductScalarFieldEnum]
+export type InspirationProductScalarFieldEnum = (typeof InspirationProductScalarFieldEnum)[keyof typeof InspirationProductScalarFieldEnum]
 
 
 export const ProductVariantScalarFieldEnum = {

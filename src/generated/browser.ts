@@ -43,20 +43,20 @@ export type User = Prisma.UserModel
  */
 export type Collection = Prisma.CollectionModel
 /**
- * Model InspirationSet
+ * Model Inspiration
  * 
  */
-export type InspirationSet = Prisma.InspirationSetModel
+export type Inspiration = Prisma.InspirationModel
 /**
  * Model Product
  * 
  */
 export type Product = Prisma.ProductModel
 /**
- * Model InspirationSetProduct
+ * Model InspirationProduct
  * 
  */
-export type InspirationSetProduct = Prisma.InspirationSetProductModel
+export type InspirationProduct = Prisma.InspirationProductModel
 /**
  * Model ProductVariant
  * 

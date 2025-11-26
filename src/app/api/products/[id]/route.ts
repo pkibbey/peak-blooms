@@ -17,9 +17,9 @@ export async function GET(
       include: {
         collection: true,
         variants: true,
-        inspirationSets: {
+        inspirations: {
           include: {
-            inspirationSet: true,
+            inspiration: true,
           },
         },
       },
