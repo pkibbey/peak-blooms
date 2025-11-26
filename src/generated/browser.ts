@@ -38,10 +38,10 @@ export type VerificationToken = Prisma.VerificationTokenModel
  */
 export type User = Prisma.UserModel
 /**
- * Model Category
+ * Model Collection
  * 
  */
-export type Category = Prisma.CategoryModel
+export type Collection = Prisma.CollectionModel
 /**
  * Model InspirationSet
  * 

@@ -7,13 +7,13 @@ import { NextRequest, NextResponse } from "next/server";
  */
 export async function GET() {
   try {
-    const categories = await db.category.findMany({
+    const collections = await db.collection.findMany({
       orderBy: {
         name: "asc",
       },
     });
 
-    return NextResponse.json(categories);
+    return NextResponse.json(collections);
   } catch (error) {
     console.error("GET /api/collections error:", error);
     return NextResponse.json(
@@ -50,7 +50,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const category = await db.category.create({
+    const collection = await db.collection.create({
       data: {
         name,
         slug,
@@ -59,7 +59,7 @@ export async function POST(request: NextRequest) {
       },
     });
 
-    return NextResponse.json(category, { status: 201 });
+    return NextResponse.json(collection, { status: 201 });
   } catch (error) {
     console.error("POST /api/collections error:", error);
     return NextResponse.json(

@@ -19,7 +19,7 @@ export default function Hero({ title, subtitle, cta }: HeroProps) {
         className="absolute inset-0 object-cover z-0"
       />
       {/* Linear gradient overlay for text readability */}
-      <div className="absolute inset-0 z-5 bg-gradient-to-r from-black/60 from-20% to-transparent to-70% hidden md:block" />
+      <div className="absolute inset-0 z-5 bg-linear-to-r from-black/60 from-20% to-transparent to-70% hidden md:block" />
       <div className="absolute inset-0 z-5 bg-black/50 md:hidden" />
       <div className="relative z-10 max-w-5xl mx-auto px-6 py-16 md:py-20">
         <div className="flex flex-col md:flex-row gap-6">

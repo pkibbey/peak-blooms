@@ -23,7 +23,7 @@ interface ProductVariant {
 interface Product {
   id: string;
   name: string;
-  category?: {
+  collection?: {
     name: string;
   };
   variants?: ProductVariant[];
@@ -56,7 +56,7 @@ export default function ProductMultiSelect({
 
   const filteredProducts = products.filter((product) =>
     product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    product.category?.name.toLowerCase().includes(searchTerm.toLowerCase())
+    product.collection?.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   const handleToggle = (productId: string) => {
@@ -190,9 +190,9 @@ export default function ProductMultiSelect({
                     />
                     <div className="min-w-0 flex-1">
                       <p className="truncate font-medium">{product.name}</p>
-                      {product.category && (
+                      {product.collection && (
                         <p className="truncate text-xs text-muted-foreground">
-                          {product.category.name}
+                          {product.collection.name}
                         </p>
                       )}
                     </div>

@@ -12,21 +12,21 @@ export async function GET(
   try {
     const { id } = await params;
 
-    const category = await db.category.findUnique({
+    const collection = await db.collection.findUnique({
       where: { id },
       include: {
         products: true,
       },
     });
 
-    if (!category) {
+    if (!collection) {
       return NextResponse.json(
         { error: "Collection not found" },
         { status: 404 }
       );
     }
 
-    return NextResponse.json(category);
+    return NextResponse.json(collection);
   } catch (error) {
     console.error("GET /api/collections/[id] error:", error);
     return NextResponse.json(
@@ -60,19 +60,19 @@ export async function PUT(
 
     const { name, slug, image, description } = body;
 
-    // Check if category exists
-    const existingCategory = await db.category.findUnique({
+    // Check if collection exists
+    const existingCollection = await db.collection.findUnique({
       where: { id },
     });
 
-    if (!existingCategory) {
+    if (!existingCollection) {
       return NextResponse.json(
         { error: "Collection not found" },
         { status: 404 }
       );
     }
 
-    const category = await db.category.update({
+    const collection = await db.collection.update({
       where: { id },
       data: {
         ...(name !== undefined && { name }),
@@ -82,7 +82,7 @@ export async function PUT(
       },
     });
 
-    return NextResponse.json(category);
+    return NextResponse.json(collection);
   } catch (error) {
     console.error("PUT /api/collections/[id] error:", error);
     return NextResponse.json(
@@ -114,8 +114,8 @@ export async function DELETE(
 
     const { id } = await params;
 
-    // Check if category exists
-    const existingCategory = await db.category.findUnique({
+    // Check if collection exists
+    const existingCollection = await db.collection.findUnique({
       where: { id },
       include: {
         _count: {
@@ -124,20 +124,20 @@ export async function DELETE(
       },
     });
 
-    if (!existingCategory) {
+    if (!existingCollection) {
       return NextResponse.json(
         { error: "Collection not found" },
         { status: 404 }
       );
     }
 
-    await db.category.delete({
+    await db.collection.delete({
       where: { id },
     });
 
     return NextResponse.json({
       success: true,
-      deletedProductCount: existingCategory._count.products,
+      deletedProductCount: existingCollection._count.products,
     });
   } catch (error) {
     console.error("DELETE /api/collections/[id] error:", error);

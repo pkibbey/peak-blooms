@@ -55,7 +55,7 @@ export const ModelName = {
   Session: 'Session',
   VerificationToken: 'VerificationToken',
   User: 'User',
-  Category: 'Category',
+  Collection: 'Collection',
   InspirationSet: 'InspirationSet',
   Product: 'Product',
   InspirationSetProduct: 'InspirationSetProduct',
@@ -134,7 +134,7 @@ export const UserScalarFieldEnum = {
 export type UserScalarFieldEnum = (typeof UserScalarFieldEnum)[keyof typeof UserScalarFieldEnum]
 
 
-export const CategoryScalarFieldEnum = {
+export const CollectionScalarFieldEnum = {
   id: 'id',
   name: 'name',
   slug: 'slug',
@@ -144,7 +144,7 @@ export const CategoryScalarFieldEnum = {
   updatedAt: 'updatedAt'
 } as const
 
-export type CategoryScalarFieldEnum = (typeof CategoryScalarFieldEnum)[keyof typeof CategoryScalarFieldEnum]
+export type CollectionScalarFieldEnum = (typeof CollectionScalarFieldEnum)[keyof typeof CollectionScalarFieldEnum]
 
 
 export const InspirationSetScalarFieldEnum = {
@@ -169,7 +169,7 @@ export const ProductScalarFieldEnum = {
   description: 'description',
   image: 'image',
   color: 'color',
-  categoryId: 'categoryId',
+  collectionId: 'collectionId',
   featured: 'featured',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'

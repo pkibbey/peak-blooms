@@ -11,23 +11,23 @@ interface CollectionDetailPageProps {
 }
 
 export async function generateStaticParams() {
-  const categories = await db.category.findMany({
+  const collections = await db.collection.findMany({
     select: { slug: true },
   });
-  return categories.map((category) => ({
-    slug: category.slug,
+  return collections.map((collection) => ({
+    slug: collection.slug,
   }));
 }
 
 export async function generateMetadata({ params }: CollectionDetailPageProps) {
   const { slug } = await params;
-  const category = await db.category.findUnique({
+  const collection = await db.collection.findUnique({
     where: { slug },
   });
-  if (!category) return {};
+  if (!collection) return {};
   return {
-    title: `${category.name} - Collections`,
-    description: category.description,
+    title: `${collection.name} - Collections`,
+    description: collection.description,
   };
 }
 
@@ -37,7 +37,7 @@ export default async function CollectionDetailPage({
   const { slug } = await params;
   const user = await getCurrentUser();
 
-  const category = await db.category.findUnique({
+  const collection = await db.collection.findUnique({
     where: { slug },
     include: {
       products: {
@@ -48,7 +48,7 @@ export default async function CollectionDetailPage({
     },
   });
 
-  if (!category) {
+  if (!collection) {
     notFound();
   }
 
@@ -66,10 +66,10 @@ export default async function CollectionDetailPage({
         {/* Collection Header */}
         <div className="mb-12">
           <h1 className="text-4xl font-extrabold font-serif">
-            {category.name}
+            {collection.name}
           </h1>
           <p className="mt-2 text-lg text-muted-foreground">
-            {category.description}
+            {collection.description}
           </p>
         </div>
 
@@ -79,7 +79,7 @@ export default async function CollectionDetailPage({
             Products in this collection
           </h2>
 
-          {category.products.length === 0 ? (
+          {collection.products.length === 0 ? (
             <div className="text-center py-12">
               <p className="text-muted-foreground">
                 No products available in this collection yet.
@@ -87,7 +87,7 @@ export default async function CollectionDetailPage({
             </div>
           ) : (
             <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
-              {category.products.map((product) => (
+              {collection.products.map((product) => (
                 <ProductCard key={product.slug} product={product} user={user} />
               ))}
             </div>

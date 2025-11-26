@@ -5,16 +5,16 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import InlineEditField from "./InlineEditField";
 
 interface Collection {
   id: string;
   name: string;
   slug: string;
-  subtitle: string;
-  image: string;
-  products: Array<{ id: string }>;
+  image: string | null;
+  _count?: {
+    products: number;
+  };
 }
 
 interface AdminCollectionCardProps {
@@ -26,24 +26,29 @@ export default function AdminCollectionCard({ collection }: AdminCollectionCardP
   const [isDeleting, setIsDeleting] = useState(false);
 
   const handleDelete = async () => {
-    if (!window.confirm(`Are you sure you want to delete "${collection.name}"? This action cannot be undone.`)) {
+    const productCount = collection._count?.products || 0;
+    const warningMessage = productCount > 0
+      ? `Are you sure you want to delete "${collection.name}"? This will also delete ${productCount} product${productCount !== 1 ? "s" : ""} in this collection. This action cannot be undone.`
+      : `Are you sure you want to delete "${collection.name}"? This action cannot be undone.`;
+
+    if (!window.confirm(warningMessage)) {
       return;
     }
 
     setIsDeleting(true);
     try {
-      const response = await fetch(`/api/inspirations/${collection.id}`, {
+      const response = await fetch(`/api/collections/${collection.id}`, {
         method: "DELETE",
       });
 
       if (response.ok) {
         router.refresh();
       } else {
-        console.error("Failed to delete inspiration");
-        alert("Failed to delete inspiration. Please try again.");
+        console.error("Failed to delete collection");
+        alert("Failed to delete collection. Please try again.");
       }
     } catch (error) {
-      console.error("Error deleting inspiration:", error);
+      console.error("Error deleting collection:", error);
       alert("An error occurred. Please try again.");
     } finally {
       setIsDeleting(false);
@@ -51,7 +56,7 @@ export default function AdminCollectionCard({ collection }: AdminCollectionCardP
   };
 
   const handleNameUpdate = async (newName: string | number) => {
-    const response = await fetch(`/api/inspirations/${collection.id}`, {
+    const response = await fetch(`/api/collections/${collection.id}`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ name: newName }),
@@ -63,8 +68,6 @@ export default function AdminCollectionCard({ collection }: AdminCollectionCardP
 
     router.refresh();
   };
-
-  const productCount = collection.products?.length || 0;
 
   return (
     <div className="flex items-center gap-4 rounded-lg border border-border p-4">
@@ -93,18 +96,17 @@ export default function AdminCollectionCard({ collection }: AdminCollectionCardP
             onSave={handleNameUpdate}
             className="font-medium"
           />
-          <Badge variant="outline" className="shrink-0">
-            {productCount} product{productCount !== 1 ? "s" : ""}
-          </Badge>
         </div>
         <p className="text-sm text-muted-foreground">/{collection.slug}</p>
-        <p className="truncate text-xs text-muted-foreground">{collection.subtitle}</p>
+        <p className="text-xs text-muted-foreground">
+          {collection._count?.products || 0} product{(collection._count?.products || 0) !== 1 ? "s" : ""}
+        </p>
       </div>
 
       {/* Actions */}
       <div className="flex items-center gap-2">
         <Button size="sm" variant="outline" asChild>
-          <Link href={`/admin/inspirations/${collection.id}/edit`}>Edit</Link>
+          <Link href={`/admin/collections/${collection.id}/edit`}>Edit</Link>
         </Button>
         <Button
           size="sm"

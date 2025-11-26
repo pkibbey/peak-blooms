@@ -19,7 +19,7 @@ export async function GET(
           include: {
             product: {
               include: {
-                category: true,
+                collection: true,
                 variants: true,
               },
             },
@@ -141,7 +141,7 @@ export async function PUT(
           include: {
             product: {
               include: {
-                category: true,
+                collection: true,
               },
             },
             productVariant: true,

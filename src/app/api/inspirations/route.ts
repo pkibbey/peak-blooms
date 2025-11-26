@@ -7,13 +7,13 @@ import { NextRequest, NextResponse } from "next/server";
  */
 export async function GET() {
   try {
-    const inspirationSets = await db.inspirationSet.findMany({
+    const inspirations = await db.inspirationSet.findMany({
       include: {
         products: {
           include: {
             product: {
               include: {
-                category: true,
+                collection: true,
               },
             },
             productVariant: true,
@@ -25,7 +25,7 @@ export async function GET() {
       },
     });
 
-    return NextResponse.json(inspirationSets);
+    return NextResponse.json(inspirations);
   } catch (error) {
     console.error("GET /api/inspirations error:", error);
     return NextResponse.json(

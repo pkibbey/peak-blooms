@@ -7,29 +7,30 @@ import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import InlineEditField from "./InlineEditField";
 
-interface Category {
+interface Inspiration {
   id: string;
   name: string;
   slug: string;
   image: string | null;
-  _count?: {
-    products: number;
-  };
+  products?: {
+    id: string;
+  }[];
 }
 
-interface AdminCategoryCardProps {
-  category: Category;
+interface AdminInspirationCardProps {
+  inspiration: Inspiration;
 }
 
-export default function AdminCategoryCard({ category }: AdminCategoryCardProps) {
+export default function AdminInspirationCard({ inspiration }: AdminInspirationCardProps) {
   const router = useRouter();
   const [isDeleting, setIsDeleting] = useState(false);
 
+  const productCount = inspiration.products?.length || 0;
+
   const handleDelete = async () => {
-    const productCount = category._count?.products || 0;
     const warningMessage = productCount > 0
-      ? `Are you sure you want to delete "${category.name}"? This will also delete ${productCount} product${productCount !== 1 ? "s" : ""} in this collection. This action cannot be undone.`
-      : `Are you sure you want to delete "${category.name}"? This action cannot be undone.`;
+      ? `Are you sure you want to delete "${inspiration.name}"? This inspiration has ${productCount} product${productCount !== 1 ? "s" : ""} associated. This action cannot be undone.`
+      : `Are you sure you want to delete "${inspiration.name}"? This action cannot be undone.`;
 
     if (!window.confirm(warningMessage)) {
       return;
@@ -37,18 +38,18 @@ export default function AdminCategoryCard({ category }: AdminCategoryCardProps) 
 
     setIsDeleting(true);
     try {
-      const response = await fetch(`/api/collections/${category.id}`, {
+      const response = await fetch(`/api/inspirations/${inspiration.id}`, {
         method: "DELETE",
       });
 
       if (response.ok) {
         router.refresh();
       } else {
-        console.error("Failed to delete collection");
-        alert("Failed to delete collection. Please try again.");
+        console.error("Failed to delete inspiration");
+        alert("Failed to delete inspiration. Please try again.");
       }
     } catch (error) {
-      console.error("Error deleting collection:", error);
+      console.error("Error deleting inspiration:", error);
       alert("An error occurred. Please try again.");
     } finally {
       setIsDeleting(false);
@@ -56,7 +57,7 @@ export default function AdminCategoryCard({ category }: AdminCategoryCardProps) 
   };
 
   const handleNameUpdate = async (newName: string | number) => {
-    const response = await fetch(`/api/collections/${category.id}`, {
+    const response = await fetch(`/api/inspirations/${inspiration.id}`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ name: newName }),
@@ -71,12 +72,12 @@ export default function AdminCategoryCard({ category }: AdminCategoryCardProps) 
 
   return (
     <div className="flex items-center gap-4 rounded-lg border border-border p-4">
-      {/* Category Image */}
+      {/* Inspiration Image */}
       <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-md bg-muted">
-        {category.image ? (
+        {inspiration.image ? (
           <Image
-            src={category.image}
-            alt={category.name}
+            src={inspiration.image}
+            alt={inspiration.name}
             fill
             className="object-cover"
             sizes="64px"
@@ -88,25 +89,25 @@ export default function AdminCategoryCard({ category }: AdminCategoryCardProps) 
         )}
       </div>
 
-      {/* Category Info */}
+      {/* Inspiration Info */}
       <div className="min-w-0 flex-1">
         <div className="flex items-center gap-2">
           <InlineEditField
-            value={category.name}
+            value={inspiration.name}
             onSave={handleNameUpdate}
             className="font-medium"
           />
         </div>
-        <p className="text-sm text-muted-foreground">/{category.slug}</p>
+        <p className="text-sm text-muted-foreground">/{inspiration.slug}</p>
         <p className="text-xs text-muted-foreground">
-          {category._count?.products || 0} product{(category._count?.products || 0) !== 1 ? "s" : ""}
+          {productCount} product{productCount !== 1 ? "s" : ""}
         </p>
       </div>
 
       {/* Actions */}
       <div className="flex items-center gap-2">
         <Button size="sm" variant="outline" asChild>
-          <Link href={`/admin/collections/${category.id}/edit`}>Edit</Link>
+          <Link href={`/admin/inspirations/${inspiration.id}/edit`}>Edit</Link>
         </Button>
         <Button
           size="sm"

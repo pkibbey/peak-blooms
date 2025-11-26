@@ -69,7 +69,7 @@ enum Role {
   ADMIN
 }
 
-model Category {
+model Collection {
   id          String    @id @default(cuid())
   name        String    @unique
   slug        String    @unique
@@ -102,18 +102,18 @@ model Product {
   description     String?   @db.Text
   image           String?
   color           String?
-  categoryId      String
+  collectionId    String
   featured        Boolean   @default(false)
   createdAt       DateTime  @default(now())
   updatedAt       DateTime  @updatedAt
 
-  category        Category  @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  collection      Collection  @relation(fields: [collectionId], references: [id], onDelete: Cascade)
   cartItems       CartItem[]
   orderItems      OrderItem[]
   inspirationSets InspirationSetProduct[]
   variants        ProductVariant[]
 
-  @@index([categoryId])
+  @@index([collectionId])
   @@index([slug])
 }
 

@@ -35,7 +35,7 @@ export default async function FeaturedInspiration() {
               } gap-8 items-center`}
             >
               {/* Image Container */}
-              <div className="w-full md:w-2/3 flex-shrink-0">
+              <div className="w-full md:w-2/3 shrink-0">
                 <div className="relative aspect-video overflow-hidden rounded-xs shadow-md">
                   <Image
                     src={set.image}

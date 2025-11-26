@@ -20,7 +20,7 @@ async function InspirationSetsList() {
   return (
     <div className="mt-12 pt-8 border-t border-t-border">
       <h2 className="text-2xl font-bold font-serif mb-8">
-        Browse Our Collections While You Wait
+        Browse Our Inspirations While You Wait
       </h2>
 
       <div className="grid grid-cols-1 gap-6 sm:grid-cols-3">
@@ -56,7 +56,7 @@ async function InspirationSetsList() {
                   href={`/inspirations/${set.slug}`}
                   className="inline-flex items-center justify-center gap-2"
                 >
-                  View Collection
+                  View Inspiration
                   <IconArrowRight aria-hidden="true" />
                 </Link>
               </Button>

@@ -20,7 +20,7 @@ import {
 } from "@/components/ui/select";
 import { Trash2, Plus } from "lucide-react";
 
-interface Category {
+interface Collection {
   id: string;
   name: string;
 }
@@ -33,7 +33,7 @@ interface ProductVariant {
 }
 
 interface ProductFormProps {
-  categories: Category[];
+  collections: Collection[];
   product?: {
     id: string;
     name: string;
@@ -41,7 +41,7 @@ interface ProductFormProps {
     description: string | null;
     image: string | null;
     color: string | null;
-    categoryId: string;
+    collectionId: string;
     featured: boolean;
     variants?: {
       id: string;
@@ -52,7 +52,7 @@ interface ProductFormProps {
   };
 }
 
-export default function ProductForm({ categories, product }: ProductFormProps) {
+export default function ProductForm({ collections, product }: ProductFormProps) {
   const router = useRouter();
   const isEditing = !!product;
 
@@ -62,7 +62,7 @@ export default function ProductForm({ categories, product }: ProductFormProps) {
     description: product?.description || "",
     image: product?.image || "",
     color: product?.color || "",
-    categoryId: product?.categoryId || "",
+    collectionId: product?.collectionId || "",
     featured: product?.featured || false,
   });
 
@@ -242,22 +242,22 @@ export default function ProductForm({ categories, product }: ProductFormProps) {
           />
         </div>
 
-        {/* Category */}
+        {/* Collection */}
         <div className="space-y-2">
-          <Label htmlFor="categoryId">Category *</Label>
+          <Label htmlFor="collectionId">Collection *</Label>
           <Select
-            value={formData.categoryId}
+            value={formData.collectionId}
             onValueChange={(value) =>
-              setFormData((prev) => ({ ...prev, categoryId: value }))
+              setFormData((prev) => ({ ...prev, collectionId: value }))
             }
           >
-            <SelectTrigger id="categoryId" className="w-full">
-              <SelectValue placeholder="Select a category" />
+            <SelectTrigger id="collectionId" className="w-full">
+              <SelectValue placeholder="Select a collection" />
             </SelectTrigger>
             <SelectContent>
-              {categories.map((cat) => (
-                <SelectItem key={cat.id} value={cat.id}>
-                  {cat.name}
+              {collections.map((col) => (
+                <SelectItem key={col.id} value={col.id}>
+                  {col.name}
                 </SelectItem>
               ))}
             </SelectContent>

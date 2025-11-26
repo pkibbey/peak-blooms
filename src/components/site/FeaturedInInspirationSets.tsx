@@ -28,7 +28,7 @@ export function FeaturedInInspirationSets({
   return (
     <div className="mt-12 pt-8">
       <h2 className="text-2xl font-bold font-serif mb-8">
-        Featured in These Collections
+        Featured in These Inspirations
       </h2>
 
       <div className="grid grid-cols-1 gap-6 sm:grid-cols-3">
@@ -64,7 +64,7 @@ export function FeaturedInInspirationSets({
                   href={`/inspirations/${set.slug}`}
                   className="inline-flex items-center justify-center gap-2"
                 >
-                  View Collection
+                  View Inspiration
                   <IconArrowRight aria-hidden="true" />
                 </Link>
               </Button>

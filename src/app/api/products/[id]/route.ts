@@ -15,7 +15,7 @@ export async function GET(
     const product = await db.product.findUnique({
       where: { id },
       include: {
-        category: true,
+        collection: true,
         variants: true,
         inspirationSets: {
           include: {
@@ -70,7 +70,7 @@ export async function PUT(
       description,
       image,
       color,
-      categoryId,
+      collectionId,
       featured,
       variants,
     } = body;
@@ -114,7 +114,7 @@ export async function PUT(
           ...(description !== undefined && { description }),
           ...(image !== undefined && { image }),
           ...(color !== undefined && { color: color || null }),
-          ...(categoryId !== undefined && { categoryId }),
+          ...(collectionId !== undefined && { collectionId }),
           ...(featured !== undefined && { featured }),
           ...(variants !== undefined && {
             variants: {
@@ -127,7 +127,7 @@ export async function PUT(
           }),
         },
         include: {
-          category: true,
+          collection: true,
           variants: true,
         },
       });

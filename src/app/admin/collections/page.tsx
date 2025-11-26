@@ -3,7 +3,7 @@ import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import AdminCategoryCard from "@/components/admin/AdminCategoryCard";
+import AdminCollectionCard from "@/components/admin/AdminCollectionCard";
 
 export default async function AdminCollectionsPage() {
   const session = await auth();
@@ -12,7 +12,7 @@ export default async function AdminCollectionsPage() {
     redirect("/admin/unauthorized");
   }
 
-  const categories = await db.category.findMany({
+  const collections = await db.collection.findMany({
     include: {
       _count: {
         select: { products: true },
@@ -30,7 +30,7 @@ export default async function AdminCollectionsPage() {
           <div>
             <h1 className="text-3xl font-bold">Collections</h1>
             <p className="mt-2 text-muted-foreground">
-              Organize products into collections ({categories.length} total)
+              Organize products into collections ({collections.length} total)
             </p>
           </div>
           <Button asChild>
@@ -40,14 +40,14 @@ export default async function AdminCollectionsPage() {
 
         {/* Collections List */}
         <div>
-          {categories.length === 0 ? (
+          {collections.length === 0 ? (
             <p className="text-muted-foreground">
               No collections found. Add your first collection to get started.
             </p>
           ) : (
             <div className="space-y-3">
-              {categories.map((category) => (
-                <AdminCategoryCard key={category.id} category={category} />
+              {collections.map((collection) => (
+                <AdminCollectionCard key={collection.id} collection={collection} />
               ))}
             </div>
           )}

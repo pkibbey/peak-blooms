@@ -21,7 +21,7 @@ interface Product {
   slug: string;
   featured: boolean;
   image: string | null;
-  category: {
+  collection: {
     id: string;
     name: string;
   };
@@ -35,7 +35,7 @@ interface ProductsTableProps {
   products: Product[];
 }
 
-type SortColumn = "name" | "category" | "price" | "variants" | "featured";
+type SortColumn = "name" | "collection" | "price" | "variants" | "featured";
 type SortDirection = "asc" | "desc";
 
 export default function ProductsTable({ products }: ProductsTableProps) {
@@ -97,8 +97,8 @@ export default function ProductsTable({ products }: ProductsTableProps) {
     switch (sortColumn) {
       case "name":
         return direction * a.name.localeCompare(b.name);
-      case "category":
-        return direction * a.category.name.localeCompare(b.category.name);
+      case "collection":
+        return direction * a.collection.name.localeCompare(b.collection.name);
       case "price":
         const aPrice = getPriceRange(a.variants).minPrice;
         const bPrice = getPriceRange(b.variants).minPrice;
@@ -156,7 +156,7 @@ export default function ProductsTable({ products }: ProductsTableProps) {
           <TableRow>
             <TableHead>Image</TableHead>
             <SortableHeader column="name">Name</SortableHeader>
-            <SortableHeader column="category">Category</SortableHeader>
+            <SortableHeader column="collection">Collection</SortableHeader>
             <SortableHeader column="price">Price</SortableHeader>
             <SortableHeader column="variants">Variants</SortableHeader>
             <SortableHeader column="featured">Featured</SortableHeader>
@@ -202,9 +202,9 @@ export default function ProductsTable({ products }: ProductsTableProps) {
                   </Link>
                 </TableCell>
 
-                {/* Category */}
+                {/* Collection */}
                 <TableCell className="text-muted-foreground">
-                  {product.category.name}
+                  {product.collection.name}
                 </TableCell>
 
                 {/* Price */}

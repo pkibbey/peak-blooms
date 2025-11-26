@@ -2,7 +2,7 @@ import { redirect, notFound } from "next/navigation";
 import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
 import Link from "next/link";
-import CollectionForm from "@/components/admin/CollectionForm";
+import InspirationForm from "@/components/admin/InspirationForm";
 
 interface EditCollectionPageProps {
   params: Promise<{ id: string }>;
@@ -31,7 +31,7 @@ export default async function EditInspirationPage({ params }: EditCollectionPage
     }),
     db.product.findMany({
       include: {
-        category: {
+        collection: {
           select: { name: true },
         },
         variants: true,
@@ -56,7 +56,7 @@ export default async function EditInspirationPage({ params }: EditCollectionPage
         </div>
 
         <div className="rounded-lg border border-border p-6">
-          <CollectionForm products={products} collection={collection} />
+          <InspirationForm products={products} inspiration={collection} />
         </div>
       </div>
     </div>

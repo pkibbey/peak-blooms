@@ -17,7 +17,7 @@ export default async function EditProductPage({ params }: EditProductPageProps) 
 
   const { id } = await params;
 
-  const [product, categories] = await Promise.all([
+  const [product, collections] = await Promise.all([
     db.product.findUnique({
       where: { id },
       include: {
@@ -29,7 +29,7 @@ export default async function EditProductPage({ params }: EditProductPageProps) 
         },
       },
     }),
-    db.category.findMany({
+    db.collection.findMany({
       orderBy: { name: "asc" },
     }),
   ]);
@@ -50,7 +50,7 @@ export default async function EditProductPage({ params }: EditProductPageProps) 
         </div>
 
         <div className="rounded-lg border border-border p-6">
-          <ProductForm categories={categories} product={product} />
+          <ProductForm collections={collections} product={product} />
         </div>
       </div>
     </div>

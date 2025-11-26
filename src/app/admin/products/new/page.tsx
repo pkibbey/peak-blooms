@@ -11,7 +11,7 @@ export default async function NewProductPage() {
     redirect("/admin/unauthorized");
   }
 
-  const categories = await db.category.findMany({
+  const collections = await db.collection.findMany({
     orderBy: { name: "asc" },
   });
 
@@ -27,7 +27,7 @@ export default async function NewProductPage() {
         </div>
 
         <div className="rounded-lg border border-border p-6">
-          <ProductForm categories={categories} />
+          <ProductForm collections={collections} />
         </div>
       </div>
     </div>

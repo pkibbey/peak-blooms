@@ -35,7 +35,7 @@ export default async function InspirationPage() {
               } gap-8 items-start md:items-center`}
             >
               {/* Image Container */}
-              <div className="w-full md:w-1/2 flex-shrink-0">
+              <div className="w-full md:w-1/2 shrink-0">
                 <Link href={`/inspirations/${set.slug}`} className="block">
                   <div className="relative aspect-video overflow-hidden rounded-xs shadow-md hover:shadow-lg transition-shadow">
                     <Image

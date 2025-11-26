@@ -42,7 +42,7 @@ export default async function ProductDetailPage({
   const product = await db.product.findUnique({
     where: { slug },
     include: {
-      category: true,
+      collection: true,
       inspirationSets: {
         include: {
           inspirationSet: true,
@@ -92,8 +92,8 @@ export default async function ProductDetailPage({
                 Shop
               </Link>
               <span className="mx-2">/</span>
-              <Link href={`/collections/${product.category.slug}`} className="hover:underline">
-                {product.category.name}
+              <Link href={`/collections/${product.collection.slug}`} className="hover:underline">
+                {product.collection.name}
               </Link>
               <span className="mx-2">/</span>
               <span>{product.name}</span>
@@ -105,7 +105,7 @@ export default async function ProductDetailPage({
                 {product.name}
               </h1>
               <p className="text-muted-foreground">
-                {product.category.name}
+                {product.collection.name}
               </p>
             </div>
 

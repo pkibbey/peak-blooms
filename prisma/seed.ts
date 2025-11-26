@@ -14,7 +14,7 @@ const adapter = new PrismaPg(pool)
 const prisma = new PrismaClient({ adapter })
 
 async function main() {
-  console.log("🌸 Seeding database with categories and products...");
+  console.log("🌸 Seeding database with collections and products...");
 
   // Clear existing data (optional, remove if you want to preserve existing data)
   await prisma.orderItem.deleteMany({});
@@ -23,11 +23,11 @@ async function main() {
   await prisma.shoppingCart.deleteMany({});
   await prisma.productVariant.deleteMany({});
   await prisma.product.deleteMany({});
-  await prisma.category.deleteMany({});
+  await prisma.collection.deleteMany({});
   await prisma.inspirationSet.deleteMany({});
 
-  // Create categories
-  const classicRoses = await prisma.category.create({
+  // Create collections
+  const classicRoses = await prisma.collection.create({
     data: {
       name: "Classic Roses",
       slug: "classic-roses",
@@ -36,7 +36,7 @@ async function main() {
     },
   });
 
-  const exoticBlooms = await prisma.category.create({
+  const exoticBlooms = await prisma.collection.create({
     data: {
       name: "Exotic Blooms",
       slug: "exotic-blooms",
@@ -45,7 +45,7 @@ async function main() {
     },
   });
 
-  const seasonalWildflowers = await prisma.category.create({
+  const seasonalWildflowers = await prisma.collection.create({
     data: {
       name: "Seasonal Wildflowers",
       slug: "seasonal-wildflowers",
@@ -61,7 +61,7 @@ async function main() {
       slug: "green-fluffy",
       description: "Lush and voluminous",
       image: "/products/green-fluffy.jpg",
-      categoryId: exoticBlooms.id,
+      collectionId: exoticBlooms.id,
       featured: true,
       variants: {
         create: [
@@ -79,7 +79,7 @@ async function main() {
       slug: "peach-flower",
       description: "Warm and inviting",
       image: "/products/peach-flower.jpg",
-      categoryId: exoticBlooms.id,
+      collectionId: exoticBlooms.id,
       featured: true,
       variants: {
         create: [
@@ -96,7 +96,7 @@ async function main() {
       slug: "pink-rose",
       description: "Elegant and romantic",
       image: "/products/pink-rose.jpg",
-      categoryId: classicRoses.id,
+      collectionId: classicRoses.id,
       featured: false,
       variants: {
         create: [
@@ -114,7 +114,7 @@ async function main() {
       slug: "playa-blanca",
       description: "Pristine white beauty",
       image: "/products/playa-blanca.jpg",
-      categoryId: seasonalWildflowers.id,
+      collectionId: seasonalWildflowers.id,
       featured: false,
       variants: {
         create: [

@@ -5,7 +5,7 @@ import Image from "next/image";
 import { db } from "@/lib/db";
 
 export default async function FeaturedCollections() {
-  const categories = await db.category.findMany();
+  const collections = await db.collection.findMany();
 
   return (
     <div className="flex flex-col items-center justify-start bg-white py-16 font-sans">
@@ -23,7 +23,7 @@ export default async function FeaturedCollections() {
         </div>
 
         <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
-          {categories.map((collection) => (
+          {collections.map((collection) => (
             <div
               key={collection.slug}
               className="group flex flex-col overflow-hidden rounded-xs shadow-md transition-shadow hover:shadow-lg"

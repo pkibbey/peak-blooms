@@ -2,7 +2,7 @@ import { redirect } from "next/navigation";
 import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
 import Link from "next/link";
-import CollectionForm from "@/components/admin/CollectionForm";
+import InspirationForm from "@/components/admin/InspirationForm";
 
 export default async function NewInspirationPage() {
   const session = await auth();
@@ -13,7 +13,7 @@ export default async function NewInspirationPage() {
 
   const products = await db.product.findMany({
     include: {
-      category: {
+      collection: {
         select: { name: true },
       },
       variants: true,
@@ -33,7 +33,7 @@ export default async function NewInspirationPage() {
         </div>
 
         <div className="rounded-lg border border-border p-6">
-          <CollectionForm products={products} />
+          <InspirationForm products={products} />
         </div>
       </div>
     </div>

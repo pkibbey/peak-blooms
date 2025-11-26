@@ -2,13 +2,13 @@ import { redirect, notFound } from "next/navigation";
 import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
 import Link from "next/link";
-import CategoryForm from "@/components/admin/CategoryForm";
+import CollectionForm from "@/components/admin/CollectionForm";
 
-interface EditCategoryPageProps {
+interface EditCollectionPageProps {
   params: Promise<{ id: string }>;
 }
 
-export default async function EditCollectionPage({ params }: EditCategoryPageProps) {
+export default async function EditCollectionPage({ params }: EditCollectionPageProps) {
   const session = await auth();
 
   if (!session?.user || session.user.role !== "ADMIN") {
@@ -17,11 +17,11 @@ export default async function EditCollectionPage({ params }: EditCategoryPagePro
 
   const { id } = await params;
 
-  const category = await db.category.findUnique({
+  const collection = await db.collection.findUnique({
     where: { id },
   });
 
-  if (!category) {
+  if (!collection) {
     notFound();
   }
 
@@ -32,12 +32,12 @@ export default async function EditCollectionPage({ params }: EditCategoryPagePro
           <Link href="/admin/collections" className="mb-4">← Back to Collections</Link>
           <h1 className="text-3xl font-bold">Edit Collection</h1>
           <p className="mt-2 text-muted-foreground">
-            Update &ldquo;{category.name}&rdquo;
+            Update &ldquo;{collection.name}&rdquo;
           </p>
         </div>
 
         <div className="rounded-lg border border-border p-6">
-          <CategoryForm category={category} />
+          <CollectionForm collection={collection} />
         </div>
       </div>
     </div>

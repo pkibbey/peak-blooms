@@ -15,7 +15,7 @@ import { IconMenu, IconX } from "@/components/ui/icons"
 import { cn } from "@/lib/utils"
 
 interface ShopFiltersProps {
-  categories: Array<{ id: string; name: string }>
+  collections: Array<{ id: string; name: string }>
   colors: string[]
   stemLengths: number[]
   user?: {
@@ -34,7 +34,7 @@ const PRICE_RANGES = [
   { label: "$100+", min: 100, max: undefined },
 ]
 
-export default function ShopFilters({ categories, colors, stemLengths, user }: ShopFiltersProps) {
+export default function ShopFilters({ collections, colors, stemLengths, user }: ShopFiltersProps) {
   const router = useRouter()
   const searchParams = useSearchParams()
 
@@ -46,7 +46,7 @@ export default function ShopFilters({ categories, colors, stemLengths, user }: S
   const selectedStemLength = searchParams.get("stemLength") || ""
   const selectedPriceMin = searchParams.get("priceMin")
   const selectedPriceMax = searchParams.get("priceMax")
-  const selectedCategory = searchParams.get("categoryId") || ""
+  const selectedCollection = searchParams.get("collectionId") || ""
 
   // Create query string based on current filters
   const createQueryString = useCallback(
@@ -84,8 +84,8 @@ export default function ShopFilters({ categories, colors, stemLengths, user }: S
     updateFilters({ stemLength: value === "clear" ? undefined : value })
   }
 
-  const handleCategoryChange = (value: string) => {
-    updateFilters({ categoryId: value === "clear" ? undefined : value })
+  const handleCollectionChange = (value: string) => {
+    updateFilters({ collectionId: value === "clear" ? undefined : value })
   }
 
   const handlePriceRangeChange = (minPrice: number | undefined, maxPrice: number | undefined) => {
@@ -101,23 +101,23 @@ export default function ShopFilters({ categories, colors, stemLengths, user }: S
   }
 
   const hasActiveFilters =
-    selectedColor || selectedStemLength || selectedPriceMin || selectedPriceMax || selectedCategory
+    selectedColor || selectedStemLength || selectedPriceMin || selectedPriceMax || selectedCollection
 
   // Mobile vertical filter content (collapsible panel)
   const MobileFilterContent = (
     <div className="flex flex-col gap-4">
-      {/* Category Filter */}
+      {/* Collection Filter */}
       <div className="flex flex-col gap-2">
-        <Label className="text-sm font-medium">Category</Label>
-        <Select value={selectedCategory || "clear"} onValueChange={handleCategoryChange}>
+        <Label className="text-sm font-medium">Collection</Label>
+        <Select value={selectedCollection || "clear"} onValueChange={handleCollectionChange}>
           <SelectTrigger className="w-full">
-            <SelectValue placeholder="All Categories" />
+            <SelectValue placeholder="All Collections" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="clear">All Categories</SelectItem>
-            {categories.map((cat) => (
-              <SelectItem key={cat.id} value={cat.id}>
-                {cat.name}
+            <SelectItem value="clear">All Collections</SelectItem>
+            {collections.map((col) => (
+              <SelectItem key={col.id} value={col.id}>
+                {col.name}
               </SelectItem>
             ))}
           </SelectContent>
@@ -232,16 +232,16 @@ export default function ShopFilters({ categories, colors, stemLengths, user }: S
       <h3 className="hidden md:block text-lg font-semibold">Product Filters</h3>
       <div className="hidden md:block mb-6 bg-secondary/30 rounded-lg px-4 py-3">
         <div className="flex flex-wrap items-center gap-3">
-          {/* Category Filter */}
-          <Select value={selectedCategory || "clear"} onValueChange={handleCategoryChange}>
+          {/* Collection Filter */}
+          <Select value={selectedCollection || "clear"} onValueChange={handleCollectionChange}>
             <SelectTrigger className="w-auto min-w-[140px] h-9 text-sm">
-              <SelectValue placeholder="All Categories" />
+              <SelectValue placeholder="All Collections" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="clear">All Categories</SelectItem>
-              {categories.map((cat) => (
-                <SelectItem key={cat.id} value={cat.id}>
-                  {cat.name}
+              <SelectItem value="clear">All Collections</SelectItem>
+              {collections.map((col) => (
+                <SelectItem key={col.id} value={col.id}>
+                  {col.name}
                 </SelectItem>
               ))}
             </SelectContent>

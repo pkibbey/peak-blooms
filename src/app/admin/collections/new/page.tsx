@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation";
 import { auth } from "@/lib/auth";
 import Link from "next/link";
-import CategoryForm from "@/components/admin/CategoryForm";
+import CollectionForm from "@/components/admin/CollectionForm";
 
 export default async function NewCollectionPage() {
   const session = await auth();
@@ -22,7 +22,7 @@ export default async function NewCollectionPage() {
         </div>
 
         <div className="rounded-lg border border-border p-6">
-          <CategoryForm />
+          <CollectionForm />
         </div>
       </div>
     </div>

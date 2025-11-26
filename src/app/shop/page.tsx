@@ -64,9 +64,9 @@ export default async function ShopPage({ searchParams }: ShopPageProps) {
   const params = await searchParams
   const user = await getCurrentUser()
 
-  // Get all categories and filter options in parallel
-  const [categories, filterOptions] = await Promise.all([
-    db.category.findMany({
+  // Get all collections and filter options in parallel
+  const [collections, filterOptions] = await Promise.all([
+    db.collection.findMany({
       orderBy: { name: "asc" },
     }),
     getFilterOptions(),
@@ -75,14 +75,14 @@ export default async function ShopPage({ searchParams }: ShopPageProps) {
   // Build filter conditions
   const where: ProductWhereInput = {}
 
-  const categoryId = typeof params.categoryId === "string" ? params.categoryId : undefined
+  const collectionId = typeof params.collectionId === "string" ? params.collectionId : undefined
   const color = typeof params.color === "string" ? params.color : undefined
   const stemLength = typeof params.stemLength === "string" ? params.stemLength : undefined
   const priceMin = typeof params.priceMin === "string" ? params.priceMin : undefined
   const priceMax = typeof params.priceMax === "string" ? params.priceMax : undefined
 
-  if (categoryId && categoryId !== "") {
-    where.categoryId = categoryId
+  if (collectionId && collectionId !== "") {
+    where.collectionId = collectionId
   }
 
   if (color && color !== "") {
@@ -123,7 +123,7 @@ export default async function ShopPage({ searchParams }: ShopPageProps) {
   const products = await db.product.findMany({
     where,
     include: {
-      category: true,
+      collection: true,
       variants: true,
     },
     orderBy: {
@@ -152,7 +152,7 @@ export default async function ShopPage({ searchParams }: ShopPageProps) {
 
         {/* Filters - Horizontal Bar */}
         <ShopFilters
-          categories={categories}
+          collections={collections}
           user={userObj}
           colors={filterOptions.colors}
           stemLengths={filterOptions.stemLengths}

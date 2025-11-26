@@ -4,12 +4,12 @@ import { NextRequest, NextResponse } from "next/server";
 /**
  * GET /api/products
  * Get all products (with optional filtering)
- * Query params: categoryId, featured, color, stemLength, priceMin, priceMax
+ * Query params: collectionId, featured, color, stemLength, priceMin, priceMax
  */
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
-    const categoryId = searchParams.get("categoryId");
+    const collectionId = searchParams.get("collectionId");
     const featured = searchParams.get("featured");
     const color = searchParams.get("color");
     const stemLength = searchParams.get("stemLength");
@@ -18,8 +18,8 @@ export async function GET(request: NextRequest) {
 
     const where: Record<string, unknown> = {};
 
-    if (categoryId) {
-      where.categoryId = categoryId;
+    if (collectionId) {
+      where.collectionId = collectionId;
     }
 
     if (featured === "true") {
@@ -62,7 +62,7 @@ export async function GET(request: NextRequest) {
     const products = await db.product.findMany({
       where,
       include: {
-        category: true,
+        collection: true,
         variants: true,
       },
       orderBy: {
@@ -98,9 +98,9 @@ export async function POST(request: NextRequest) {
 
     const body = await request.json();
 
-    const { name, slug, description, image, color, categoryId, featured, variants } = body;
+    const { name, slug, description, image, color, collectionId, featured, variants } = body;
 
-    if (!name || !slug || !categoryId) {
+    if (!name || !slug || !collectionId) {
       return NextResponse.json(
         { error: "Missing required fields" },
         { status: 400 }
@@ -121,7 +121,7 @@ export async function POST(request: NextRequest) {
         description,
         image,
         color: color || null,
-        categoryId,
+        collectionId,
         featured: featured === true,
         variants: {
           create: variants.map((v: { price: number; stemLength?: number | null; countPerBunch?: number | null }) => ({
@@ -132,7 +132,7 @@ export async function POST(request: NextRequest) {
         },
       },
       include: {
-        category: true,
+        collection: true,
         variants: true,
       },
     });

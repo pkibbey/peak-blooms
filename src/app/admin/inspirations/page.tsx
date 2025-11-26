@@ -3,7 +3,7 @@ import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import AdminCollectionCard from "@/components/admin/AdminCollectionCard";
+import AdminInspirationCard from "@/components/admin/AdminInspirationCard";
 
 export default async function AdminInspirationsPage() {
   const session = await auth();
@@ -47,7 +47,7 @@ export default async function AdminInspirationsPage() {
           ) : (
             <div className="space-y-3">
               {collections.map((collection) => (
-                <AdminCollectionCard key={collection.id} collection={collection} />
+                <AdminInspirationCard key={collection.id} inspiration={collection} />
               ))}
             </div>
           )}
