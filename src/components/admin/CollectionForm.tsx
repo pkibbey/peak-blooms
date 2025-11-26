@@ -10,6 +10,7 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import SlugInput from "@/components/admin/SlugInput";
+import { IconTrash } from "../ui/icons";
 
 interface CollectionFormProps {
   collection?: {
@@ -18,6 +19,9 @@ interface CollectionFormProps {
     slug: string;
     image: string | null;
     description: string | null;
+    _count?: {
+      products: number;
+    };
   };
 }
 
@@ -33,6 +37,7 @@ export default function CollectionForm({ collection }: CollectionFormProps) {
   });
 
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -63,6 +68,37 @@ export default function CollectionForm({ collection }: CollectionFormProps) {
       console.error(err);
     } finally {
       setIsSubmitting(false);
+    }
+  };
+
+  const handleDelete = async () => {
+    const productCount = collection?._count?.products || 0;
+    const warningMessage = productCount > 0
+      ? `Are you sure you want to delete "${collection?.name}"? This will also delete ${productCount} product${productCount !== 1 ? "s" : ""} in this collection. This action cannot be undone.`
+      : `Are you sure you want to delete "${collection?.name}"? This action cannot be undone.`;
+
+    if (!window.confirm(warningMessage)) {
+      return;
+    }
+
+    setIsDeleting(true);
+    try {
+      const response = await fetch(`/api/collections/${collection?.id}`, {
+        method: "DELETE",
+      });
+
+      if (response.ok) {
+        toast.success("Collection deleted successfully");
+        router.push("/admin/collections");
+        router.refresh();
+      } else {
+        setError("Failed to delete collection. Please try again.");
+      }
+    } catch (err) {
+      setError("An error occurred. Please try again.");
+      console.error(err);
+    } finally {
+      setIsDeleting(false);
     }
   };
 
@@ -147,13 +183,26 @@ export default function CollectionForm({ collection }: CollectionFormProps) {
       </div>
 
       {/* Actions */}
-      <div className="flex gap-4">
-        <Button type="submit" disabled={isSubmitting}>
-          Save Collection
-        </Button>
-        <Button type="button" variant="outline" asChild>
-          <Link href="/admin/collections">Cancel</Link>
-        </Button>
+      <div className="flex gap-4 justify-between">
+        <div className="flex gap-4">
+          <Button type="submit" disabled={isSubmitting}>
+            Save Collection
+          </Button>
+          <Button type="button" variant="outline" asChild>
+            <Link href="/admin/collections">Cancel</Link>
+          </Button>
+        </div>
+        {isEditing && (
+          <Button
+            type="button"
+            variant="destructive"
+            onClick={handleDelete}
+            disabled={isDeleting}
+          >
+            <IconTrash className="mr-2 inline-block" />
+            Delete Collection
+          </Button>
+        )}
       </div>
     </form>
   );

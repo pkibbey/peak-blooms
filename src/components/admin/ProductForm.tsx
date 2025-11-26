@@ -18,7 +18,7 @@ import {
   SelectContent,
   SelectItem,
 } from "@/components/ui/select";
-import { Trash2, Plus } from "lucide-react";
+import { IconTrash, IconPlus } from "../ui/icons";
 
 interface Collection {
   id: string;
@@ -80,6 +80,7 @@ export default function ProductForm({ collections, product }: ProductFormProps) 
   });
 
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -155,6 +156,32 @@ export default function ProductForm({ collections, product }: ProductFormProps) 
   const removeVariant = (index: number) => {
     if (variants.length > 1) {
       setVariants((prev) => prev.filter((_, i) => i !== index));
+    }
+  };
+
+  const handleDelete = async () => {
+    if (!window.confirm(`Are you sure you want to delete "${product?.name}"? This action cannot be undone.`)) {
+      return;
+    }
+
+    setIsDeleting(true);
+    try {
+      const response = await fetch(`/api/products/${product?.id}`, {
+        method: "DELETE",
+      });
+
+      if (response.ok) {
+        toast.success("Product deleted successfully");
+        router.push("/admin/products");
+        router.refresh();
+      } else {
+        setError("Failed to delete product. Please try again.");
+      }
+    } catch (err) {
+      setError("An error occurred. Please try again.");
+      console.error(err);
+    } finally {
+      setIsDeleting(false);
     }
   };
 
@@ -270,7 +297,7 @@ export default function ProductForm({ collections, product }: ProductFormProps) 
         <div className="flex items-center justify-between">
           <Label>Variants *</Label>
           <Button type="button" variant="outline" size="sm" onClick={addVariant}>
-            <Plus className="h-4 w-4 mr-1" />
+            <IconPlus className="h-4 w-4 mr-1" />
             Add Variant
           </Button>
         </div>
@@ -333,7 +360,7 @@ export default function ProductForm({ collections, product }: ProductFormProps) 
                   disabled={variants.length === 1}
                   className="w-full border-destructive text-destructive hover:bg-destructive hover:text-white disabled:opacity-50"
                 >
-                  <Trash2 className="h-4 w-4 mr-1" />
+                  <IconTrash className="h-4 w-4 mr-1" />
                   Remove
                 </Button>
               </div>
@@ -358,13 +385,26 @@ export default function ProductForm({ collections, product }: ProductFormProps) 
       </div>
 
       {/* Actions */}
-      <div className="flex gap-4">
-        <Button type="submit" disabled={isSubmitting}>
-          Save Product
-        </Button>
-        <Button type="button" variant="outline" asChild>
-          <Link href="/admin/products">Cancel</Link>
-        </Button>
+      <div className="flex gap-4 justify-between">
+        <div className="flex gap-4">
+          <Button type="submit" disabled={isSubmitting}>
+            Save Product
+          </Button>
+          <Button type="button" variant="outline" asChild>
+            <Link href="/admin/products">Cancel</Link>
+          </Button>
+        </div>
+        {isEditing && (
+          <Button
+            type="button"
+            variant="destructive"
+            onClick={handleDelete}
+            disabled={isDeleting}
+          >
+            <IconTrash className="mr-2 inline-block" />
+            Delete Product
+          </Button>
+        )}
       </div>
     </form>
   );

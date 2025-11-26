@@ -51,7 +51,7 @@ export default async function AdminDashboard() {
 
           <div className="mt-6 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
             <div className="rounded-md border border-border p-4">
-              <h3 className="text-lg font-semibold">Shop</h3>
+              <h3 className="text-lg font-semibold">Products</h3>
               <p className="mt-1 text-sm text-muted-foreground">Add, edit, and manage product listings</p>
               <div className="mt-4 flex flex-col gap-2">
                 <Button asChild size="sm">

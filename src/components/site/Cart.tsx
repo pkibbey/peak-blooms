@@ -5,12 +5,12 @@ import { useRouter } from "next/navigation"
 import Image from "next/image"
 import Link from "next/link"
 import { toast } from "sonner"
-import { Minus, Plus, Trash2, ShoppingBag } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Label } from "@/components/ui/label"
 import { Input } from "@/components/ui/input"
 
 import { useDebouncedCallback } from "@/lib/useDebouncedCallback"
+import { IconMinus, IconPlus, IconShoppingBag, IconTrash } from "../ui/icons"
 
 interface CartProduct {
   id: string
@@ -183,7 +183,7 @@ export default function Cart() {
   if (!cart || cart.items.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-16 text-center">
-        <ShoppingBag className="h-16 w-16 text-muted-foreground/50 mb-4" />
+        <IconShoppingBag className="h-16 w-16 text-muted-foreground/50 mb-4" />
         <h2 className="text-xl font-semibold mb-2">Your cart is empty</h2>
         <p className="text-muted-foreground mb-6">
           Looks like you haven&apos;t added any flowers to your cart yet.
@@ -283,7 +283,7 @@ export default function Cart() {
                         disabled={isUpdating || item.quantity <= 1}
                         aria-label="Decrease quantity"
                       >
-                        <Minus className="h-4 w-4" />
+                        <IconMinus className="h-4 w-4" />
                       </Button>
                       <Input
                         type="number"
@@ -305,7 +305,7 @@ export default function Cart() {
                         disabled={isUpdating}
                         aria-label="Increase quantity"
                       >
-                        <Plus className="h-4 w-4" />
+                        <IconPlus className="h-4 w-4" />
                       </Button>
                     </div>
                   </div>
@@ -317,7 +317,7 @@ export default function Cart() {
                     aria-label={`Remove ${item.product.name} from cart`}
                     className="border-destructive text-destructive hover:bg-destructive hover:text-white"
                   >
-                    <Trash2 className="h-4 w-4 mr-1" />
+                    <IconTrash className="h-4 w-4 mr-1" />
                     Remove
                   </Button>
                 </div>

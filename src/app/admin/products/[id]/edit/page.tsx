@@ -1,8 +1,8 @@
 import { redirect, notFound } from "next/navigation";
 import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
-import Link from "next/link";
 import ProductForm from "@/components/admin/ProductForm";
+import BackLink from "@/components/site/BackLink";
 
 interface EditProductPageProps {
   params: Promise<{ id: string }>;
@@ -41,8 +41,8 @@ export default async function EditProductPage({ params }: EditProductPageProps) 
   return (
     <div className="bg-background">
       <div className="mx-auto max-w-5xl px-4 py-12 sm:px-6 lg:px-8">
+        <BackLink href="/admin/products" label="Products" />
         <div className="mb-8">
-          <Link href="/admin/products" className="mb-4 inline-block">← Back to Products</Link>
           <h1 className="text-3xl font-bold">Edit Product</h1>
           <p className="mt-2 text-muted-foreground">
             Update &ldquo;{product.name}&rdquo;

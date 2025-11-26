@@ -3,7 +3,6 @@
 import Link from "next/link";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import {
   Table,
   TableBody,
@@ -13,39 +12,25 @@ import {
   TableRow,
 } from "@/components/ui/table";
 
-interface Product {
+interface Inspiration {
   id: string;
   name: string;
   slug: string;
-  featured: boolean;
   image: string | null;
-  collection: {
+  products?: {
     id: string;
-    name: string;
-  };
-  variants: {
-    id: string;
-    price: number;
   }[];
 }
 
-interface ProductsTableProps {
-  products: Product[];
+interface InspirationsTableProps {
+  inspirations: Inspiration[];
 }
 
-export default function ProductsTable({ products }: ProductsTableProps) {
-  // Calculate price range helper
-  const getPriceRange = (variants: { price: number }[]) => {
-    const prices = variants.map((v) => v.price);
-    const minPrice = prices.length > 0 ? Math.min(...prices) : 0;
-    const maxPrice = prices.length > 0 ? Math.max(...prices) : 0;
-    return { minPrice, maxPrice };
-  };
-
-  if (products.length === 0) {
+export default function InspirationsTable({ inspirations }: InspirationsTableProps) {
+  if (inspirations.length === 0) {
     return (
       <p className="text-muted-foreground">
-        No products found. Add your first product to get started.
+        No inspirations found. Add your first inspiration to get started.
       </p>
     );
   }
@@ -57,30 +42,24 @@ export default function ProductsTable({ products }: ProductsTableProps) {
           <TableRow>
             <TableHead>Image</TableHead>
             <TableHead>Name</TableHead>
-            <TableHead>Collection</TableHead>
-            <TableHead>Price</TableHead>
-            <TableHead>Variants</TableHead>
-            <TableHead>Featured</TableHead>
+            <TableHead>Slug</TableHead>
+            <TableHead>Products</TableHead>
             <TableHead>Actions</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
-          {products.map((product) => {
-            const { minPrice, maxPrice } = getPriceRange(product.variants);
-            const priceDisplay =
-              minPrice === maxPrice
-                ? `$${minPrice.toFixed(2)}`
-                : `$${minPrice.toFixed(2)} - $${maxPrice.toFixed(2)}`;
+          {inspirations.map((inspiration) => {
+            const productCount = inspiration.products?.length || 0;
 
             return (
-              <TableRow key={product.id}>
+              <TableRow key={inspiration.id}>
                 {/* Image */}
                 <TableCell>
                   <div className="relative h-12 w-12 overflow-hidden rounded-sm bg-muted">
-                    {product.image ? (
+                    {inspiration.image ? (
                       <Image
-                        src={product.image}
-                        alt={product.name}
+                        src={inspiration.image}
+                        alt={inspiration.name}
                         fill
                         className="object-cover"
                         sizes="48px"
@@ -96,42 +75,28 @@ export default function ProductsTable({ products }: ProductsTableProps) {
                 {/* Name */}
                 <TableCell>
                   <Link
-                    href={`/admin/products/${product.id}/edit`}
+                    href={`/admin/inspirations/${inspiration.id}/edit`}
                     className="text-primary font-medium hover:underline"
                   >
-                    {product.name}
+                    {inspiration.name}
                   </Link>
                 </TableCell>
 
-                {/* Collection */}
+                {/* Slug */}
                 <TableCell className="text-muted-foreground">
-                  {product.collection.name}
+                  /{inspiration.slug}
                 </TableCell>
 
-                {/* Price */}
-                <TableCell>
-                  {product.variants.length > 0 ? priceDisplay : "—"}
-                </TableCell>
-
-                {/* Variants */}
+                {/* Products Count */}
                 <TableCell className="text-muted-foreground">
-                  {product.variants.length}
-                </TableCell>
-
-                {/* Featured */}
-                <TableCell>
-                  {product.featured ? (
-                    <Badge variant="secondary">Featured</Badge>
-                  ) : (
-                    <span className="text-muted-foreground">—</span>
-                  )}
+                  {productCount}
                 </TableCell>
 
                 {/* Actions */}
                 <TableCell>
                   <div className="flex items-center gap-2">
                     <Button size="sm" variant="outline" asChild>
-                      <Link href={`/admin/products/${product.id}/edit`}>
+                      <Link href={`/admin/inspirations/${inspiration.id}/edit`}>
                         Edit
                       </Link>
                     </Button>

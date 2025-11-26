@@ -5,6 +5,7 @@ import { FeaturedInInspirations } from "@/components/site/FeaturedInInspirations
 import { db } from "@/lib/db";
 import { ProductConfigurator } from "@/components/site/ProductConfigurator";
 import { getCurrentUser } from "@/lib/auth-utils";
+import BackLink from "@/components/site/BackLink";
 
 interface ProductDetailPageProps {
   params: Promise<{
@@ -60,12 +61,7 @@ export default async function ProductDetailPage({
     <div className="flex flex-col items-center justify-start bg-white py-16 font-sans">
       <div className="w-full max-w-5xl px-6">
         {/* Navigation Back Link */}
-        <Link
-          href="/shop"
-          className="inline-block text-primary mb-4"
-        >
-          ← Back to shop
-        </Link>
+        <BackLink href="/shop" label="shop" />
 
         {/* Product Detail Grid */}
         <div className="grid grid-cols-1 gap-12 md:grid-cols-2">

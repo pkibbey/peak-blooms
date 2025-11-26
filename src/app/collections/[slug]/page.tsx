@@ -1,8 +1,8 @@
-import Link from "next/link";
 import { notFound } from "next/navigation";
 import { db } from "@/lib/db";
 import { ProductCard } from "@/components/site/ProductCard";
 import { getCurrentUser } from "@/lib/auth-utils";
+import BackLink from "@/components/site/BackLink";
 
 interface CollectionDetailPageProps {
   params: Promise<{
@@ -56,7 +56,7 @@ export default async function CollectionDetailPage({
     <div className="flex flex-col items-center justify-start bg-white py-16 font-sans">
       <div className="w-full max-w-5xl px-6">
         {/* Navigation Back Link */}
-        <Link href="/admin/collections" className="text-sm text-primary inline-block mb-4">← Back to Collections</Link>
+        <BackLink href="/admin/collections" label="Collections" />
 
         {/* Collection Header */}
         <div className="mb-12">
@@ -87,11 +87,6 @@ export default async function CollectionDetailPage({
               ))}
             </div>
           )}
-        </div>
-
-        {/* Back Button */}
-        <div className="mt-12 pt-8 border-t border-gray-200">
-          <Link href="/admin/collections" className="text-sm text-primary inline-block mb-4">← Back to Collections</Link>
         </div>
       </div>
     </div>

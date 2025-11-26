@@ -54,7 +54,7 @@ export default function ApprovedUserCard({ user }: ApprovedUserCardProps) {
       <div className="ml-4">
         <Button
           size="sm"
-          variant="destructive"
+          variant="outline-destructive"
           onClick={handleUnapprove}
           disabled={unapproving}
         >

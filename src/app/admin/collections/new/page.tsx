@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation";
 import { auth } from "@/lib/auth";
-import Link from "next/link";
 import CollectionForm from "@/components/admin/CollectionForm";
+import BackLink from "@/components/site/BackLink";
 
 export default async function NewCollectionPage() {
   const session = await auth();
@@ -13,8 +13,8 @@ export default async function NewCollectionPage() {
   return (
     <div className="bg-background">
       <div className="mx-auto max-w-5xl px-4 py-12 sm:px-6 lg:px-8">
+        <BackLink href="/admin/collections" label="Collections" />
         <div className="mb-8">
-          <Link href="/admin/collections" className="text-primary inline-block mb-4">← Back to Collections</Link>
           <h1 className="text-3xl font-bold">Add New Collection</h1>
           <p className="mt-2 text-muted-foreground">
             Create a new product collection

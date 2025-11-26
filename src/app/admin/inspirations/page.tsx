@@ -3,7 +3,8 @@ import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import AdminInspirationCard from "@/components/admin/AdminInspirationCard";
+import InspirationsTable from "@/components/admin/InspirationsTable";
+import BackLink from "@/components/site/BackLink";
 
 export default async function AdminInspirationsPage() {
   const session = await auth();
@@ -26,6 +27,7 @@ export default async function AdminInspirationsPage() {
   return (
     <div className="bg-background">
       <div className="mx-auto max-w-5xl px-4 py-12 sm:px-6 lg:px-8">
+        <BackLink href="/admin" label="Dashboard" />
         <div className="mb-8 flex items-center justify-between">
           <div>
             <h1 className="text-3xl font-bold">Inspirations</h1>
@@ -38,25 +40,8 @@ export default async function AdminInspirationsPage() {
           </Button>
         </div>
 
-        {/* Inspirations List */}
-        <div>
-          {inspirations.length === 0 ? (
-            <p className="text-muted-foreground">
-              No inspirations found. Add your first inspiration to get started.
-            </p>
-          ) : (
-            <div className="space-y-3">
-              {inspirations.map((inspiration) => (
-                <AdminInspirationCard key={inspiration.id} inspiration={inspiration} />
-              ))}
-            </div>
-          )}
-        </div>
-
-        {/* Back to Dashboard */}
-        <div className="mt-12">
-          <Link href="/admin">← Back to Dashboard</Link>
-        </div>
+        {/* Inspirations Table */}
+        <InspirationsTable inspirations={inspirations} />
       </div>
     </div>
   );

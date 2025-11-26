@@ -75,6 +75,7 @@ export default function InspirationForm({ products, inspiration }: InspirationFo
   );
 
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -108,6 +109,37 @@ export default function InspirationForm({ products, inspiration }: InspirationFo
       console.error(err);
     } finally {
       setIsSubmitting(false);
+    }
+  };
+
+  const handleDelete = async () => {
+    const productCount = inspiration?.products?.length || 0;
+    const warningMessage = productCount > 0
+      ? `Are you sure you want to delete "${inspiration?.name}"? This inspiration has ${productCount} product${productCount !== 1 ? "s" : ""} associated. This action cannot be undone.`
+      : `Are you sure you want to delete "${inspiration?.name}"? This action cannot be undone.`;
+
+    if (!window.confirm(warningMessage)) {
+      return;
+    }
+
+    setIsDeleting(true);
+    try {
+      const response = await fetch(`/api/inspirations/${inspiration?.id}`, {
+        method: "DELETE",
+      });
+
+      if (response.ok) {
+        toast.success("Inspiration deleted successfully");
+        router.push("/admin/inspirations");
+        router.refresh();
+      } else {
+        setError("Failed to delete inspiration. Please try again.");
+      }
+    } catch (err) {
+      setError("An error occurred. Please try again.");
+      console.error(err);
+    } finally {
+      setIsDeleting(false);
     }
   };
 
@@ -237,13 +269,25 @@ export default function InspirationForm({ products, inspiration }: InspirationFo
       </div>
 
       {/* Actions */}
-      <div className="flex gap-4">
-        <Button type="submit" disabled={isSubmitting}>
-          Save Inspiration
-        </Button>
-        <Button type="button" variant="outline" asChild>
-          <Link href="/admin/inspirations">Cancel</Link>
-        </Button>
+      <div className="flex gap-4 justify-between">
+        <div className="flex gap-4">
+          <Button type="submit" disabled={isSubmitting}>
+            Save Inspiration
+          </Button>
+          <Button type="button" variant="outline" asChild>
+            <Link href="/admin/inspirations">Cancel</Link>
+          </Button>
+          </div>
+          {isEditing && (
+            <Button
+              type="button"
+              variant="destructive"
+              onClick={handleDelete}
+              disabled={isDeleting}
+            >
+              Delete Inspiration
+            </Button>
+          )}
       </div>
     </form>
   );

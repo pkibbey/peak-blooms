@@ -3,7 +3,8 @@ import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import AdminCollectionCard from "@/components/admin/AdminCollectionCard";
+import CollectionsTable from "@/components/admin/CollectionsTable";
+import BackLink from "@/components/site/BackLink";
 
 export default async function AdminCollectionsPage() {
   const session = await auth();
@@ -26,6 +27,7 @@ export default async function AdminCollectionsPage() {
   return (
     <div className="bg-background">
       <div className="mx-auto max-w-5xl px-4 py-12 sm:px-6 lg:px-8">
+        <BackLink href="/admin" label="Dashboard" />
         <div className="mb-8 flex items-center justify-between">
           <div>
             <h1 className="text-3xl font-bold">Collections</h1>
@@ -38,25 +40,8 @@ export default async function AdminCollectionsPage() {
           </Button>
         </div>
 
-        {/* Collections List */}
-        <div>
-          {collections.length === 0 ? (
-            <p className="text-muted-foreground">
-              No collections found. Add your first collection to get started.
-            </p>
-          ) : (
-            <div className="space-y-3">
-              {collections.map((collection) => (
-                <AdminCollectionCard key={collection.id} collection={collection} />
-              ))}
-            </div>
-          )}
-        </div>
-
-        {/* Back to Dashboard */}
-        <div className="mt-12">
-          <Link href="/admin">← Back to Dashboard</Link>
-        </div>
+        {/* Collections Table */}
+        <CollectionsTable collections={collections} />
       </div>
     </div>
   );

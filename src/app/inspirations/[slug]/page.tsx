@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import AddAllToCartButton from "@/components/site/AddAllToCartButton";
 import { db } from "@/lib/db";
 import { getCurrentUser } from "@/lib/auth-utils";
+import BackLink from "@/components/site/BackLink";
 import {
   Table,
   TableBody,
@@ -77,12 +78,7 @@ export default async function InspirationDetailPage({
     <div className="flex flex-col items-center justify-start bg-white py-16 font-sans">
       <div className="w-full max-w-5xl px-6">
         {/* Navigation Back Link */}
-        <Link
-          href="/inspirations"
-          className="text-sm font-medium text-primary hover:underline mb-8"
-        >
-          ← Back to inspirations
-        </Link>
+        <BackLink href="/inspirations" label="inspirations" className="mb-8" />
 
         {/* Featured Image */}
         <div className="relative aspect-video overflow-hidden rounded-xs shadow-md mb-12">
@@ -210,16 +206,6 @@ export default async function InspirationDetailPage({
             setName={inspiration.name}
             user={user}
           />
-        </div>
-
-        {/* Back Button */}
-        <div className="mt-12 pt-8 border-t border-gray-200">
-          <Link
-            href="/inspirations"
-            className="text-sm font-medium text-primary hover:underline"
-          >
-            ← Back to inspirations
-          </Link>
         </div>
       </div>
     </div>
