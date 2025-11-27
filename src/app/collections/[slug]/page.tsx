@@ -1,8 +1,8 @@
 import { notFound } from "next/navigation"
-import { db } from "@/lib/db"
+import BackLink from "@/components/site/BackLink"
 import { ProductCard } from "@/components/site/ProductCard"
 import { getCurrentUser } from "@/lib/auth-utils"
-import BackLink from "@/components/site/BackLink"
+import { db } from "@/lib/db"
 
 interface CollectionDetailPageProps {
   params: Promise<{
@@ -41,6 +41,9 @@ export default async function CollectionDetailPage({ params }: CollectionDetailP
       products: {
         orderBy: {
           createdAt: "desc",
+        },
+        include: {
+          variants: true,
         },
       },
     },

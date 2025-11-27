@@ -1,7 +1,4 @@
-import Image from "next/image"
-import Link from "next/link"
-import { Button } from "@/components/ui/button"
-import { IconArrowRight } from "@/components/ui/icons"
+import { InspirationCard } from "@/components/site/InspirationCard"
 import { db } from "@/lib/db"
 
 export const metadata = {
@@ -10,7 +7,13 @@ export const metadata = {
 }
 
 export default async function InspirationPage() {
-  const inspirations = await db.inspiration.findMany()
+  const inspirations = await db.inspiration.findMany({
+    include: {
+      _count: {
+        select: { products: true },
+      },
+    },
+  })
 
   return (
     <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 py-10">
@@ -24,50 +27,10 @@ export default async function InspirationPage() {
         </p>
       </div>
 
-      {/* Gallery Feed */}
-      <div className="flex flex-col gap-16">
-        {inspirations.map((inspiration, index) => (
-          <div
-            key={inspiration.slug}
-            className={`flex flex-col ${
-              index % 2 === 0 ? "md:flex-row" : "md:flex-row-reverse"
-            } gap-8 items-start md:items-center`}
-          >
-            {/* Image Container */}
-            <div className="w-full md:w-1/2 shrink-0">
-              <Link href={`/inspirations/${inspiration.slug}`} className="block">
-                <div className="relative aspect-video overflow-hidden rounded-xs shadow-md hover:shadow-lg transition-shadow">
-                  <Image
-                    src={inspiration.image}
-                    alt={inspiration.name}
-                    fill
-                    className="object-cover hover:scale-105 transition-transform duration-300"
-                  />
-                </div>
-              </Link>
-            </div>
-
-            {/* Content Container */}
-            <div className="w-full md:w-1/2 flex flex-col justify-start">
-              <Link href={`/inspirations/${inspiration.slug}`} className="group">
-                <h2 className="text-3xl font-bold group-hover:text-primary transition-colors font-serif">
-                  {inspiration.name}
-                </h2>
-              </Link>
-              <p className="mt-2 text-sm text-muted-foreground">{inspiration.subtitle}</p>
-              <p className="mt-6 text-base leading-relaxed text-gray-700">{inspiration.excerpt}</p>
-
-              <Button asChild className="mt-6 w-full md:w-auto">
-                <Link
-                  href={`/inspirations/${inspiration.slug}`}
-                  className="inline-flex items-center justify-center gap-2"
-                >
-                  View Inspiration
-                  <IconArrowRight aria-hidden="true" />
-                </Link>
-              </Button>
-            </div>
-          </div>
+      {/* Gallery Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {inspirations.map((inspiration) => (
+          <InspirationCard key={inspiration.slug} inspiration={inspiration} />
         ))}
       </div>
     </div>

@@ -1,6 +1,6 @@
-import { PrismaClient } from "../src/generated/client"
-import { Pool } from "pg"
 import { PrismaPg } from "@prisma/adapter-pg"
+import { Pool } from "pg"
+import { PrismaClient } from "../src/generated/client"
 
 const connectionString = process.env.DATABASE_URL
 
@@ -136,7 +136,7 @@ async function main() {
       name: "Sunset Romance",
       slug: "sunset-romance",
       subtitle: "Warm hues for evening celebrations",
-      image: "/products/peach-flower.jpg",
+      image: "/inspiration/sunset-romance.png",
       excerpt:
         "A stunning combination of warm peach and amber tones that evoke the magical hour just before dusk. Perfect for evening receptions and intimate celebrations.",
       inspirationText:
@@ -149,7 +149,7 @@ async function main() {
       name: "Romantic Elegance",
       slug: "romantic-elegance",
       subtitle: "Timeless pink and white arrangement",
-      image: "/products/pink-rose.jpg",
+      image: "/inspiration/romantic-elegance.png",
       excerpt:
         "A classic combination that exudes sophistication and grace. The soft pink roses paired with lush greenery create an arrangement that transcends trends.",
       inspirationText:
@@ -162,7 +162,7 @@ async function main() {
       name: "Pure Serenity",
       slug: "pure-serenity",
       subtitle: "Pristine white and green sanctuary",
-      image: "/products/playa-blanca.jpg",
+      image: "/inspiration/pure-serenity.png",
       excerpt:
         "Simplicity meets sophistication in this minimalist arrangement. The pristine white blooms paired with lush greenery create a calming, elegant presence.",
       inspirationText:
@@ -175,7 +175,7 @@ async function main() {
       name: "Lush Garden",
       slug: "lush-garden",
       subtitle: "Abundant greenery with vibrant accents",
-      image: "/products/green-fluffy.jpg",
+      image: "/inspiration/lush-garden.png",
       excerpt:
         "Nature's bounty meets artful arrangement. This set celebrates the beauty of layered textures and verdant tones for creating immersive botanical spaces.",
       inspirationText:

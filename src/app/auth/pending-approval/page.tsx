@@ -1,9 +1,9 @@
-import { Suspense } from "react"
 import Link from "next/link"
-import Image from "next/image"
-import { Button } from "@/components/ui/button"
-import { IconArrowRight, IconMail } from "@/components/ui/icons"
+import { Suspense } from "react"
 import { ResendConfirmationEmail } from "@/components/auth/ResendConfirmationEmail"
+import { InspirationCard } from "@/components/site/InspirationCard"
+import { Button } from "@/components/ui/button"
+import { IconMail } from "@/components/ui/icons"
 import { db } from "@/lib/db"
 
 interface PendingApprovalPageProps {
@@ -11,7 +11,13 @@ interface PendingApprovalPageProps {
 }
 
 async function InspirationsList() {
-  const inspirations = await db.inspiration.findMany()
+  const inspirations = await db.inspiration.findMany({
+    include: {
+      _count: {
+        select: { products: true },
+      },
+    },
+  })
 
   if (!inspirations || inspirations.length === 0) {
     return null
@@ -21,45 +27,9 @@ async function InspirationsList() {
     <div className="mt-12 pt-8 border-t border-t-border">
       <h2 className="text-2xl font-bold font-serif mb-8">Browse Our Inspirations While You Wait</h2>
 
-      <div className="grid grid-cols-1 gap-6 sm:grid-cols-3">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {inspirations.map((inspiration) => (
-          <div
-            key={inspiration.id}
-            className="group flex flex-col overflow-hidden rounded-xs shadow-md transition-shadow hover:shadow-lg"
-          >
-            {/* Image Container */}
-            <div className="relative aspect-square overflow-hidden bg-zinc-200">
-              {inspiration.image && (
-                <Image
-                  src={inspiration.image}
-                  alt={inspiration.name}
-                  fill
-                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
-                  className="object-cover transition-transform duration-300 group-hover:scale-105"
-                />
-              )}
-            </div>
-
-            {/* Card Content */}
-            <div className="flex flex-col justify-between bg-white p-6 grow">
-              <div>
-                <h3 className="text-xl font-bold font-serif">{inspiration.name}</h3>
-                <p className="mt-2 text-sm text-muted-foreground line-clamp-2">
-                  {inspiration.subtitle}
-                </p>
-              </div>
-
-              <Button asChild className="mt-6 w-full">
-                <Link
-                  href={`/inspirations/${inspiration.slug}`}
-                  className="inline-flex items-center justify-center gap-2"
-                >
-                  View Inspiration
-                  <IconArrowRight aria-hidden="true" />
-                </Link>
-              </Button>
-            </div>
-          </div>
+          <InspirationCard key={inspiration.id} inspiration={inspiration} />
         ))}
       </div>
     </div>
