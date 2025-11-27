@@ -83,15 +83,6 @@ export default async function ShopPage({ searchParams }: ShopPageProps) {
     },
   })
 
-  const userObj = user
-    ? {
-        role: user.role as "CUSTOMER" | "ADMIN",
-        approved: user.approved || false,
-        email: user.email,
-        name: user.name,
-      }
-    : null
-
   return (
     <div className="flex flex-col items-center justify-start bg-white py-16 font-sans">
       <div className="w-full max-w-5xl px-6">
@@ -112,7 +103,7 @@ export default async function ShopPage({ searchParams }: ShopPageProps) {
         ) : (
           <div className="grid grid-cols-2 gap-4 sm:gap-6 md:grid-cols-3 lg:grid-cols-4">
             {products.map((product) => (
-              <ProductCard key={product.slug} product={product} user={userObj} />
+              <ProductCard key={product.slug} product={product} user={user} />
             ))}
           </div>
         )}
