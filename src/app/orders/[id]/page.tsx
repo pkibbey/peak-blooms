@@ -1,29 +1,16 @@
-import { redirect, notFound } from "next/navigation"
+import Link from "next/link"
+import { notFound, redirect } from "next/navigation"
+import { AddressDisplay } from "@/components/site/AddressDisplay"
+import { OrderItem } from "@/components/site/OrderItem"
+import { type OrderStatus, OrderStatusBadge } from "@/components/site/OrderStatusBadge"
+import { Button } from "@/components/ui/button"
+import { IconCheckCircle, IconMapPin } from "@/components/ui/icons"
 import { getCurrentUser } from "@/lib/auth-utils"
 import { db } from "@/lib/db"
-import Link from "next/link"
-import Image from "next/image"
-import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
-import {
-  IconCheckCircle,
-  IconClock,
-  IconTruck,
-  IconPackage,
-  IconXCircle,
-  IconMapPin,
-} from "@/components/ui/icons"
+import { formatDate, formatPrice } from "@/lib/utils"
 
 interface OrderDetailPageProps {
   params: Promise<{ id: string }>
-}
-
-const statusConfig = {
-  PENDING: { label: "Pending", variant: "secondary" as const, icon: IconClock },
-  CONFIRMED: { label: "Confirmed", variant: "default" as const, icon: IconCheckCircle },
-  SHIPPED: { label: "Shipped", variant: "default" as const, icon: IconTruck },
-  DELIVERED: { label: "Delivered", variant: "default" as const, icon: IconPackage },
-  CANCELLED: { label: "Cancelled", variant: "destructive" as const, icon: IconXCircle },
 }
 
 export default async function OrderDetailPage({ params }: OrderDetailPageProps) {
@@ -62,23 +49,6 @@ export default async function OrderDetailPage({ params }: OrderDetailPageProps) 
     notFound()
   }
 
-  const formatPrice = (price: number) => {
-    return new Intl.NumberFormat("en-US", {
-      style: "currency",
-      currency: "USD",
-    }).format(price)
-  }
-
-  const formatDate = (date: Date) => {
-    return new Intl.DateTimeFormat("en-US", {
-      dateStyle: "long",
-      timeStyle: "short",
-    }).format(new Date(date))
-  }
-
-  const status = statusConfig[order.status]
-  const StatusIcon = status.icon
-
   return (
     <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 py-10">
       {/* Order Header */}
@@ -86,10 +56,7 @@ export default async function OrderDetailPage({ params }: OrderDetailPageProps) 
         <div>
           <div className="flex items-center gap-3 mb-2">
             <h1 className="text-3xl font-bold font-serif">Order {order.orderNumber}</h1>
-            <Badge variant={status.variant} className="text-sm">
-              <StatusIcon className="h-3 w-3 mr-1" />
-              {status.label}
-            </Badge>
+            <OrderStatusBadge status={order.status as OrderStatus} className="text-sm" />
           </div>
           <p className="text-muted-foreground">Placed on {formatDate(order.createdAt)}</p>
         </div>
@@ -120,49 +87,9 @@ export default async function OrderDetailPage({ params }: OrderDetailPageProps) 
           <div className="bg-white rounded-xs shadow-sm border p-6">
             <h2 className="text-lg font-semibold font-serif mb-4">Order Items</h2>
             <div className="space-y-4">
-              {order.items.map((item) => {
-                const lineTotal = item.price * item.quantity
-                const variantSpecs = item.productVariant
-                  ? [
-                      item.productVariant.stemLength ? `${item.productVariant.stemLength}cm` : null,
-                      item.productVariant.countPerBunch
-                        ? `${item.productVariant.countPerBunch} stems`
-                        : null,
-                    ]
-                      .filter(Boolean)
-                      .join(" • ")
-                  : null
-
-                return (
-                  <div key={item.id} className="flex gap-4 py-4 border-b last:border-b-0">
-                    <div className="relative h-20 w-20 shrink-0 overflow-hidden rounded-xs bg-neutral-100">
-                      {item.product.image ? (
-                        <Image
-                          src={item.product.image}
-                          alt={item.product.name}
-                          fill
-                          className="object-cover"
-                          sizes="80px"
-                        />
-                      ) : (
-                        <div className="h-full w-full bg-muted" />
-                      )}
-                    </div>
-                    <div className="flex-1">
-                      <div className="flex justify-between">
-                        <div>
-                          <p className="font-medium">{item.product.name}</p>
-                          <p className="text-sm text-muted-foreground mt-1">
-                            {formatPrice(item.price)} × {item.quantity}
-                            {variantSpecs && ` • ${variantSpecs}`}
-                          </p>
-                        </div>
-                        <p className="font-medium">{formatPrice(lineTotal)}</p>
-                      </div>
-                    </div>
-                  </div>
-                )
-              })}
+              {order.items.map((item) => (
+                <OrderItem key={item.id} item={item} />
+              ))}
             </div>
 
             {/* Order Total */}
@@ -199,38 +126,14 @@ export default async function OrderDetailPage({ params }: OrderDetailPageProps) 
               <IconMapPin className="h-5 w-5" />
               Shipping Address
             </h2>
-            <address className="not-italic text-sm text-muted-foreground space-y-1">
-              <p className="font-medium text-foreground">
-                {order.shippingAddress.firstName} {order.shippingAddress.lastName}
-              </p>
-              {order.shippingAddress.company && <p>{order.shippingAddress.company}</p>}
-              <p>{order.shippingAddress.street1}</p>
-              {order.shippingAddress.street2 && <p>{order.shippingAddress.street2}</p>}
-              <p>
-                {order.shippingAddress.city}, {order.shippingAddress.state}{" "}
-                {order.shippingAddress.zip}
-              </p>
-              <p>{order.shippingAddress.country}</p>
-            </address>
+            <AddressDisplay address={order.shippingAddress} />
           </div>
 
           {/* Billing Address (if different) */}
           {order.billingAddress && (
             <div className="bg-white rounded-xs shadow-sm border p-6">
               <h2 className="text-lg font-semibold font-serif mb-4">Billing Address</h2>
-              <address className="not-italic text-sm text-muted-foreground space-y-1">
-                <p className="font-medium text-foreground">
-                  {order.billingAddress.firstName} {order.billingAddress.lastName}
-                </p>
-                {order.billingAddress.company && <p>{order.billingAddress.company}</p>}
-                <p>{order.billingAddress.street1}</p>
-                {order.billingAddress.street2 && <p>{order.billingAddress.street2}</p>}
-                <p>
-                  {order.billingAddress.city}, {order.billingAddress.state}{" "}
-                  {order.billingAddress.zip}
-                </p>
-                <p>{order.billingAddress.country}</p>
-              </address>
+              <AddressDisplay address={order.billingAddress} />
             </div>
           )}
 

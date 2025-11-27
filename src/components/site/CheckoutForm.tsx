@@ -1,6 +1,5 @@
 "use client"
 
-import Image from "next/image"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { useState } from "react"
@@ -10,7 +9,7 @@ import AddressForm, {
   emptyAddress,
   validateAddress,
 } from "@/components/site/AddressForm"
-import { Badge } from "@/components/ui/badge"
+import { CheckoutOrderItem } from "@/components/site/CheckoutOrderItem"
 import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
 import { IconMapPin } from "@/components/ui/icons"
@@ -24,6 +23,7 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
+import { formatPrice } from "@/lib/utils"
 
 interface CartProduct {
   id: string
@@ -204,13 +204,6 @@ export default function CheckoutForm({ cart, savedAddresses, userEmail }: Checko
     }
   }
 
-  const formatPrice = (price: number) => {
-    return new Intl.NumberFormat("en-US", {
-      style: "currency",
-      currency: "USD",
-    }).format(price)
-  }
-
   const formatAddressPreview = (addr: SavedAddress) => {
     return `${addr.firstName} ${addr.lastName}, ${addr.street1}, ${addr.city}, ${addr.state} ${addr.zip}`
   }
@@ -337,51 +330,9 @@ export default function CheckoutForm({ cart, savedAddresses, userEmail }: Checko
 
           {/* Cart Items */}
           <div className="space-y-4 mb-4">
-            {cart.items.map((item) => {
-              const price = item.productVariant?.price ?? 0
-              const lineTotal = price * item.quantity
-
-              return (
-                <div key={item.id} className="flex gap-3">
-                  <div className="relative h-16 w-16 shrink-0">
-                    <div className="h-full w-full overflow-hidden rounded-xs bg-neutral-100">
-                      {item.product.image ? (
-                        <Image
-                          src={item.product.image}
-                          alt={item.product.name}
-                          fill
-                          className="object-cover rounded-xs"
-                          sizes="64px"
-                        />
-                      ) : (
-                        <div className="h-full w-full bg-muted" />
-                      )}
-                    </div>
-                    <Badge className="absolute -top-2 -right-2 h-5 w-5 p-0 flex items-center justify-center text-xs">
-                      {item.quantity}
-                    </Badge>
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium truncate">{item.product.name}</p>
-                    {item.productVariant && (
-                      <p className="text-xs text-muted-foreground">
-                        {[
-                          item.productVariant.stemLength
-                            ? `${item.productVariant.stemLength}cm`
-                            : null,
-                          item.productVariant.countPerBunch
-                            ? `${item.productVariant.countPerBunch} stems`
-                            : null,
-                        ]
-                          .filter(Boolean)
-                          .join(" • ")}
-                      </p>
-                    )}
-                  </div>
-                  <p className="text-sm font-medium">{formatPrice(lineTotal)}</p>
-                </div>
-              )
-            })}
+            {cart.items.map((item) => (
+              <CheckoutOrderItem key={item.id} item={item} />
+            ))}
           </div>
 
           <div className="border-t pt-4 space-y-2 text-sm">

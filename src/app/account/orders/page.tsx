@@ -1,26 +1,13 @@
 import Image from "next/image"
 import Link from "next/link"
 import BackLink from "@/components/site/BackLink"
+import { type OrderStatus, OrderStatusBadge } from "@/components/site/OrderStatusBadge"
 import ReorderButton from "@/components/site/ReorderButton"
-import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import {
-  IconCheckCircle,
-  IconClock,
-  IconPackage,
-  IconTruck,
-  IconXCircle,
-} from "@/components/ui/icons"
+import { IconPackage } from "@/components/ui/icons"
 import { getCurrentUser } from "@/lib/auth-utils"
 import { db } from "@/lib/db"
-
-const statusConfig = {
-  PENDING: { label: "Pending", variant: "secondary" as const, icon: IconClock },
-  CONFIRMED: { label: "Confirmed", variant: "default" as const, icon: IconCheckCircle },
-  SHIPPED: { label: "Shipped", variant: "default" as const, icon: IconTruck },
-  DELIVERED: { label: "Delivered", variant: "default" as const, icon: IconPackage },
-  CANCELLED: { label: "Cancelled", variant: "destructive" as const, icon: IconXCircle },
-}
+import { formatDate, formatPrice } from "@/lib/utils"
 
 export default async function OrdersPage() {
   const user = await getCurrentUser()
@@ -41,19 +28,6 @@ export default async function OrdersPage() {
     },
   })
 
-  const formatPrice = (price: number) => {
-    return new Intl.NumberFormat("en-US", {
-      style: "currency",
-      currency: "USD",
-    }).format(price)
-  }
-
-  const formatDate = (date: Date) => {
-    return new Intl.DateTimeFormat("en-US", {
-      dateStyle: "medium",
-    }).format(new Date(date))
-  }
-
   return (
     <>
       <BackLink href="/account" label="Account" />
@@ -69,9 +43,6 @@ export default async function OrdersPage() {
       {orders.length > 0 ? (
         <div className="space-y-4">
           {orders.map((order) => {
-            const status = statusConfig[order.status]
-            const StatusIcon = status.icon
-
             return (
               <div key={order.id} className="border-b last:border-b-0 pb-4 last:pb-0">
                 <div className="flex items-start justify-between gap-2 mb-2">
@@ -81,10 +52,7 @@ export default async function OrdersPage() {
                     </Link>
                     <p className="text-xs text-muted-foreground">{formatDate(order.createdAt)}</p>
                   </div>
-                  <Badge variant={status.variant} className="text-xs">
-                    <StatusIcon className="h-3 w-3 mr-1" />
-                    {status.label}
-                  </Badge>
+                  <OrderStatusBadge status={order.status as OrderStatus} className="text-xs" />
                 </div>
 
                 {/* Order Items Preview */}

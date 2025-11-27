@@ -7,7 +7,7 @@ import AddToCartButton from "@/components/site/AddToCartButton"
 import { Button } from "@/components/ui/button"
 import { IconArrowRight } from "@/components/ui/icons"
 import type { ProductModel, ProductVariantModel } from "@/generated/models"
-import { cn } from "@/lib/utils"
+import { cn, formatVariantSpecs } from "@/lib/utils"
 
 interface ProductCardProps {
   product: ProductModel & {
@@ -155,19 +155,9 @@ export function ProductCard({ product, user }: ProductCardProps) {
 
   // Build variant specs string from selected variant (variants required)
   const variantSpecs = selectedVariant
-    ? [
-        selectedVariant.stemLength ? `${selectedVariant.stemLength}cm` : null,
-        selectedVariant.countPerBunch ? `${selectedVariant.countPerBunch} stems` : null,
-      ]
-        .filter(Boolean)
-        .join(" • ")
+    ? formatVariantSpecs(selectedVariant.stemLength, selectedVariant.countPerBunch)
     : variants[0]
-      ? [
-          variants[0].stemLength ? `${variants[0].stemLength}cm` : null,
-          variants[0].countPerBunch ? `${variants[0].countPerBunch} stems` : null,
-        ]
-          .filter(Boolean)
-          .join(" • ")
+      ? formatVariantSpecs(variants[0].stemLength, variants[0].countPerBunch)
       : ""
 
   return (

@@ -1,26 +1,10 @@
 import Link from "next/link"
 import { redirect } from "next/navigation"
-import { Badge } from "@/components/ui/badge"
+import { OrderCard } from "@/components/site/OrderCard"
 import { Button } from "@/components/ui/button"
-import {
-  IconCheckCircle,
-  IconClock,
-  IconEye,
-  IconPackage,
-  IconShoppingBag,
-  IconTruck,
-  IconXCircle,
-} from "@/components/ui/icons"
+import { IconShoppingBag } from "@/components/ui/icons"
 import { getCurrentUser } from "@/lib/auth-utils"
 import { db } from "@/lib/db"
-
-const statusConfig = {
-  PENDING: { label: "Pending", variant: "secondary" as const, icon: IconClock },
-  CONFIRMED: { label: "Confirmed", variant: "default" as const, icon: IconCheckCircle },
-  SHIPPED: { label: "Shipped", variant: "default" as const, icon: IconTruck },
-  DELIVERED: { label: "Delivered", variant: "default" as const, icon: IconPackage },
-  CANCELLED: { label: "Cancelled", variant: "destructive" as const, icon: IconXCircle },
-}
 
 export default async function OrdersPage() {
   const user = await getCurrentUser()
@@ -48,19 +32,6 @@ export default async function OrdersPage() {
     orderBy: { createdAt: "desc" },
   })
 
-  const formatPrice = (price: number) => {
-    return new Intl.NumberFormat("en-US", {
-      style: "currency",
-      currency: "USD",
-    }).format(price)
-  }
-
-  const formatDate = (date: Date) => {
-    return new Intl.DateTimeFormat("en-US", {
-      dateStyle: "medium",
-    }).format(new Date(date))
-  }
-
   if (orders.length === 0) {
     return (
       <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 py-10">
@@ -84,50 +55,9 @@ export default async function OrdersPage() {
       <h1 className="text-3xl font-bold font-serif mb-8">My Orders</h1>
 
       <div className="space-y-4">
-        {orders.map((order) => {
-          const status = statusConfig[order.status]
-          const StatusIcon = status.icon
-          const itemCount = order.items.reduce((sum, item) => sum + item.quantity, 0)
-
-          return (
-            <div key={order.id} className="bg-white rounded-xs shadow-sm border p-6">
-              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-                <div className="space-y-1">
-                  <div className="flex items-center gap-3">
-                    <h2 className="font-semibold text-lg">{order.orderNumber}</h2>
-                    <Badge variant={status.variant}>
-                      <StatusIcon className="h-3 w-3 mr-1" />
-                      {status.label}
-                    </Badge>
-                  </div>
-                  <p className="text-sm text-muted-foreground">
-                    {formatDate(order.createdAt)} • {itemCount} {itemCount === 1 ? "item" : "items"}
-                  </p>
-                </div>
-                <div className="flex items-center gap-4">
-                  <p className="font-semibold text-lg">{formatPrice(order.total)}</p>
-                  <Button variant="outline" size="sm" asChild>
-                    <Link href={`/orders/${order.id}`}>
-                      <IconEye className="h-4 w-4 mr-1" />
-                      View Details
-                    </Link>
-                  </Button>
-                </div>
-              </div>
-
-              {/* Preview of items */}
-              <div className="mt-4 pt-4 border-t">
-                <p className="text-sm text-muted-foreground">
-                  {order.items
-                    .slice(0, 3)
-                    .map((item) => item.product.name)
-                    .join(", ")}
-                  {order.items.length > 3 && ` and ${order.items.length - 3} more`}
-                </p>
-              </div>
-            </div>
-          )
-        })}
+        {orders.map((order) => (
+          <OrderCard key={order.id} order={order} />
+        ))}
       </div>
     </div>
   )

@@ -1,14 +1,7 @@
 import Link from "next/link"
-import { Badge } from "@/components/ui/badge"
+import { type OrderStatus, OrderStatusBadge } from "@/components/site/OrderStatusBadge"
 import { Button } from "@/components/ui/button"
-import {
-  IconCheckCircle,
-  IconClock,
-  IconEye,
-  IconPackage,
-  IconTruck,
-  IconXCircle,
-} from "@/components/ui/icons"
+import { IconEye } from "@/components/ui/icons"
 import {
   Table,
   TableBody,
@@ -17,6 +10,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
+import { formatDate, formatPrice } from "@/lib/utils"
 
 interface OrderUser {
   id: string
@@ -27,7 +21,7 @@ interface OrderUser {
 interface Order {
   id: string
   orderNumber: string
-  status: "PENDING" | "CONFIRMED" | "SHIPPED" | "DELIVERED" | "CANCELLED"
+  status: OrderStatus
   total: number
   email: string
   createdAt: Date
@@ -42,29 +36,7 @@ interface OrdersTableProps {
   currentStatus: string
 }
 
-const statusConfig = {
-  PENDING: { label: "Pending", variant: "secondary" as const, icon: IconClock },
-  CONFIRMED: { label: "Confirmed", variant: "default" as const, icon: IconCheckCircle },
-  SHIPPED: { label: "Shipped", variant: "default" as const, icon: IconTruck },
-  DELIVERED: { label: "Delivered", variant: "default" as const, icon: IconPackage },
-  CANCELLED: { label: "Cancelled", variant: "destructive" as const, icon: IconXCircle },
-}
-
 export default function OrdersTable({ orders, currentStatus }: OrdersTableProps) {
-  const formatPrice = (price: number) => {
-    return new Intl.NumberFormat("en-US", {
-      style: "currency",
-      currency: "USD",
-    }).format(price)
-  }
-
-  const formatDate = (date: Date) => {
-    return new Intl.DateTimeFormat("en-US", {
-      dateStyle: "medium",
-      timeStyle: "short",
-    }).format(new Date(date))
-  }
-
   const statusFilters = [
     { value: "ALL", label: "All" },
     { value: "PENDING", label: "Pending" },
@@ -123,9 +95,6 @@ export default function OrdersTable({ orders, currentStatus }: OrdersTableProps)
             </TableHeader>
             <TableBody>
               {orders.map((order) => {
-                const status = statusConfig[order.status]
-                const StatusIcon = status.icon
-
                 return (
                   <TableRow key={order.id}>
                     <TableCell>
@@ -149,10 +118,7 @@ export default function OrdersTable({ orders, currentStatus }: OrdersTableProps)
                       {order._count.items}
                     </TableCell>
                     <TableCell>
-                      <Badge variant={status.variant}>
-                        <StatusIcon className="h-3 w-3 mr-1" />
-                        {status.label}
-                      </Badge>
+                      <OrderStatusBadge status={order.status} />
                     </TableCell>
                     <TableCell className="text-right font-medium">
                       {formatPrice(order.total)}

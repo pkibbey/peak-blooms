@@ -1,17 +1,9 @@
 "use client"
 
 import { useState } from "react"
+import { ProductMultiSelectItem } from "@/components/admin/ProductMultiSelectItem"
 import { Button } from "@/components/ui/button"
-import { Checkbox } from "@/components/ui/checkbox"
 import { Input } from "@/components/ui/input"
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select"
-import { Label } from "../ui/label"
 
 interface ProductVariant {
   id: string
@@ -124,14 +116,6 @@ export default function ProductMultiSelect({
     return selection?.productVariantId ?? null
   }
 
-  const formatVariantLabel = (variant: ProductVariant): string => {
-    const parts = []
-    if (variant.stemLength) parts.push(`${variant.stemLength}cm`)
-    if (variant.countPerBunch) parts.push(`${variant.countPerBunch} stems`)
-    parts.push(`$${variant.price.toFixed(2)}`)
-    return parts.join(" • ")
-  }
-
   const selectedCount = selectedIds.length
   const filteredSelectedCount = filteredProducts.filter((p) => selectedIds.includes(p.id)).length
 
@@ -177,61 +161,17 @@ export default function ProductMultiSelect({
           <p className="p-4 text-center text-sm text-muted-foreground">No products found</p>
         ) : (
           <ul className="divide-y divide-border">
-            {filteredProducts.map((product) => {
-              const isSelected = selectedIds.includes(product.id)
-              const hasVariants = product.variants && product.variants.length > 0
-              const selectedVariantId = getSelectedVariantId(product.id)
-
-              return (
-                <li key={product.id} className="p-3">
-                  <Label
-                    className={`flex cursor-pointer items-center gap-3 ${
-                      disabled ? "cursor-not-allowed opacity-50" : ""
-                    }`}
-                  >
-                    <Checkbox
-                      checked={isSelected}
-                      onChange={() => handleToggle(product.id)}
-                      disabled={disabled}
-                      className="h-4 w-4 rounded"
-                    />
-                    <div className="min-w-0 flex-1">
-                      <p className="truncate font-medium">{product.name}</p>
-                      {product.collection && (
-                        <p className="truncate text-xs text-muted-foreground">
-                          {product.collection.name}
-                        </p>
-                      )}
-                    </div>
-                  </Label>
-
-                  {/* Variant Selector - shown when product is selected and has variants */}
-                  {isSelected && hasVariants && onSelectionsChange && (
-                    <div className="mt-2 ml-7">
-                      <Select
-                        value={selectedVariantId ?? "none"}
-                        onValueChange={(value) =>
-                          handleVariantChange(product.id, value === "none" ? null : value)
-                        }
-                        disabled={disabled}
-                      >
-                        <SelectTrigger className="h-8 text-xs">
-                          <SelectValue placeholder="Select variant" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="none">No specific variant</SelectItem>
-                          {product.variants?.map((variant) => (
-                            <SelectItem key={variant.id} value={variant.id}>
-                              {formatVariantLabel(variant)}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
-                  )}
-                </li>
-              )
-            })}
+            {filteredProducts.map((product) => (
+              <ProductMultiSelectItem
+                key={product.id}
+                product={product}
+                isSelected={selectedIds.includes(product.id)}
+                selectedVariantId={getSelectedVariantId(product.id)}
+                disabled={disabled}
+                onToggle={handleToggle}
+                onVariantChange={onSelectionsChange ? handleVariantChange : undefined}
+              />
+            ))}
           </ul>
         )}
       </div>
