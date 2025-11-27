@@ -1,22 +1,13 @@
-import { redirect } from "next/navigation"
-import { auth } from "@/lib/auth"
-import { db } from "@/lib/db"
 import OrdersTable from "@/components/admin/OrdersTable"
-import { OrderStatus } from "@/generated/enums"
 import BackLink from "@/components/site/BackLink"
+import { OrderStatus } from "@/generated/enums"
+import { db } from "@/lib/db"
 
 interface AdminOrdersPageProps {
   searchParams: Promise<{ status?: string }>
 }
 
 export default async function AdminOrdersPage({ searchParams }: AdminOrdersPageProps) {
-  const session = await auth()
-
-  // Verify admin role
-  if (!session?.user || session.user.role !== "ADMIN") {
-    redirect("/admin/unauthorized")
-  }
-
   const { status } = await searchParams
   const statusFilter = status as OrderStatus | undefined
 
@@ -47,18 +38,16 @@ export default async function AdminOrdersPage({ searchParams }: AdminOrdersPageP
   })
 
   return (
-    <div className="bg-background">
-      <div className="mx-auto max-w-5xl px-4 py-12 sm:px-6 lg:px-8">
-        <BackLink href="/admin" label="Dashboard" />
-        <div className="flex items-center justify-between mb-8">
-          <div>
-            <h1 className="text-3xl font-bold">Orders</h1>
-            <p className="mt-2 text-muted-foreground">View and manage customer orders</p>
-          </div>
+    <>
+      <BackLink href="/admin" label="Dashboard" />
+      <div className="flex items-center justify-between mb-8">
+        <div>
+          <h1 className="text-3xl font-bold">Orders</h1>
+          <p className="mt-2 text-muted-foreground">View and manage customer orders</p>
         </div>
-
-        <OrdersTable orders={orders} currentStatus={statusFilter || "ALL"} />
       </div>
-    </div>
+
+      <OrdersTable orders={orders} currentStatus={statusFilter || "ALL"} />
+    </>
   )
 }

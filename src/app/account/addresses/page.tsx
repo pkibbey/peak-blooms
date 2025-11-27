@@ -1,6 +1,5 @@
 import AddressManager from "@/components/site/AddressManager"
 import BackLink from "@/components/site/BackLink"
-import { IconMapPin } from "@/components/ui/icons"
 import { getCurrentUser } from "@/lib/auth-utils"
 import { db } from "@/lib/db"
 
@@ -18,13 +17,16 @@ export default async function AddressesPage() {
   return (
     <>
       <BackLink href="/account" label="Account" />
-      <div className="bg-white rounded-xs shadow-sm border p-6">
-      <h2 className="text-lg font-semibold font-serif mb-4 flex items-center gap-2">
-        <IconMapPin className="h-5 w-5" />
-        Delivery Addresses
-      </h2>
+      <div className="mb-8">
+        <h1 className="text-3xl font-bold font-serif">Delivery Addresses</h1>
+        <p className="mt-2 text-muted-foreground">
+          {addresses.length > 0
+            ? `Manage your ${addresses.length} saved address${addresses.length === 1 ? "" : "es"}`
+            : "Add and manage your delivery addresses"}
+        </p>
+      </div>
+
       <AddressManager addresses={addresses} />
-    </div>
     </>
   )
 }

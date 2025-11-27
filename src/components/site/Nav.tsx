@@ -1,22 +1,22 @@
 "use client"
 
-import { useState } from "react"
 import Image from "next/image"
 import Link from "next/link"
 import { signOut } from "next-auth/react"
+import { useState } from "react"
 import NavLink from "@/components/site/NavLink"
 import {
-  IconShoppingBag,
-  IconMenu,
-  IconX,
-  IconShoppingCart,
-  IconRose,
   IconFlower,
+  IconMenu,
+  IconRose,
   IconSettings,
+  IconShoppingBag,
+  IconShoppingCart,
   IconUser,
+  IconX,
 } from "@/components/ui/icons"
-import { Button } from "../ui/button"
 import { Badge } from "../ui/badge"
+import { Button } from "../ui/button"
 
 const links = [
   { label: "Shop", href: "/shop", icon: <IconShoppingBag /> },

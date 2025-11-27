@@ -98,9 +98,7 @@ export async function POST(request: NextRequest) {
       },
     })
 
-    let cartItem: Awaited<
-      ReturnType<typeof db.cartItem.create>
-    >
+    let cartItem: Awaited<ReturnType<typeof db.cartItem.create>>
     if (existingItem) {
       cartItem = await db.cartItem.update({
         where: { id: existingItem.id },

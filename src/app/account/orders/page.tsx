@@ -57,11 +57,14 @@ export default async function OrdersPage() {
   return (
     <>
       <BackLink href="/account" label="Account" />
-      <div className="bg-white rounded-xs shadow-sm border p-6">
-        <h2 className="text-lg font-semibold font-serif mb-4 flex items-center gap-2">
-          <IconPackage className="h-5 w-5" />
-          Orders
-        </h2>
+      <div className="mb-8">
+        <h1 className="text-3xl font-bold font-serif">Order History</h1>
+        <p className="mt-2 text-muted-foreground">
+          {orders.length > 0
+            ? `You have ${orders.length} order${orders.length === 1 ? "" : "s"}`
+            : "View and manage your orders"}
+        </p>
+      </div>
 
       {orders.length > 0 ? (
         <div className="space-y-4">
@@ -126,7 +129,7 @@ export default async function OrdersPage() {
           })}
         </div>
       ) : (
-        <div className="text-center py-8">
+        <div className="text-center py-16">
           <IconPackage className="h-12 w-12 mx-auto text-muted-foreground mb-3" />
           <p className="text-muted-foreground mb-4">No orders yet</p>
           <Button asChild>
@@ -134,7 +137,6 @@ export default async function OrdersPage() {
           </Button>
         </div>
       )}
-    </div>
     </>
   )
 }

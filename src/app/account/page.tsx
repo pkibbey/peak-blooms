@@ -1,8 +1,15 @@
 import Link from "next/link"
+import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import { IconMapPin, IconPackage, IconUser } from "@/components/ui/icons"
+import { IconCheckCircle, IconClock } from "@/components/ui/icons"
 import { getCurrentUser } from "@/lib/auth-utils"
 import { db } from "@/lib/db"
+
+const formatDate = (date: Date) => {
+  return new Intl.DateTimeFormat("en-US", {
+    dateStyle: "medium",
+  }).format(new Date(date))
+}
 
 export default async function AccountPage() {
   const user = await getCurrentUser()
@@ -23,57 +30,94 @@ export default async function AccountPage() {
   return (
     <>
       <div className="mb-8">
-        <h1 className="text-3xl font-bold font-serif">My Account</h1>
-        <p className="mt-2 text-muted-foreground">
-          Manage your profile, addresses, and view your orders
-        </p>
+        <h1 className="text-3xl font-bold font-serif">Account Settings</h1>
+        <p className="mt-2 text-muted-foreground">Manage your profile, addresses, and orders</p>
       </div>
 
-      <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-        {/* Profile Card */}
-        <div className="rounded-xs border bg-white p-6 shadow-sm">
-          <div className="flex items-center gap-3 mb-2">
-            <IconUser className="h-5 w-5" />
-            <h2 className="text-lg font-semibold font-serif">Profile</h2>
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        {/* Main Content */}
+        <div className="lg:col-span-2 space-y-6">
+          {/* Profile Section */}
+          <div className="rounded-lg border border-border p-6">
+            <div className="flex items-start justify-between gap-4">
+              <div>
+                <h2 className="text-xl font-semibold">Profile</h2>
+                <p className="mt-2 text-sm text-muted-foreground">View your account details</p>
+              </div>
+              <div className="shrink-0">
+                <Button asChild className="mt-2">
+                  <Link href="/account/profile">View Profile</Link>
+                </Button>
+              </div>
+            </div>
           </div>
-          <p className="text-sm text-muted-foreground mb-4">
-            View your account details and membership status
-          </p>
-          <Button asChild size="sm">
-            <Link href="/account/profile">View Profile</Link>
-          </Button>
+
+          {/* Addresses Section */}
+          <div className="rounded-lg border border-border p-6">
+            <div className="flex items-start justify-between gap-4">
+              <div>
+                <h2 className="text-xl font-semibold">Addresses</h2>
+                <p className="mt-2 text-sm text-muted-foreground">
+                  {addressCount > 0
+                    ? `You have ${addressCount} saved address${addressCount === 1 ? "" : "es"}`
+                    : "Manage your delivery addresses"}
+                </p>
+              </div>
+              <div className="shrink-0">
+                <Button asChild className="mt-2">
+                  <Link href="/account/addresses">Manage Addresses</Link>
+                </Button>
+              </div>
+            </div>
+          </div>
+
+          {/* Orders Section */}
+          <div className="rounded-lg border border-border p-6">
+            <div className="flex items-start justify-between gap-4">
+              <div>
+                <h2 className="text-xl font-semibold">Orders</h2>
+                <p className="mt-2 text-sm text-muted-foreground">
+                  {orderCount > 0
+                    ? `You have ${orderCount} order${orderCount === 1 ? "" : "s"}`
+                    : "View your order history"}
+                </p>
+              </div>
+              <div className="shrink-0">
+                <Button asChild className="mt-2">
+                  <Link href="/account/orders">View Orders</Link>
+                </Button>
+              </div>
+            </div>
+          </div>
         </div>
 
-        {/* Addresses Card */}
-        <div className="rounded-xs border bg-white p-6 shadow-sm">
-          <div className="flex items-center gap-3 mb-2">
-            <IconMapPin className="h-5 w-5" />
-            <h2 className="text-lg font-semibold font-serif">Addresses</h2>
+        {/* Account Info Sidebar */}
+        <div className="lg:col-span-1">
+          <div className="rounded-lg border border-border p-6 sticky top-24">
+            <h2 className="text-lg font-semibold mb-4 font-serif">Account Information</h2>
+            <div className="space-y-4">
+              <div>
+                <p className="text-sm text-muted-foreground">Account Status</p>
+                <div className="flex items-center gap-2 mt-1">
+                  {user.approved ? (
+                    <Badge variant="default">
+                      <IconCheckCircle className="h-3 w-3 mr-1" />
+                      Approved
+                    </Badge>
+                  ) : (
+                    <Badge variant="secondary">
+                      <IconClock className="h-3 w-3 mr-1" />
+                      Pending Approval
+                    </Badge>
+                  )}
+                </div>
+              </div>
+              <div>
+                <p className="text-sm text-muted-foreground">Member Since</p>
+                <p className="font-medium">{formatDate(user.createdAt)}</p>
+              </div>
+            </div>
           </div>
-          <p className="text-sm text-muted-foreground mb-4">
-            {addressCount > 0
-              ? `You have ${addressCount} saved address${addressCount === 1 ? "" : "es"}`
-              : "Manage your delivery addresses"}
-          </p>
-          <Button asChild size="sm">
-            <Link href="/account/addresses">Manage Addresses</Link>
-          </Button>
-        </div>
-
-        {/* Orders Card */}
-        <div className="rounded-xs border bg-white p-6 shadow-sm">
-          <div className="flex items-center gap-3 mb-2">
-            <IconPackage className="h-5 w-5" />
-            <h2 className="text-lg font-semibold font-serif">Orders</h2>
-          </div>
-          <p className="text-sm text-muted-foreground mb-4">
-            {orderCount > 0
-              ? `You have ${orderCount} order${orderCount === 1 ? "" : "s"}`
-              : "View your order history"}
-          </p>
-          <Button asChild size="sm">
-            <Link href="/account/orders">View Orders</Link>
-          </Button>
         </div>
       </div>
     </>

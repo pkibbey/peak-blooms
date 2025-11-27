@@ -1,7 +1,7 @@
-import { db } from "@/lib/db"
 import { ProductCard } from "@/components/site/ProductCard"
 import type { ProductWhereInput } from "@/generated/models/Product"
 import { getCurrentUser } from "@/lib/auth-utils"
+import { db } from "@/lib/db"
 
 interface ShopPageProps {
   searchParams: Promise<Record<string, string | string[] | undefined>>
@@ -86,30 +86,28 @@ export default async function ShopPage({ searchParams }: ShopPageProps) {
   })
 
   return (
-    <div className="flex flex-col items-center justify-start bg-white py-16 font-sans">
-      <div className="w-full max-w-5xl px-6">
-        <div className="mb-8">
-          <h1 className="text-4xl font-extrabold font-serif">Shop</h1>
-          <p className="mt-2 text-lg text-muted-foreground">
-            Browse our full catalog of premium flowers
-          </p>
-        </div>
-
-        {/* Filters - Horizontal Bar */}
-
-        {/* Products Grid */}
-        {products.length === 0 ? (
-          <div className="flex justify-center items-center py-12">
-            <p className="text-muted-foreground">No products found matching your filters.</p>
-          </div>
-        ) : (
-          <div className="grid grid-cols-2 gap-4 sm:gap-6 md:grid-cols-3 lg:grid-cols-4">
-            {products.map((product) => (
-              <ProductCard key={product.slug} product={product} user={user} />
-            ))}
-          </div>
-        )}
+    <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 py-10">
+      <div className="mb-8">
+        <h1 className="text-4xl font-extrabold font-serif">Shop</h1>
+        <p className="mt-2 text-lg text-muted-foreground">
+          Browse our full catalog of premium flowers
+        </p>
       </div>
+
+      {/* Filters - Horizontal Bar */}
+
+      {/* Products Grid */}
+      {products.length === 0 ? (
+        <div className="flex justify-center items-center py-12">
+          <p className="text-muted-foreground">No products found matching your filters.</p>
+        </div>
+      ) : (
+        <div className="grid grid-cols-2 gap-4 sm:gap-6 md:grid-cols-3 lg:grid-cols-4">
+          {products.map((product) => (
+            <ProductCard key={product.slug} product={product} user={user} />
+          ))}
+        </div>
+      )}
     </div>
   )
 }

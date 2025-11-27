@@ -3,8 +3,8 @@ import { Geist, Geist_Mono, Playfair_Display } from "next/font/google"
 import { SessionProvider } from "next-auth/react"
 import { Toaster } from "sonner"
 import "./globals.css"
-import Nav from "@/components/site/Nav"
 import Footer from "@/components/site/Footer"
+import Nav from "@/components/site/Nav"
 import { getCurrentUser, getOrCreateCart } from "@/lib/auth-utils"
 
 const geistSans = Geist({

@@ -1,6 +1,6 @@
-import Link from "next/link"
 import Image from "next/image"
-import { IconMail, IconInstagram, IconPhone } from "@/components/ui/icons"
+import Link from "next/link"
+import { IconInstagram, IconMail, IconPhone } from "@/components/ui/icons"
 
 export default function Footer() {
   return (

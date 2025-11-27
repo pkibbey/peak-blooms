@@ -24,3 +24,4 @@
 - [ ] Go through the site and make sure that the components are separated well. Some of the files are pretty big, and could be split up a little to keep the code cleaner and make future changes more isolated
 - [ ] Validate all form fields using zod + react-hook-form instead of relying on html validation
 - [ ] Allow users to change their email address
+- [ ] Should repeat orders add to the existing cart, or replace it? This should probably be a user preference that pops up when the user clicks on the reorder button

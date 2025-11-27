@@ -1,7 +1,6 @@
-import { notFound, redirect } from "next/navigation"
+import { notFound } from "next/navigation"
 import InspirationForm from "@/components/admin/InspirationForm"
 import BackLink from "@/components/site/BackLink"
-import { auth } from "@/lib/auth"
 import { db } from "@/lib/db"
 
 interface EditInspirationPageProps {
@@ -9,12 +8,6 @@ interface EditInspirationPageProps {
 }
 
 export default async function EditInspirationPage({ params }: EditInspirationPageProps) {
-  const session = await auth()
-
-  if (!session?.user || session.user.role !== "ADMIN") {
-    redirect("/admin/unauthorized")
-  }
-
   const { id } = await params
 
   const [inspiration, products] = await Promise.all([
@@ -45,18 +38,16 @@ export default async function EditInspirationPage({ params }: EditInspirationPag
   }
 
   return (
-    <div className="bg-background">
-      <div className="mx-auto max-w-5xl px-4 py-12 sm:px-6 lg:px-8">
-        <BackLink href="/admin/inspirations" label="Inspirations" />
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold">Edit Inspiration</h1>
-          <p className="mt-2 text-muted-foreground">Update &ldquo;{inspiration.name}&rdquo;</p>
-        </div>
-
-        <div className="rounded-lg border border-border p-6">
-          <InspirationForm products={products} inspiration={inspiration} />
-        </div>
+    <>
+      <BackLink href="/admin/inspirations" label="Inspirations" />
+      <div className="mb-8">
+        <h1 className="text-3xl font-bold">Edit Inspiration</h1>
+        <p className="mt-2 text-muted-foreground">Update &ldquo;{inspiration.name}&rdquo;</p>
       </div>
-    </div>
+
+      <div className="rounded-lg border border-border p-6">
+        <InspirationForm products={products} inspiration={inspiration} />
+      </div>
+    </>
   )
 }

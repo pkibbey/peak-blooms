@@ -1,11 +1,10 @@
-import { redirect } from "next/navigation"
-import { getCurrentUser } from "@/lib/auth-utils"
-import { getOrCreateCart, calculateCartTotal } from "@/lib/auth-utils"
-import { db } from "@/lib/db"
-import CheckoutForm from "@/components/site/CheckoutForm"
 import Link from "next/link"
+import { redirect } from "next/navigation"
+import CheckoutForm from "@/components/site/CheckoutForm"
 import { Button } from "@/components/ui/button"
 import { IconShoppingBag } from "@/components/ui/icons"
+import { calculateCartTotal, getCurrentUser, getOrCreateCart } from "@/lib/auth-utils"
+import { db } from "@/lib/db"
 
 export default async function CheckoutPage() {
   const user = await getCurrentUser()
