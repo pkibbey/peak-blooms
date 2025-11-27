@@ -36,7 +36,7 @@ export default async function AdminCollectionsPage() {
             </p>
           </div>
           <Button asChild>
-            <Link href="/admin/collections/new">Add Collection</Link>
+            <Link href="/admin/collections/new">Add New Collection</Link>
           </Button>
         </div>
 

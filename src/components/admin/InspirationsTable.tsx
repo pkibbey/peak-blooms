@@ -2,7 +2,6 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { Button } from "@/components/ui/button";
 import {
   Table,
   TableBody,
@@ -42,9 +41,8 @@ export default function InspirationsTable({ inspirations }: InspirationsTablePro
           <TableRow>
             <TableHead>Image</TableHead>
             <TableHead>Name</TableHead>
-            <TableHead>Slug</TableHead>
+            <TableHead className="hidden md:table-cell">Slug</TableHead>
             <TableHead>Products</TableHead>
-            <TableHead>Actions</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -83,25 +81,14 @@ export default function InspirationsTable({ inspirations }: InspirationsTablePro
                 </TableCell>
 
                 {/* Slug */}
-                <TableCell className="text-muted-foreground">
+                <TableCell className="hidden md:table-cell text-muted-foreground">
                   /{inspiration.slug}
                 </TableCell>
 
                 {/* Products Count */}
                 <TableCell className="text-muted-foreground">
                   {productCount}
-                </TableCell>
-
-                {/* Actions */}
-                <TableCell>
-                  <div className="flex items-center gap-2">
-                    <Button size="sm" variant="outline" asChild>
-                      <Link href={`/admin/inspirations/${inspiration.id}/edit`}>
-                        Edit
-                      </Link>
-                    </Button>
-                  </div>
-                </TableCell>
+                </TableCell>                
               </TableRow>
             );
           })}

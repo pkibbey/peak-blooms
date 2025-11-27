@@ -2,7 +2,6 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
   Table,
@@ -57,11 +56,10 @@ export default function ProductsTable({ products }: ProductsTableProps) {
           <TableRow>
             <TableHead>Image</TableHead>
             <TableHead>Name</TableHead>
-            <TableHead>Collection</TableHead>
-            <TableHead>Price</TableHead>
-            <TableHead>Variants</TableHead>
+            <TableHead className="hidden md:table-cell">Collection</TableHead>
+            <TableHead className="hidden lg:table-cell">Price</TableHead>
+            <TableHead className="hidden lg:table-cell">Variants</TableHead>
             <TableHead>Featured</TableHead>
-            <TableHead>Actions</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -104,17 +102,17 @@ export default function ProductsTable({ products }: ProductsTableProps) {
                 </TableCell>
 
                 {/* Collection */}
-                <TableCell className="text-muted-foreground">
+                <TableCell className="hidden md:table-cell text-muted-foreground">
                   {product.collection.name}
                 </TableCell>
 
                 {/* Price */}
-                <TableCell>
+                <TableCell className="hidden lg:table-cell">
                   {product.variants.length > 0 ? priceDisplay : "—"}
                 </TableCell>
 
                 {/* Variants */}
-                <TableCell className="text-muted-foreground">
+                <TableCell className="hidden lg:table-cell text-muted-foreground">
                   {product.variants.length}
                 </TableCell>
 
@@ -125,17 +123,6 @@ export default function ProductsTable({ products }: ProductsTableProps) {
                   ) : (
                     <span className="text-muted-foreground">—</span>
                   )}
-                </TableCell>
-
-                {/* Actions */}
-                <TableCell>
-                  <div className="flex items-center gap-2">
-                    <Button size="sm" variant="outline" asChild>
-                      <Link href={`/admin/products/${product.id}/edit`}>
-                        Edit
-                      </Link>
-                    </Button>
-                  </div>
                 </TableCell>
               </TableRow>
             );

@@ -36,7 +36,7 @@ export default async function AdminInspirationsPage() {
             </p>
           </div>
           <Button asChild>
-            <Link href="/admin/inspirations/new">Add Inspiration</Link>
+            <Link href="/admin/inspirations/new">Add New Inspiration</Link>
           </Button>
         </div>
 
