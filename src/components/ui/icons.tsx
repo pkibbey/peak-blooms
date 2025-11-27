@@ -1,5 +1,5 @@
 import React from "react"
-import { ShoppingCart, ShoppingBag, Menu, X, Info, Mail, Flower, ArrowRight, Instagram, Facebook, Rose, Phone, Settings, Plus, Trash2, Minus, Pencil } from "lucide-react"
+import { ShoppingCart, ShoppingBag, Menu, X, Info, Mail, Flower, ArrowRight, Instagram, Facebook, Rose, Phone, Settings, Plus, Trash2, Minus, Pencil, MapPin, Package, Clock, CheckCircle, XCircle, Truck, Eye } from "lucide-react"
 
 // Small re-exports used across the UI so we have a single place to tweak sizing & classes
 export const IconSizeClass = "h-4 w-4"
@@ -70,6 +70,34 @@ export function IconEdit(props: React.ComponentProps<typeof Pencil>) {
 
 export function IconTrash(props: React.ComponentProps<typeof Trash2>) {
   return <Trash2 {...props} className={[IconSizeClass, props.className].filter(Boolean).join(" ")} />
+}
+
+export function IconMapPin(props: React.ComponentProps<typeof MapPin>) {
+  return <MapPin {...props} className={[IconSizeClass, props.className].filter(Boolean).join(" ")} />
+}
+
+export function IconPackage(props: React.ComponentProps<typeof Package>) {
+  return <Package {...props} className={[IconSizeClass, props.className].filter(Boolean).join(" ")} />
+}
+
+export function IconClock(props: React.ComponentProps<typeof Clock>) {
+  return <Clock {...props} className={[IconSizeClass, props.className].filter(Boolean).join(" ")} />
+}
+
+export function IconCheckCircle(props: React.ComponentProps<typeof CheckCircle>) {
+  return <CheckCircle {...props} className={[IconSizeClass, props.className].filter(Boolean).join(" ")} />
+}
+
+export function IconXCircle(props: React.ComponentProps<typeof XCircle>) {
+  return <XCircle {...props} className={[IconSizeClass, props.className].filter(Boolean).join(" ")} />
+}
+
+export function IconTruck(props: React.ComponentProps<typeof Truck>) {
+  return <Truck {...props} className={[IconSizeClass, props.className].filter(Boolean).join(" ")} />
+}
+
+export function IconEye(props: React.ComponentProps<typeof Eye>) {
+  return <Eye {...props} className={[IconSizeClass, props.className].filter(Boolean).join(" ")} />
 }
 
 // intentionally no default export — use named icon exports

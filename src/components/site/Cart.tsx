@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useState } from "react"
 import { useRouter } from "next/navigation"
 import Image from "next/image"
 import Link from "next/link"
@@ -21,7 +21,6 @@ interface CartProduct {
 
 interface CartVariant {
   id: string
-  name: string
   price: number
   stemLength: number | null
   countPerBunch: number | null
@@ -42,10 +41,13 @@ interface CartData {
   total: number
 }
 
-export default function Cart() {
+interface CartProps {
+  initialCart: CartData
+}
+
+export default function Cart({ initialCart }: CartProps) {
   const router = useRouter()
-  const [cart, setCart] = useState<CartData | null>(null)
-  const [loading, setLoading] = useState(true)
+  const [cart, setCart] = useState<CartData>(initialCart)
   const [updatingItems, setUpdatingItems] = useState<Set<string>>(new Set())
 
   // Debounced API call for quantity updates
@@ -70,7 +72,7 @@ export default function Cart() {
       } catch (error) {
         console.error("Error updating quantity:", error)
         toast.error("Failed to update quantity")
-        fetchCart()
+        refreshCart()
       } finally {
         setUpdatingItems((prev) => {
           const next = new Set(prev)
@@ -82,13 +84,7 @@ export default function Cart() {
     800
   )
 
-  // Fetch cart on mount only. Dependency array is intentionally empty because
-  // fetchCart is defined in component scope and captures latest state via closure.
-  useEffect(() => {
-    fetchCart()
-  }, [])
-
-  const fetchCart = async () => {
+  const refreshCart = async () => {
     try {
       const response = await fetch("/api/cart")
       if (!response.ok) {
@@ -99,8 +95,6 @@ export default function Cart() {
     } catch (error) {
       console.error("Error fetching cart:", error)
       toast.error("Failed to load cart")
-    } finally {
-      setLoading(false)
     }
   }
 
@@ -155,7 +149,7 @@ export default function Cart() {
       console.error("Error removing item:", error)
       toast.error("Failed to remove item")
       // Revert on error
-      fetchCart()
+      refreshCart()
     } finally {
       setUpdatingItems((prev) => {
         const next = new Set(prev)
@@ -172,15 +166,7 @@ export default function Cart() {
     }).format(price)
   }
 
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center py-12">
-        <div className="text-muted-foreground">Loading cart...</div>
-      </div>
-    )
-  }
-
-  if (!cart || cart.items.length === 0) {
+  if (cart.items.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-16 text-center">
         <IconShoppingBag className="h-16 w-16 text-muted-foreground/50 mb-4" />
@@ -355,10 +341,9 @@ export default function Cart() {
           <Button
             size="lg"
             className="w-full"
-            disabled
-            title="Checkout coming soon"
+            asChild
           >
-            Checkout coming soon
+            <Link href="/checkout">Proceed to Checkout</Link>
           </Button>
 
           <div className="mt-4">

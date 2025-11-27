@@ -4,6 +4,26 @@ import { isApproved } from "@/lib/auth-utils";
 import { NextResponse } from "next/server";
 
 /**
+ * Generate the next order number in sequence (PB-00001, PB-00002, etc.)
+ */
+async function generateOrderNumber(): Promise<string> {
+  const lastOrder = await db.order.findFirst({
+    orderBy: { orderNumber: "desc" },
+    select: { orderNumber: true },
+  });
+
+  let nextNumber = 1;
+  if (lastOrder?.orderNumber) {
+    const match = lastOrder.orderNumber.match(/PB-(\d+)/);
+    if (match) {
+      nextNumber = parseInt(match[1], 10) + 1;
+    }
+  }
+
+  return `PB-${nextNumber.toString().padStart(5, "0")}`;
+}
+
+/**
  * GET /api/orders
  * Get current user's orders (approved users only)
  */
@@ -66,7 +86,7 @@ export async function GET() {
  * POST /api/orders
  * Create a new order from shopping cart (approved users only)
  */
-export async function POST() {
+export async function POST(request: Request) {
   try {
     const session = await auth();
 
@@ -97,6 +117,26 @@ export async function POST() {
       );
     }
 
+    // Parse request body
+    const body = await request.json();
+    const {
+      shippingAddressId,
+      shippingAddress,
+      saveShippingAddress,
+      billingAddress,
+      email,
+      phone,
+      notes,
+    } = body;
+
+    // Validate email
+    if (!email || typeof email !== "string") {
+      return NextResponse.json(
+        { error: "Email is required" },
+        { status: 400 }
+      );
+    }
+
     // Get user's cart
     const cart = await db.shoppingCart.findUnique({
       where: { userId: user.id },
@@ -124,12 +164,88 @@ export async function POST() {
       return sum + price * item.quantity;
     }, 0);
 
+    // Handle shipping address
+    let finalShippingAddressId: string;
+
+    if (shippingAddressId) {
+      // Using existing address - verify it belongs to user
+      const existingAddress = await db.address.findFirst({
+        where: {
+          id: shippingAddressId,
+          userId: user.id,
+        },
+      });
+
+      if (!existingAddress) {
+        return NextResponse.json(
+          { error: "Invalid shipping address" },
+          { status: 400 }
+        );
+      }
+
+      finalShippingAddressId = shippingAddressId;
+    } else if (shippingAddress) {
+      // Creating new address
+      const newAddress = await db.address.create({
+        data: {
+          userId: saveShippingAddress ? user.id : null,
+          firstName: shippingAddress.firstName,
+          lastName: shippingAddress.lastName,
+          company: shippingAddress.company || null,
+          street1: shippingAddress.street1,
+          street2: shippingAddress.street2 || null,
+          city: shippingAddress.city,
+          state: shippingAddress.state,
+          zip: shippingAddress.zip,
+          country: shippingAddress.country || "US",
+        },
+      });
+
+      finalShippingAddressId = newAddress.id;
+    } else {
+      return NextResponse.json(
+        { error: "Shipping address is required" },
+        { status: 400 }
+      );
+    }
+
+    // Handle billing address (optional)
+    let finalBillingAddressId: string | null = null;
+
+    if (billingAddress) {
+      const newBillingAddress = await db.address.create({
+        data: {
+          userId: null, // Billing addresses are not saved to user profile
+          firstName: billingAddress.firstName,
+          lastName: billingAddress.lastName,
+          company: billingAddress.company || null,
+          street1: billingAddress.street1,
+          street2: billingAddress.street2 || null,
+          city: billingAddress.city,
+          state: billingAddress.state,
+          zip: billingAddress.zip,
+          country: billingAddress.country || "US",
+        },
+      });
+
+      finalBillingAddressId = newBillingAddress.id;
+    }
+
+    // Generate order number
+    const orderNumber = await generateOrderNumber();
+
     // Create order with items
     const order = await db.order.create({
       data: {
+        orderNumber,
         userId: user.id,
         total,
         status: "PENDING",
+        email,
+        phone: phone || null,
+        notes: notes || null,
+        shippingAddressId: finalShippingAddressId,
+        billingAddressId: finalBillingAddressId,
         items: {
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           create: cart.items.map((item: any) => ({
@@ -147,6 +263,8 @@ export async function POST() {
             productVariant: true,
           },
         },
+        shippingAddress: true,
+        billingAddress: true,
       },
     });
 

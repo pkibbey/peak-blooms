@@ -62,6 +62,28 @@ model User {
   sessions      Session[]
   cart          ShoppingCart?
   orders        Order[]
+  addresses     Address[]
+}
+
+model Address {
+  id        String   @id @default(cuid())
+  userId    String?
+  firstName String
+  lastName  String
+  company   String?
+  street1   String
+  street2   String?
+  city      String
+  state     String
+  zip       String
+  country   String   @default("US")
+  createdAt DateTime @default(now())
+
+  user            User?   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  shippingOrders  Order[] @relation("ShippingAddress")
+  billingOrders   Order[] @relation("BillingAddress")
+
+  @@index([userId])
 }
 
 enum Role {
@@ -180,17 +202,27 @@ model CartItem {
 }
 
 model Order {
-  id        String    @id @default(cuid())
-  userId    String
-  status    OrderStatus @default(PENDING)
-  total     Float
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
+  id                String      @id @default(cuid())
+  orderNumber       String      @unique
+  userId            String
+  status            OrderStatus @default(PENDING)
+  total             Float
+  email             String
+  phone             String?
+  notes             String?     @db.Text
+  shippingAddressId String
+  billingAddressId  String?
+  createdAt         DateTime    @default(now())
+  updatedAt         DateTime    @updatedAt
 
-  user      User        @relation(fields: [userId], references: [id], onDelete: Cascade)
-  items     OrderItem[]
+  user            User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  shippingAddress Address     @relation("ShippingAddress", fields: [shippingAddressId], references: [id])
+  billingAddress  Address?    @relation("BillingAddress", fields: [billingAddressId], references: [id])
+  items           OrderItem[]
 
   @@index([userId])
+  @@index([orderNumber])
+  @@index([status])
 }
 
 model OrderItem {

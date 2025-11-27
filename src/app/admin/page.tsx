@@ -1,7 +1,10 @@
 import { redirect } from "next/navigation";
 import { auth } from "@/lib/auth";
+import { db } from "@/lib/db";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { IconClock } from "@/components/ui/icons";
 
 export default async function AdminDashboard() {
   const session = await auth();
@@ -11,6 +14,11 @@ export default async function AdminDashboard() {
     redirect("/admin/unauthorized");
   }
 
+  // Count pending orders
+  const pendingOrdersCount = await db.order.count({
+    where: { status: "PENDING" },
+  });
+
   return (
     <div className="bg-background">
       <div className="mx-auto max-w-5xl px-4 py-12 sm:px-6 lg:px-8">
@@ -19,6 +27,38 @@ export default async function AdminDashboard() {
           <p className="mt-2 text-muted-foreground">
             Manage Peak Blooms content and user approvals
           </p>
+        </div>
+
+        {/* Orders section */}
+        <div className="mb-6 rounded-lg border border-border p-6">
+          <div className="flex items-start justify-between gap-4">
+            <div>
+              <div className="flex items-center gap-3">
+                <h2 className="text-xl font-semibold">Order Management</h2>
+                {pendingOrdersCount > 0 && (
+                  <Badge variant="secondary" className="flex items-center gap-1">
+                    <IconClock className="h-3 w-3" />
+                    {pendingOrdersCount} pending
+                  </Badge>
+                )}
+              </div>
+              <p className="mt-2 text-sm text-muted-foreground">
+                View and manage customer orders
+              </p>
+            </div>
+            <div className="shrink-0 flex gap-2">
+              {pendingOrdersCount > 0 && (
+                <Button asChild variant="outline" className="mt-2">
+                  <Link href="/admin/orders?status=PENDING">
+                    View Pending
+                  </Link>
+                </Button>
+              )}
+              <Button asChild className="mt-2">
+                <Link href="/admin/orders">All Orders</Link>
+              </Button>
+            </div>
+          </div>
         </div>
 
         {/* Users section */}

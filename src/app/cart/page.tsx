@@ -1,5 +1,6 @@
 import { redirect } from "next/navigation"
 import { getCurrentUser } from "@/lib/auth-utils"
+import { getOrCreateCart, calculateCartTotal } from "@/lib/auth-utils"
 import Cart from "@/components/site/Cart"
 
 export default async function CartPage() {
@@ -15,10 +16,20 @@ export default async function CartPage() {
     redirect("/auth/pending-approval")
   }
 
+  // Fetch cart data server-side
+  const cart = await getOrCreateCart()
+  
+  // This shouldn't happen since user is authenticated, but handle it
+  if (!cart) {
+    redirect("/auth/signin?callbackUrl=/cart")
+  }
+  
+  const total = calculateCartTotal(cart.items)
+
   return (
     <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 py-10">
       <h1 className="text-3xl font-bold font-serif mb-8">Shopping Cart</h1>
-      <Cart />
+      <Cart initialCart={{ id: cart.id, items: cart.items, total }} />
     </div>
   )
 }

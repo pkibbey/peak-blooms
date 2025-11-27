@@ -55,6 +55,7 @@ export const ModelName = {
   Session: 'Session',
   VerificationToken: 'VerificationToken',
   User: 'User',
+  Address: 'Address',
   Collection: 'Collection',
   Inspiration: 'Inspiration',
   Product: 'Product',
@@ -132,6 +133,24 @@ export const UserScalarFieldEnum = {
 } as const
 
 export type UserScalarFieldEnum = (typeof UserScalarFieldEnum)[keyof typeof UserScalarFieldEnum]
+
+
+export const AddressScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  firstName: 'firstName',
+  lastName: 'lastName',
+  company: 'company',
+  street1: 'street1',
+  street2: 'street2',
+  city: 'city',
+  state: 'state',
+  zip: 'zip',
+  country: 'country',
+  createdAt: 'createdAt'
+} as const
+
+export type AddressScalarFieldEnum = (typeof AddressScalarFieldEnum)[keyof typeof AddressScalarFieldEnum]
 
 
 export const CollectionScalarFieldEnum = {
@@ -227,9 +246,15 @@ export type CartItemScalarFieldEnum = (typeof CartItemScalarFieldEnum)[keyof typ
 
 export const OrderScalarFieldEnum = {
   id: 'id',
+  orderNumber: 'orderNumber',
   userId: 'userId',
   status: 'status',
   total: 'total',
+  email: 'email',
+  phone: 'phone',
+  notes: 'notes',
+  shippingAddressId: 'shippingAddressId',
+  billingAddressId: 'billingAddressId',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const
