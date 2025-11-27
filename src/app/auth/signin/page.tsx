@@ -1,12 +1,12 @@
 "use client"
 
-import { type FormEvent, useState } from "react"
-import { signIn } from "next-auth/react"
-import { useSearchParams } from "next/navigation"
 import Link from "next/link"
+import { useSearchParams } from "next/navigation"
+import { signIn } from "next-auth/react"
+import { type FormEvent, useState } from "react"
 import { Button } from "@/components/ui/button"
-import { Label } from "@/components/ui/label"
 import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
 
 export default function SignInPage() {
   const searchParams = useSearchParams()

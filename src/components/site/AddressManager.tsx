@@ -1,18 +1,18 @@
 "use client"
 
-import { useState } from "react"
 import { useRouter } from "next/navigation"
+import { useState } from "react"
 import { toast } from "sonner"
-import { Button } from "@/components/ui/button"
-import { Checkbox } from "@/components/ui/checkbox"
-import { Label } from "@/components/ui/label"
-import { IconPlus, IconX } from "@/components/ui/icons"
 import AddressCard, { type Address } from "@/components/site/AddressCard"
 import AddressForm, {
   type AddressFormData,
   emptyAddress,
   validateAddress,
 } from "@/components/site/AddressForm"
+import { Button } from "@/components/ui/button"
+import { Checkbox } from "@/components/ui/checkbox"
+import { IconPlus, IconX } from "@/components/ui/icons"
+import { Label } from "@/components/ui/label"
 
 interface AddressManagerProps {
   addresses: Address[]

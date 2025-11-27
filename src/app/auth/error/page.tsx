@@ -1,14 +1,14 @@
-"use client"
-
-import { useSearchParams } from "next/navigation"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 
-export default function ErrorPage() {
-  const searchParams = useSearchParams()
-  const error = searchParams.get("error")
+export default async function ErrorPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ error?: string }>
+}) {
+  const { error } = await searchParams
 
-  const getErrorMessage = (error: string | null) => {
+  const getErrorMessage = (error: string | undefined) => {
     switch (error) {
       case "Callback":
         return "Invalid sign-in link or link has expired. Please try signing in again."

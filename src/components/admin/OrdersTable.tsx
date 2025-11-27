@@ -1,7 +1,4 @@
-"use client"
-
 import Link from "next/link"
-import { useRouter, useSearchParams } from "next/navigation"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import {
@@ -12,13 +9,6 @@ import {
   IconTruck,
   IconXCircle,
 } from "@/components/ui/icons"
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select"
 import {
   Table,
   TableBody,
@@ -61,19 +51,6 @@ const statusConfig = {
 }
 
 export default function OrdersTable({ orders, currentStatus }: OrdersTableProps) {
-  const router = useRouter()
-  const searchParams = useSearchParams()
-
-  const handleStatusFilter = (status: string) => {
-    const params = new URLSearchParams(searchParams.toString())
-    if (status === "ALL") {
-      params.delete("status")
-    } else {
-      params.set("status", status)
-    }
-    router.push(`/admin/orders?${params.toString()}`)
-  }
-
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat("en-US", {
       style: "currency",
@@ -88,25 +65,41 @@ export default function OrdersTable({ orders, currentStatus }: OrdersTableProps)
     }).format(new Date(date))
   }
 
+  const statusFilters = [
+    { value: "ALL", label: "All" },
+    { value: "PENDING", label: "Pending" },
+    { value: "CONFIRMED", label: "Confirmed" },
+    { value: "SHIPPED", label: "Shipped" },
+    { value: "DELIVERED", label: "Delivered" },
+    { value: "CANCELLED", label: "Cancelled" },
+  ]
+
   return (
     <div className="space-y-4">
       {/* Filters */}
       <div className="flex items-center gap-4">
         <div className="flex items-center gap-2">
           <span className="text-sm text-muted-foreground">Filter by status:</span>
-          <Select value={currentStatus} onValueChange={handleStatusFilter}>
-            <SelectTrigger className="w-[180px]">
-              <SelectValue placeholder="All statuses" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="ALL">All statuses</SelectItem>
-              <SelectItem value="PENDING">Pending</SelectItem>
-              <SelectItem value="CONFIRMED">Confirmed</SelectItem>
-              <SelectItem value="SHIPPED">Shipped</SelectItem>
-              <SelectItem value="DELIVERED">Delivered</SelectItem>
-              <SelectItem value="CANCELLED">Cancelled</SelectItem>
-            </SelectContent>
-          </Select>
+          <div className="flex flex-wrap gap-1">
+            {statusFilters.map((filter) => (
+              <Button
+                key={filter.value}
+                variant={currentStatus === filter.value ? "default" : "outline"}
+                size="sm"
+                asChild
+              >
+                <Link
+                  href={
+                    filter.value === "ALL"
+                      ? "/admin/orders"
+                      : `/admin/orders?status=${filter.value}`
+                  }
+                >
+                  {filter.label}
+                </Link>
+              </Button>
+            ))}
+          </div>
         </div>
       </div>
 

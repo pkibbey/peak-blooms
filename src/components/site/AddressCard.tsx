@@ -1,11 +1,11 @@
 "use client"
 
-import { useState } from "react"
 import { useRouter } from "next/navigation"
+import { useState } from "react"
 import { toast } from "sonner"
-import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { IconEdit, IconTrash, IconStar } from "@/components/ui/icons"
+import { Button } from "@/components/ui/button"
+import { IconEdit, IconStar, IconTrash } from "@/components/ui/icons"
 
 export interface Address {
   id: string

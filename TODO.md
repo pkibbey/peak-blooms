@@ -1,13 +1,5 @@
 ## 🛠️ Website To-Do List
 
-### 🚀 Core Features
-
-- [ ] Add a page where users can manage their account information and see their own order history and manage delivery addresses
-- [ ] Create an InspirationCard
-- [ ] Create a CollectionCard
-
-### ✨ Future Ideas
-
 - [ ] Update logos with proper graphics
 - [ ] Try our different colour schemes
 - [ ] Add price multiplier per account
