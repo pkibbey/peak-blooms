@@ -1,7 +1,6 @@
 import { db } from "@/lib/db"
 import { ProductCard } from "@/components/site/ProductCard"
 import type { ProductWhereInput } from "@/generated/models/Product"
-import ShopFilters from "@/components/site/ShopFilters"
 import { getCurrentUser } from "@/lib/auth-utils"
 
 interface ShopPageProps {
@@ -13,71 +12,17 @@ export const metadata = {
   description: "Browse our full catalog of premium flowers",
 }
 
-// Fetch filter options (colors and stem lengths) from database
-async function getFilterOptions() {
-  const [colors, stemLengths] = await Promise.all([
-    db.product.findMany({
-      where: {
-        color: {
-          not: null,
-        },
-      },
-      distinct: ["color"],
-      select: {
-        color: true,
-      },
-    }),
-    // Get stem lengths from variants
-    db.productVariant.findMany({
-      where: {
-        stemLength: {
-          not: null,
-        },
-      },
-      distinct: ["stemLength"],
-      select: {
-        stemLength: true,
-      },
-      orderBy: {
-        stemLength: "asc",
-      },
-    }),
-  ])
-
-  const distinctColors = colors
-    .map((p) => p.color)
-    .filter((color): color is string => color !== null)
-    .sort()
-
-  const distinctStemLengths = stemLengths
-    .map((v) => v.stemLength)
-    .filter((length): length is number => length !== null)
-    .sort((a, b) => a - b)
-
-  return {
-    colors: distinctColors,
-    stemLengths: distinctStemLengths,
-  }
-}
-
 export default async function ShopPage({ searchParams }: ShopPageProps) {
   const params = await searchParams
   const user = await getCurrentUser()
-
-  // Get all collections and filter options in parallel
-  const [collections, filterOptions] = await Promise.all([
-    db.collection.findMany({
-      orderBy: { name: "asc" },
-    }),
-    getFilterOptions(),
-  ])
 
   // Build filter conditions
   const where: ProductWhereInput = {}
 
   const collectionId = typeof params.collectionId === "string" ? params.collectionId : undefined
   const color = typeof params.color === "string" ? params.color : undefined
-  const stemLength = typeof params.stemLength === "string" ? params.stemLength : undefined
+  const stemLengthMin = typeof params.stemLengthMin === "string" ? parseInt(params.stemLengthMin, 10) : undefined
+  const stemLengthMax = typeof params.stemLengthMax === "string" ? parseInt(params.stemLengthMax, 10) : undefined
   const priceMin = typeof params.priceMin === "string" ? params.priceMin : undefined
   const priceMax = typeof params.priceMax === "string" ? params.priceMax : undefined
 
@@ -92,11 +37,18 @@ export default async function ShopPage({ searchParams }: ShopPageProps) {
     }
   }
 
-  // Filter by variant properties (stemLength, price)
-  if (stemLength !== undefined && stemLength !== "") {
+  // Filter by variant properties (stemLength range, price)
+  if (stemLengthMin !== undefined || stemLengthMax !== undefined) {
+    const stemLengthFilter: { gte?: number; lte?: number } = {}
+    if (stemLengthMin !== undefined) {
+      stemLengthFilter.gte = stemLengthMin
+    }
+    if (stemLengthMax !== undefined) {
+      stemLengthFilter.lte = stemLengthMax
+    }
     where.variants = {
       some: {
-        stemLength: parseInt(stemLength, 10),
+        stemLength: stemLengthFilter,
       },
     }
   }
@@ -151,12 +103,6 @@ export default async function ShopPage({ searchParams }: ShopPageProps) {
         </div>
 
         {/* Filters - Horizontal Bar */}
-        <ShopFilters
-          collections={collections}
-          user={userObj}
-          colors={filterOptions.colors}
-          stemLengths={filterOptions.stemLengths}
-        />
 
         {/* Products Grid */}
         {products.length === 0 ? (
