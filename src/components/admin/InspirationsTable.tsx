@@ -1,7 +1,7 @@
-"use client";
+"use client"
 
-import Link from "next/link";
-import Image from "next/image";
+import Link from "next/link"
+import Image from "next/image"
 import {
   Table,
   TableBody,
@@ -9,20 +9,20 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table";
+} from "@/components/ui/table"
 
 interface Inspiration {
-  id: string;
-  name: string;
-  slug: string;
-  image: string | null;
+  id: string
+  name: string
+  slug: string
+  image: string | null
   products?: {
-    id: string;
-  }[];
+    id: string
+  }[]
 }
 
 interface InspirationsTableProps {
-  inspirations: Inspiration[];
+  inspirations: Inspiration[]
 }
 
 export default function InspirationsTable({ inspirations }: InspirationsTableProps) {
@@ -31,7 +31,7 @@ export default function InspirationsTable({ inspirations }: InspirationsTablePro
       <p className="text-muted-foreground">
         No inspirations found. Add your first inspiration to get started.
       </p>
-    );
+    )
   }
 
   return (
@@ -47,7 +47,7 @@ export default function InspirationsTable({ inspirations }: InspirationsTablePro
         </TableHeader>
         <TableBody>
           {inspirations.map((inspiration) => {
-            const productCount = inspiration.products?.length || 0;
+            const productCount = inspiration.products?.length || 0
 
             return (
               <TableRow key={inspiration.id}>
@@ -86,14 +86,12 @@ export default function InspirationsTable({ inspirations }: InspirationsTablePro
                 </TableCell>
 
                 {/* Products Count */}
-                <TableCell className="text-muted-foreground">
-                  {productCount}
-                </TableCell>                
+                <TableCell className="text-muted-foreground">{productCount}</TableCell>
               </TableRow>
-            );
+            )
           })}
         </TableBody>
       </Table>
     </div>
-  );
+  )
 }

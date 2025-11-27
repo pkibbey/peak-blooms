@@ -1,51 +1,49 @@
-"use client";
+"use client"
 
-import { FormEvent, useState } from "react";
-import { signIn } from "next-auth/react";
-import { useSearchParams } from "next/navigation";
-import Link from "next/link";
-import { Button } from "@/components/ui/button";
-import { Label } from "@/components/ui/label";
-import { Input } from "@/components/ui/input";
+import { type FormEvent, useState } from "react"
+import { signIn } from "next-auth/react"
+import { useSearchParams } from "next/navigation"
+import Link from "next/link"
+import { Button } from "@/components/ui/button"
+import { Label } from "@/components/ui/label"
+import { Input } from "@/components/ui/input"
 
 export default function SignInPage() {
-  const searchParams = useSearchParams();
+  const searchParams = useSearchParams()
   // If a caller passed a callbackUrl (e.g. /admin) keep it; otherwise send
   // users through a short server-side redirect handler which will route
   // admins to /admin and everyone else to home. This ensures admin users
   // who sign in from the generic flow are taken to the dashboard.
   const callbackUrl =
-    searchParams.get("callbackUrl") || `/auth/redirect?next=${encodeURIComponent(
-      "/"
-    )}`;
-  const error = searchParams.get("error");
+    searchParams.get("callbackUrl") || `/auth/redirect?next=${encodeURIComponent("/")}`
+  const error = searchParams.get("error")
 
-  const [email, setEmail] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [submitted, setSubmitted] = useState(false);
+  const [email, setEmail] = useState("")
+  const [loading, setLoading] = useState(false)
+  const [submitted, setSubmitted] = useState(false)
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    setLoading(true);
+    e.preventDefault()
+    setLoading(true)
 
     try {
       const result = await signIn("email", {
         email,
         callbackUrl,
         redirect: false,
-      });
+      })
 
       if (result?.ok) {
-        setSubmitted(true);
+        setSubmitted(true)
       } else {
-        console.error("Sign in failed:", result?.error);
+        console.error("Sign in failed:", result?.error)
       }
     } catch (error) {
-      console.error("Error signing in:", error);
+      console.error("Error signing in:", error)
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
-  };
+  }
 
   if (submitted) {
     return (
@@ -66,7 +64,7 @@ export default function SignInPage() {
           </Button>
         </div>
       </div>
-    );
+    )
   }
 
   return (
@@ -110,5 +108,5 @@ export default function SignInPage() {
         </p>
       </div>
     </div>
-  );
+  )
 }

@@ -1,44 +1,42 @@
-import Link from "next/link";
-import Image from "next/image";
-import { notFound } from "next/navigation";
-import { FeaturedInInspirations } from "@/components/site/FeaturedInInspirations";
-import { db } from "@/lib/db";
-import { ProductConfigurator } from "@/components/site/ProductConfigurator";
-import { getCurrentUser } from "@/lib/auth-utils";
-import BackLink from "@/components/site/BackLink";
+import Link from "next/link"
+import Image from "next/image"
+import { notFound } from "next/navigation"
+import { FeaturedInInspirations } from "@/components/site/FeaturedInInspirations"
+import { db } from "@/lib/db"
+import { ProductConfigurator } from "@/components/site/ProductConfigurator"
+import { getCurrentUser } from "@/lib/auth-utils"
+import BackLink from "@/components/site/BackLink"
 
 interface ProductDetailPageProps {
   params: Promise<{
-    slug: string;
-  }>;
+    slug: string
+  }>
 }
 
 export async function generateStaticParams() {
   const products = await db.product.findMany({
     select: { slug: true },
-  });
+  })
   return products.map((product) => ({
     slug: product.slug,
-  }));
+  }))
 }
 
 export async function generateMetadata({ params }: ProductDetailPageProps) {
-  const { slug } = await params;
+  const { slug } = await params
   const product = await db.product.findUnique({
     where: { slug },
-  });
-  if (!product) return {};
+  })
+  if (!product) return {}
   return {
     title: `${product.name} - Shop`,
     description: product.description,
-  };
+  }
 }
 
-export default async function ProductDetailPage({
-  params,
-}: ProductDetailPageProps) {
-  const { slug } = await params;
-  const user = await getCurrentUser();
+export default async function ProductDetailPage({ params }: ProductDetailPageProps) {
+  const { slug } = await params
+  const user = await getCurrentUser()
 
   const product = await db.product.findUnique({
     where: { slug },
@@ -51,10 +49,10 @@ export default async function ProductDetailPage({
       },
       variants: true,
     },
-  });
+  })
 
   if (!product) {
-    notFound();
+    notFound()
   }
 
   return (
@@ -97,19 +95,13 @@ export default async function ProductDetailPage({
 
             {/* Product Title */}
             <div>
-              <h1 className="text-4xl font-extrabold font-serif mb-2">
-                {product.name}
-              </h1>
-              <p className="text-muted-foreground">
-                {product.collection.name}
-              </p>
+              <h1 className="text-4xl font-extrabold font-serif mb-2">{product.name}</h1>
+              <p className="text-muted-foreground">{product.collection.name}</p>
             </div>
 
             {/* Description */}
             <div>
-              <p className="text-lg text-muted-foreground">
-                {product.description}
-              </p>
+              <p className="text-lg text-muted-foreground">{product.description}</p>
             </div>
 
             {/* Product Configurator */}
@@ -121,5 +113,5 @@ export default async function ProductDetailPage({
         <FeaturedInInspirations inspirations={product.inspirations} />
       </div>
     </div>
-  );
+  )
 }

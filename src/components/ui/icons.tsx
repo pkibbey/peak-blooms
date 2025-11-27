@@ -1,15 +1,53 @@
-import React from "react"
-import { ShoppingCart, ShoppingBag, Menu, X, Info, Mail, Flower, ArrowRight, Instagram, Facebook, Rose, Phone, Settings, Plus, Trash2, Minus, Pencil, MapPin, Package, Clock, CheckCircle, XCircle, Truck, Eye } from "lucide-react"
+import type React from "react"
+import {
+  ShoppingCart,
+  ShoppingBag,
+  Menu,
+  X,
+  Info,
+  Mail,
+  Flower,
+  ArrowRight,
+  Instagram,
+  Facebook,
+  Rose,
+  Phone,
+  Settings,
+  Plus,
+  Trash2,
+  Minus,
+  Pencil,
+  MapPin,
+  Package,
+  Clock,
+  CheckCircle,
+  XCircle,
+  Truck,
+  Eye,
+  Star,
+  User,
+  RefreshCw,
+} from "lucide-react"
 
 // Small re-exports used across the UI so we have a single place to tweak sizing & classes
 export const IconSizeClass = "h-4 w-4"
 
 export function IconShoppingCart(props: React.ComponentProps<typeof ShoppingCart>) {
-  return <ShoppingCart {...props} className={[IconSizeClass, props.className].filter(Boolean).join(" ")} />
+  return (
+    <ShoppingCart
+      {...props}
+      className={[IconSizeClass, props.className].filter(Boolean).join(" ")}
+    />
+  )
 }
 
 export function IconShoppingBag(props: React.ComponentProps<typeof ShoppingBag>) {
-  return <ShoppingBag {...props} className={[IconSizeClass, props.className].filter(Boolean).join(" ")} />
+  return (
+    <ShoppingBag
+      {...props}
+      className={[IconSizeClass, props.className].filter(Boolean).join(" ")}
+    />
+  )
 }
 
 export function IconMenu(props: React.ComponentProps<typeof Menu>) {
@@ -29,19 +67,27 @@ export function IconMail(props: React.ComponentProps<typeof Mail>) {
 }
 
 export function IconFlower(props: React.ComponentProps<typeof Flower>) {
-  return <Flower {...props} className={[IconSizeClass, props.className].filter(Boolean).join(" ")} />
+  return (
+    <Flower {...props} className={[IconSizeClass, props.className].filter(Boolean).join(" ")} />
+  )
 }
 
 export function IconArrowRight(props: React.ComponentProps<typeof ArrowRight>) {
-  return <ArrowRight {...props} className={[IconSizeClass, props.className].filter(Boolean).join(" ")} />
+  return (
+    <ArrowRight {...props} className={[IconSizeClass, props.className].filter(Boolean).join(" ")} />
+  )
 }
 
 export function IconInstagram(props: React.ComponentProps<typeof Instagram>) {
-  return <Instagram {...props} className={[IconSizeClass, props.className].filter(Boolean).join(" ")} />
+  return (
+    <Instagram {...props} className={[IconSizeClass, props.className].filter(Boolean).join(" ")} />
+  )
 }
 
 export function IconFacebook(props: React.ComponentProps<typeof Facebook>) {
-  return <Facebook {...props} className={[IconSizeClass, props.className].filter(Boolean).join(" ")} />
+  return (
+    <Facebook {...props} className={[IconSizeClass, props.className].filter(Boolean).join(" ")} />
+  )
 }
 
 export function IconRose(props: React.ComponentProps<typeof Rose>) {
@@ -53,7 +99,9 @@ export function IconPhone(props: React.ComponentProps<typeof Phone>) {
 }
 
 export function IconSettings(props: React.ComponentProps<typeof Settings>) {
-  return <Settings {...props} className={[IconSizeClass, props.className].filter(Boolean).join(" ")} />
+  return (
+    <Settings {...props} className={[IconSizeClass, props.className].filter(Boolean).join(" ")} />
+  )
 }
 
 export function IconPlus(props: React.ComponentProps<typeof Plus>) {
@@ -65,19 +113,27 @@ export function IconMinus(props: React.ComponentProps<typeof Minus>) {
 }
 
 export function IconEdit(props: React.ComponentProps<typeof Pencil>) {
-  return <Pencil {...props} className={[IconSizeClass, props.className].filter(Boolean).join(" ")} />
+  return (
+    <Pencil {...props} className={[IconSizeClass, props.className].filter(Boolean).join(" ")} />
+  )
 }
 
 export function IconTrash(props: React.ComponentProps<typeof Trash2>) {
-  return <Trash2 {...props} className={[IconSizeClass, props.className].filter(Boolean).join(" ")} />
+  return (
+    <Trash2 {...props} className={[IconSizeClass, props.className].filter(Boolean).join(" ")} />
+  )
 }
 
 export function IconMapPin(props: React.ComponentProps<typeof MapPin>) {
-  return <MapPin {...props} className={[IconSizeClass, props.className].filter(Boolean).join(" ")} />
+  return (
+    <MapPin {...props} className={[IconSizeClass, props.className].filter(Boolean).join(" ")} />
+  )
 }
 
 export function IconPackage(props: React.ComponentProps<typeof Package>) {
-  return <Package {...props} className={[IconSizeClass, props.className].filter(Boolean).join(" ")} />
+  return (
+    <Package {...props} className={[IconSizeClass, props.className].filter(Boolean).join(" ")} />
+  )
 }
 
 export function IconClock(props: React.ComponentProps<typeof Clock>) {
@@ -85,11 +141,18 @@ export function IconClock(props: React.ComponentProps<typeof Clock>) {
 }
 
 export function IconCheckCircle(props: React.ComponentProps<typeof CheckCircle>) {
-  return <CheckCircle {...props} className={[IconSizeClass, props.className].filter(Boolean).join(" ")} />
+  return (
+    <CheckCircle
+      {...props}
+      className={[IconSizeClass, props.className].filter(Boolean).join(" ")}
+    />
+  )
 }
 
 export function IconXCircle(props: React.ComponentProps<typeof XCircle>) {
-  return <XCircle {...props} className={[IconSizeClass, props.className].filter(Boolean).join(" ")} />
+  return (
+    <XCircle {...props} className={[IconSizeClass, props.className].filter(Boolean).join(" ")} />
+  )
 }
 
 export function IconTruck(props: React.ComponentProps<typeof Truck>) {
@@ -98,6 +161,20 @@ export function IconTruck(props: React.ComponentProps<typeof Truck>) {
 
 export function IconEye(props: React.ComponentProps<typeof Eye>) {
   return <Eye {...props} className={[IconSizeClass, props.className].filter(Boolean).join(" ")} />
+}
+
+export function IconStar(props: React.ComponentProps<typeof Star>) {
+  return <Star {...props} className={[IconSizeClass, props.className].filter(Boolean).join(" ")} />
+}
+
+export function IconUser(props: React.ComponentProps<typeof User>) {
+  return <User {...props} className={[IconSizeClass, props.className].filter(Boolean).join(" ")} />
+}
+
+export function IconRefresh(props: React.ComponentProps<typeof RefreshCw>) {
+  return (
+    <RefreshCw {...props} className={[IconSizeClass, props.className].filter(Boolean).join(" ")} />
+  )
 }
 
 // intentionally no default export — use named icon exports

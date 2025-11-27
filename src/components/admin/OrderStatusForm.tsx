@@ -33,7 +33,7 @@ export default function OrderStatusForm({ orderId, currentStatus }: OrderStatusF
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    
+
     if (status === currentStatus) {
       toast.info("Status unchanged")
       return

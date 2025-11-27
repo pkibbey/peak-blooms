@@ -1,11 +1,11 @@
-import { Button } from "@/components/ui/button";
-import { IconArrowRight } from "@/components/ui/icons";
-import Link from "next/link";
-import Image from "next/image";
-import { db } from "@/lib/db";
+import { Button } from "@/components/ui/button"
+import { IconArrowRight } from "@/components/ui/icons"
+import Link from "next/link"
+import Image from "next/image"
+import { db } from "@/lib/db"
 
 export default async function FeaturedCollections() {
-  const collections = await db.collection.findMany();
+  const collections = await db.collection.findMany()
 
   return (
     <div className="flex flex-col items-center justify-start bg-white py-16 font-sans">
@@ -46,9 +46,7 @@ export default async function FeaturedCollections() {
               <div className="flex flex-col justify-between bg-white p-6">
                 <div>
                   <h3 className="text-xl font-bold font-serif">{collection.name}</h3>
-                  <p className="mt-2 text-sm text-muted-foreground">
-                    {collection.description}
-                  </p>
+                  <p className="mt-2 text-sm text-muted-foreground">{collection.description}</p>
                 </div>
 
                 <Button asChild className="mt-6 w-full">
@@ -66,5 +64,5 @@ export default async function FeaturedCollections() {
         </div>
       </div>
     </div>
-  );
+  )
 }

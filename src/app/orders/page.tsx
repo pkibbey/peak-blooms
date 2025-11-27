@@ -4,7 +4,15 @@ import { db } from "@/lib/db"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { IconPackage, IconClock, IconCheckCircle, IconTruck, IconXCircle, IconEye, IconShoppingBag } from "@/components/ui/icons"
+import {
+  IconPackage,
+  IconClock,
+  IconCheckCircle,
+  IconTruck,
+  IconXCircle,
+  IconEye,
+  IconShoppingBag,
+} from "@/components/ui/icons"
 
 const statusConfig = {
   PENDING: { label: "Pending", variant: "secondary" as const, icon: IconClock },
@@ -74,7 +82,7 @@ export default async function OrdersPage() {
   return (
     <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 py-10">
       <h1 className="text-3xl font-bold font-serif mb-8">My Orders</h1>
-      
+
       <div className="space-y-4">
         {orders.map((order) => {
           const status = statusConfig[order.status]
@@ -82,10 +90,7 @@ export default async function OrdersPage() {
           const itemCount = order.items.reduce((sum, item) => sum + item.quantity, 0)
 
           return (
-            <div
-              key={order.id}
-              className="bg-white rounded-xs shadow-sm border p-6"
-            >
+            <div key={order.id} className="bg-white rounded-xs shadow-sm border p-6">
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                 <div className="space-y-1">
                   <div className="flex items-center gap-3">
@@ -113,7 +118,10 @@ export default async function OrdersPage() {
               {/* Preview of items */}
               <div className="mt-4 pt-4 border-t">
                 <p className="text-sm text-muted-foreground">
-                  {order.items.slice(0, 3).map((item) => item.product.name).join(", ")}
+                  {order.items
+                    .slice(0, 3)
+                    .map((item) => item.product.name)
+                    .join(", ")}
                   {order.items.length > 3 && ` and ${order.items.length - 3} more`}
                 </p>
               </div>

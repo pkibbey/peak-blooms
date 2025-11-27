@@ -1,52 +1,52 @@
-"use client";
+"use client"
 
-import { FormEvent, useState, useEffect } from "react";
-import { signIn, useSession } from "next-auth/react";
-import { useRouter } from "next/navigation";
-import Link from "next/link";
-import { Button } from "@/components/ui/button";
-import { Label } from "@/components/ui/label";
-import { Input } from "@/components/ui/input";
+import { type FormEvent, useState, useEffect } from "react"
+import { signIn, useSession } from "next-auth/react"
+import { useRouter } from "next/navigation"
+import Link from "next/link"
+import { Button } from "@/components/ui/button"
+import { Label } from "@/components/ui/label"
+import { Input } from "@/components/ui/input"
 
 export default function SignUpPage() {
-  const router = useRouter();
-  const { data: session, status } = useSession();
-  const [email, setEmail] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
+  const router = useRouter()
+  const { data: session, status } = useSession()
+  const [email, setEmail] = useState("")
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState("")
 
   // Redirect if already authenticated
   useEffect(() => {
     if (status === "authenticated" && session) {
-      router.push("/");
+      router.push("/")
     }
-  }, [status, session, router]);
+  }, [status, session, router])
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    setLoading(true);
-    setError("");
+    e.preventDefault()
+    setLoading(true)
+    setError("")
 
     try {
       const result = await signIn("email", {
         email,
         redirect: false,
-      });
+      })
 
       if (result?.ok) {
         // Redirect to pending approval page
-        router.push(`/auth/pending-approval?email=${encodeURIComponent(email)}`);
+        router.push(`/auth/pending-approval?email=${encodeURIComponent(email)}`)
       } else {
-        setError("Failed to send sign-up email. Please try again.");
-        console.error("Sign up failed:", result?.error);
+        setError("Failed to send sign-up email. Please try again.")
+        console.error("Sign up failed:", result?.error)
       }
     } catch (error) {
-      setError("An error occurred. Please try again.");
-      console.error("Error signing up:", error);
+      setError("An error occurred. Please try again.")
+      console.error("Error signing up:", error)
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
-  };
+  }
 
   return (
     <div className="flex items-center justify-center px-4 py-12">
@@ -59,9 +59,7 @@ export default function SignUpPage() {
         </div>
 
         {error && (
-          <div className="rounded-lg bg-destructive/10 p-3 text-sm text-destructive">
-            {error}
-          </div>
+          <div className="rounded-lg bg-destructive/10 p-3 text-sm text-destructive">{error}</div>
         )}
 
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -96,5 +94,5 @@ export default function SignUpPage() {
         </p>
       </div>
     </div>
-  );
+  )
 }

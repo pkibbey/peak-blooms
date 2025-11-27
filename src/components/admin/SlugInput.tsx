@@ -1,24 +1,19 @@
-"use client";
+"use client"
 
-import { useState, useEffect } from "react";
-import { Label } from "@/components/ui/label";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
+import { useState, useEffect } from "react"
+import { Label } from "@/components/ui/label"
+import { Input } from "@/components/ui/input"
+import { Button } from "@/components/ui/button"
 
 interface SlugInputProps {
-  name: string;
-  slug: string;
-  onSlugChange: (slug: string) => void;
-  disabled?: boolean;
+  name: string
+  slug: string
+  onSlugChange: (slug: string) => void
+  disabled?: boolean
 }
 
-export default function SlugInput({
-  name,
-  slug,
-  onSlugChange,
-  disabled = false,
-}: SlugInputProps) {
-  const [isManualEdit, setIsManualEdit] = useState(false);
+export default function SlugInput({ name, slug, onSlugChange, disabled = false }: SlugInputProps) {
+  const [isManualEdit, setIsManualEdit] = useState(false)
 
   // Auto-generate slug from name if not manually edited
   useEffect(() => {
@@ -26,34 +21,34 @@ export default function SlugInput({
       const generatedSlug = name
         .toLowerCase()
         .replace(/[^a-z0-9]+/g, "-")
-        .replace(/^-+|-+$/g, "");
-      
+        .replace(/^-+|-+$/g, "")
+
       if (slug !== generatedSlug) {
-        onSlugChange(generatedSlug);
+        onSlugChange(generatedSlug)
       }
     }
-  }, [name, isManualEdit, onSlugChange, slug]);
+  }, [name, isManualEdit, onSlugChange, slug])
 
   const handleSlugChange = (value: string) => {
-    setIsManualEdit(true);
+    setIsManualEdit(true)
     // Sanitize slug input
     const sanitizedSlug = value
       .toLowerCase()
       .replace(/[^a-z0-9-]+/g, "-")
-      .replace(/^-+/, "");
-    onSlugChange(sanitizedSlug);
-  };
+      .replace(/^-+/, "")
+    onSlugChange(sanitizedSlug)
+  }
 
   const handleReset = () => {
-    setIsManualEdit(false);
+    setIsManualEdit(false)
     if (name) {
       const generatedSlug = name
         .toLowerCase()
         .replace(/[^a-z0-9]+/g, "-")
-        .replace(/^-+|-+$/g, "");
-      onSlugChange(generatedSlug);
+        .replace(/^-+|-+$/g, "")
+      onSlugChange(generatedSlug)
     }
-  };
+  }
 
   return (
     <div className="space-y-2">
@@ -78,5 +73,5 @@ export default function SlugInput({
         URL-friendly identifier. {isManualEdit ? "Manually edited." : "Auto-generated from name."}
       </p>
     </div>
-  );
+  )
 }

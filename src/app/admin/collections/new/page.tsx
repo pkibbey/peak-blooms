@@ -1,13 +1,13 @@
-import { redirect } from "next/navigation";
-import { auth } from "@/lib/auth";
-import CollectionForm from "@/components/admin/CollectionForm";
-import BackLink from "@/components/site/BackLink";
+import { redirect } from "next/navigation"
+import CollectionForm from "@/components/admin/CollectionForm"
+import BackLink from "@/components/site/BackLink"
+import { auth } from "@/lib/auth"
 
 export default async function NewCollectionPage() {
-  const session = await auth();
+  const session = await auth()
 
   if (!session?.user || session.user.role !== "ADMIN") {
-    redirect("/admin/unauthorized");
+    redirect("/admin/unauthorized")
   }
 
   return (
@@ -16,9 +16,7 @@ export default async function NewCollectionPage() {
         <BackLink href="/admin/collections" label="Collections" />
         <div className="mb-8">
           <h1 className="text-3xl font-bold">Add New Collection</h1>
-          <p className="mt-2 text-muted-foreground">
-            Create a new product collection
-          </p>
+          <p className="mt-2 text-muted-foreground">Create a new product collection</p>
         </div>
 
         <div className="rounded-lg border border-border p-6">
@@ -26,5 +24,5 @@ export default async function NewCollectionPage() {
         </div>
       </div>
     </div>
-  );
+  )
 }

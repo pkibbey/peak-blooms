@@ -30,14 +30,17 @@ export function useDebouncedCallback<T extends (...args: readonly unknown[]) => 
     }
   }, [])
 
-  return useCallback((...args: Parameters<T>) => {
-    if (timeoutRef.current) {
-      clearTimeout(timeoutRef.current)
-    }
-    timeoutRef.current = setTimeout(() => {
-      // callbackRef.current is typed as T, which accepts Parameters<T>
-      // We can call it directly with the captured args.
-      callbackRef.current(...(args as Parameters<T>))
-    }, delay)
-  }, [delay])
+  return useCallback(
+    (...args: Parameters<T>) => {
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current)
+      }
+      timeoutRef.current = setTimeout(() => {
+        // callbackRef.current is typed as T, which accepts Parameters<T>
+        // We can call it directly with the captured args.
+        callbackRef.current(...(args as Parameters<T>))
+      }, delay)
+    },
+    [delay]
+  )
 }

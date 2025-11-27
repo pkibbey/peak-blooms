@@ -1,8 +1,8 @@
-"use client";
+"use client"
 
-import Link from "next/link";
-import Image from "next/image";
-import { Badge } from "@/components/ui/badge";
+import Link from "next/link"
+import Image from "next/image"
+import { Badge } from "@/components/ui/badge"
 import {
   Table,
   TableBody,
@@ -10,43 +10,43 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table";
+} from "@/components/ui/table"
 
 interface Product {
-  id: string;
-  name: string;
-  slug: string;
-  featured: boolean;
-  image: string | null;
+  id: string
+  name: string
+  slug: string
+  featured: boolean
+  image: string | null
   collection: {
-    id: string;
-    name: string;
-  };
+    id: string
+    name: string
+  }
   variants: {
-    id: string;
-    price: number;
-  }[];
+    id: string
+    price: number
+  }[]
 }
 
 interface ProductsTableProps {
-  products: Product[];
+  products: Product[]
 }
 
 export default function ProductsTable({ products }: ProductsTableProps) {
   // Calculate price range helper
   const getPriceRange = (variants: { price: number }[]) => {
-    const prices = variants.map((v) => v.price);
-    const minPrice = prices.length > 0 ? Math.min(...prices) : 0;
-    const maxPrice = prices.length > 0 ? Math.max(...prices) : 0;
-    return { minPrice, maxPrice };
-  };
+    const prices = variants.map((v) => v.price)
+    const minPrice = prices.length > 0 ? Math.min(...prices) : 0
+    const maxPrice = prices.length > 0 ? Math.max(...prices) : 0
+    return { minPrice, maxPrice }
+  }
 
   if (products.length === 0) {
     return (
       <p className="text-muted-foreground">
         No products found. Add your first product to get started.
       </p>
-    );
+    )
   }
 
   return (
@@ -64,11 +64,11 @@ export default function ProductsTable({ products }: ProductsTableProps) {
         </TableHeader>
         <TableBody>
           {products.map((product) => {
-            const { minPrice, maxPrice } = getPriceRange(product.variants);
+            const { minPrice, maxPrice } = getPriceRange(product.variants)
             const priceDisplay =
               minPrice === maxPrice
                 ? `$${minPrice.toFixed(2)}`
-                : `$${minPrice.toFixed(2)} - $${maxPrice.toFixed(2)}`;
+                : `$${minPrice.toFixed(2)} - $${maxPrice.toFixed(2)}`
 
             return (
               <TableRow key={product.id}>
@@ -125,10 +125,10 @@ export default function ProductsTable({ products }: ProductsTableProps) {
                   )}
                 </TableCell>
               </TableRow>
-            );
+            )
           })}
         </TableBody>
       </Table>
     </div>
-  );
+  )
 }

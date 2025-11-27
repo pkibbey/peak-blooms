@@ -1,9 +1,9 @@
-import { auth } from "@/lib/auth";
-import { db } from "@/lib/db";
-import { NextRequest, NextResponse } from "next/server";
+import { auth } from "@/lib/auth"
+import { db } from "@/lib/db"
+import { type NextRequest, NextResponse } from "next/server"
 
 interface RouteParams {
-  params: Promise<{ id: string }>;
+  params: Promise<{ id: string }>
 }
 
 /**
@@ -12,24 +12,18 @@ interface RouteParams {
  */
 export async function PATCH(request: NextRequest, { params }: RouteParams) {
   try {
-    const session = await auth();
+    const session = await auth()
 
     if (!session || session.user.role !== "ADMIN") {
-      return NextResponse.json(
-        { error: "Unauthorized" },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }
 
-    const { id } = await params;
-    const body = await request.json();
-    const { approved } = body;
+    const { id } = await params
+    const body = await request.json()
+    const { approved } = body
 
     if (typeof approved !== "boolean") {
-      return NextResponse.json(
-        { error: "Invalid request body" },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: "Invalid request body" }, { status: 400 })
     }
 
     const user = await db.user.update({
@@ -42,14 +36,11 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
         approved: true,
         createdAt: true,
       },
-    });
+    })
 
-    return NextResponse.json(user);
+    return NextResponse.json(user)
   } catch (error) {
-    console.error("PATCH /api/admin/users/[id] error:", error);
-    return NextResponse.json(
-      { error: "Failed to update user" },
-      { status: 500 }
-    );
+    console.error("PATCH /api/admin/users/[id] error:", error)
+    return NextResponse.json({ error: "Failed to update user" }, { status: 500 })
   }
 }

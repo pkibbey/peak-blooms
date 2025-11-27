@@ -1,16 +1,16 @@
-import { Button } from "@/components/ui/button";
-import { IconArrowRight } from "@/components/ui/icons";
-import Link from "next/link";
-import Image from "next/image";
-import { db } from "@/lib/db";
+import { Button } from "@/components/ui/button"
+import { IconArrowRight } from "@/components/ui/icons"
+import Link from "next/link"
+import Image from "next/image"
+import { db } from "@/lib/db"
 
 export const metadata = {
   title: "Peak Blooms - Collections",
   description: "Browse our curated collection of premium flowers",
-};
+}
 
 export default async function CollectionsPage() {
-  const collections = await db.collection.findMany();
+  const collections = await db.collection.findMany()
 
   return (
     <div className="flex flex-col items-center justify-start bg-white py-16 font-sans">
@@ -46,12 +46,8 @@ export default async function CollectionsPage() {
               {/* Card Content */}
               <div className="flex flex-col justify-between bg-white p-6">
                 <div>
-                  <h2 className="text-xl font-bold font-serif">
-                    {collection.name}
-                  </h2>
-                  <p className="mt-2 text-sm text-muted-foreground">
-                    {collection.description}
-                  </p>
+                  <h2 className="text-xl font-bold font-serif">{collection.name}</h2>
+                  <p className="mt-2 text-sm text-muted-foreground">{collection.description}</p>
                 </div>
 
                 <Button asChild className="mt-6 w-full">
@@ -69,5 +65,5 @@ export default async function CollectionsPage() {
         </div>
       </div>
     </div>
-  );
+  )
 }

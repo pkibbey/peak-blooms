@@ -30,11 +30,7 @@ const Textarea = React.forwardRef<
   React.TextareaHTMLAttributes<HTMLTextAreaElement> & VariantProps<typeof textareaVariants>
 >(({ className, variant, size, ...props }, ref) => {
   return (
-    <textarea
-      ref={ref}
-      className={cn(textareaVariants({ variant, size, className }))}
-      {...props}
-    />
+    <textarea ref={ref} className={cn(textareaVariants({ variant, size, className }))} {...props} />
   )
 })
 

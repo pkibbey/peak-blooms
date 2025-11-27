@@ -5,7 +5,14 @@ import Link from "next/link"
 import Image from "next/image"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { IconCheckCircle, IconClock, IconTruck, IconPackage, IconXCircle, IconMapPin } from "@/components/ui/icons"
+import {
+  IconCheckCircle,
+  IconClock,
+  IconTruck,
+  IconPackage,
+  IconXCircle,
+  IconMapPin,
+} from "@/components/ui/icons"
 
 interface OrderDetailPageProps {
   params: Promise<{ id: string }>
@@ -84,9 +91,7 @@ export default async function OrderDetailPage({ params }: OrderDetailPageProps) 
               {status.label}
             </Badge>
           </div>
-          <p className="text-muted-foreground">
-            Placed on {formatDate(order.createdAt)}
-          </p>
+          <p className="text-muted-foreground">Placed on {formatDate(order.createdAt)}</p>
         </div>
         <Button variant="outline" asChild>
           <Link href="/orders">View All Orders</Link>
@@ -101,7 +106,8 @@ export default async function OrderDetailPage({ params }: OrderDetailPageProps) 
             <div>
               <h3 className="font-semibold text-green-800">Order Placed Successfully!</h3>
               <p className="text-sm text-green-700 mt-1">
-                Thank you for your order. We&apos;ll send you an update when your order is confirmed.
+                Thank you for your order. We&apos;ll send you an update when your order is
+                confirmed.
               </p>
             </div>
           </div>
@@ -119,7 +125,9 @@ export default async function OrderDetailPage({ params }: OrderDetailPageProps) 
                 const variantSpecs = item.productVariant
                   ? [
                       item.productVariant.stemLength ? `${item.productVariant.stemLength}cm` : null,
-                      item.productVariant.countPerBunch ? `${item.productVariant.countPerBunch} stems` : null,
+                      item.productVariant.countPerBunch
+                        ? `${item.productVariant.countPerBunch} stems`
+                        : null,
                     ]
                       .filter(Boolean)
                       .join(" • ")
@@ -195,15 +203,12 @@ export default async function OrderDetailPage({ params }: OrderDetailPageProps) 
               <p className="font-medium text-foreground">
                 {order.shippingAddress.firstName} {order.shippingAddress.lastName}
               </p>
-              {order.shippingAddress.company && (
-                <p>{order.shippingAddress.company}</p>
-              )}
+              {order.shippingAddress.company && <p>{order.shippingAddress.company}</p>}
               <p>{order.shippingAddress.street1}</p>
-              {order.shippingAddress.street2 && (
-                <p>{order.shippingAddress.street2}</p>
-              )}
+              {order.shippingAddress.street2 && <p>{order.shippingAddress.street2}</p>}
               <p>
-                {order.shippingAddress.city}, {order.shippingAddress.state} {order.shippingAddress.zip}
+                {order.shippingAddress.city}, {order.shippingAddress.state}{" "}
+                {order.shippingAddress.zip}
               </p>
               <p>{order.shippingAddress.country}</p>
             </address>
@@ -217,15 +222,12 @@ export default async function OrderDetailPage({ params }: OrderDetailPageProps) 
                 <p className="font-medium text-foreground">
                   {order.billingAddress.firstName} {order.billingAddress.lastName}
                 </p>
-                {order.billingAddress.company && (
-                  <p>{order.billingAddress.company}</p>
-                )}
+                {order.billingAddress.company && <p>{order.billingAddress.company}</p>}
                 <p>{order.billingAddress.street1}</p>
-                {order.billingAddress.street2 && (
-                  <p>{order.billingAddress.street2}</p>
-                )}
+                {order.billingAddress.street2 && <p>{order.billingAddress.street2}</p>}
                 <p>
-                  {order.billingAddress.city}, {order.billingAddress.state} {order.billingAddress.zip}
+                  {order.billingAddress.city}, {order.billingAddress.state}{" "}
+                  {order.billingAddress.zip}
                 </p>
                 <p>{order.billingAddress.country}</p>
               </address>

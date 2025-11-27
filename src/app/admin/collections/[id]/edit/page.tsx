@@ -1,21 +1,21 @@
-import { redirect, notFound } from "next/navigation";
-import { auth } from "@/lib/auth";
-import { db } from "@/lib/db";
-import CollectionForm from "@/components/admin/CollectionForm";
-import BackLink from "@/components/site/BackLink";
+import { notFound, redirect } from "next/navigation"
+import CollectionForm from "@/components/admin/CollectionForm"
+import BackLink from "@/components/site/BackLink"
+import { auth } from "@/lib/auth"
+import { db } from "@/lib/db"
 
 interface EditCollectionPageProps {
-  params: Promise<{ id: string }>;
+  params: Promise<{ id: string }>
 }
 
 export default async function EditCollectionPage({ params }: EditCollectionPageProps) {
-  const session = await auth();
+  const session = await auth()
 
   if (!session?.user || session.user.role !== "ADMIN") {
-    redirect("/admin/unauthorized");
+    redirect("/admin/unauthorized")
   }
 
-  const { id } = await params;
+  const { id } = await params
 
   const collection = await db.collection.findUnique({
     where: { id },
@@ -24,10 +24,10 @@ export default async function EditCollectionPage({ params }: EditCollectionPageP
         select: { products: true },
       },
     },
-  });
+  })
 
   if (!collection) {
-    notFound();
+    notFound()
   }
 
   return (
@@ -35,9 +35,7 @@ export default async function EditCollectionPage({ params }: EditCollectionPageP
       <div className="mx-auto max-w-5xl px-4 py-12 sm:px-6 lg:px-8">
         <BackLink href="/admin/collections" label="Collections" />
         <div className="mb-8">
-          <p className="mt-2 text-muted-foreground">
-            Update &ldquo;{collection.name}&rdquo;
-          </p>
+          <p className="mt-2 text-muted-foreground">Update &ldquo;{collection.name}&rdquo;</p>
         </div>
 
         <div className="rounded-lg border border-border p-6">
@@ -45,5 +43,5 @@ export default async function EditCollectionPage({ params }: EditCollectionPageP
         </div>
       </div>
     </div>
-  );
+  )
 }

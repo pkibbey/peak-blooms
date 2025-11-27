@@ -1,13 +1,13 @@
-import { Button } from "@/components/ui/button";
-import { IconArrowRight } from "@/components/ui/icons";
-import Link from "next/link";
-import Image from "next/image";
+import { Button } from "@/components/ui/button"
+import { IconArrowRight } from "@/components/ui/icons"
+import Link from "next/link"
+import Image from "next/image"
 
-import { db } from "@/lib/db";
+import { db } from "@/lib/db"
 
 export default async function FeaturedInspiration() {
-  const inspirations = await db.inspiration.findMany();
-  
+  const inspirations = await db.inspiration.findMany()
+
   return (
     <div className="flex flex-col items-center justify-start bg-white py-16 font-sans">
       <div className="w-full max-w-5xl px-6">
@@ -18,10 +18,7 @@ export default async function FeaturedInspiration() {
               Discover curated flower arrangements designed to inspire and delight
             </p>
           </div>
-          <Link
-            href="/inspirations"
-            className="text-sm font-medium text-primary hover:underline"
-          >
+          <Link href="/inspirations" className="text-sm font-medium text-primary hover:underline">
             View all inspirations →
           </Link>
         </div>
@@ -49,12 +46,8 @@ export default async function FeaturedInspiration() {
               {/* Content Container */}
               <div className="w-full md:w-1/3 flex flex-col justify-center">
                 <h3 className="text-2xl font-bold font-serif">{inspiration.name}</h3>
-                <p className="mt-2 text-sm text-muted-foreground">
-                  {inspiration.subtitle}
-                </p>
-                <p className="mt-4 text-sm leading-relaxed text-gray-600">
-                  {inspiration.excerpt}
-                </p>
+                <p className="mt-2 text-sm text-muted-foreground">{inspiration.subtitle}</p>
+                <p className="mt-4 text-sm leading-relaxed text-gray-600">{inspiration.excerpt}</p>
 
                 <Button asChild className="mt-6 w-full md:w-auto">
                   <Link
@@ -71,5 +64,5 @@ export default async function FeaturedInspiration() {
         </div>
       </div>
     </div>
-  );
+  )
 }

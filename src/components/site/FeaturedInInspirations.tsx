@@ -1,35 +1,31 @@
-import Link from "next/link";
-import Image from "next/image";
-import { Button } from "@/components/ui/button";
-import { IconArrowRight } from "@/components/ui/icons";
-import { InspirationModel, InspirationProductModel } from "@/generated/models";
+import Link from "next/link"
+import Image from "next/image"
+import { Button } from "@/components/ui/button"
+import { IconArrowRight } from "@/components/ui/icons"
+import type { InspirationModel, InspirationProductModel } from "@/generated/models"
 
 interface FeaturedInInspirationsProps {
   inspirations: (InspirationProductModel & {
-    inspiration: InspirationModel;
-  })[];
+    inspiration: InspirationModel
+  })[]
 }
 
-export function FeaturedInInspirations({
-  inspirations,
-}: FeaturedInInspirationsProps) {
+export function FeaturedInInspirations({ inspirations }: FeaturedInInspirationsProps) {
   if (!inspirations || inspirations.length === 0) {
-    return null;
+    return null
   }
 
   // Extract unique inspirations from the join table entries
   const uniqueInspirations = inspirations.reduce((acc, isp) => {
-    if (!acc.find(s => s.id === isp.inspiration.id)) {
-      acc.push(isp.inspiration);
+    if (!acc.find((s) => s.id === isp.inspiration.id)) {
+      acc.push(isp.inspiration)
     }
-    return acc;
-  }, [] as InspirationModel[]);
+    return acc
+  }, [] as InspirationModel[])
 
   return (
     <div className="mt-12 pt-8">
-      <h2 className="text-2xl font-bold font-serif mb-8">
-        Featured in These Inspirations
-      </h2>
+      <h2 className="text-2xl font-bold font-serif mb-8">Featured in These Inspirations</h2>
 
       <div className="grid grid-cols-1 gap-6 sm:grid-cols-3">
         {uniqueInspirations.map((inspiration) => (
@@ -73,5 +69,5 @@ export function FeaturedInInspirations({
         ))}
       </div>
     </div>
-  );
+  )
 }

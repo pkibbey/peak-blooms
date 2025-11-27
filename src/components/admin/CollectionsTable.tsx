@@ -1,7 +1,7 @@
-"use client";
+"use client"
 
-import Link from "next/link";
-import Image from "next/image";
+import Link from "next/link"
+import Image from "next/image"
 import {
   Table,
   TableBody,
@@ -9,20 +9,20 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table";
+} from "@/components/ui/table"
 
 interface Collection {
-  id: string;
-  name: string;
-  slug: string;
-  image: string | null;
+  id: string
+  name: string
+  slug: string
+  image: string | null
   _count?: {
-    products: number;
-  };
+    products: number
+  }
 }
 
 interface CollectionsTableProps {
-  collections: Collection[];
+  collections: Collection[]
 }
 
 export default function CollectionsTable({ collections }: CollectionsTableProps) {
@@ -31,7 +31,7 @@ export default function CollectionsTable({ collections }: CollectionsTableProps)
       <p className="text-muted-foreground">
         No collections found. Add your first collection to get started.
       </p>
-    );
+    )
   }
 
   return (
@@ -91,5 +91,5 @@ export default function CollectionsTable({ collections }: CollectionsTableProps)
         </TableBody>
       </Table>
     </div>
-  );
+  )
 }

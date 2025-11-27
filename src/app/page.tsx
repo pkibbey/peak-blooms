@@ -1,13 +1,13 @@
-import { Button } from "@/components/ui/button";
-import Link from "next/link";
-import Hero from "@/components/site/Hero";
-import FeaturedCollections from "@/components/site/FeaturedCollections";
-import FeaturedProducts from "@/components/site/FeaturedProducts";
+import { Button } from "@/components/ui/button"
+import Link from "next/link"
+import Hero from "@/components/site/Hero"
+import FeaturedCollections from "@/components/site/FeaturedCollections"
+import FeaturedProducts from "@/components/site/FeaturedProducts"
 
 export default function Home() {
   return (
     <>
-      <Hero 
+      <Hero
         title="Your premier flower distributor"
         subtitle="We deliver the highest quality, freshest flowers at competitive prices to florists and retailers."
         cta={
@@ -21,5 +21,5 @@ export default function Home() {
       <FeaturedCollections />
       <FeaturedProducts />
     </>
-  );
+  )
 }

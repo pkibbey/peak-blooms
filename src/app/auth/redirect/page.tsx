@@ -1,19 +1,19 @@
-import { redirect } from "next/navigation";
-import { auth } from "@/lib/auth";
+import { redirect } from "next/navigation"
+import { auth } from "@/lib/auth"
 
 interface RedirectPageProps {
-  searchParams?: { next?: string };
+  searchParams?: { next?: string }
 }
 
 export default async function AuthRedirectPage({ searchParams }: RedirectPageProps) {
-  const session = await auth();
+  const session = await auth()
 
   // If a signed-in admin reaches this route, send them to the admin dashboard.
   if (session?.user?.role === "ADMIN") {
-    return redirect("/admin");
+    return redirect("/admin")
   }
 
   // Otherwise send them to the next param or home.
-  const next = searchParams?.next || "/";
-  return redirect(next);
+  const next = searchParams?.next || "/"
+  return redirect(next)
 }

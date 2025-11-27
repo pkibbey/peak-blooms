@@ -20,12 +20,15 @@ export default function Footer() {
             </Link>
 
             <p className="mt-2 text-sm text-muted-foreground max-w-md">
-              Peak Blooms — fresh, seasonal bouquets delivered locally. Have questions or need help with an order? Reach out below.
+              Peak Blooms — fresh, seasonal bouquets delivered locally. Have questions or need help
+              with an order? Reach out below.
             </p>
 
             <div className="mt-4 flex items-center gap-4 text-sm text-muted-foreground">
               <IconMail aria-hidden="true" />
-              <a href="mailto:hello@peakblooms.com" className="hover:underline">hello@peakblooms.com</a>
+              <a href="mailto:hello@peakblooms.com" className="hover:underline">
+                hello@peakblooms.com
+              </a>
             </div>
 
             <div className="mt-3 flex items-center gap-4 text-sm text-muted-foreground">
@@ -34,10 +37,17 @@ export default function Footer() {
             </div>
 
             <div className="mt-4 flex items-center gap-3">
-              <a href="https://instagram.com/peakblooms" aria-label="Instagram" className="text-muted-foreground hover:text-foreground">
+              <a
+                href="https://instagram.com/peakblooms"
+                aria-label="Instagram"
+                className="text-muted-foreground hover:text-foreground"
+              >
                 <IconInstagram />
               </a>
-              <a href="https://instagram.com/peakblooms" className="text-sm text-muted-foreground hover:underline">
+              <a
+                href="https://instagram.com/peakblooms"
+                className="text-sm text-muted-foreground hover:underline"
+              >
                 @peakblooms
               </a>
             </div>
@@ -48,35 +58,79 @@ export default function Footer() {
             <div>
               <h4 className="text-sm font-medium">Shop</h4>
               <ul className="mt-3 text-sm text-muted-foreground space-y-2">
-                <li><Link href="/shop" className="hover:underline inline-flex items-center gap-2">Flowers</Link></li>
-                <li><Link href="/collections" className="hover:underline">Collections</Link></li>
-                <li><Link href="/inspirations" className="hover:underline">Inspirations</Link></li>
+                <li>
+                  <Link href="/shop" className="hover:underline inline-flex items-center gap-2">
+                    Flowers
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/collections" className="hover:underline">
+                    Collections
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/inspirations" className="hover:underline">
+                    Inspirations
+                  </Link>
+                </li>
               </ul>
             </div>
 
             <div>
               <h4 className="text-sm font-medium">Company</h4>
               <ul className="mt-3 text-sm text-muted-foreground space-y-2">
-                <li><Link href="/about" className="hover:underline inline-flex items-center gap-2">About</Link></li>
-                <li><Link href="/contact" className="hover:underline">Contact</Link></li>
+                <li>
+                  <Link href="/about" className="hover:underline inline-flex items-center gap-2">
+                    About
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/contact" className="hover:underline">
+                    Contact
+                  </Link>
+                </li>
               </ul>
             </div>
 
             <div>
               <h4 className="text-sm font-medium">Support</h4>
               <ul className="mt-3 text-sm text-muted-foreground space-y-2">
-                <li><Link href="/faq" className="hover:underline">FAQ</Link></li>
-                <li><Link href="/shipping" className="hover:underline">Shipping</Link></li>
-                <li><Link href="/returns" className="hover:underline">Returns</Link></li>
+                <li>
+                  <Link href="/faq" className="hover:underline">
+                    FAQ
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/shipping" className="hover:underline">
+                    Shipping
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/returns" className="hover:underline">
+                    Returns
+                  </Link>
+                </li>
               </ul>
             </div>
 
             <div>
               <h4 className="text-sm font-medium">Legal</h4>
               <ul className="mt-3 text-sm text-muted-foreground space-y-2">
-                <li><Link href="/privacy" className="hover:underline">Privacy</Link></li>
-                <li><Link href="/terms" className="hover:underline">Terms</Link></li>
-                <li><Link href="/cookies" className="hover:underline">Cookie Policy</Link></li>
+                <li>
+                  <Link href="/privacy" className="hover:underline">
+                    Privacy
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/terms" className="hover:underline">
+                    Terms
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/cookies" className="hover:underline">
+                    Cookie Policy
+                  </Link>
+                </li>
               </ul>
             </div>
           </div>
@@ -85,7 +139,9 @@ export default function Footer() {
         <div className="mt-8 border-t border-t-border pt-4 text-sm text-muted-foreground flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
           <div>© {new Date().getFullYear()} Peak Blooms. All rights reserved.</div>
           <div className="flex items-center gap-4">
-            <Link href="/sitemap" className="hover:underline">Sitemap</Link>
+            <Link href="/sitemap" className="hover:underline">
+              Sitemap
+            </Link>
           </div>
         </div>
       </div>

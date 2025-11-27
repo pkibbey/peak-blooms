@@ -1,46 +1,46 @@
-"use client";
+"use client"
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
-import { Button } from "@/components/ui/button";
+import { useState } from "react"
+import { useRouter } from "next/navigation"
+import { Button } from "@/components/ui/button"
 
 interface User {
-  id: string;
-  email: string | null;
-  name: string | null;
-  approved: boolean;
-  createdAt: string;
+  id: string
+  email: string | null
+  name: string | null
+  approved: boolean
+  createdAt: string
 }
 
 interface ApprovedUserCardProps {
-  user: User;
+  user: User
 }
 
 export default function ApprovedUserCard({ user }: ApprovedUserCardProps) {
-  const router = useRouter();
-  const [unapproving, setUnapproving] = useState(false);
+  const router = useRouter()
+  const [unapproving, setUnapproving] = useState(false)
 
   const handleUnapprove = async () => {
-    setUnapproving(true);
+    setUnapproving(true)
     try {
       const response = await fetch(`/api/admin/users/${user.id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ approved: false }),
-      });
+      })
 
       if (response.ok) {
         // Refresh to update the user list
-        router.refresh();
+        router.refresh()
       } else {
-        console.error("Failed to unapprove user");
+        console.error("Failed to unapprove user")
       }
     } catch (error) {
-      console.error("Error unapproving user:", error);
+      console.error("Error unapproving user:", error)
     } finally {
-      setUnapproving(false);
+      setUnapproving(false)
     }
-  };
+  }
 
   return (
     <div className="flex items-center justify-between rounded-lg border border-border p-4">
@@ -62,5 +62,5 @@ export default function ApprovedUserCard({ user }: ApprovedUserCardProps) {
         </Button>
       </div>
     </div>
-  );
+  )
 }

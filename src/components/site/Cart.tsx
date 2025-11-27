@@ -1,13 +1,13 @@
 "use client"
 
-import { useState } from "react"
-import { useRouter } from "next/navigation"
 import Image from "next/image"
 import Link from "next/link"
+import { useRouter } from "next/navigation"
+import { useState } from "react"
 import { toast } from "sonner"
 import { Button } from "@/components/ui/button"
-import { Label } from "@/components/ui/label"
 import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
 
 import { useDebouncedCallback } from "@/lib/useDebouncedCallback"
 import { IconMinus, IconPlus, IconShoppingBag, IconTrash } from "../ui/icons"
@@ -51,38 +51,35 @@ export default function Cart({ initialCart }: CartProps) {
   const [updatingItems, setUpdatingItems] = useState<Set<string>>(new Set())
 
   // Debounced API call for quantity updates
-  const debouncedQuantityUpdate = useDebouncedCallback(
-    async (...args: readonly unknown[]) => {
-      const itemId = args[0] as string
-      const quantity = args[1] as number
-      setUpdatingItems((prev) => new Set(prev).add(itemId))
+  const debouncedQuantityUpdate = useDebouncedCallback(async (...args: readonly unknown[]) => {
+    const itemId = args[0] as string
+    const quantity = args[1] as number
+    setUpdatingItems((prev) => new Set(prev).add(itemId))
 
-      try {
-        const response = await fetch(`/api/cart/items/${itemId}`, {
-          method: "PATCH",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ quantity }),
-        })
+    try {
+      const response = await fetch(`/api/cart/items/${itemId}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ quantity }),
+      })
 
-        if (!response.ok) {
-          throw new Error("Failed to update quantity")
-        }
-
-        router.refresh()
-      } catch (error) {
-        console.error("Error updating quantity:", error)
-        toast.error("Failed to update quantity")
-        refreshCart()
-      } finally {
-        setUpdatingItems((prev) => {
-          const next = new Set(prev)
-          next.delete(itemId)
-          return next
-        })
+      if (!response.ok) {
+        throw new Error("Failed to update quantity")
       }
-    },
-    800
-  )
+
+      router.refresh()
+    } catch (error) {
+      console.error("Error updating quantity:", error)
+      toast.error("Failed to update quantity")
+      refreshCart()
+    } finally {
+      setUpdatingItems((prev) => {
+        const next = new Set(prev)
+        next.delete(itemId)
+        return next
+      })
+    }
+  }, 800)
 
   const refreshCart = async () => {
     try {
@@ -195,7 +192,9 @@ export default function Cart({ initialCart }: CartProps) {
           const variantSpecs = item.productVariant
             ? [
                 item.productVariant.stemLength ? `${item.productVariant.stemLength}cm` : null,
-                item.productVariant.countPerBunch ? `${item.productVariant.countPerBunch} stems` : null,
+                item.productVariant.countPerBunch
+                  ? `${item.productVariant.countPerBunch} stems`
+                  : null,
               ]
                 .filter(Boolean)
                 .join(" • ")
@@ -258,9 +257,7 @@ export default function Cart({ initialCart }: CartProps) {
                 {/* Quantity Controls */}
                 <div className="flex items-end justify-between gap-4 mt-auto pt-2">
                   <div className="flex flex-col gap-1">
-                    <Label className="text-xs font-semibold text-muted-foreground">
-                      Quantity
-                    </Label>
+                    <Label className="text-xs font-semibold text-muted-foreground">Quantity</Label>
                     <div className="flex items-center gap-2">
                       <Button
                         variant="outline"
@@ -277,7 +274,7 @@ export default function Cart({ initialCart }: CartProps) {
                         value={item.quantity}
                         onChange={(e) => {
                           const newQty = parseInt(e.target.value, 10)
-                          if (!isNaN(newQty) && newQty >= 1) {
+                          if (!Number.isNaN(newQty) && newQty >= 1) {
                             updateQuantity(item.id, newQty)
                           }
                         }}
@@ -338,11 +335,7 @@ export default function Cart({ initialCart }: CartProps) {
             <span>{formatPrice(cart.total)}</span>
           </div>
 
-          <Button
-            size="lg"
-            className="w-full"
-            asChild
-          >
+          <Button size="lg" className="w-full" asChild>
             <Link href="/checkout">Proceed to Checkout</Link>
           </Button>
 

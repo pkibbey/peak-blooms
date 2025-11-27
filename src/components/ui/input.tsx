@@ -30,13 +30,7 @@ const Input = React.forwardRef<
   HTMLInputElement,
   React.InputHTMLAttributes<HTMLInputElement> & VariantProps<typeof inputVariants>
 >(({ className, variant, size, ...props }, ref) => {
-  return (
-    <input
-      ref={ref}
-      className={cn(inputVariants({ variant, size, className }))}
-      {...props}
-    />
-  )
+  return <input ref={ref} className={cn(inputVariants({ variant, size, className }))} {...props} />
 })
 
 Input.displayName = "Input"

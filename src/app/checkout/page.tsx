@@ -22,7 +22,7 @@ export default async function CheckoutPage() {
 
   // Fetch cart data
   const cart = await getOrCreateCart()
-  
+
   // Redirect to cart if empty
   if (!cart || cart.items.length === 0) {
     redirect("/cart")
@@ -30,10 +30,10 @@ export default async function CheckoutPage() {
 
   const total = calculateCartTotal(cart.items)
 
-  // Fetch user's saved addresses
+  // Fetch user's saved addresses, with default first
   const savedAddresses = await db.address.findMany({
     where: { userId: user.id },
-    orderBy: { createdAt: "desc" },
+    orderBy: [{ isDefault: "desc" }, { createdAt: "desc" }],
   })
 
   // If cart is somehow null at this point (shouldn't happen)
@@ -57,8 +57,8 @@ export default async function CheckoutPage() {
   return (
     <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 py-10">
       <h1 className="text-3xl font-bold font-serif mb-8">Checkout</h1>
-      <CheckoutForm 
-        cart={{ ...cart, total }} 
+      <CheckoutForm
+        cart={{ ...cart, total }}
         savedAddresses={savedAddresses}
         userEmail={user.email || ""}
       />

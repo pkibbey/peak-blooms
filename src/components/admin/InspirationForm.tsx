@@ -1,58 +1,58 @@
-"use client";
+"use client"
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
-import Link from "next/link";
-import Image from "next/image";
-import { toast } from "sonner";
-import { Button } from "@/components/ui/button";
-import { Label } from "@/components/ui/label";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import SlugInput from "@/components/admin/SlugInput";
-import ProductMultiSelect from "@/components/admin/ProductMultiSelect";
+import { useState } from "react"
+import { useRouter } from "next/navigation"
+import Link from "next/link"
+import Image from "next/image"
+import { toast } from "sonner"
+import { Button } from "@/components/ui/button"
+import { Label } from "@/components/ui/label"
+import { Input } from "@/components/ui/input"
+import { Textarea } from "@/components/ui/textarea"
+import SlugInput from "@/components/admin/SlugInput"
+import ProductMultiSelect from "@/components/admin/ProductMultiSelect"
 
 interface ProductVariant {
-  id: string;
-  price: number;
-  stemLength: number | null;
-  countPerBunch: number | null;
+  id: string
+  price: number
+  stemLength: number | null
+  countPerBunch: number | null
 }
 
 interface Product {
-  id: string;
-  name: string;
+  id: string
+  name: string
   collection?: {
-    name: string;
-  };
-  variants?: ProductVariant[];
+    name: string
+  }
+  variants?: ProductVariant[]
 }
 
 interface ProductSelection {
-  productId: string;
-  productVariantId: string | null;
+  productId: string
+  productVariantId: string | null
 }
 
 interface InspirationFormProps {
-  products: Product[];
+  products: Product[]
   inspiration?: {
-    id: string;
-    name: string;
-    slug: string;
-    subtitle: string;
-    image: string;
-    excerpt: string;
-    inspirationText: string;
-    products: Array<{ 
-      productId: string; 
-      productVariantId: string | null;
-    }>;
-  };
+    id: string
+    name: string
+    slug: string
+    subtitle: string
+    image: string
+    excerpt: string
+    inspirationText: string
+    products: Array<{
+      productId: string
+      productVariantId: string | null
+    }>
+  }
 }
 
 export default function InspirationForm({ products, inspiration }: InspirationFormProps) {
-  const router = useRouter();
-  const isEditing = !!inspiration;
+  const router = useRouter()
+  const isEditing = !!inspiration
 
   const [formData, setFormData] = useState({
     name: inspiration?.name || "",
@@ -61,31 +61,31 @@ export default function InspirationForm({ products, inspiration }: InspirationFo
     image: inspiration?.image || "",
     excerpt: inspiration?.excerpt || "",
     inspirationText: inspiration?.inspirationText || "",
-  });
+  })
 
   const [selectedProductIds, setSelectedProductIds] = useState<string[]>(
     inspiration?.products?.map((p) => p.productId) || []
-  );
+  )
 
   const [productSelections, setProductSelections] = useState<ProductSelection[]>(
     inspiration?.products?.map((p) => ({
       productId: p.productId,
       productVariantId: p.productVariantId,
     })) || []
-  );
+  )
 
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isDeleting, setIsDeleting] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [isDeleting, setIsDeleting] = useState(false)
+  const [error, setError] = useState<string | null>(null)
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsSubmitting(true);
-    setError(null);
+    e.preventDefault()
+    setIsSubmitting(true)
+    setError(null)
 
     try {
-      const url = isEditing ? `/api/inspirations/${inspiration.id}` : "/api/inspirations";
-      const method = isEditing ? "PUT" : "POST";
+      const url = isEditing ? `/api/inspirations/${inspiration.id}` : "/api/inspirations"
+      const method = isEditing ? "PUT" : "POST"
 
       const response = await fetch(url, {
         method,
@@ -94,71 +94,70 @@ export default function InspirationForm({ products, inspiration }: InspirationFo
           ...formData,
           productSelections: productSelections,
         }),
-      });
+      })
 
       if (response.ok) {
-        toast.success(isEditing ? "Inspiration updated successfully" : "Inspiration created successfully");
-        router.push("/admin/inspirations");
-        router.refresh();
+        toast.success(
+          isEditing ? "Inspiration updated successfully" : "Inspiration created successfully"
+        )
+        router.push("/admin/inspirations")
+        router.refresh()
       } else {
-        const data = await response.json();
-        setError(data.error || "Failed to save inspiration");
+        const data = await response.json()
+        setError(data.error || "Failed to save inspiration")
       }
     } catch (err) {
-      setError("An error occurred. Please try again.");
-      console.error(err);
+      setError("An error occurred. Please try again.")
+      console.error(err)
     } finally {
-      setIsSubmitting(false);
+      setIsSubmitting(false)
     }
-  };
+  }
 
   const handleDelete = async () => {
-    const productCount = inspiration?.products?.length || 0;
-    const warningMessage = productCount > 0
-      ? `Are you sure you want to delete "${inspiration?.name}"? This inspiration has ${productCount} product${productCount !== 1 ? "s" : ""} associated. This action cannot be undone.`
-      : `Are you sure you want to delete "${inspiration?.name}"? This action cannot be undone.`;
+    const productCount = inspiration?.products?.length || 0
+    const warningMessage =
+      productCount > 0
+        ? `Are you sure you want to delete "${inspiration?.name}"? This inspiration has ${productCount} product${productCount !== 1 ? "s" : ""} associated. This action cannot be undone.`
+        : `Are you sure you want to delete "${inspiration?.name}"? This action cannot be undone.`
 
     if (!window.confirm(warningMessage)) {
-      return;
+      return
     }
 
-    setIsDeleting(true);
+    setIsDeleting(true)
     try {
       const response = await fetch(`/api/inspirations/${inspiration?.id}`, {
         method: "DELETE",
-      });
+      })
 
       if (response.ok) {
-        toast.success("Inspiration deleted successfully");
-        router.push("/admin/inspirations");
-        router.refresh();
+        toast.success("Inspiration deleted successfully")
+        router.push("/admin/inspirations")
+        router.refresh()
       } else {
-        setError("Failed to delete inspiration. Please try again.");
+        setError("Failed to delete inspiration. Please try again.")
       }
     } catch (err) {
-      setError("An error occurred. Please try again.");
-      console.error(err);
+      setError("An error occurred. Please try again.")
+      console.error(err)
     } finally {
-      setIsDeleting(false);
+      setIsDeleting(false)
     }
-  };
+  }
 
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-  ) => {
-    const { name, value } = e.target;
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target
     setFormData((prev) => ({
       ...prev,
       [name]: value,
-    }));
-  };
+    }))
+  }
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
       {error && (
-        <div className="rounded-md bg-destructive/10 p-4 text-sm text-destructive">
-          {error}
-        </div>
+        <div className="rounded-md bg-destructive/10 p-4 text-sm text-destructive">{error}</div>
       )}
 
       <div className="grid gap-6 md:grid-cols-2">
@@ -218,7 +217,7 @@ export default function InspirationForm({ products, inspiration }: InspirationFo
               className="rounded-md object-cover"
               sizes="(max-width: 448px) 100vw, 448px"
               onError={(e) => {
-                (e.target as HTMLImageElement).style.display = "none";
+                ;(e.target as HTMLImageElement).style.display = "none"
               }}
             />
           </div>
@@ -277,18 +276,13 @@ export default function InspirationForm({ products, inspiration }: InspirationFo
           <Button type="button" variant="outline" asChild>
             <Link href="/admin/inspirations">Cancel</Link>
           </Button>
-          </div>
-          {isEditing && (
-            <Button
-              type="button"
-              variant="destructive"
-              onClick={handleDelete}
-              disabled={isDeleting}
-            >
-              Delete Inspiration
-            </Button>
-          )}
+        </div>
+        {isEditing && (
+          <Button type="button" variant="destructive" onClick={handleDelete} disabled={isDeleting}>
+            Delete Inspiration
+          </Button>
+        )}
       </div>
     </form>
-  );
+  )
 }

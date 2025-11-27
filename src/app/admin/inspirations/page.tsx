@@ -1,16 +1,16 @@
-import { redirect } from "next/navigation";
-import { auth } from "@/lib/auth";
-import { db } from "@/lib/db";
-import Link from "next/link";
-import { Button } from "@/components/ui/button";
-import InspirationsTable from "@/components/admin/InspirationsTable";
-import BackLink from "@/components/site/BackLink";
+import { redirect } from "next/navigation"
+import { auth } from "@/lib/auth"
+import { db } from "@/lib/db"
+import Link from "next/link"
+import { Button } from "@/components/ui/button"
+import InspirationsTable from "@/components/admin/InspirationsTable"
+import BackLink from "@/components/site/BackLink"
 
 export default async function AdminInspirationsPage() {
-  const session = await auth();
+  const session = await auth()
 
   if (!session?.user || session.user.role !== "ADMIN") {
-    redirect("/admin/unauthorized");
+    redirect("/admin/unauthorized")
   }
 
   const inspirations = await db.inspiration.findMany({
@@ -22,7 +22,7 @@ export default async function AdminInspirationsPage() {
     orderBy: {
       createdAt: "desc",
     },
-  });
+  })
 
   return (
     <div className="bg-background">
@@ -44,5 +44,5 @@ export default async function AdminInspirationsPage() {
         <InspirationsTable inspirations={inspirations} />
       </div>
     </div>
-  );
+  )
 }

@@ -1,28 +1,28 @@
-import { redirect, notFound } from "next/navigation";
-import { auth } from "@/lib/auth";
-import { db } from "@/lib/db";
-import InspirationForm from "@/components/admin/InspirationForm";
-import BackLink from "@/components/site/BackLink";
+import { notFound, redirect } from "next/navigation"
+import InspirationForm from "@/components/admin/InspirationForm"
+import BackLink from "@/components/site/BackLink"
+import { auth } from "@/lib/auth"
+import { db } from "@/lib/db"
 
 interface EditInspirationPageProps {
-  params: Promise<{ id: string }>;
+  params: Promise<{ id: string }>
 }
 
 export default async function EditInspirationPage({ params }: EditInspirationPageProps) {
-  const session = await auth();
+  const session = await auth()
 
   if (!session?.user || session.user.role !== "ADMIN") {
-    redirect("/admin/unauthorized");
+    redirect("/admin/unauthorized")
   }
 
-  const { id } = await params;
+  const { id } = await params
 
   const [inspiration, products] = await Promise.all([
     db.inspiration.findUnique({
       where: { id },
       include: {
         products: {
-          select: { 
+          select: {
             productId: true,
             productVariantId: true,
           },
@@ -38,10 +38,10 @@ export default async function EditInspirationPage({ params }: EditInspirationPag
       },
       orderBy: { name: "asc" },
     }),
-  ]);
+  ])
 
   if (!inspiration) {
-    notFound();
+    notFound()
   }
 
   return (
@@ -50,9 +50,7 @@ export default async function EditInspirationPage({ params }: EditInspirationPag
         <BackLink href="/admin/inspirations" label="Inspirations" />
         <div className="mb-8">
           <h1 className="text-3xl font-bold">Edit Inspiration</h1>
-          <p className="mt-2 text-muted-foreground">
-            Update &ldquo;{inspiration.name}&rdquo;
-          </p>
+          <p className="mt-2 text-muted-foreground">Update &ldquo;{inspiration.name}&rdquo;</p>
         </div>
 
         <div className="rounded-lg border border-border p-6">
@@ -60,5 +58,5 @@ export default async function EditInspirationPage({ params }: EditInspirationPag
         </div>
       </div>
     </div>
-  );
+  )
 }

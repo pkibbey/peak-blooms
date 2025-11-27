@@ -1,123 +1,122 @@
-"use client";
+"use client"
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
-import Link from "next/link";
-import Image from "next/image";
-import { toast } from "sonner";
-import { Button } from "@/components/ui/button";
-import { Label } from "@/components/ui/label";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import SlugInput from "@/components/admin/SlugInput";
-import { IconTrash } from "../ui/icons";
+import Image from "next/image"
+import Link from "next/link"
+import { useRouter } from "next/navigation"
+import { useState } from "react"
+import { toast } from "sonner"
+import SlugInput from "@/components/admin/SlugInput"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { Textarea } from "@/components/ui/textarea"
+import { IconTrash } from "../ui/icons"
 
 interface CollectionFormProps {
   collection?: {
-    id: string;
-    name: string;
-    slug: string;
-    image: string | null;
-    description: string | null;
+    id: string
+    name: string
+    slug: string
+    image: string | null
+    description: string | null
     _count?: {
-      products: number;
-    };
-  };
+      products: number
+    }
+  }
 }
 
 export default function CollectionForm({ collection }: CollectionFormProps) {
-  const router = useRouter();
-  const isEditing = !!collection;
+  const router = useRouter()
+  const isEditing = !!collection
 
   const [formData, setFormData] = useState({
     name: collection?.name || "",
     slug: collection?.slug || "",
     image: collection?.image || "",
     description: collection?.description || "",
-  });
+  })
 
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isDeleting, setIsDeleting] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [isDeleting, setIsDeleting] = useState(false)
+  const [error, setError] = useState<string | null>(null)
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsSubmitting(true);
-    setError(null);
+    e.preventDefault()
+    setIsSubmitting(true)
+    setError(null)
 
     try {
-      const url = isEditing ? `/api/collections/${collection.id}` : "/api/collections";
-      const method = isEditing ? "PUT" : "POST";
+      const url = isEditing ? `/api/collections/${collection.id}` : "/api/collections"
+      const method = isEditing ? "PUT" : "POST"
 
       const response = await fetch(url, {
         method,
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),
-      });
+      })
 
       if (response.ok) {
-        toast.success(isEditing ? "Collection updated successfully" : "Collection created successfully");
-        router.push("/admin/collections");
-        router.refresh();
+        toast.success(
+          isEditing ? "Collection updated successfully" : "Collection created successfully"
+        )
+        router.push("/admin/collections")
+        router.refresh()
       } else {
-        const data = await response.json();
-        setError(data.error || "Failed to save collection");
+        const data = await response.json()
+        setError(data.error || "Failed to save collection")
       }
     } catch (err) {
-      setError("An error occurred. Please try again.");
-      console.error(err);
+      setError("An error occurred. Please try again.")
+      console.error(err)
     } finally {
-      setIsSubmitting(false);
+      setIsSubmitting(false)
     }
-  };
+  }
 
   const handleDelete = async () => {
-    const productCount = collection?._count?.products || 0;
-    const warningMessage = productCount > 0
-      ? `Are you sure you want to delete "${collection?.name}"? This will also delete ${productCount} product${productCount !== 1 ? "s" : ""} in this collection. This action cannot be undone.`
-      : `Are you sure you want to delete "${collection?.name}"? This action cannot be undone.`;
+    const productCount = collection?._count?.products || 0
+    const warningMessage =
+      productCount > 0
+        ? `Are you sure you want to delete "${collection?.name}"? This will also delete ${productCount} product${productCount !== 1 ? "s" : ""} in this collection. This action cannot be undone.`
+        : `Are you sure you want to delete "${collection?.name}"? This action cannot be undone.`
 
     if (!window.confirm(warningMessage)) {
-      return;
+      return
     }
 
-    setIsDeleting(true);
+    setIsDeleting(true)
     try {
       const response = await fetch(`/api/collections/${collection?.id}`, {
         method: "DELETE",
-      });
+      })
 
       if (response.ok) {
-        toast.success("Collection deleted successfully");
-        router.push("/admin/collections");
-        router.refresh();
+        toast.success("Collection deleted successfully")
+        router.push("/admin/collections")
+        router.refresh()
       } else {
-        setError("Failed to delete collection. Please try again.");
+        setError("Failed to delete collection. Please try again.")
       }
     } catch (err) {
-      setError("An error occurred. Please try again.");
-      console.error(err);
+      setError("An error occurred. Please try again.")
+      console.error(err)
     } finally {
-      setIsDeleting(false);
+      setIsDeleting(false)
     }
-  };
+  }
 
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-  ) => {
-    const { name, value } = e.target;
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target
     setFormData((prev) => ({
       ...prev,
       [name]: value,
-    }));
-  };
+    }))
+  }
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
       {error && (
-        <div className="rounded-md bg-destructive/10 p-4 text-sm text-destructive">
-          {error}
-        </div>
+        <div className="rounded-md bg-destructive/10 p-4 text-sm text-destructive">{error}</div>
       )}
 
       <div className="grid gap-6 md:grid-cols-2">
@@ -175,7 +174,7 @@ export default function CollectionForm({ collection }: CollectionFormProps) {
               className="rounded-md object-cover"
               sizes="128px"
               onError={(e) => {
-                (e.target as HTMLImageElement).style.display = "none";
+                ;(e.target as HTMLImageElement).style.display = "none"
               }}
             />
           </div>
@@ -193,17 +192,12 @@ export default function CollectionForm({ collection }: CollectionFormProps) {
           </Button>
         </div>
         {isEditing && (
-          <Button
-            type="button"
-            variant="destructive"
-            onClick={handleDelete}
-            disabled={isDeleting}
-          >
+          <Button type="button" variant="destructive" onClick={handleDelete} disabled={isDeleting}>
             <IconTrash className="mr-2 inline-block" />
             Delete Collection
           </Button>
         )}
       </div>
     </form>
-  );
+  )
 }

@@ -47,9 +47,6 @@ export async function GET() {
     })
   } catch (error) {
     console.error("Error fetching filter options:", error)
-    return Response.json(
-      { error: "Failed to fetch filter options" },
-      { status: 500 }
-    )
+    return Response.json({ error: "Failed to fetch filter options" }, { status: 500 })
   }
 }

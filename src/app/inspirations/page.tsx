@@ -1,8 +1,8 @@
-import Link from "next/link";
-import Image from "next/image";
-import { Button } from "@/components/ui/button";
-import { IconArrowRight } from "@/components/ui/icons";
-import { db } from "@/lib/db";
+import Link from "next/link"
+import Image from "next/image"
+import { Button } from "@/components/ui/button"
+import { IconArrowRight } from "@/components/ui/icons"
+import { db } from "@/lib/db"
 
 export const metadata = {
   title: "Peak Blooms - Inspirations",
@@ -10,7 +10,7 @@ export const metadata = {
 }
 
 export default async function InspirationPage() {
-  const inspirations = await db.inspiration.findMany();
+  const inspirations = await db.inspiration.findMany()
 
   return (
     <div className="flex flex-col items-center justify-start bg-white py-16 font-sans">
@@ -19,9 +19,9 @@ export default async function InspirationPage() {
         <div className="mb-16">
           <h1 className="text-4xl font-extrabold font-serif">Inspirations</h1>
           <p className="mt-4 text-lg text-muted-foreground">
-            Curated flower arrangements designed by our artisans to inspire and delight. 
-            Explore each set to discover the story behind the arrangement and order complete 
-            collections for your most memorable celebrations.
+            Curated flower arrangements designed by our artisans to inspire and delight. Explore
+            each set to discover the story behind the arrangement and order complete collections for
+            your most memorable celebrations.
           </p>
         </div>
 
@@ -55,9 +55,7 @@ export default async function InspirationPage() {
                     {inspiration.name}
                   </h2>
                 </Link>
-                <p className="mt-2 text-sm text-muted-foreground">
-                  {inspiration.subtitle}
-                </p>
+                <p className="mt-2 text-sm text-muted-foreground">{inspiration.subtitle}</p>
                 <p className="mt-6 text-base leading-relaxed text-gray-700">
                   {inspiration.excerpt}
                 </p>
@@ -77,5 +75,5 @@ export default async function InspirationPage() {
         </div>
       </div>
     </div>
-  );
+  )
 }

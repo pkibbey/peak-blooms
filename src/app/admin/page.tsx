@@ -1,23 +1,23 @@
-import { redirect } from "next/navigation";
-import { auth } from "@/lib/auth";
-import { db } from "@/lib/db";
-import Link from "next/link";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { IconClock } from "@/components/ui/icons";
+import { redirect } from "next/navigation"
+import { auth } from "@/lib/auth"
+import { db } from "@/lib/db"
+import Link from "next/link"
+import { Button } from "@/components/ui/button"
+import { Badge } from "@/components/ui/badge"
+import { IconClock } from "@/components/ui/icons"
 
 export default async function AdminDashboard() {
-  const session = await auth();
+  const session = await auth()
 
   // Verify admin role
   if (!session?.user || session.user.role !== "ADMIN") {
-    redirect("/admin/unauthorized");
+    redirect("/admin/unauthorized")
   }
 
   // Count pending orders
   const pendingOrdersCount = await db.order.count({
     where: { status: "PENDING" },
-  });
+  })
 
   return (
     <div className="bg-background">
@@ -42,16 +42,12 @@ export default async function AdminDashboard() {
                   </Badge>
                 )}
               </div>
-              <p className="mt-2 text-sm text-muted-foreground">
-                View and manage customer orders
-              </p>
+              <p className="mt-2 text-sm text-muted-foreground">View and manage customer orders</p>
             </div>
             <div className="shrink-0 flex gap-2">
               {pendingOrdersCount > 0 && (
                 <Button asChild variant="outline" className="mt-2">
-                  <Link href="/admin/orders?status=PENDING">
-                    View Pending
-                  </Link>
+                  <Link href="/admin/orders?status=PENDING">View Pending</Link>
                 </Button>
               )}
               <Button asChild className="mt-2">
@@ -92,7 +88,9 @@ export default async function AdminDashboard() {
           <div className="mt-6 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
             <div className="rounded-md border border-border p-4">
               <h3 className="text-lg font-semibold">Products</h3>
-              <p className="mt-1 text-sm text-muted-foreground">Add, edit, and manage product listings</p>
+              <p className="mt-1 text-sm text-muted-foreground">
+                Add, edit, and manage product listings
+              </p>
               <div className="mt-4 flex flex-col gap-2">
                 <Button asChild size="sm">
                   <Link href="/admin/products">Manage Products</Link>
@@ -102,14 +100,15 @@ export default async function AdminDashboard() {
 
             <div className="rounded-md border border-border p-4">
               <h3 className="text-lg font-semibold">Collections</h3>
-              <p className="mt-1 text-sm text-muted-foreground">Organize products into collections</p>
+              <p className="mt-1 text-sm text-muted-foreground">
+                Organize products into collections
+              </p>
               <div className="mt-4 flex flex-col gap-2">
                 <Button asChild size="sm">
                   <Link href="/admin/collections">Manage Collections</Link>
                 </Button>
               </div>
             </div>
-
 
             <div className="rounded-md border border-border p-4">
               <h3 className="text-lg font-semibold">Inspirations</h3>
@@ -124,5 +123,5 @@ export default async function AdminDashboard() {
         </div>
       </div>
     </div>
-  );
+  )
 }

@@ -19,6 +19,11 @@ import {
   SelectItem,
 } from "@/components/ui/select"
 import { IconMapPin } from "@/components/ui/icons"
+import AddressForm, {
+  type AddressFormData,
+  emptyAddress,
+  validateAddress,
+} from "@/components/site/AddressForm"
 
 interface CartProduct {
   id: string
@@ -66,30 +71,6 @@ interface CheckoutFormProps {
   cart: CartData
   savedAddresses: SavedAddress[]
   userEmail: string
-}
-
-interface AddressFormData {
-  firstName: string
-  lastName: string
-  company: string
-  street1: string
-  street2: string
-  city: string
-  state: string
-  zip: string
-  country: string
-}
-
-const emptyAddress: AddressFormData = {
-  firstName: "",
-  lastName: "",
-  company: "",
-  street1: "",
-  street2: "",
-  city: "",
-  state: "",
-  zip: "",
-  country: "US",
 }
 
 export default function CheckoutForm({ cart, savedAddresses, userEmail }: CheckoutFormProps) {
@@ -159,17 +140,6 @@ export default function CheckoutForm({ cart, savedAddresses, userEmail }: Checko
 
   const handleBillingChange = (field: keyof AddressFormData, value: string) => {
     setBillingAddress((prev) => ({ ...prev, [field]: value }))
-  }
-
-  const validateAddress = (addr: AddressFormData): string | null => {
-    if (!addr.firstName.trim()) return "First name is required"
-    if (!addr.lastName.trim()) return "Last name is required"
-    if (!addr.company.trim()) return "Company name is required"
-    if (!addr.street1.trim()) return "Street address is required"
-    if (!addr.city.trim()) return "City is required"
-    if (!addr.state.trim()) return "State is required"
-    if (!addr.zip.trim()) return "ZIP code is required"
-    return null
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -250,9 +220,7 @@ export default function CheckoutForm({ cart, savedAddresses, userEmail }: Checko
       {/* Left Column - Forms */}
       <div className="lg:col-span-2 space-y-8">
         {error && (
-          <div className="rounded-md bg-destructive/10 p-4 text-sm text-destructive">
-            {error}
-          </div>
+          <div className="rounded-md bg-destructive/10 p-4 text-sm text-destructive">{error}</div>
         )}
 
         {/* Contact Information */}
@@ -309,101 +277,7 @@ export default function CheckoutForm({ cart, savedAddresses, userEmail }: Checko
             </div>
           )}
 
-          <div className="grid gap-4 md:grid-cols-2">
-            <div className="space-y-2">
-              <Label htmlFor="firstName">First Name *</Label>
-              <Input
-                id="firstName"
-                type="text"
-                required
-                value={shippingAddress.firstName}
-                onChange={(e) => handleShippingChange("firstName", e.target.value)}
-                placeholder="First name"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="lastName">Last Name *</Label>
-              <Input
-                id="lastName"
-                type="text"
-                required
-                value={shippingAddress.lastName}
-                onChange={(e) => handleShippingChange("lastName", e.target.value)}
-                placeholder="Last name"
-              />
-            </div>
-          </div>
-
-          <div className="space-y-2 mt-4">
-            <Label htmlFor="company">Company *</Label>
-            <Input
-              id="company"
-              type="text"
-              required
-              value={shippingAddress.company}
-              onChange={(e) => handleShippingChange("company", e.target.value)}
-              placeholder="Company name"
-            />
-          </div>
-
-          <div className="space-y-2 mt-4">
-            <Label htmlFor="street1">Street Address *</Label>
-            <Input
-              id="street1"
-              type="text"
-              required
-              value={shippingAddress.street1}
-              onChange={(e) => handleShippingChange("street1", e.target.value)}
-              placeholder="123 Main St"
-            />
-          </div>
-
-          <div className="space-y-2 mt-4">
-            <Label htmlFor="street2">Apartment, suite, etc. (optional)</Label>
-            <Input
-              id="street2"
-              type="text"
-              value={shippingAddress.street2}
-              onChange={(e) => handleShippingChange("street2", e.target.value)}
-              placeholder="Apt 4B"
-            />
-          </div>
-
-          <div className="grid gap-4 md:grid-cols-3 mt-4">
-            <div className="space-y-2">
-              <Label htmlFor="city">City *</Label>
-              <Input
-                id="city"
-                type="text"
-                required
-                value={shippingAddress.city}
-                onChange={(e) => handleShippingChange("city", e.target.value)}
-                placeholder="City"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="state">State *</Label>
-              <Input
-                id="state"
-                type="text"
-                required
-                value={shippingAddress.state}
-                onChange={(e) => handleShippingChange("state", e.target.value)}
-                placeholder="State"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="zip">ZIP Code *</Label>
-              <Input
-                id="zip"
-                type="text"
-                required
-                value={shippingAddress.zip}
-                onChange={(e) => handleShippingChange("zip", e.target.value)}
-                placeholder="12345"
-              />
-            </div>
-          </div>
+          <AddressForm address={shippingAddress} onChange={handleShippingChange} />
 
           {selectedAddressId === "new" && (
             <div className="flex items-center gap-2 mt-4">
@@ -433,102 +307,13 @@ export default function CheckoutForm({ cart, savedAddresses, userEmail }: Checko
           </div>
 
           {differentBilling && (
-            <div className="space-y-4 pt-2">
-              <div className="grid gap-4 md:grid-cols-2">
-                <div className="space-y-2">
-                  <Label htmlFor="billingFirstName">First Name *</Label>
-                  <Input
-                    id="billingFirstName"
-                    type="text"
-                    required={differentBilling}
-                    value={billingAddress.firstName}
-                    onChange={(e) => handleBillingChange("firstName", e.target.value)}
-                    placeholder="First name"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="billingLastName">Last Name *</Label>
-                  <Input
-                    id="billingLastName"
-                    type="text"
-                    required={differentBilling}
-                    value={billingAddress.lastName}
-                    onChange={(e) => handleBillingChange("lastName", e.target.value)}
-                    placeholder="Last name"
-                  />
-                </div>
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="billingCompany">Company *</Label>
-                <Input
-                  id="billingCompany"
-                  type="text"
-                  required={differentBilling}
-                  value={billingAddress.company}
-                  onChange={(e) => handleBillingChange("company", e.target.value)}
-                  placeholder="Company name"
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="billingStreet1">Street Address *</Label>
-                <Input
-                  id="billingStreet1"
-                  type="text"
-                  required={differentBilling}
-                  value={billingAddress.street1}
-                  onChange={(e) => handleBillingChange("street1", e.target.value)}
-                  placeholder="123 Main St"
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="billingStreet2">Apartment, suite, etc. (optional)</Label>
-                <Input
-                  id="billingStreet2"
-                  type="text"
-                  value={billingAddress.street2}
-                  onChange={(e) => handleBillingChange("street2", e.target.value)}
-                  placeholder="Apt 4B"
-                />
-              </div>
-
-              <div className="grid gap-4 md:grid-cols-3">
-                <div className="space-y-2">
-                  <Label htmlFor="billingCity">City *</Label>
-                  <Input
-                    id="billingCity"
-                    type="text"
-                    required={differentBilling}
-                    value={billingAddress.city}
-                    onChange={(e) => handleBillingChange("city", e.target.value)}
-                    placeholder="City"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="billingState">State *</Label>
-                  <Input
-                    id="billingState"
-                    type="text"
-                    required={differentBilling}
-                    value={billingAddress.state}
-                    onChange={(e) => handleBillingChange("state", e.target.value)}
-                    placeholder="State"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="billingZip">ZIP Code *</Label>
-                  <Input
-                    id="billingZip"
-                    type="text"
-                    required={differentBilling}
-                    value={billingAddress.zip}
-                    onChange={(e) => handleBillingChange("zip", e.target.value)}
-                    placeholder="12345"
-                  />
-                </div>
-              </div>
+            <div className="pt-2">
+              <AddressForm
+                address={billingAddress}
+                onChange={handleBillingChange}
+                idPrefix="billing"
+                required={differentBilling}
+              />
             </div>
           )}
         </div>
@@ -581,8 +366,12 @@ export default function CheckoutForm({ cart, savedAddresses, userEmail }: Checko
                     {item.productVariant && (
                       <p className="text-xs text-muted-foreground">
                         {[
-                          item.productVariant.stemLength ? `${item.productVariant.stemLength}cm` : null,
-                          item.productVariant.countPerBunch ? `${item.productVariant.countPerBunch} stems` : null,
+                          item.productVariant.stemLength
+                            ? `${item.productVariant.stemLength}cm`
+                            : null,
+                          item.productVariant.countPerBunch
+                            ? `${item.productVariant.countPerBunch} stems`
+                            : null,
                         ]
                           .filter(Boolean)
                           .join(" • ")}
@@ -615,12 +404,7 @@ export default function CheckoutForm({ cart, savedAddresses, userEmail }: Checko
             <span>{formatPrice(cart.total)}</span>
           </div>
 
-          <Button
-            type="submit"
-            size="lg"
-            className="w-full"
-            disabled={isSubmitting}
-          >
+          <Button type="submit" size="lg" className="w-full" disabled={isSubmitting}>
             Place Order
           </Button>
 

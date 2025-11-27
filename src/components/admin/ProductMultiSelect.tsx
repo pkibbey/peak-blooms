@@ -1,47 +1,47 @@
-"use client";
+"use client"
 
-import { useState } from "react";
-import { Label } from "../ui/label";
-import { Input } from "@/components/ui/input";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Button } from "@/components/ui/button";
+import { useState } from "react"
+import { Label } from "../ui/label"
+import { Input } from "@/components/ui/input"
+import { Checkbox } from "@/components/ui/checkbox"
+import { Button } from "@/components/ui/button"
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
+} from "@/components/ui/select"
 
 interface ProductVariant {
-  id: string;
-  price: number;
-  stemLength: number | null;
-  countPerBunch: number | null;
+  id: string
+  price: number
+  stemLength: number | null
+  countPerBunch: number | null
 }
 
 interface Product {
-  id: string;
-  name: string;
+  id: string
+  name: string
   collection?: {
-    name: string;
-  };
-  variants?: ProductVariant[];
+    name: string
+  }
+  variants?: ProductVariant[]
 }
 
 interface ProductSelection {
-  productId: string;
-  productVariantId: string | null;
+  productId: string
+  productVariantId: string | null
 }
 
 interface ProductMultiSelectProps {
-  products: Product[];
-  selectedIds: string[];
-  onChange: (selectedIds: string[]) => void;
+  products: Product[]
+  selectedIds: string[]
+  onChange: (selectedIds: string[]) => void
   // New props for variant selection
-  productSelections?: ProductSelection[];
-  onSelectionsChange?: (selections: ProductSelection[]) => void;
-  disabled?: boolean;
+  productSelections?: ProductSelection[]
+  onSelectionsChange?: (selections: ProductSelection[]) => void
+  disabled?: boolean
 }
 
 export default function ProductMultiSelect({
@@ -52,91 +52,88 @@ export default function ProductMultiSelect({
   onSelectionsChange,
   disabled = false,
 }: ProductMultiSelectProps) {
-  const [searchTerm, setSearchTerm] = useState("");
+  const [searchTerm, setSearchTerm] = useState("")
 
-  const filteredProducts = products.filter((product) =>
-    product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    product.collection?.name.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const filteredProducts = products.filter(
+    (product) =>
+      product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      product.collection?.name.toLowerCase().includes(searchTerm.toLowerCase())
+  )
 
   const handleToggle = (productId: string) => {
-    if (disabled) return;
-    
+    if (disabled) return
+
     if (selectedIds.includes(productId)) {
-      onChange(selectedIds.filter((id) => id !== productId));
+      onChange(selectedIds.filter((id) => id !== productId))
       // Also remove from selections
       if (onSelectionsChange) {
-        onSelectionsChange(productSelections.filter(s => s.productId !== productId));
+        onSelectionsChange(productSelections.filter((s) => s.productId !== productId))
       }
     } else {
-      onChange([...selectedIds, productId]);
+      onChange([...selectedIds, productId])
       // Add to selections with first variant or null
       if (onSelectionsChange) {
-        const product = products.find(p => p.id === productId);
-        const firstVariantId = product?.variants?.[0]?.id ?? null;
-        onSelectionsChange([...productSelections, { productId, productVariantId: firstVariantId }]);
+        const product = products.find((p) => p.id === productId)
+        const firstVariantId = product?.variants?.[0]?.id ?? null
+        onSelectionsChange([...productSelections, { productId, productVariantId: firstVariantId }])
       }
     }
-  };
+  }
 
   const handleVariantChange = (productId: string, variantId: string | null) => {
-    if (disabled || !onSelectionsChange) return;
-    
-    const updatedSelections = productSelections.map(s => 
-      s.productId === productId 
-        ? { ...s, productVariantId: variantId }
-        : s
-    );
-    onSelectionsChange(updatedSelections);
-  };
+    if (disabled || !onSelectionsChange) return
+
+    const updatedSelections = productSelections.map((s) =>
+      s.productId === productId ? { ...s, productVariantId: variantId } : s
+    )
+    onSelectionsChange(updatedSelections)
+  }
 
   const handleSelectAll = () => {
-    if (disabled) return;
-    const filteredIds = filteredProducts.map((p) => p.id);
-    const newSelected = [...new Set([...selectedIds, ...filteredIds])];
-    onChange(newSelected);
-    
+    if (disabled) return
+    const filteredIds = filteredProducts.map((p) => p.id)
+    const newSelected = [...new Set([...selectedIds, ...filteredIds])]
+    onChange(newSelected)
+
     // Add selections for newly added products
     if (onSelectionsChange) {
-      const existingProductIds = new Set(productSelections.map(s => s.productId));
+      const existingProductIds = new Set(productSelections.map((s) => s.productId))
       const newSelections = filteredProducts
-        .filter(p => !existingProductIds.has(p.id))
-        .map(p => ({ 
-          productId: p.id, 
-          productVariantId: p.variants?.[0]?.id ?? null 
-        }));
-      onSelectionsChange([...productSelections, ...newSelections]);
+        .filter((p) => !existingProductIds.has(p.id))
+        .map((p) => ({
+          productId: p.id,
+          productVariantId: p.variants?.[0]?.id ?? null,
+        }))
+      onSelectionsChange([...productSelections, ...newSelections])
     }
-  };
+  }
 
   const handleDeselectAll = () => {
-    if (disabled) return;
-    const filteredIds = new Set(filteredProducts.map((p) => p.id));
-    onChange(selectedIds.filter((id) => !filteredIds.has(id)));
-    
+    if (disabled) return
+    const filteredIds = new Set(filteredProducts.map((p) => p.id))
+    onChange(selectedIds.filter((id) => !filteredIds.has(id)))
+
     // Remove from selections
     if (onSelectionsChange) {
-      onSelectionsChange(productSelections.filter(s => !filteredIds.has(s.productId)));
+      onSelectionsChange(productSelections.filter((s) => !filteredIds.has(s.productId)))
     }
-  };
+  }
 
   const getSelectedVariantId = (productId: string): string | null => {
-    const selection = productSelections.find(s => s.productId === productId);
-    return selection?.productVariantId ?? null;
-  };
+    const selection = productSelections.find((s) => s.productId === productId)
+    return selection?.productVariantId ?? null
+  }
 
   const formatVariantLabel = (variant: ProductVariant): string => {
-    const parts = [];
-    if (variant.stemLength) parts.push(`${variant.stemLength}cm`);
-    if (variant.countPerBunch) parts.push(`${variant.countPerBunch} stems`);
-    parts.push(`$${variant.price.toFixed(2)}`);
-    return parts.join(" • ");
-  };
+    const parts = []
+    if (variant.stemLength) parts.push(`${variant.stemLength}cm`)
+    if (variant.countPerBunch) parts.push(`${variant.countPerBunch} stems`)
+    parts.push(`$${variant.price.toFixed(2)}`)
+    return parts.join(" • ")
+  }
 
-  const selectedCount = selectedIds.length;
-  const filteredSelectedCount = filteredProducts.filter((p) =>
-    selectedIds.includes(p.id)
-  ).length;
+  const selectedCount = selectedIds.length
+  const filteredSelectedCount = filteredProducts.filter((p) => selectedIds.includes(p.id)).length
 
   return (
     <div className="space-y-3">
@@ -145,10 +142,22 @@ export default function ProductMultiSelect({
           {selectedCount} product{selectedCount !== 1 ? "s" : ""} selected
         </p>
         <div className="flex gap-2">
-          <Button size="sm" variant="link" onClick={handleSelectAll} disabled={disabled} className="text-sm">
+          <Button
+            size="sm"
+            variant="link"
+            onClick={handleSelectAll}
+            disabled={disabled}
+            className="text-sm"
+          >
             Select visible
           </Button>
-          <Button size="sm" variant="ghost" onClick={handleDeselectAll} disabled={disabled} className="text-sm text-muted-foreground">
+          <Button
+            size="sm"
+            variant="ghost"
+            onClick={handleDeselectAll}
+            disabled={disabled}
+            className="text-sm text-muted-foreground"
+          >
             Deselect visible
           </Button>
         </div>
@@ -165,16 +174,14 @@ export default function ProductMultiSelect({
 
       <div className="max-h-96 overflow-y-auto rounded-md border border-border">
         {filteredProducts.length === 0 ? (
-          <p className="p-4 text-center text-sm text-muted-foreground">
-            No products found
-          </p>
+          <p className="p-4 text-center text-sm text-muted-foreground">No products found</p>
         ) : (
           <ul className="divide-y divide-border">
             {filteredProducts.map((product) => {
-              const isSelected = selectedIds.includes(product.id);
-              const hasVariants = product.variants && product.variants.length > 0;
-              const selectedVariantId = getSelectedVariantId(product.id);
-              
+              const isSelected = selectedIds.includes(product.id)
+              const hasVariants = product.variants && product.variants.length > 0
+              const selectedVariantId = getSelectedVariantId(product.id)
+
               return (
                 <li key={product.id} className="p-3">
                   <Label
@@ -197,13 +204,15 @@ export default function ProductMultiSelect({
                       )}
                     </div>
                   </Label>
-                  
+
                   {/* Variant Selector - shown when product is selected and has variants */}
                   {isSelected && hasVariants && onSelectionsChange && (
                     <div className="mt-2 ml-7">
                       <Select
                         value={selectedVariantId ?? "none"}
-                        onValueChange={(value) => handleVariantChange(product.id, value === "none" ? null : value)}
+                        onValueChange={(value) =>
+                          handleVariantChange(product.id, value === "none" ? null : value)
+                        }
                         disabled={disabled}
                       >
                         <SelectTrigger className="h-8 text-xs">
@@ -211,7 +220,7 @@ export default function ProductMultiSelect({
                         </SelectTrigger>
                         <SelectContent>
                           <SelectItem value="none">No specific variant</SelectItem>
-                          {product.variants!.map((variant) => (
+                          {product.variants?.map((variant) => (
                             <SelectItem key={variant.id} value={variant.id}>
                               {formatVariantLabel(variant)}
                             </SelectItem>
@@ -221,7 +230,7 @@ export default function ProductMultiSelect({
                     </div>
                   )}
                 </li>
-              );
+              )
             })}
           </ul>
         )}
@@ -234,5 +243,5 @@ export default function ProductMultiSelect({
         </p>
       )}
     </div>
-  );
+  )
 }

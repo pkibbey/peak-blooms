@@ -18,12 +18,12 @@ export default async function CartPage() {
 
   // Fetch cart data server-side
   const cart = await getOrCreateCart()
-  
+
   // This shouldn't happen since user is authenticated, but handle it
   if (!cart) {
     redirect("/auth/signin?callbackUrl=/cart")
   }
-  
+
   const total = calculateCartTotal(cart.items)
 
   return (

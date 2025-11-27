@@ -1,4 +1,4 @@
-import { ReactNode } from "react"
+import type { ReactNode } from "react"
 import Image from "next/image"
 
 interface HeroProps {
@@ -25,15 +25,9 @@ export default function Hero({ title, subtitle, cta }: HeroProps) {
         <div className="flex flex-col md:flex-row gap-6">
           {/* Left section - Content */}
           <div className="flex flex-col justify-center md:w-1/3">
-            <h1 className="text-4xl md:text-5xl font-extrabold text-white font-serif">
-              {title}
-            </h1>
-            <p className="mt-3 text-lg text-white/80">
-              {subtitle}
-            </p>
-            <div className="mt-6">
-              {cta}
-            </div>
+            <h1 className="text-4xl md:text-5xl font-extrabold text-white font-serif">{title}</h1>
+            <p className="mt-3 text-lg text-white/80">{subtitle}</p>
+            <div className="mt-6">{cta}</div>
           </div>
         </div>
       </div>

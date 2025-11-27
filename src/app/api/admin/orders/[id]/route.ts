@@ -11,15 +11,12 @@ interface RouteParams {
  * GET /api/admin/orders/[id]
  * Get a specific order (admin only)
  */
-export async function GET(request: Request, { params }: RouteParams) {
+export async function GET(_request: Request, { params }: RouteParams) {
   try {
     const session = await auth()
 
     if (!session?.user || session.user.role !== "ADMIN") {
-      return NextResponse.json(
-        { error: "Unauthorized" },
-        { status: 401 }
-      )
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }
 
     const { id } = await params
@@ -46,19 +43,13 @@ export async function GET(request: Request, { params }: RouteParams) {
     })
 
     if (!order) {
-      return NextResponse.json(
-        { error: "Order not found" },
-        { status: 404 }
-      )
+      return NextResponse.json({ error: "Order not found" }, { status: 404 })
     }
 
     return NextResponse.json(order)
   } catch (error) {
     console.error("GET /api/admin/orders/[id] error:", error)
-    return NextResponse.json(
-      { error: "Failed to fetch order" },
-      { status: 500 }
-    )
+    return NextResponse.json({ error: "Failed to fetch order" }, { status: 500 })
   }
 }
 
@@ -71,10 +62,7 @@ export async function PATCH(request: Request, { params }: RouteParams) {
     const session = await auth()
 
     if (!session?.user || session.user.role !== "ADMIN") {
-      return NextResponse.json(
-        { error: "Unauthorized" },
-        { status: 401 }
-      )
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }
 
     const { id } = await params
@@ -83,10 +71,7 @@ export async function PATCH(request: Request, { params }: RouteParams) {
 
     // Validate status
     if (!status || !Object.values(OrderStatus).includes(status)) {
-      return NextResponse.json(
-        { error: "Invalid status" },
-        { status: 400 }
-      )
+      return NextResponse.json({ error: "Invalid status" }, { status: 400 })
     }
 
     // Check if order exists
@@ -95,10 +80,7 @@ export async function PATCH(request: Request, { params }: RouteParams) {
     })
 
     if (!existingOrder) {
-      return NextResponse.json(
-        { error: "Order not found" },
-        { status: 404 }
-      )
+      return NextResponse.json({ error: "Order not found" }, { status: 404 })
     }
 
     // Update order status
@@ -127,9 +109,6 @@ export async function PATCH(request: Request, { params }: RouteParams) {
     return NextResponse.json(updatedOrder)
   } catch (error) {
     console.error("PATCH /api/admin/orders/[id] error:", error)
-    return NextResponse.json(
-      { error: "Failed to update order" },
-      { status: 500 }
-    )
+    return NextResponse.json({ error: "Failed to update order" }, { status: 500 })
   }
 }

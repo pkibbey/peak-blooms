@@ -2,9 +2,6 @@
 
 ### 🚀 Core Features
 
-- [x] Add order history for accounts
-- [x] Complete checkout process with address management
-- [x] Admin order management with status updates
 - [ ] Add a page where users can manage their account information and see their own order history and manage delivery addresses
 - [ ] Create an InspirationCard
 - [ ] Create a CollectionCard
@@ -26,3 +23,4 @@
 - [ ] Allow download of content as CSV, so that they can be edited offline and uploaded to modify the content
 - [ ] Go through the site and make sure that the components are separated well. Some of the files are pretty big, and could be split up a little to keep the code cleaner and make future changes more isolated
 - [ ] Validate all form fields using zod + react-hook-form instead of relying on html validation
+- [ ] Allow users to change their email address

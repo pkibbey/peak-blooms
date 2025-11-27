@@ -1,7 +1,7 @@
-"use client";
+"use client"
 
-import Link from "next/link";
-import { Button } from "@/components/ui/button";
+import Link from "next/link"
+import { Button } from "@/components/ui/button"
 
 export default function VerifyRequestPage() {
   return (
@@ -33,5 +33,5 @@ export default function VerifyRequestPage() {
         </Button>
       </div>
     </div>
-  );
+  )
 }

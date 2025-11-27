@@ -21,8 +21,10 @@ export default async function ShopPage({ searchParams }: ShopPageProps) {
 
   const collectionId = typeof params.collectionId === "string" ? params.collectionId : undefined
   const color = typeof params.color === "string" ? params.color : undefined
-  const stemLengthMin = typeof params.stemLengthMin === "string" ? parseInt(params.stemLengthMin, 10) : undefined
-  const stemLengthMax = typeof params.stemLengthMax === "string" ? parseInt(params.stemLengthMax, 10) : undefined
+  const stemLengthMin =
+    typeof params.stemLengthMin === "string" ? parseInt(params.stemLengthMin, 10) : undefined
+  const stemLengthMax =
+    typeof params.stemLengthMax === "string" ? parseInt(params.stemLengthMax, 10) : undefined
   const priceMin = typeof params.priceMin === "string" ? params.priceMin : undefined
   const priceMax = typeof params.priceMax === "string" ? params.priceMax : undefined
 
@@ -107,7 +109,7 @@ export default async function ShopPage({ searchParams }: ShopPageProps) {
             ))}
           </div>
         )}
-    </div>
+      </div>
     </div>
   )
 }

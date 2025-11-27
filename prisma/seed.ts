@@ -1,30 +1,30 @@
-import { PrismaClient } from "../src/generated/client";
-import { Pool } from 'pg'
-import { PrismaPg } from '@prisma/adapter-pg'
+import { PrismaClient } from "../src/generated/client"
+import { Pool } from "pg"
+import { PrismaPg } from "@prisma/adapter-pg"
 
 const connectionString = process.env.DATABASE_URL
 
 if (!connectionString) {
-  throw new Error("DATABASE_URL is not defined");
+  throw new Error("DATABASE_URL is not defined")
 }
 
-console.log("Connecting to database...");
+console.log("Connecting to database...")
 const pool = new Pool({ connectionString })
 const adapter = new PrismaPg(pool)
 const prisma = new PrismaClient({ adapter })
 
 async function main() {
-  console.log("🌸 Seeding database with collections and products...");
+  console.log("🌸 Seeding database with collections and products...")
 
   // Clear existing data (optional, remove if you want to preserve existing data)
-  await prisma.orderItem.deleteMany({});
-  await prisma.cartItem.deleteMany({});
-  await prisma.order.deleteMany({});
-  await prisma.shoppingCart.deleteMany({});
-  await prisma.productVariant.deleteMany({});
-  await prisma.product.deleteMany({});
-  await prisma.collection.deleteMany({});
-  await prisma.inspiration.deleteMany({});
+  await prisma.orderItem.deleteMany({})
+  await prisma.cartItem.deleteMany({})
+  await prisma.order.deleteMany({})
+  await prisma.shoppingCart.deleteMany({})
+  await prisma.productVariant.deleteMany({})
+  await prisma.product.deleteMany({})
+  await prisma.collection.deleteMany({})
+  await prisma.inspiration.deleteMany({})
 
   // Create collections
   const classicRoses = await prisma.collection.create({
@@ -32,27 +32,30 @@ async function main() {
       name: "Classic Roses",
       slug: "classic-roses",
       image: "/categories/classic-roses.png",
-      description: "Timeless elegance and beauty in every bloom. Our classic rose collection features the most beloved varieties, perfect for traditional arrangements and timeless celebrations.",
+      description:
+        "Timeless elegance and beauty in every bloom. Our classic rose collection features the most beloved varieties, perfect for traditional arrangements and timeless celebrations.",
     },
-  });
+  })
 
   const exoticBlooms = await prisma.collection.create({
     data: {
       name: "Exotic Blooms",
       slug: "exotic-blooms",
       image: "/categories/exotic-blooms.png",
-      description: "Bold and vibrant arrangements that bring drama and sophistication to any space. Discover unique textures and rich colors from around the world.",
+      description:
+        "Bold and vibrant arrangements that bring drama and sophistication to any space. Discover unique textures and rich colors from around the world.",
     },
-  });
+  })
 
   const seasonalWildflowers = await prisma.collection.create({
     data: {
       name: "Seasonal Wildflowers",
       slug: "seasonal-wildflowers",
       image: "/categories/seasonal-wildflowers.png",
-      description: "Nature's finest seasonal selections capturing the essence of each time of year. Fresh, vibrant, and sustainably sourced for maximum impact.",
+      description:
+        "Nature's finest seasonal selections capturing the essence of each time of year. Fresh, vibrant, and sustainably sourced for maximum impact.",
     },
-  });
+  })
 
   // Create products
   await prisma.product.create({
@@ -71,7 +74,7 @@ async function main() {
         ],
       },
     },
-  });
+  })
 
   await prisma.product.create({
     data: {
@@ -88,7 +91,7 @@ async function main() {
         ],
       },
     },
-  });
+  })
 
   await prisma.product.create({
     data: {
@@ -106,7 +109,7 @@ async function main() {
         ],
       },
     },
-  });
+  })
 
   await prisma.product.create({
     data: {
@@ -123,9 +126,9 @@ async function main() {
         ],
       },
     },
-  });
+  })
 
-  console.log("✨ Creating inspirations...");
+  console.log("✨ Creating inspirations...")
 
   // First create the inspirations without products
   const sunsetRomance = await prisma.inspiration.create({
@@ -139,7 +142,7 @@ async function main() {
       inspirationText:
         "This arrangement draws inspiration from the golden hour's fleeting beauty. I combined soft peach flowers with deeper amber accents to create depth and warmth. The voluminous textures balance the delicate blooms, making this set ideal for florists seeking to create memorable moments at sunset celebrations.",
     },
-  });
+  })
 
   const romanticElegance = await prisma.inspiration.create({
     data: {
@@ -152,7 +155,7 @@ async function main() {
       inspirationText:
         "Inspired by classic wedding aesthetics, I curated this set to appeal to traditionalists while maintaining modern elegance. The pink roses provide focal depth, while the abundant green creates visual balance. This set works beautifully for both intimate and grand celebrations, offering versatility for florists managing diverse client needs.",
     },
-  });
+  })
 
   const pureSerenity = await prisma.inspiration.create({
     data: {
@@ -165,7 +168,7 @@ async function main() {
       inspirationText:
         "This set embodies the belief that less is often more. The pure white flowers demand attention without noise, creating a serene focal point. Paired with generous green elements, it speaks to clients seeking understated luxury. Perfect for modern minimalist spaces and those who appreciate refined simplicity.",
     },
-  });
+  })
 
   const lushGarden = await prisma.inspiration.create({
     data: {
@@ -178,59 +181,103 @@ async function main() {
       inspirationText:
         "I created this set for designers seeking volume and texture-rich arrangements. The primary focus on lush greenery provides an excellent base for clients who prefer to add their own focal flowers, or stands beautifully on its own for those appreciating organic abundance. It's perfect for installations and large-scale projects.",
     },
-  });
+  })
 
   // Fetch the products to get their IDs
-  const peachFlower = await prisma.product.findUnique({ where: { slug: "peach-flower" }, include: { variants: true } });
-  const greenFluffy = await prisma.product.findUnique({ where: { slug: "green-fluffy" }, include: { variants: true } });
-  const pinkRose = await prisma.product.findUnique({ where: { slug: "pink-rose" }, include: { variants: true } });
-  const playaBlanca = await prisma.product.findUnique({ where: { slug: "playa-blanca" }, include: { variants: true } });
+  const peachFlower = await prisma.product.findUnique({
+    where: { slug: "peach-flower" },
+    include: { variants: true },
+  })
+  const greenFluffy = await prisma.product.findUnique({
+    where: { slug: "green-fluffy" },
+    include: { variants: true },
+  })
+  const pinkRose = await prisma.product.findUnique({
+    where: { slug: "pink-rose" },
+    include: { variants: true },
+  })
+  const playaBlanca = await prisma.product.findUnique({
+    where: { slug: "playa-blanca" },
+    include: { variants: true },
+  })
 
   // Create the inspiration product associations with variants
   if (peachFlower && greenFluffy) {
     await prisma.inspirationProduct.createMany({
       data: [
-        { inspirationId: sunsetRomance.id, productId: peachFlower.id, productVariantId: peachFlower.variants[0]?.id ?? null },
-        { inspirationId: sunsetRomance.id, productId: greenFluffy.id, productVariantId: greenFluffy.variants[0]?.id ?? null },
+        {
+          inspirationId: sunsetRomance.id,
+          productId: peachFlower.id,
+          productVariantId: peachFlower.variants[0]?.id ?? null,
+        },
+        {
+          inspirationId: sunsetRomance.id,
+          productId: greenFluffy.id,
+          productVariantId: greenFluffy.variants[0]?.id ?? null,
+        },
       ],
-    });
+    })
   }
 
   if (pinkRose && greenFluffy) {
     await prisma.inspirationProduct.createMany({
       data: [
-        { inspirationId: romanticElegance.id, productId: pinkRose.id, productVariantId: pinkRose.variants[0]?.id ?? null },
-        { inspirationId: romanticElegance.id, productId: greenFluffy.id, productVariantId: greenFluffy.variants[0]?.id ?? null },
+        {
+          inspirationId: romanticElegance.id,
+          productId: pinkRose.id,
+          productVariantId: pinkRose.variants[0]?.id ?? null,
+        },
+        {
+          inspirationId: romanticElegance.id,
+          productId: greenFluffy.id,
+          productVariantId: greenFluffy.variants[0]?.id ?? null,
+        },
       ],
-    });
+    })
   }
 
   if (playaBlanca && greenFluffy) {
     await prisma.inspirationProduct.createMany({
       data: [
-        { inspirationId: pureSerenity.id, productId: playaBlanca.id, productVariantId: playaBlanca.variants[0]?.id ?? null },
-        { inspirationId: pureSerenity.id, productId: greenFluffy.id, productVariantId: greenFluffy.variants[0]?.id ?? null },
+        {
+          inspirationId: pureSerenity.id,
+          productId: playaBlanca.id,
+          productVariantId: playaBlanca.variants[0]?.id ?? null,
+        },
+        {
+          inspirationId: pureSerenity.id,
+          productId: greenFluffy.id,
+          productVariantId: greenFluffy.variants[0]?.id ?? null,
+        },
       ],
-    });
+    })
   }
 
   if (greenFluffy && peachFlower) {
     await prisma.inspirationProduct.createMany({
       data: [
-        { inspirationId: lushGarden.id, productId: greenFluffy.id, productVariantId: greenFluffy.variants[0]?.id ?? null },
-        { inspirationId: lushGarden.id, productId: peachFlower.id, productVariantId: peachFlower.variants[0]?.id ?? null },
+        {
+          inspirationId: lushGarden.id,
+          productId: greenFluffy.id,
+          productVariantId: greenFluffy.variants[0]?.id ?? null,
+        },
+        {
+          inspirationId: lushGarden.id,
+          productId: peachFlower.id,
+          productVariantId: peachFlower.variants[0]?.id ?? null,
+        },
       ],
-    });
+    })
   }
 
-  console.log("✅ Database seeded successfully!");
+  console.log("✅ Database seeded successfully!")
 }
 
 main()
   .catch((e) => {
-    console.error("❌ Seeding failed:", e);
-    process.exit(1);
+    console.error("❌ Seeding failed:", e)
+    process.exit(1)
   })
   .finally(async () => {
-    await prisma.$disconnect();
-  });
+    await prisma.$disconnect()
+  })

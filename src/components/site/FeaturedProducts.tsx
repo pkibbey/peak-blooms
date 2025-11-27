@@ -1,10 +1,10 @@
-import Link from "next/link";
-import { db } from "@/lib/db";
-import { ProductCard } from "./ProductCard";
-import { getCurrentUser } from "@/lib/auth-utils";
+import Link from "next/link"
+import { db } from "@/lib/db"
+import { ProductCard } from "./ProductCard"
+import { getCurrentUser } from "@/lib/auth-utils"
 
 export default async function FeaturedProducts() {
-  const user = await getCurrentUser();
+  const user = await getCurrentUser()
   const products = await db.product.findMany({
     where: {
       featured: true,
@@ -13,7 +13,7 @@ export default async function FeaturedProducts() {
       variants: true,
     },
     take: 4,
-  });
+  })
 
   return (
     <div className="flex flex-col items-center justify-start bg-white py-16 font-sans">
@@ -37,5 +37,5 @@ export default async function FeaturedProducts() {
         </div>
       </div>
     </div>
-  );
+  )
 }

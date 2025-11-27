@@ -1,46 +1,46 @@
-"use client";
+"use client"
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
-import { Button } from "@/components/ui/button";
+import { useState } from "react"
+import { useRouter } from "next/navigation"
+import { Button } from "@/components/ui/button"
 
 interface User {
-  id: string;
-  email: string | null;
-  name: string | null;
-  approved: boolean;
-  createdAt: string;
+  id: string
+  email: string | null
+  name: string | null
+  approved: boolean
+  createdAt: string
 }
 
 interface PendingUserCardProps {
-  user: User;
+  user: User
 }
 
 export default function PendingUserCard({ user }: PendingUserCardProps) {
-  const router = useRouter();
-  const [approving, setApproving] = useState<string | null>(null);
+  const router = useRouter()
+  const [approving, setApproving] = useState<string | null>(null)
 
   const handleApprove = async () => {
-    setApproving(user.id);
+    setApproving(user.id)
     try {
       const response = await fetch(`/api/admin/users/${user.id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ approved: true }),
-      });
+      })
 
       if (response.ok) {
         // Refresh to update the user list
-        router.refresh();
+        router.refresh()
       } else {
-        console.error("Failed to approve user");
+        console.error("Failed to approve user")
       }
     } catch (error) {
-      console.error("Error approving user:", error);
+      console.error("Error approving user:", error)
     } finally {
-      setApproving(null);
+      setApproving(null)
     }
-  };
+  }
 
   return (
     <div className="flex items-center justify-between rounded-lg border border-border p-4">
@@ -52,14 +52,10 @@ export default function PendingUserCard({ user }: PendingUserCardProps) {
         </p>
       </div>
       <div className="ml-4 flex gap-2">
-        <Button
-          size="sm"
-          onClick={handleApprove}
-          disabled={approving === user.id}
-        >
+        <Button size="sm" onClick={handleApprove} disabled={approving === user.id}>
           Approve
         </Button>
       </div>
     </div>
-  );
+  )
 }

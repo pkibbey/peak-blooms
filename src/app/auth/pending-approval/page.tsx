@@ -1,27 +1,25 @@
-import { Suspense } from "react";
-import Link from "next/link";
-import Image from "next/image";
-import { Button } from "@/components/ui/button";
-import { IconArrowRight, IconMail } from "@/components/ui/icons";
-import { ResendConfirmationEmail } from "@/components/auth/ResendConfirmationEmail";
-import { db } from "@/lib/db";
+import { Suspense } from "react"
+import Link from "next/link"
+import Image from "next/image"
+import { Button } from "@/components/ui/button"
+import { IconArrowRight, IconMail } from "@/components/ui/icons"
+import { ResendConfirmationEmail } from "@/components/auth/ResendConfirmationEmail"
+import { db } from "@/lib/db"
 
 interface PendingApprovalPageProps {
-  searchParams: Promise<{ email?: string }>;
+  searchParams: Promise<{ email?: string }>
 }
 
 async function InspirationsList() {
-  const inspirations = await db.inspiration.findMany();
+  const inspirations = await db.inspiration.findMany()
 
   if (!inspirations || inspirations.length === 0) {
-    return null;
+    return null
   }
 
   return (
     <div className="mt-12 pt-8 border-t border-t-border">
-      <h2 className="text-2xl font-bold font-serif mb-8">
-        Browse Our Inspirations While You Wait
-      </h2>
+      <h2 className="text-2xl font-bold font-serif mb-8">Browse Our Inspirations While You Wait</h2>
 
       <div className="grid grid-cols-1 gap-6 sm:grid-cols-3">
         {inspirations.map((inspiration) => (
@@ -65,14 +63,12 @@ async function InspirationsList() {
         ))}
       </div>
     </div>
-  );
+  )
 }
 
-export default async function PendingApprovalPage({
-  searchParams,
-}: PendingApprovalPageProps) {
-  const params = await searchParams;
-  const email = params.email || "";
+export default async function PendingApprovalPage({ searchParams }: PendingApprovalPageProps) {
+  const params = await searchParams
+  const email = params.email || ""
 
   return (
     <div className="flex flex-col bg-white">
@@ -80,12 +76,8 @@ export default async function PendingApprovalPage({
         <div className="w-full max-w-3xl space-y-8">
           {/* Header Section */}
           <div className="space-y-4 text-center">
-            <h1 className="text-4xl font-bold font-serif">
-              Welcome to Peak Blooms!
-            </h1>
-            <p className="text-lg text-muted-foreground">
-              Your account is pending approval
-            </p>
+            <h1 className="text-4xl font-bold font-serif">Welcome to Peak Blooms!</h1>
+            <p className="text-lg text-muted-foreground">Your account is pending approval</p>
           </div>
 
           {/* Main Content */}
@@ -95,12 +87,12 @@ export default async function PendingApprovalPage({
               <h2 className="text-xl font-semibold">What&apos;s Next?</h2>
               <p className="text-muted-foreground">
                 We&apos;ve sent a confirmation email to{" "}
-                <strong className="text-foreground">{email}</strong>. Click the
-                link in that email to verify your account.
+                <strong className="text-foreground">{email}</strong>. Click the link in that email
+                to verify your account.
               </p>
               <p className="text-sm text-muted-foreground">
-                New accounts require approval from our team before you can place
-                orders. This typically takes 24-48 hours.
+                New accounts require approval from our team before you can place orders. This
+                typically takes 24-48 hours.
               </p>
               <div className="pt-2">
                 <ResendConfirmationEmail email={email} />
@@ -111,9 +103,9 @@ export default async function PendingApprovalPage({
             <div className="space-y-3 border-t border-t-border pt-6">
               <h2 className="text-xl font-semibold">First-Time Customer Bonus</h2>
               <p className="text-muted-foreground">
-                As a new Peak Blooms customer, you&apos;ll receive an exclusive
-                discount on your first order once your account is approved. This
-                is our way of welcoming you to our community!
+                As a new Peak Blooms customer, you&apos;ll receive an exclusive discount on your
+                first order once your account is approved. This is our way of welcoming you to our
+                community!
               </p>
             </div>
 
@@ -121,8 +113,7 @@ export default async function PendingApprovalPage({
             <div className="space-y-3 border-t border-t-border pt-6">
               <h2 className="text-xl font-semibold">Need Faster Approval?</h2>
               <p className="text-muted-foreground">
-                If you need your account approved urgently, please reach out to
-                our team:
+                If you need your account approved urgently, please reach out to our team:
               </p>
               <div className="space-y-2">
                 <Button asChild variant="outline">
@@ -158,5 +149,5 @@ export default async function PendingApprovalPage({
         </div>
       </div>
     </div>
-  );
+  )
 }

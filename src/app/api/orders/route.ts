@@ -1,7 +1,7 @@
-import { auth } from "@/lib/auth";
-import { db } from "@/lib/db";
-import { isApproved } from "@/lib/auth-utils";
-import { NextResponse } from "next/server";
+import { NextResponse } from "next/server"
+import { auth } from "@/lib/auth"
+import { isApproved } from "@/lib/auth-utils"
+import { db } from "@/lib/db"
 
 /**
  * Generate the next order number in sequence (PB-00001, PB-00002, etc.)
@@ -10,17 +10,17 @@ async function generateOrderNumber(): Promise<string> {
   const lastOrder = await db.order.findFirst({
     orderBy: { orderNumber: "desc" },
     select: { orderNumber: true },
-  });
+  })
 
-  let nextNumber = 1;
+  let nextNumber = 1
   if (lastOrder?.orderNumber) {
-    const match = lastOrder.orderNumber.match(/PB-(\d+)/);
+    const match = lastOrder.orderNumber.match(/PB-(\d+)/)
     if (match) {
-      nextNumber = parseInt(match[1], 10) + 1;
+      nextNumber = parseInt(match[1], 10) + 1
     }
   }
 
-  return `PB-${nextNumber.toString().padStart(5, "0")}`;
+  return `PB-${nextNumber.toString().padStart(5, "0")}`
 }
 
 /**
@@ -29,33 +29,27 @@ async function generateOrderNumber(): Promise<string> {
  */
 export async function GET() {
   try {
-    const session = await auth();
+    const session = await auth()
 
     if (!session?.user?.email) {
-      return NextResponse.json(
-        { error: "Unauthorized" },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }
 
     // Check if user is approved
-    const approved = await isApproved();
+    const approved = await isApproved()
     if (!approved) {
       return NextResponse.json(
         { error: "Your account is not approved for purchases" },
         { status: 403 }
-      );
+      )
     }
 
     const user = await db.user.findUnique({
       where: { email: session.user.email },
-    });
+    })
 
     if (!user) {
-      return NextResponse.json(
-        { error: "User not found" },
-        { status: 404 }
-      );
+      return NextResponse.json({ error: "User not found" }, { status: 404 })
     }
 
     const orders = await db.order.findMany({
@@ -70,15 +64,12 @@ export async function GET() {
       orderBy: {
         createdAt: "desc",
       },
-    });
+    })
 
-    return NextResponse.json(orders);
+    return NextResponse.json(orders)
   } catch (error) {
-    console.error("GET /api/orders error:", error);
-    return NextResponse.json(
-      { error: "Failed to fetch orders" },
-      { status: 500 }
-    );
+    console.error("GET /api/orders error:", error)
+    return NextResponse.json({ error: "Failed to fetch orders" }, { status: 500 })
   }
 }
 
@@ -88,37 +79,31 @@ export async function GET() {
  */
 export async function POST(request: Request) {
   try {
-    const session = await auth();
+    const session = await auth()
 
     if (!session?.user?.email) {
-      return NextResponse.json(
-        { error: "Unauthorized" },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }
 
     // Check if user is approved
-    const approved = await isApproved();
+    const approved = await isApproved()
     if (!approved) {
       return NextResponse.json(
         { error: "Your account is not approved for purchases" },
         { status: 403 }
-      );
+      )
     }
 
     const user = await db.user.findUnique({
       where: { email: session.user.email },
-    });
+    })
 
     if (!user) {
-      return NextResponse.json(
-        { error: "User not found" },
-        { status: 404 }
-      );
+      return NextResponse.json({ error: "User not found" }, { status: 404 })
     }
 
     // Parse request body
-    const body = await request.json();
+    const body = await request.json()
     const {
       shippingAddressId,
       shippingAddress,
@@ -127,14 +112,11 @@ export async function POST(request: Request) {
       email,
       phone,
       notes,
-    } = body;
+    } = body
 
     // Validate email
     if (!email || typeof email !== "string") {
-      return NextResponse.json(
-        { error: "Email is required" },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: "Email is required" }, { status: 400 })
     }
 
     // Get user's cart
@@ -148,24 +130,20 @@ export async function POST(request: Request) {
           },
         },
       },
-    });
+    })
 
     if (!cart || cart.items.length === 0) {
-      return NextResponse.json(
-        { error: "Cart is empty" },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: "Cart is empty" }, { status: 400 })
     }
 
     // Calculate total using variant pricing (required)
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const total = cart.items.reduce((sum: number, item: any) => {
-      const price = item.productVariant?.price ?? 0;
-      return sum + price * item.quantity;
-    }, 0);
+    const total = cart.items.reduce((sum: number, item) => {
+      const price = item.productVariant?.price ?? 0
+      return sum + price * item.quantity
+    }, 0)
 
     // Handle shipping address
-    let finalShippingAddressId: string;
+    let finalShippingAddressId: string
 
     if (shippingAddressId) {
       // Using existing address - verify it belongs to user
@@ -174,16 +152,13 @@ export async function POST(request: Request) {
           id: shippingAddressId,
           userId: user.id,
         },
-      });
+      })
 
       if (!existingAddress) {
-        return NextResponse.json(
-          { error: "Invalid shipping address" },
-          { status: 400 }
-        );
+        return NextResponse.json({ error: "Invalid shipping address" }, { status: 400 })
       }
 
-      finalShippingAddressId = shippingAddressId;
+      finalShippingAddressId = shippingAddressId
     } else if (shippingAddress) {
       // Creating new address
       const newAddress = await db.address.create({
@@ -199,18 +174,15 @@ export async function POST(request: Request) {
           zip: shippingAddress.zip,
           country: shippingAddress.country || "US",
         },
-      });
+      })
 
-      finalShippingAddressId = newAddress.id;
+      finalShippingAddressId = newAddress.id
     } else {
-      return NextResponse.json(
-        { error: "Shipping address is required" },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: "Shipping address is required" }, { status: 400 })
     }
 
     // Handle billing address (optional)
-    let finalBillingAddressId: string | null = null;
+    let finalBillingAddressId: string | null = null
 
     if (billingAddress) {
       const newBillingAddress = await db.address.create({
@@ -226,13 +198,13 @@ export async function POST(request: Request) {
           zip: billingAddress.zip,
           country: billingAddress.country || "US",
         },
-      });
+      })
 
-      finalBillingAddressId = newBillingAddress.id;
+      finalBillingAddressId = newBillingAddress.id
     }
 
     // Generate order number
-    const orderNumber = await generateOrderNumber();
+    const orderNumber = await generateOrderNumber()
 
     // Create order with items
     const order = await db.order.create({
@@ -247,8 +219,7 @@ export async function POST(request: Request) {
         shippingAddressId: finalShippingAddressId,
         billingAddressId: finalBillingAddressId,
         items: {
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          create: cart.items.map((item: any) => ({
+          create: cart.items.map((item) => ({
             productId: item.productId,
             productVariantId: item.productVariantId,
             quantity: item.quantity,
@@ -266,19 +237,16 @@ export async function POST(request: Request) {
         shippingAddress: true,
         billingAddress: true,
       },
-    });
+    })
 
     // Clear the cart
     await db.cartItem.deleteMany({
       where: { cartId: cart.id },
-    });
+    })
 
-    return NextResponse.json(order, { status: 201 });
+    return NextResponse.json(order, { status: 201 })
   } catch (error) {
-    console.error("POST /api/orders error:", error);
-    return NextResponse.json(
-      { error: "Failed to create order" },
-      { status: 500 }
-    );
+    console.error("POST /api/orders error:", error)
+    return NextResponse.json({ error: "Failed to create order" }, { status: 500 })
   }
 }

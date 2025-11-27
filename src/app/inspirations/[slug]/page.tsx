@@ -1,10 +1,8 @@
-import Link from "next/link";
-import Image from "next/image";
-import { notFound } from "next/navigation";
-import AddAllToCartButton from "@/components/site/AddAllToCartButton";
-import { db } from "@/lib/db";
-import { getCurrentUser } from "@/lib/auth-utils";
-import BackLink from "@/components/site/BackLink";
+import Image from "next/image"
+import Link from "next/link"
+import { notFound } from "next/navigation"
+import AddAllToCartButton from "@/components/site/AddAllToCartButton"
+import BackLink from "@/components/site/BackLink"
 import {
   Table,
   TableBody,
@@ -12,40 +10,40 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table";
+} from "@/components/ui/table"
+import { getCurrentUser } from "@/lib/auth-utils"
+import { db } from "@/lib/db"
 
 interface InspirationDetailPageProps {
   params: Promise<{
-    slug: string;
-  }>;
+    slug: string
+  }>
 }
 
 export async function generateStaticParams() {
   const inspirations = await db.inspiration.findMany({
     select: { slug: true },
-  });
+  })
   return inspirations.map((inspiration) => ({
     slug: inspiration.slug,
-  }));
+  }))
 }
 
 export async function generateMetadata({ params }: InspirationDetailPageProps) {
-  const { slug } = await params;
+  const { slug } = await params
   const inspiration = await db.inspiration.findUnique({
     where: { slug },
-  });
-  if (!inspiration) return {};
+  })
+  if (!inspiration) return {}
   return {
     title: `${inspiration.name} - Inspirations`,
     description: inspiration.subtitle,
-  };
+  }
 }
 
-export default async function InspirationDetailPage({
-  params,
-}: InspirationDetailPageProps) {
-  const { slug } = await params;
-  const user = await getCurrentUser();
+export default async function InspirationDetailPage({ params }: InspirationDetailPageProps) {
+  const { slug } = await params
+  const user = await getCurrentUser()
   const inspiration = await db.inspiration.findUnique({
     where: { slug },
     include: {
@@ -60,10 +58,10 @@ export default async function InspirationDetailPage({
         },
       },
     },
-  });
+  })
 
   if (!inspiration) {
-    notFound();
+    notFound()
   }
 
   // Extract products with their selected variants from the join table
@@ -72,7 +70,7 @@ export default async function InspirationDetailPage({
     selectedVariant: sp.productVariant,
     // Use the selected variant or fall back to first variant
     displayVariant: sp.productVariant ?? sp.product.variants[0] ?? null,
-  }));
+  }))
 
   return (
     <div className="flex flex-col items-center justify-start bg-white py-16 font-sans">
@@ -100,9 +98,7 @@ export default async function InspirationDetailPage({
         {/* Inspiration Text */}
         <div className="mb-12 p-6 bg-secondary/30 rounded-xs">
           <h2 className="text-lg font-semibold mb-4">The Story</h2>
-          <p className="text-base leading-relaxed text-gray-700">
-            {inspiration.inspirationText}
-          </p>
+          <p className="text-base leading-relaxed text-gray-700">{inspiration.inspirationText}</p>
         </div>
 
         {/* Products Section */}
@@ -170,9 +166,7 @@ export default async function InspirationDetailPage({
                           </div>
                         </div>
                       ) : (
-                        <div className="text-sm text-muted-foreground">
-                          No variant
-                        </div>
+                        <div className="text-sm text-muted-foreground">No variant</div>
                       )}
                     </TableCell>
                     <TableCell>
@@ -182,6 +176,7 @@ export default async function InspirationDetailPage({
                           fill="currentColor"
                           viewBox="0 0 20 20"
                         >
+                          <title>Included</title>
                           <path
                             fillRule="evenodd"
                             d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
@@ -209,5 +204,5 @@ export default async function InspirationDetailPage({
         </div>
       </div>
     </div>
-  );
+  )
 }

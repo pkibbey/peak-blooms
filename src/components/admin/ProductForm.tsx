@@ -1,60 +1,60 @@
-"use client";
+"use client"
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
-import Link from "next/link";
-import Image from "next/image";
-import { toast } from "sonner";
-import { Button } from "@/components/ui/button";
-import { Label } from "@/components/ui/label";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { Checkbox } from "@/components/ui/checkbox";
-import SlugInput from "@/components/admin/SlugInput";
+import Image from "next/image"
+import Link from "next/link"
+import { useRouter } from "next/navigation"
+import { useState } from "react"
+import { toast } from "sonner"
+import SlugInput from "@/components/admin/SlugInput"
+import { Button } from "@/components/ui/button"
+import { Checkbox } from "@/components/ui/checkbox"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
 import {
   Select,
-  SelectTrigger,
-  SelectValue,
   SelectContent,
   SelectItem,
-} from "@/components/ui/select";
-import { IconTrash, IconPlus } from "../ui/icons";
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
+import { Textarea } from "@/components/ui/textarea"
+import { IconPlus, IconTrash } from "../ui/icons"
 
 interface Collection {
-  id: string;
-  name: string;
+  id: string
+  name: string
 }
 
 interface ProductVariant {
-  id?: string;
-  price: string;
-  stemLength: string;
-  countPerBunch: string;
+  id?: string
+  price: string
+  stemLength: string
+  countPerBunch: string
 }
 
 interface ProductFormProps {
-  collections: Collection[];
+  collections: Collection[]
   product?: {
-    id: string;
-    name: string;
-    slug: string;
-    description: string | null;
-    image: string | null;
-    color: string | null;
-    collectionId: string;
-    featured: boolean;
+    id: string
+    name: string
+    slug: string
+    description: string | null
+    image: string | null
+    color: string | null
+    collectionId: string
+    featured: boolean
     variants?: {
-      id: string;
-      price: number;
-      stemLength: number | null;
-      countPerBunch: number | null;
-    }[];
-  };
+      id: string
+      price: number
+      stemLength: number | null
+      countPerBunch: number | null
+    }[]
+  }
 }
 
 export default function ProductForm({ collections, product }: ProductFormProps) {
-  const router = useRouter();
-  const isEditing = !!product;
+  const router = useRouter()
+  const isEditing = !!product
 
   const [formData, setFormData] = useState({
     name: product?.name || "",
@@ -64,7 +64,7 @@ export default function ProductForm({ collections, product }: ProductFormProps) 
     color: product?.color || "",
     collectionId: product?.collectionId || "",
     featured: product?.featured || false,
-  });
+  })
 
   const [variants, setVariants] = useState<ProductVariant[]>(() => {
     if (product?.variants && product.variants.length > 0) {
@@ -73,32 +73,32 @@ export default function ProductForm({ collections, product }: ProductFormProps) 
         price: v.price.toString(),
         stemLength: v.stemLength?.toString() || "",
         countPerBunch: v.countPerBunch?.toString() || "",
-      }));
+      }))
     }
     // Start with one empty variant for new products
-    return [{ price: "", stemLength: "", countPerBunch: "" }];
-  });
+    return [{ price: "", stemLength: "", countPerBunch: "" }]
+  })
 
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isDeleting, setIsDeleting] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [isDeleting, setIsDeleting] = useState(false)
+  const [error, setError] = useState<string | null>(null)
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsSubmitting(true);
-    setError(null);
+    e.preventDefault()
+    setIsSubmitting(true)
+    setError(null)
 
     // Validate at least one variant with a price
-    const validVariants = variants.filter((v) => v.price.trim() !== "");
+    const validVariants = variants.filter((v) => v.price.trim() !== "")
     if (validVariants.length === 0) {
-      setError("At least one variant with a price is required");
-      setIsSubmitting(false);
-      return;
+      setError("At least one variant with a price is required")
+      setIsSubmitting(false)
+      return
     }
 
     try {
-      const url = isEditing ? `/api/products/${product.id}` : "/api/products";
-      const method = isEditing ? "PUT" : "POST";
+      const url = isEditing ? `/api/products/${product.id}` : "/api/products"
+      const method = isEditing ? "PUT" : "POST"
 
       const response = await fetch(url, {
         method,
@@ -111,86 +111,82 @@ export default function ProductForm({ collections, product }: ProductFormProps) 
             countPerBunch: v.countPerBunch ? parseInt(v.countPerBunch) : null,
           })),
         }),
-      });
+      })
 
       if (response.ok) {
-        toast.success(isEditing ? "Product updated successfully" : "Product created successfully");
-        router.push("/admin/products");
-        router.refresh();
+        toast.success(isEditing ? "Product updated successfully" : "Product created successfully")
+        router.push("/admin/products")
+        router.refresh()
       } else {
-        const data = await response.json();
-        setError(data.error || "Failed to save product");
+        const data = await response.json()
+        setError(data.error || "Failed to save product")
       }
     } catch (err) {
-      setError("An error occurred. Please try again.");
-      console.error(err);
+      setError("An error occurred. Please try again.")
+      console.error(err)
     } finally {
-      setIsSubmitting(false);
+      setIsSubmitting(false)
     }
-  };
+  }
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
   ) => {
-    const { name, value, type } = e.target;
+    const { name, value, type } = e.target
     setFormData((prev) => ({
       ...prev,
       [name]: type === "checkbox" ? (e.target as HTMLInputElement).checked : value,
-    }));
-  };
+    }))
+  }
 
-  const handleVariantChange = (
-    index: number,
-    field: keyof ProductVariant,
-    value: string
-  ) => {
-    setVariants((prev) =>
-      prev.map((v, i) => (i === index ? { ...v, [field]: value } : v))
-    );
-  };
+  const handleVariantChange = (index: number, field: keyof ProductVariant, value: string) => {
+    setVariants((prev) => prev.map((v, i) => (i === index ? { ...v, [field]: value } : v)))
+  }
 
   const addVariant = () => {
-    setVariants((prev) => [...prev, { price: "", stemLength: "", countPerBunch: "" }]);
-  };
+    setVariants((prev) => [...prev, { price: "", stemLength: "", countPerBunch: "" }])
+  }
 
   const removeVariant = (index: number) => {
     if (variants.length > 1) {
-      setVariants((prev) => prev.filter((_, i) => i !== index));
+      setVariants((prev) => prev.filter((_, i) => i !== index))
     }
-  };
+  }
 
   const handleDelete = async () => {
-    if (!window.confirm(`Are you sure you want to delete "${product?.name}"? This action cannot be undone.`)) {
-      return;
+    if (
+      !window.confirm(
+        `Are you sure you want to delete "${product?.name}"? This action cannot be undone.`
+      )
+    ) {
+      return
     }
 
-    setIsDeleting(true);
+    setIsDeleting(true)
     try {
       const response = await fetch(`/api/products/${product?.id}`, {
         method: "DELETE",
-      });
+      })
 
       if (response.ok) {
-        toast.success("Product deleted successfully");
-        router.push("/admin/products");
-        router.refresh();
+        toast.success("Product deleted successfully")
+        router.push("/admin/products")
+        router.refresh()
       } else {
-        setError("Failed to delete product. Please try again.");
+        setError("Failed to delete product. Please try again.")
       }
     } catch (err) {
-      setError("An error occurred. Please try again.");
-      console.error(err);
+      setError("An error occurred. Please try again.")
+      console.error(err)
     } finally {
-      setIsDeleting(false);
+      setIsDeleting(false)
     }
-  };
+  }
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
       {error && (
-        <div className="rounded-md bg-destructive/10 p-4 text-sm text-destructive">
-          {error}
-        </div>
+        <div className="rounded-md bg-destructive/10 p-4 text-sm text-destructive">{error}</div>
       )}
 
       <div className="grid gap-6 md:grid-cols-2">
@@ -248,7 +244,7 @@ export default function ProductForm({ collections, product }: ProductFormProps) 
               className="rounded-md object-cover"
               sizes="128px"
               onError={(e) => {
-                (e.target as HTMLImageElement).style.display = "none";
+                ;(e.target as HTMLImageElement).style.display = "none"
               }}
             />
           </div>
@@ -274,9 +270,7 @@ export default function ProductForm({ collections, product }: ProductFormProps) 
           <Label htmlFor="collectionId">Collection *</Label>
           <Select
             value={formData.collectionId}
-            onValueChange={(value) =>
-              setFormData((prev) => ({ ...prev, collectionId: value }))
-            }
+            onValueChange={(value) => setFormData((prev) => ({ ...prev, collectionId: value }))}
           >
             <SelectTrigger id="collectionId" className="w-full">
               <SelectValue placeholder="Select a collection" />
@@ -307,7 +301,7 @@ export default function ProductForm({ collections, product }: ProductFormProps) 
         <div className="space-y-3">
           {variants.map((variant, index) => (
             <div
-              key={index}
+              key={variant.id}
               className="grid gap-4 md:grid-cols-4 items-end p-4 border border-border rounded-md bg-muted/30"
             >
               {/* Price */}
@@ -378,7 +372,7 @@ export default function ProductForm({ collections, product }: ProductFormProps) 
           checked={formData.featured}
           onChange={handleChange}
         />
-        
+
         <Label htmlFor="featured" className="cursor-pointer">
           Featured product (show on homepage)
         </Label>
@@ -395,17 +389,12 @@ export default function ProductForm({ collections, product }: ProductFormProps) 
           </Button>
         </div>
         {isEditing && (
-          <Button
-            type="button"
-            variant="destructive"
-            onClick={handleDelete}
-            disabled={isDeleting}
-          >
+          <Button type="button" variant="destructive" onClick={handleDelete} disabled={isDeleting}>
             <IconTrash className="mr-2 inline-block" />
             Delete Product
           </Button>
         )}
       </div>
     </form>
-  );
+  )
 }

@@ -3,10 +3,16 @@ import { auth } from "@/lib/auth"
 import { db } from "@/lib/db"
 import Link from "next/link"
 import Image from "next/image"
-import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import OrderStatusForm from "@/components/admin/OrderStatusForm"
-import { IconCheckCircle, IconClock, IconTruck, IconPackage, IconXCircle, IconMapPin } from "@/components/ui/icons"
+import {
+  IconCheckCircle,
+  IconClock,
+  IconTruck,
+  IconPackage,
+  IconXCircle,
+  IconMapPin,
+} from "@/components/ui/icons"
 import BackLink from "@/components/site/BackLink"
 
 interface AdminOrderDetailPageProps {
@@ -88,9 +94,7 @@ export default async function AdminOrderDetailPage({ params }: AdminOrderDetailP
                 {status.label}
               </Badge>
             </div>
-            <p className="text-muted-foreground">
-              Placed on {formatDate(order.createdAt)}
-            </p>
+            <p className="text-muted-foreground">Placed on {formatDate(order.createdAt)}</p>
           </div>
         </div>
 
@@ -105,8 +109,12 @@ export default async function AdminOrderDetailPage({ params }: AdminOrderDetailP
                   const lineTotal = item.price * item.quantity
                   const variantSpecs = item.productVariant
                     ? [
-                        item.productVariant.stemLength ? `${item.productVariant.stemLength}cm` : null,
-                        item.productVariant.countPerBunch ? `${item.productVariant.countPerBunch} stems` : null,
+                        item.productVariant.stemLength
+                          ? `${item.productVariant.stemLength}cm`
+                          : null,
+                        item.productVariant.countPerBunch
+                          ? `${item.productVariant.countPerBunch} stems`
+                          : null,
                       ]
                         .filter(Boolean)
                         .join(" • ")
@@ -130,7 +138,7 @@ export default async function AdminOrderDetailPage({ params }: AdminOrderDetailP
                       <div className="flex-1">
                         <div className="flex justify-between">
                           <div>
-                            <Link 
+                            <Link
                               href={`/admin/products/${item.productId}/edit`}
                               className="font-medium hover:text-primary hover:underline"
                             >
@@ -215,15 +223,12 @@ export default async function AdminOrderDetailPage({ params }: AdminOrderDetailP
                 <p className="font-medium text-foreground">
                   {order.shippingAddress.firstName} {order.shippingAddress.lastName}
                 </p>
-                {order.shippingAddress.company && (
-                  <p>{order.shippingAddress.company}</p>
-                )}
+                {order.shippingAddress.company && <p>{order.shippingAddress.company}</p>}
                 <p>{order.shippingAddress.street1}</p>
-                {order.shippingAddress.street2 && (
-                  <p>{order.shippingAddress.street2}</p>
-                )}
+                {order.shippingAddress.street2 && <p>{order.shippingAddress.street2}</p>}
                 <p>
-                  {order.shippingAddress.city}, {order.shippingAddress.state} {order.shippingAddress.zip}
+                  {order.shippingAddress.city}, {order.shippingAddress.state}{" "}
+                  {order.shippingAddress.zip}
                 </p>
                 <p>{order.shippingAddress.country}</p>
               </address>
@@ -237,15 +242,12 @@ export default async function AdminOrderDetailPage({ params }: AdminOrderDetailP
                   <p className="font-medium text-foreground">
                     {order.billingAddress.firstName} {order.billingAddress.lastName}
                   </p>
-                  {order.billingAddress.company && (
-                    <p>{order.billingAddress.company}</p>
-                  )}
+                  {order.billingAddress.company && <p>{order.billingAddress.company}</p>}
                   <p>{order.billingAddress.street1}</p>
-                  {order.billingAddress.street2 && (
-                    <p>{order.billingAddress.street2}</p>
-                  )}
+                  {order.billingAddress.street2 && <p>{order.billingAddress.street2}</p>}
                   <p>
-                    {order.billingAddress.city}, {order.billingAddress.state} {order.billingAddress.zip}
+                    {order.billingAddress.city}, {order.billingAddress.state}{" "}
+                    {order.billingAddress.zip}
                   </p>
                   <p>{order.billingAddress.country}</p>
                 </address>

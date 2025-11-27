@@ -1,23 +1,21 @@
-"use client";
+"use client"
 
-import { useState } from "react";
-import { toast } from "sonner";
-import { Button } from "@/components/ui/button";
-import { IconMail } from "@/components/ui/icons";
+import { useState } from "react"
+import { toast } from "sonner"
+import { Button } from "@/components/ui/button"
+import { IconMail } from "@/components/ui/icons"
 
 interface ResendConfirmationEmailProps {
-  email: string;
+  email: string
 }
 
-export function ResendConfirmationEmail({
-  email,
-}: ResendConfirmationEmailProps) {
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
+export function ResendConfirmationEmail({ email }: ResendConfirmationEmailProps) {
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState("")
 
   const handleResend = async () => {
-    setLoading(true);
-    setError("");
+    setLoading(true)
+    setError("")
 
     try {
       const response = await fetch("/api/auth/resend-confirmation", {
@@ -26,28 +24,26 @@ export function ResendConfirmationEmail({
           "Content-Type": "application/json",
         },
         body: JSON.stringify({ email }),
-      });
+      })
 
-      console.log("Resend response status:", response.status);
+      console.log("Resend response status:", response.status)
 
       if (!response.ok) {
-        const data = await response.json();
-        console.error("Resend error response:", data);
-        throw new Error(data.error || "Failed to resend email");
+        const data = await response.json()
+        console.error("Resend error response:", data)
+        throw new Error(data.error || "Failed to resend email")
       }
 
-      const data = await response.json();
-      console.log("Resend success response:", data);
-      toast.success(`Confirmation email sent to ${email}`);
+      const data = await response.json()
+      console.log("Resend success response:", data)
+      toast.success(`Confirmation email sent to ${email}`)
     } catch (err) {
-      console.error("Resend exception:", err);
-      setError(
-        err instanceof Error ? err.message : "Failed to resend email"
-      );
+      console.error("Resend exception:", err)
+      setError(err instanceof Error ? err.message : "Failed to resend email")
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
-  };
+  }
 
   return (
     <div className="space-y-2">
@@ -60,9 +56,7 @@ export function ResendConfirmationEmail({
         <IconMail aria-hidden="true" />
         Resend Confirmation Email
       </Button>
-      {error && (
-        <p className="text-sm text-destructive">{error}</p>
-      )}
+      {error && <p className="text-sm text-destructive">{error}</p>}
     </div>
-  );
+  )
 }

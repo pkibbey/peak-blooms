@@ -1,13 +1,13 @@
-import { auth } from "./auth";
-import { db } from "./db";
+import { auth } from "./auth"
+import { db } from "./db"
 
 /**
  * Get the current authenticated user with their approval and role status
  */
 export async function getCurrentUser() {
-  const session = await auth();
+  const session = await auth()
   if (!session?.user?.email) {
-    return null;
+    return null
   }
 
   const user = await db.user.findUnique({
@@ -20,34 +20,34 @@ export async function getCurrentUser() {
       approved: true,
       createdAt: true,
     },
-  });
+  })
 
-  return user;
+  return user
 }
 
 /**
  * Check if the current user is an admin
  */
 export async function isAdmin() {
-  const user = await getCurrentUser();
-  return user?.role === "ADMIN";
+  const user = await getCurrentUser()
+  return user?.role === "ADMIN"
 }
 
 /**
  * Check if the current user is approved
  */
 export async function isApproved() {
-  const user = await getCurrentUser();
-  return user?.approved === true;
+  const user = await getCurrentUser()
+  return user?.approved === true
 }
 
 /**
  * Get the current user's shopping cart (creates one if it doesn't exist)
  */
 export async function getOrCreateCart() {
-  const user = await getCurrentUser();
+  const user = await getCurrentUser()
   if (!user) {
-    return null;
+    return null
   }
 
   let cart = await db.shoppingCart.findUnique({
@@ -60,7 +60,7 @@ export async function getOrCreateCart() {
         },
       },
     },
-  });
+  })
 
   if (!cart) {
     cart = await db.shoppingCart.create({
@@ -75,10 +75,10 @@ export async function getOrCreateCart() {
           },
         },
       },
-    });
+    })
   }
 
-  return cart;
+  return cart
 }
 
 /**
@@ -86,13 +86,13 @@ export async function getOrCreateCart() {
  */
 export function calculateCartTotal(
   cartItems: Array<{
-    productVariant?: { price: number } | null;
-    quantity: number;
+    productVariant?: { price: number } | null
+    quantity: number
   }>
 ) {
   return cartItems.reduce((total, item) => {
     // Variant is required for pricing
-    const price = item.productVariant?.price ?? 0;
-    return total + price * item.quantity;
-  }, 0);
+    const price = item.productVariant?.price ?? 0
+    return total + price * item.quantity
+  }, 0)
 }

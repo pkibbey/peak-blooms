@@ -13,6 +13,7 @@ import {
   IconRose,
   IconFlower,
   IconSettings,
+  IconUser,
 } from "@/components/ui/icons"
 import { Button } from "../ui/button"
 import { Badge } from "../ui/badge"
@@ -25,12 +26,12 @@ const links = [
 
 interface NavProps {
   user: {
-    role: "CUSTOMER" | "ADMIN";
-    approved: boolean;
-    email: string | null;
-    name?: string | null;
-  } | null;
-  cartCount?: number;
+    role: "CUSTOMER" | "ADMIN"
+    approved: boolean
+    email: string | null
+    name?: string | null
+  } | null
+  cartCount?: number
 }
 
 export default function Nav({ user, cartCount = 0 }: NavProps) {
@@ -47,7 +48,7 @@ export default function Nav({ user, cartCount = 0 }: NavProps) {
         <div className="flex h-16 items-center justify-between">
           <div className="flex items-center gap-6">
             <Link href="/" className="inline-flex items-center gap-3 text-lg font-semibold">
-              <Image 
+              <Image
                 src="/logos/peakblooms.png"
                 alt="Peak Blooms logo"
                 width={384}
@@ -79,11 +80,16 @@ export default function Nav({ user, cartCount = 0 }: NavProps) {
                 <Link href="/cart" className="inline-flex items-center gap-2">
                   <IconShoppingCart aria-hidden="true" />
                   <span>Cart</span>
-                  {cartCount > 0 && (
-                    <Badge variant="destructive">
-                      {cartCount}
-                    </Badge>
-                  )}
+                  {cartCount > 0 && <Badge variant="destructive">{cartCount}</Badge>}
+                </Link>
+              </div>
+            )}
+
+            {user && (
+              <div className="hidden md:block">
+                <Link href="/account" className="inline-flex items-center gap-2">
+                  <IconUser aria-hidden="true" />
+                  <span>Account</span>
                 </Link>
               </div>
             )}
@@ -135,16 +141,15 @@ export default function Nav({ user, cartCount = 0 }: NavProps) {
                   <Link href="/cart" className="inline-flex items-center gap-2 px-4 py-2">
                     <IconShoppingCart aria-hidden="true" />
                     <span>Cart</span>
-                    {cartCount > 0 && (
-                      <Badge variant="destructive">
-                        {cartCount}
-                      </Badge>
-                    )}
+                    {cartCount > 0 && <Badge variant="destructive">{cartCount}</Badge>}
                   </Link>
                 </Button>
               )}
               {user ? (
                 <>
+                  <NavLink href="/account" icon={<IconUser />} className="px-4 py-2">
+                    Account
+                  </NavLink>
                   {user.role === "ADMIN" && (
                     <NavLink href="/admin" icon={<IconSettings />} className="px-4 py-2">
                       Admin Dashboard

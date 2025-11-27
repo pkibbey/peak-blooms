@@ -1,16 +1,16 @@
-import { redirect } from "next/navigation";
-import { auth } from "@/lib/auth";
-import { db } from "@/lib/db";
-import Link from "next/link";
-import { Button } from "@/components/ui/button";
-import ProductsTable from "@/components/admin/ProductsTable";
-import BackLink from "@/components/site/BackLink";
+import { redirect } from "next/navigation"
+import { auth } from "@/lib/auth"
+import { db } from "@/lib/db"
+import Link from "next/link"
+import { Button } from "@/components/ui/button"
+import ProductsTable from "@/components/admin/ProductsTable"
+import BackLink from "@/components/site/BackLink"
 
 export default async function AdminProductsPage() {
-  const session = await auth();
+  const session = await auth()
 
   if (!session?.user || session.user.role !== "ADMIN") {
-    redirect("/admin/unauthorized");
+    redirect("/admin/unauthorized")
   }
 
   const products = await db.product.findMany({
@@ -26,7 +26,7 @@ export default async function AdminProductsPage() {
     orderBy: {
       name: "asc",
     },
-  });
+  })
 
   return (
     <div className="bg-background">
@@ -47,5 +47,5 @@ export default async function AdminProductsPage() {
         <ProductsTable products={products} />
       </div>
     </div>
-  );
+  )
 }

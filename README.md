@@ -10,11 +10,13 @@ Peak Blooms is a modern wholesale flower shop application built with Next.js. It
 ## Project Overview
 
 This application is designed to be:
+
 - **Professional & Modern:** A clean aesthetic distinguishing it from competitors.
 - **Efficient:** Streamlined B2B purchasing workflow.
 - **Inspirational:** Content to engage smaller florist businesses.
 
 ### Key Features
+
 - **Dual User Roles:** Customer (requires approval) and Admin.
 - **Conditional Visibility:** Prices and cart are hidden for guest users.
 - **Full Text Search:** Easy product discovery.

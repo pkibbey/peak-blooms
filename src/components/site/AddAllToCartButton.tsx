@@ -1,76 +1,81 @@
-"use client";
+"use client"
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
-import { useSession } from "next-auth/react";
-import { toast } from "sonner";
-import { Button } from "@/components/ui/button";
+import { useState } from "react"
+import { useRouter } from "next/navigation"
+import { useSession } from "next-auth/react"
+import { toast } from "sonner"
+import { Button } from "@/components/ui/button"
 
 interface AddAllToCartButtonProps {
-  productIds: string[];
-  productVariantIds?: (string | null)[];
-  setName?: string;
-  user?: { approved: boolean } | null;
+  productIds: string[]
+  productVariantIds?: (string | null)[]
+  setName?: string
+  user?: { approved: boolean } | null
 }
 
-export default function AddAllToCartButton({ productIds, productVariantIds, setName, user }: AddAllToCartButtonProps) {
-  const router = useRouter();
-  const { data: session } = useSession();
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+export default function AddAllToCartButton({
+  productIds,
+  productVariantIds,
+  setName,
+  user,
+}: AddAllToCartButtonProps) {
+  const router = useRouter()
+  const { data: session } = useSession()
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
 
   const handleAddAllToCart = async () => {
     if (!session && !user) {
       // If session isn't available client-side and server didn't pass a user, redirect to signin
-      router.push(`/auth/signin?callbackUrl=${window.location.pathname}`);
-      return;
+      router.push(`/auth/signin?callbackUrl=${window.location.pathname}`)
+      return
     }
 
     if (!Array.isArray(productIds) || productIds.length === 0) {
-      setError("No products to add to cart");
-      toast.error("No products to add to cart");
-      return;
+      setError("No products to add to cart")
+      toast.error("No products to add to cart")
+      return
     }
 
-    setLoading(true);
-    setError(null);
+    setLoading(true)
+    setError(null)
 
     try {
-      type Payload = { productIds: string[]; productVariantIds?: (string | null)[] };
-      const payload: Payload = { productIds };
-      if (Array.isArray(productVariantIds)) payload.productVariantIds = productVariantIds;
+      type Payload = { productIds: string[]; productVariantIds?: (string | null)[] }
+      const payload: Payload = { productIds }
+      if (Array.isArray(productVariantIds)) payload.productVariantIds = productVariantIds
 
       const response = await fetch("/api/cart/batch", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
-      });
+      })
 
       if (!response.ok) {
-        const data = await response.json();
-        throw new Error(data.error || "Failed to add items to cart");
+        const data = await response.json()
+        throw new Error(data.error || "Failed to add items to cart")
       }
 
       toast.success(
         setName
           ? `Added all items from "${setName}" to your cart!`
           : `Added ${productIds.length} items to your cart!`
-      );
+      )
 
       // Refresh the page to update cart count and other server components
-      router.refresh();
+      router.refresh()
     } catch (err) {
-      const message = err instanceof Error ? err.message : "Failed to add items to cart";
-      setError(message);
-      toast.error(message);
+      const message = err instanceof Error ? err.message : "Failed to add items to cart"
+      setError(message)
+      toast.error(message)
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
-  };
+  }
 
   // Mirror ProductConfigurator logic for showing buttons (sign in / approval / active)
-  const isSignedOut = !user && !session;
-  const isUnapproved = (user && !user.approved) ?? false;
+  const isSignedOut = !user && !session
+  const isUnapproved = (user && !user.approved) ?? false
 
   if (isSignedOut) {
     return (
@@ -80,7 +85,7 @@ export default function AddAllToCartButton({ productIds, productVariantIds, setN
         </Button>
         {error ? <p className="mt-2 text-sm text-destructive">{error}</p> : null}
       </>
-    );
+    )
   }
 
   if (isUnapproved) {
@@ -91,15 +96,20 @@ export default function AddAllToCartButton({ productIds, productVariantIds, setN
         </Button>
         {error ? <p className="mt-2 text-sm text-destructive">{error}</p> : null}
       </>
-    );
+    )
   }
 
   return (
     <>
-      <Button size="lg" className="w-full md:w-auto" onClick={handleAddAllToCart} disabled={loading}>
+      <Button
+        size="lg"
+        className="w-full md:w-auto"
+        onClick={handleAddAllToCart}
+        disabled={loading}
+      >
         Add All to Cart
       </Button>
       {error ? <p className="mt-2 text-sm text-destructive">{error}</p> : null}
     </>
-  );
+  )
 }

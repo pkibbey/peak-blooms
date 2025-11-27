@@ -1,16 +1,13 @@
-import { db } from "@/lib/db";
-import { NextRequest, NextResponse } from "next/server";
+import { db } from "@/lib/db"
+import { type NextRequest, NextResponse } from "next/server"
 
 /**
  * GET /api/inspirations/[id]
  * Get a single inspiration by ID
  */
-export async function GET(
-  request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
+export async function GET(_request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
-    const { id } = await params;
+    const { id } = await params
 
     const inspiration = await db.inspiration.findUnique({
       where: { id },
@@ -27,52 +24,40 @@ export async function GET(
           },
         },
       },
-    });
+    })
 
     if (!inspiration) {
-      return NextResponse.json(
-        { error: "Inspiration not found" },
-        { status: 404 }
-      );
+      return NextResponse.json({ error: "Inspiration not found" }, { status: 404 })
     }
 
-    return NextResponse.json(inspiration);
+    return NextResponse.json(inspiration)
   } catch (error) {
-    console.error("GET /api/inspirations/[id] error:", error);
-    return NextResponse.json(
-      { error: "Failed to fetch inspiration" },
-      { status: 500 }
-    );
+    console.error("GET /api/inspirations/[id] error:", error)
+    return NextResponse.json({ error: "Failed to fetch inspiration" }, { status: 500 })
   }
 }
 
 // Type for product selection with optional variant
 interface ProductSelection {
-  productId: string;
-  productVariantId?: string | null;
+  productId: string
+  productVariantId?: string | null
 }
 
 /**
  * PUT /api/inspirations/[id]
  * Update an inspiration (admin only)
  */
-export async function PUT(
-  request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
+export async function PUT(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
-    const { auth } = await import("@/lib/auth");
-    const session = await auth();
+    const { auth } = await import("@/lib/auth")
+    const session = await auth()
 
     if (!session || session.user.role !== "ADMIN") {
-      return NextResponse.json(
-        { error: "Unauthorized" },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }
 
-    const { id } = await params;
-    const body = await request.json();
+    const { id } = await params
+    const body = await request.json()
 
     const {
       name,
@@ -83,43 +68,40 @@ export async function PUT(
       inspirationText,
       productSelections, // New: array of { productId, productVariantId }
       productIds, // Legacy support: array of product IDs
-    } = body;
+    } = body
 
     // Check if inspiration exists
     const existingInspiration = await db.inspiration.findUnique({
       where: { id },
-    });
+    })
 
     if (!existingInspiration) {
-      return NextResponse.json(
-        { error: "Inspiration not found" },
-        { status: 404 }
-      );
+      return NextResponse.json({ error: "Inspiration not found" }, { status: 404 })
     }
 
     // Build update data
-    const updateData: Record<string, unknown> = {};
-    
-    if (name !== undefined) updateData.name = name;
-    if (slug !== undefined) updateData.slug = slug;
-    if (subtitle !== undefined) updateData.subtitle = subtitle;
-    if (image !== undefined) updateData.image = image;
-    if (excerpt !== undefined) updateData.excerpt = excerpt;
-    if (inspirationText !== undefined) updateData.inspirationText = inspirationText;
+    const updateData: Record<string, unknown> = {}
+
+    if (name !== undefined) updateData.name = name
+    if (slug !== undefined) updateData.slug = slug
+    if (subtitle !== undefined) updateData.subtitle = subtitle
+    if (image !== undefined) updateData.image = image
+    if (excerpt !== undefined) updateData.excerpt = excerpt
+    if (inspirationText !== undefined) updateData.inspirationText = inspirationText
 
     // Handle product associations with variants
     if (productSelections !== undefined || productIds !== undefined) {
       // Delete existing products first
       await db.inspirationProduct.deleteMany({
         where: { inspirationId: id },
-      });
+      })
 
       // Handle both new format (productSelections) and legacy format (productIds)
-      let selections: ProductSelection[] = [];
+      let selections: ProductSelection[] = []
       if (productSelections && productSelections.length > 0) {
-        selections = productSelections;
+        selections = productSelections
       } else if (productIds && productIds.length > 0) {
-        selections = productIds.map((pid: string) => ({ productId: pid, productVariantId: null }));
+        selections = productIds.map((pid: string) => ({ productId: pid, productVariantId: null }))
       }
 
       // Create new product associations
@@ -129,7 +111,7 @@ export async function PUT(
             productId: sel.productId,
             productVariantId: sel.productVariantId || null,
           })),
-        };
+        }
       }
     }
 
@@ -148,15 +130,12 @@ export async function PUT(
           },
         },
       },
-    });
+    })
 
-    return NextResponse.json(inspiration);
+    return NextResponse.json(inspiration)
   } catch (error) {
-    console.error("PUT /api/inspirations/[id] error:", error);
-    return NextResponse.json(
-      { error: "Failed to update inspiration" },
-      { status: 500 }
-    );
+    console.error("PUT /api/inspirations/[id] error:", error)
+    return NextResponse.json({ error: "Failed to update inspiration" }, { status: 500 })
   }
 }
 
@@ -165,44 +144,35 @@ export async function PUT(
  * Delete an inspiration (admin only)
  */
 export async function DELETE(
-  request: NextRequest,
+  _request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { auth } = await import("@/lib/auth");
-    const session = await auth();
+    const { auth } = await import("@/lib/auth")
+    const session = await auth()
 
     if (!session || session.user.role !== "ADMIN") {
-      return NextResponse.json(
-        { error: "Unauthorized" },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }
 
-    const { id } = await params;
+    const { id } = await params
 
     // Check if inspiration exists
     const existingInspiration = await db.inspiration.findUnique({
       where: { id },
-    });
+    })
 
     if (!existingInspiration) {
-      return NextResponse.json(
-        { error: "Inspiration not found" },
-        { status: 404 }
-      );
+      return NextResponse.json({ error: "Inspiration not found" }, { status: 404 })
     }
 
     await db.inspiration.delete({
       where: { id },
-    });
+    })
 
-    return NextResponse.json({ success: true });
+    return NextResponse.json({ success: true })
   } catch (error) {
-    console.error("DELETE /api/inspirations/[id] error:", error);
-    return NextResponse.json(
-      { error: "Failed to delete inspiration" },
-      { status: 500 }
-    );
+    console.error("DELETE /api/inspirations/[id] error:", error)
+    return NextResponse.json({ error: "Failed to delete inspiration" }, { status: 500 })
   }
 }
