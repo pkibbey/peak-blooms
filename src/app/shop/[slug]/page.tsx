@@ -1,11 +1,11 @@
-import Link from "next/link"
 import Image from "next/image"
+import Link from "next/link"
 import { notFound } from "next/navigation"
+import BackLink from "@/components/site/BackLink"
 import { FeaturedInInspirations } from "@/components/site/FeaturedInInspirations"
-import { db } from "@/lib/db"
 import { ProductConfigurator } from "@/components/site/ProductConfigurator"
 import { getCurrentUser } from "@/lib/auth-utils"
-import BackLink from "@/components/site/BackLink"
+import { db } from "@/lib/db"
 
 interface ProductDetailPageProps {
   params: Promise<{
@@ -44,7 +44,13 @@ export default async function ProductDetailPage({ params }: ProductDetailPagePro
       collection: true,
       inspirations: {
         include: {
-          inspiration: true,
+          inspiration: {
+            include: {
+              _count: {
+                select: { products: true },
+              },
+            },
+          },
         },
       },
       variants: true,
