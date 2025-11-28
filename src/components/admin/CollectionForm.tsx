@@ -29,6 +29,9 @@ export default function CollectionForm({ collection }: CollectionFormProps) {
   const router = useRouter()
   const isEditing = !!collection
 
+  // Track original image URL to clean up old blob when image changes
+  const [originalImage] = useState(collection?.image || "")
+
   const [formData, setFormData] = useState({
     name: collection?.name || "",
     slug: collection?.slug || "",
@@ -160,6 +163,8 @@ export default function CollectionForm({ collection }: CollectionFormProps) {
         value={formData.image}
         onChange={(url) => setFormData((prev) => ({ ...prev, image: url }))}
         folder="collections"
+        slug={formData.slug}
+        previousUrl={originalImage}
         label="Image"
       />
 

@@ -13,7 +13,7 @@ export async function POST(request: Request): Promise<NextResponse> {
     const jsonResponse = await handleUpload({
       body,
       request,
-      onBeforeGenerateToken: async (_pathname) => {
+      onBeforeGenerateToken: async (_pathname, clientPayload) => {
         // Authenticate the user - only admins can upload
         const session = await auth()
 
@@ -25,9 +25,20 @@ export async function POST(request: Request): Promise<NextResponse> {
           throw new Error("Not authorized - admin access required")
         }
 
+        // Parse client payload for folder, slug, and extension
+        const payload = clientPayload ? JSON.parse(clientPayload) : {}
+        const { folder = "general", slug, extension = "jpg" } = payload
+
+        if (!slug) {
+          throw new Error("Slug is required for upload")
+        }
+
         return {
           allowedContentTypes: ALLOWED_CONTENT_TYPES,
           maximumSizeInBytes: MAX_FILE_SIZE,
+          addRandomSuffix: false,
+          allowOverwrite: true,
+          pathname: `${folder}/${slug}.${extension}`,
           tokenPayload: JSON.stringify({
             userId: session.user.id,
           }),
@@ -35,7 +46,6 @@ export async function POST(request: Request): Promise<NextResponse> {
       },
       onUploadCompleted: async ({ blob, tokenPayload }) => {
         // This callback is called after the file has been uploaded to Vercel Blob
-        // You can use this to update your database with the blob URL if needed
         console.log("Upload completed:", blob.url)
 
         if (tokenPayload) {

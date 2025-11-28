@@ -165,6 +165,9 @@ export default function ProductForm({ collections, product }: ProductFormProps) 
   const router = useRouter()
   const isEditing = !!product
 
+  // Track original image URL to clean up old blob when image changes
+  const [originalImage] = useState(product?.image || "")
+
   const [formData, setFormData] = useState({
     name: product?.name || "",
     slug: product?.slug || "",
@@ -344,6 +347,8 @@ export default function ProductForm({ collections, product }: ProductFormProps) 
         value={formData.image}
         onChange={(url) => setFormData((prev) => ({ ...prev, image: url }))}
         folder="products"
+        slug={formData.slug}
+        previousUrl={originalImage}
         label="Image"
       />
 

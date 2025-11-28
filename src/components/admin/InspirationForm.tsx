@@ -54,6 +54,9 @@ export default function InspirationForm({ products, inspiration }: InspirationFo
   const router = useRouter()
   const isEditing = !!inspiration
 
+  // Track original image URL to clean up old blob when image changes
+  const [originalImage] = useState(inspiration?.image || "")
+
   const [formData, setFormData] = useState({
     name: inspiration?.name || "",
     slug: inspiration?.slug || "",
@@ -202,7 +205,10 @@ export default function InspirationForm({ products, inspiration }: InspirationFo
         value={formData.image}
         onChange={(url) => setFormData((prev) => ({ ...prev, image: url }))}
         folder="inspiration"
+        slug={formData.slug}
+        previousUrl={originalImage}
         label="Image"
+        aspectRatio="16:9"
         required
       />
 

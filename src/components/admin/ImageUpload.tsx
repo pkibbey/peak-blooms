@@ -16,8 +16,11 @@ interface ImageUploadProps {
   value: string
   onChange: (url: string) => void
   folder?: string
+  slug: string // Required - used for predictable blob pathname
+  previousUrl?: string // Original image URL for cleanup when slug changes
   label?: string
   required?: boolean
+  aspectRatio?: "square" | "16:9" // Default is square (1:1)
   className?: string
 }
 
@@ -25,8 +28,11 @@ export function ImageUpload({
   value,
   onChange,
   folder = "general",
+  slug,
+  previousUrl,
   label = "Image",
   required = false,
+  aspectRatio = "square",
   className,
 }: ImageUploadProps) {
   const [isUploading, setIsUploading] = useState(false)
@@ -35,7 +41,30 @@ export function ImageUpload({
   const [isDragging, setIsDragging] = useState(false)
   const inputRef = useRef<HTMLInputElement>(null)
 
+  const isDisabled = !slug
+
+  const deleteOldBlob = async (oldUrl: string) => {
+    // Only delete if it's a Vercel Blob URL
+    if (!oldUrl.includes("blob.vercel-storage.com")) return
+
+    try {
+      await fetch("/api/upload/delete", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ url: oldUrl }),
+      })
+    } catch (error) {
+      // Silently fail - old blob cleanup is not critical
+      console.error("Failed to delete old blob:", error)
+    }
+  }
+
   const handleFile = async (file: File) => {
+    if (!slug) {
+      toast.error("Please enter a slug before uploading an image.")
+      return
+    }
+
     // Client-side validation
     if (!ALLOWED_TYPES.includes(file.type)) {
       toast.error("Invalid file type. Please upload a JPEG, PNG, or WebP image.")
@@ -51,14 +80,24 @@ export function ImageUpload({
     setUploadProgress(0)
 
     try {
-      const blob = await upload(file.name, file, {
+      const extension = file.name.split(".").pop()?.toLowerCase() || "jpg"
+      // Use slug-based pathname for predictable URLs (e.g., products/pink-rose.png)
+      const pathname = `${folder}/${slug}.${extension}`
+
+      const blob = await upload(pathname, file, {
         access: "public",
         handleUploadUrl: "/api/upload",
-        clientPayload: JSON.stringify({ folder }),
+        clientPayload: JSON.stringify({ folder, slug, extension }),
         onUploadProgress: (progress) => {
           setUploadProgress(progress.percentage)
         },
       })
+
+      // Delete old blob if URL changed (e.g., slug changed or different extension)
+      const oldUrl = previousUrl || value
+      if (oldUrl && oldUrl !== blob.url) {
+        deleteOldBlob(oldUrl)
+      }
 
       onChange(blob.url)
       setImageError(false)
@@ -128,22 +167,25 @@ export function ImageUpload({
       {/* biome-ignore lint/a11y/useSemanticElements: Using div for complex drop zone with image preview */}
       <div
         role="button"
-        tabIndex={!value && !isUploading ? 0 : -1}
-        onClick={!value ? handleClick : undefined}
+        tabIndex={!value && !isUploading && !isDisabled ? 0 : -1}
+        onClick={!value && !isDisabled ? handleClick : undefined}
         onKeyDown={(e) => {
-          if (!value && (e.key === "Enter" || e.key === " ")) {
+          if (!value && !isDisabled && (e.key === "Enter" || e.key === " ")) {
             e.preventDefault()
             handleClick()
           }
         }}
-        onDrop={handleDrop}
-        onDragOver={handleDragOver}
-        onDragLeave={handleDragLeave}
+        onDrop={!isDisabled ? handleDrop : undefined}
+        onDragOver={!isDisabled ? handleDragOver : undefined}
+        onDragLeave={!isDisabled ? handleDragLeave : undefined}
         className={cn(
-          "relative flex h-48 w-full max-w-md items-center justify-center overflow-hidden rounded-md border-2 border-dashed transition-colors",
-          isDragging && "border-primary bg-primary/5",
+          "relative flex items-center justify-center overflow-hidden rounded-md border-2 border-dashed transition-colors",
+          aspectRatio === "square" ? "h-48 w-48" : "h-48 w-[340px]", // 16:9 at h-48 (192px) = 341px width
+          isDisabled && "cursor-not-allowed opacity-60",
+          isDragging && !isDisabled && "border-primary bg-primary/5",
           !value &&
             !isUploading &&
+            !isDisabled &&
             "cursor-pointer hover:border-primary hover:bg-muted/50 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20",
           value && !imageError && "border-solid border-border",
           imageError && "border-destructive"
@@ -170,17 +212,28 @@ export function ImageUpload({
         {/* Empty state */}
         {!value && !isUploading && (
           <div className="flex flex-col items-center gap-2 p-6 text-center">
-            <CloudUpload className="size-10 text-muted-foreground" />
+            <CloudUpload
+              className={cn(
+                "size-10",
+                isDisabled ? "text-muted-foreground/50" : "text-muted-foreground"
+              )}
+            />
             <div className="space-y-1">
-              <p className="text-sm font-medium">Click to upload or drag and drop</p>
-              <p className="text-xs text-muted-foreground">JPEG, PNG, or WebP (max 5 MB)</p>
+              {isDisabled ? (
+                <p className="text-sm text-muted-foreground">Enter a slug before uploading</p>
+              ) : (
+                <>
+                  <p className="text-sm font-medium">Click to upload or drag and drop</p>
+                  <p className="text-xs text-muted-foreground">JPEG, PNG, or WebP (max 5 MB)</p>
+                </>
+              )}
             </div>
           </div>
         )}
 
         {/* Image preview */}
         {value && !isUploading && !imageError && (
-          <>
+          <div className="group relative h-full w-full">
             <Image
               src={value}
               alt="Preview"
@@ -189,11 +242,12 @@ export function ImageUpload({
               sizes="(max-width: 448px) 100vw, 448px"
               onError={() => setImageError(true)}
             />
-            <div className="absolute inset-0 flex items-center justify-center bg-black/0 opacity-0 transition-all hover:bg-black/40 hover:opacity-100">
+            <div className="absolute inset-0 flex items-center justify-center bg-black/0 transition-all group-hover:bg-black/50">
               <Button
                 type="button"
                 variant="secondary"
                 size="sm"
+                className="opacity-0 transition-opacity group-hover:opacity-100"
                 onClick={(e) => {
                   e.stopPropagation()
                   handleClick()
@@ -206,7 +260,7 @@ export function ImageUpload({
               type="button"
               variant="destructive"
               size="icon-sm"
-              className="absolute right-2 top-2"
+              className="absolute right-2 top-2 opacity-0 transition-opacity group-hover:opacity-100"
               onClick={(e) => {
                 e.stopPropagation()
                 handleClear()
@@ -214,7 +268,7 @@ export function ImageUpload({
             >
               <X />
             </Button>
-          </>
+          </div>
         )}
 
         {/* Error state */}

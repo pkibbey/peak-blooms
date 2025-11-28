@@ -11,6 +11,8 @@
 - [ ] Add price multiplier per account
 - [ ] Add unit tests and e2e tests to ensure complete site functionality
 - [ ] Create separate development and production databases
+- [ ] Product colour should be able to be generated from the image, maybe the predominant colour, or a colour picker?
+
 
 ### 🎨 Design Changes
 
@@ -33,3 +35,5 @@
 - [ ] Should repeat orders add to the existing cart, or replace it? This should probably be a user preference that pops up when the user clicks on the reorder button
 - [ ] Maybe when the boxlot option is selected, we should automatically highlight the boxlot option on the product
 - [ ] Add a feature section to the homepage which sells the idea of boxlots to users, which just takes them to the shop page with the boxlot filter on
+- [ ] Editing product details should be saved automatically without needed to press save?
+- Add the ability to upload different hero images
