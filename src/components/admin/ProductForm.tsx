@@ -1,10 +1,10 @@
 "use client"
 
-import Image from "next/image"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { useCallback, useEffect, useState } from "react"
 import { toast } from "sonner"
+import { ImageUpload } from "@/components/admin/ImageUpload"
 import SlugInput from "@/components/admin/SlugInput"
 import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
@@ -339,31 +339,13 @@ export default function ProductForm({ collections, product }: ProductFormProps) 
         />
       </div>
 
-      {/* Image URL */}
-      <div className="space-y-2">
-        <Label htmlFor="image">Image URL</Label>
-        <Input
-          id="image"
-          name="image"
-          value={formData.image}
-          onChange={handleChange}
-          placeholder="https://example.com/image.jpg"
-        />
-        {formData.image && (
-          <div className="relative mt-2 h-32 w-32">
-            <Image
-              src={formData.image}
-              alt="Preview"
-              fill
-              className="rounded-md object-cover"
-              sizes="128px"
-              onError={(e) => {
-                ;(e.target as HTMLImageElement).style.display = "none"
-              }}
-            />
-          </div>
-        )}
-      </div>
+      {/* Image */}
+      <ImageUpload
+        value={formData.image}
+        onChange={(url) => setFormData((prev) => ({ ...prev, image: url }))}
+        folder="products"
+        label="Image"
+      />
 
       <div className="grid gap-6 md:grid-cols-2">
         {/* Color */}

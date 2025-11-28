@@ -22,11 +22,7 @@ export function BoxlotFilter() {
 
   return (
     <div className="flex items-center gap-3">
-      <Switch
-        id="boxlot-filter"
-        checked={isBoxlotOnly}
-        onCheckedChange={toggleBoxlotFilter}
-      />
+      <Switch id="boxlot-filter" checked={isBoxlotOnly} onCheckedChange={toggleBoxlotFilter} />
       <Label
         htmlFor="boxlot-filter"
         className="flex items-center gap-2 cursor-pointer text-sm font-medium"

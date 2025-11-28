@@ -1,0 +1,26 @@
+{
+  "servers": {
+    "ShadCN": {
+      "type": "stdio",
+      "command": "npx",
+      "args": ["shadcn@latest", "mcp"]
+    },
+    "next-devtools": {
+      "command": "npx",
+      "args": ["-y", "next-devtools-mcp@latest"]
+    },
+    "lucide-icons": {
+      "command": "npx",
+      "args": ["lucide-icons-mcp", "--stdio"]
+    },
+    "Prisma-Local": {
+      "command": "npx",
+      "args": ["-y", "prisma", "mcp"]
+    },
+    "Vercel": {
+      "url": "https://mcp.vercel.com",
+      "type": "http"
+    }
+  },
+  "inputs": []
+}

@@ -2,7 +2,6 @@
 
 ### 🌟 Features to Add
 
-- [x] Add ability to buy bulk boxlots for large scale event planners
 - [ ] Add image upload for content management instead of url fields
 - [ ] Allow download of content as CSV, so that data can be edited offline and uploaded to modify the content, or just backed up and restored
 - [ ] Validate all form fields using zod + react-hook-form instead of relying on html validation
@@ -11,6 +10,7 @@
 - [ ] Add shipping charges to checkout process
 - [ ] Add price multiplier per account
 - [ ] Add unit tests and e2e tests to ensure complete site functionality
+- [ ] Create separate development and production databases
 
 ### 🎨 Design Changes
 
@@ -32,3 +32,4 @@
 - [ ] Allow users to change their email address
 - [ ] Should repeat orders add to the existing cart, or replace it? This should probably be a user preference that pops up when the user clicks on the reorder button
 - [ ] Maybe when the boxlot option is selected, we should automatically highlight the boxlot option on the product
+- [ ] Add a feature section to the homepage which sells the idea of boxlots to users, which just takes them to the shop page with the boxlot filter on
