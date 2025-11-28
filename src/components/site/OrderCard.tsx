@@ -46,7 +46,7 @@ export function OrderCard({ order }: OrderCardProps) {
         <div className="flex items-center gap-4">
           <p className="font-semibold text-lg">{formatPrice(order.total)}</p>
           <Button variant="outline" size="sm" asChild>
-            <Link href={`/orders/${order.id}`}>
+            <Link href={`/account/order-history/${order.id}`}>
               <IconEye className="h-4 w-4 mr-1" />
               View Details
             </Link>

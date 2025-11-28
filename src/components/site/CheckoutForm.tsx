@@ -195,7 +195,7 @@ export default function CheckoutForm({ cart, savedAddresses, userEmail }: Checko
       const order = await response.json()
       toast.success("Order placed successfully!")
       router.refresh() // Refresh to update cart count in nav
-      router.push(`/orders/${order.id}`)
+      router.push(`/account/order-history/${order.id}`)
     } catch (err) {
       console.error("Checkout error:", err)
       setError(err instanceof Error ? err.message : "An error occurred. Please try again.")

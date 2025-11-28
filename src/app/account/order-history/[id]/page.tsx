@@ -19,7 +19,7 @@ export default async function OrderDetailPage({ params }: OrderDetailPageProps) 
 
   // Redirect to sign in if not authenticated
   if (!user) {
-    redirect(`/auth/signin?callbackUrl=/orders/${id}`)
+    redirect(`/auth/signin?callbackUrl=/account/order-history/${id}`)
   }
 
   // Redirect to pending approval if not approved
@@ -61,7 +61,7 @@ export default async function OrderDetailPage({ params }: OrderDetailPageProps) 
           <p className="text-muted-foreground">Placed on {formatDate(order.createdAt)}</p>
         </div>
         <Button variant="outline" asChild>
-          <Link href="/orders">View All Orders</Link>
+          <Link href="/account/order-history">View All Orders</Link>
         </Button>
       </div>
 
