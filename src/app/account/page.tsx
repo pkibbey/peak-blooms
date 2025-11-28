@@ -31,7 +31,9 @@ export default async function AccountPage() {
     <>
       <div className="mb-8">
         <h1 className="text-3xl font-bold font-serif">Account Settings</h1>
-        <p className="mt-2 text-muted-foreground">Manage your profile, addresses, and orders</p>
+        <p className="mt-2 text-muted-foreground">
+          Manage your profile, addresses, and order history
+        </p>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -71,11 +73,11 @@ export default async function AccountPage() {
             </div>
           </div>
 
-          {/* Orders Section */}
+          {/* Order History Section */}
           <div className="rounded-lg border border-border p-6">
             <div className="flex items-start justify-between gap-4">
               <div>
-                <h2 className="text-xl font-semibold">Orders</h2>
+                <h2 className="text-xl font-semibold">Order History</h2>
                 <p className="mt-2 text-sm text-muted-foreground">
                   {orderCount > 0
                     ? `You have ${orderCount} order${orderCount === 1 ? "" : "s"}`
@@ -84,7 +86,7 @@ export default async function AccountPage() {
               </div>
               <div className="shrink-0">
                 <Button asChild className="mt-2">
-                  <Link href="/account/orders">View Orders</Link>
+                  <Link href="/account/order-history">View Order History</Link>
                 </Button>
               </div>
             </div>

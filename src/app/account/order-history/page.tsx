@@ -9,7 +9,7 @@ import { getCurrentUser } from "@/lib/auth-utils"
 import { db } from "@/lib/db"
 import { formatDate, formatPrice } from "@/lib/utils"
 
-export default async function OrdersPage() {
+export default async function OrderHistoryPage() {
   const user = await getCurrentUser()
 
   // User is guaranteed to exist due to layout auth check
