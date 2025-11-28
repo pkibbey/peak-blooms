@@ -3,7 +3,7 @@ import Link from "next/link"
 import { notFound } from "next/navigation"
 import BackLink from "@/components/site/BackLink"
 import { FeaturedInInspirations } from "@/components/site/FeaturedInInspirations"
-import { ProductConfigurator } from "@/components/site/ProductConfigurator"
+import { ProductControls } from "@/components/site/ProductControls"
 import { getCurrentUser } from "@/lib/auth-utils"
 import { db } from "@/lib/db"
 
@@ -110,8 +110,8 @@ export default async function ProductDetailPage({ params }: ProductDetailPagePro
               <p className="text-lg text-muted-foreground">{product.description}</p>
             </div>
 
-            {/* Product Configurator */}
-            <ProductConfigurator product={product} user={user} />
+            {/* Product Controls */}
+            <ProductControls product={product} user={user} mode="detail" />
           </div>
         </div>
 
