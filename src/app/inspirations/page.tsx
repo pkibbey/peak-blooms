@@ -18,12 +18,10 @@ export default async function InspirationPage() {
   return (
     <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 py-10">
       {/* Page Header */}
-      <div className="mb-16">
+      <div className="mb-12">
         <h1 className="text-4xl font-extrabold font-serif">Inspirations</h1>
-        <p className="mt-4 text-lg text-muted-foreground">
-          Curated flower arrangements designed by our artisans to inspire and delight. Explore each
-          set to discover the story behind the arrangement and order complete collections for your
-          most memorable celebrations.
+        <p className="mt-2 text-lg text-muted-foreground">
+          Curated flower arrangements designed by our artisans to inspire and delight.
         </p>
       </div>
 

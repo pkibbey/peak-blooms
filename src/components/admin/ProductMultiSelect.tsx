@@ -23,7 +23,7 @@ interface Product {
 
 interface ProductSelection {
   productId: string
-  productVariantId: string | null
+  productVariantId: string
 }
 
 interface ProductMultiSelectProps {
@@ -63,16 +63,21 @@ export default function ProductMultiSelect({
       }
     } else {
       onChange([...selectedIds, productId])
-      // Add to selections with first variant or null
+      // Add to selections with first variant (required)
       if (onSelectionsChange) {
         const product = products.find((p) => p.id === productId)
-        const firstVariantId = product?.variants?.[0]?.id ?? null
-        onSelectionsChange([...productSelections, { productId, productVariantId: firstVariantId }])
+        const firstVariantId = product?.variants?.[0]?.id
+        if (firstVariantId) {
+          onSelectionsChange([
+            ...productSelections,
+            { productId, productVariantId: firstVariantId },
+          ])
+        }
       }
     }
   }
 
-  const handleVariantChange = (productId: string, variantId: string | null) => {
+  const handleVariantChange = (productId: string, variantId: string) => {
     if (disabled || !onSelectionsChange) return
 
     const updatedSelections = productSelections.map((s) =>
@@ -87,15 +92,16 @@ export default function ProductMultiSelect({
     const newSelected = [...new Set([...selectedIds, ...filteredIds])]
     onChange(newSelected)
 
-    // Add selections for newly added products
+    // Add selections for newly added products (only those with variants)
     if (onSelectionsChange) {
       const existingProductIds = new Set(productSelections.map((s) => s.productId))
-      const newSelections = filteredProducts
-        .filter((p) => !existingProductIds.has(p.id))
-        .map((p) => ({
-          productId: p.id,
-          productVariantId: p.variants?.[0]?.id ?? null,
-        }))
+      const newSelections: ProductSelection[] = []
+      for (const p of filteredProducts) {
+        const firstVariantId = p.variants?.[0]?.id
+        if (!existingProductIds.has(p.id) && firstVariantId) {
+          newSelections.push({ productId: p.id, productVariantId: firstVariantId })
+        }
+      }
       onSelectionsChange([...productSelections, ...newSelections])
     }
   }

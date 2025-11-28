@@ -30,7 +30,7 @@ interface Product {
 
 interface ProductSelection {
   productId: string
-  productVariantId: string | null
+  productVariantId: string
 }
 
 interface InspirationFormProps {
@@ -45,7 +45,7 @@ interface InspirationFormProps {
     inspirationText: string
     products: Array<{
       productId: string
-      productVariantId: string | null
+      productVariantId: string
     }>
   }
 }

@@ -1,5 +1,5 @@
-import { db } from "@/lib/db"
 import { type NextRequest, NextResponse } from "next/server"
+import { db } from "@/lib/db"
 
 /**
  * GET /api/inspirations/[id]
@@ -37,10 +37,10 @@ export async function GET(_request: NextRequest, { params }: { params: Promise<{
   }
 }
 
-// Type for product selection with optional variant
+// Type for product selection with required variant
 interface ProductSelection {
   productId: string
-  productVariantId?: string | null
+  productVariantId: string
 }
 
 /**
@@ -66,8 +66,7 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
       image,
       excerpt,
       inspirationText,
-      productSelections, // New: array of { productId, productVariantId }
-      productIds, // Legacy support: array of product IDs
+      productSelections, // Array of { productId, productVariantId }
     } = body
 
     // Check if inspiration exists
@@ -90,18 +89,20 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
     if (inspirationText !== undefined) updateData.inspirationText = inspirationText
 
     // Handle product associations with variants
-    if (productSelections !== undefined || productIds !== undefined) {
+    if (productSelections !== undefined) {
       // Delete existing products first
       await db.inspirationProduct.deleteMany({
         where: { inspirationId: id },
       })
 
-      // Handle both new format (productSelections) and legacy format (productIds)
-      let selections: ProductSelection[] = []
-      if (productSelections && productSelections.length > 0) {
-        selections = productSelections
-      } else if (productIds && productIds.length > 0) {
-        selections = productIds.map((pid: string) => ({ productId: pid, productVariantId: null }))
+      // Validate product selections - each must have a variant
+      const selections: ProductSelection[] = productSelections || []
+      const invalidSelections = selections.filter((sel) => !sel.productId || !sel.productVariantId)
+      if (invalidSelections.length > 0) {
+        return NextResponse.json(
+          { error: "Each product must have a specific variant selected" },
+          { status: 400 }
+        )
       }
 
       // Create new product associations
@@ -109,7 +110,7 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
         updateData.products = {
           create: selections.map((sel: ProductSelection) => ({
             productId: sel.productId,
-            productVariantId: sel.productVariantId || null,
+            productVariantId: sel.productVariantId,
           })),
         }
       }

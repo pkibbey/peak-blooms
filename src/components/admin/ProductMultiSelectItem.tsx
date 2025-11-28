@@ -27,10 +27,10 @@ interface Product {
 interface ProductMultiSelectItemProps {
   product: Product
   isSelected: boolean
-  selectedVariantId: string | null
+  selectedVariantId: string
   disabled: boolean
   onToggle: (productId: string) => void
-  onVariantChange?: (productId: string, variantId: string | null) => void
+  onVariantChange?: (productId: string, variantId: string) => void
 }
 
 function formatVariantLabel(variant: ProductVariant): string {
@@ -76,15 +76,14 @@ export function ProductMultiSelectItem({
       {isSelected && hasVariants && onVariantChange && (
         <div className="mt-2 ml-7">
           <Select
-            value={selectedVariantId ?? "none"}
-            onValueChange={(value) => onVariantChange(product.id, value === "none" ? null : value)}
+            value={selectedVariantId}
+            onValueChange={(value) => onVariantChange(product.id, value)}
             disabled={disabled}
           >
             <SelectTrigger className="h-8 text-xs">
               <SelectValue placeholder="Select variant" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="none">No specific variant</SelectItem>
               {product.variants?.map((variant) => (
                 <SelectItem key={variant.id} value={variant.id}>
                   {formatVariantLabel(variant)}

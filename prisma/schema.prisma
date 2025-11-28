@@ -145,12 +145,12 @@ model InspirationProduct {
   id                String           @id @default(cuid())
   inspirationId     String
   productId         String
-  productVariantId  String?
+  productVariantId  String
   createdAt         DateTime         @default(now())
 
   inspiration       Inspiration      @relation(fields: [inspirationId], references: [id], onDelete: Cascade)
   product           Product          @relation(fields: [productId], references: [id], onDelete: Cascade)
-  productVariant    ProductVariant?  @relation(fields: [productVariantId], references: [id], onDelete: SetNull)
+  productVariant    ProductVariant   @relation(fields: [productVariantId], references: [id], onDelete: Cascade)
 
   @@unique([inspirationId, productId])
   @@index([inspirationId])

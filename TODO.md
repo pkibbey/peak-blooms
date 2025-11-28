@@ -12,6 +12,7 @@
 - [ ] Add unit tests and e2e tests to ensure complete site functionality
 - [ ] Create separate development and production databases
 - [ ] Product colour should be able to be generated from the image, maybe the predominant colour, or a colour picker?
+- [ ] Add quantity selector to the inspirations page
 
 
 ### 🎨 Design Changes
@@ -21,6 +22,7 @@
 - [ ] Create reusable typography utility classes in tailwind
 - [ ] Create container and card utility classes
 - [ ] Create some shared layout components like ThreeColumnGrid - to enforce layout consistency
+- [ ] Improve the layout for the admin dashboard, it looks bland and just a load of boxes without any real overview of the state of the system
  
 ### 🔍 Review Features
 
@@ -36,4 +38,5 @@
 - [ ] Maybe when the boxlot option is selected, we should automatically highlight the boxlot option on the product
 - [ ] Add a feature section to the homepage which sells the idea of boxlots to users, which just takes them to the shop page with the boxlot filter on
 - [ ] Editing product details should be saved automatically without needed to press save?
-- Add the ability to upload different hero images
+- [ ] Add the ability to upload different hero images
+- [ ] Improve the blog post of the inspiration page, get some more ideas about how this could look in the real world and where we would source this information from

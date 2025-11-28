@@ -1,5 +1,5 @@
-import { db } from "@/lib/db"
 import { type NextRequest, NextResponse } from "next/server"
+import { db } from "@/lib/db"
 
 /**
  * GET /api/inspirations
@@ -32,10 +32,10 @@ export async function GET() {
   }
 }
 
-// Type for product selection with optional variant
+// Type for product selection with required variant
 interface ProductSelection {
   productId: string
-  productVariantId?: string | null
+  productVariantId: string
 }
 
 /**
@@ -60,20 +60,21 @@ export async function POST(request: NextRequest) {
       image,
       excerpt,
       inspirationText,
-      productSelections, // New: array of { productId, productVariantId }
-      productIds, // Legacy support: array of product IDs (uses first variant)
+      productSelections, // Array of { productId, productVariantId }
     } = body
 
     if (!name || !slug || !subtitle || !image || !excerpt || !inspirationText) {
       return NextResponse.json({ error: "Missing required fields" }, { status: 400 })
     }
 
-    // Handle both new format (productSelections) and legacy format (productIds)
-    let selections: ProductSelection[] = []
-    if (productSelections && productSelections.length > 0) {
-      selections = productSelections
-    } else if (productIds && productIds.length > 0) {
-      selections = productIds.map((id: string) => ({ productId: id, productVariantId: null }))
+    // Validate product selections - each must have a variant
+    const selections: ProductSelection[] = productSelections || []
+    const invalidSelections = selections.filter((sel) => !sel.productId || !sel.productVariantId)
+    if (invalidSelections.length > 0) {
+      return NextResponse.json(
+        { error: "Each product must have a specific variant selected" },
+        { status: 400 }
+      )
     }
 
     const inspiration = await db.inspiration.create({
@@ -88,7 +89,7 @@ export async function POST(request: NextRequest) {
           products: {
             create: selections.map((sel: ProductSelection) => ({
               productId: sel.productId,
-              productVariantId: sel.productVariantId || null,
+              productVariantId: sel.productVariantId,
             })),
           },
         }),

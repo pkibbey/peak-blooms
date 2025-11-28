@@ -22,7 +22,7 @@ export default async function AdminDashboard() {
         <div className="flex items-start justify-between gap-4">
           <div>
             <div className="flex items-center gap-3">
-              <h2 className="text-xl font-semibold">Order Management</h2>
+              <h2 className="text-xl font-semibold">Orders</h2>
               {pendingOrdersCount > 0 && (
                 <Badge variant="secondary" className="flex items-center gap-1">
                   <IconClock className="h-3 w-3" />
@@ -49,7 +49,7 @@ export default async function AdminDashboard() {
       <div className="mb-6 rounded-lg border border-border p-6">
         <div className="flex items-start justify-between gap-4">
           <div>
-            <h2 className="text-xl font-semibold">User Management</h2>
+            <h2 className="text-xl font-semibold">User Accounts</h2>
             <p className="mt-2 text-sm text-muted-foreground">
               Review and approve pending user accounts
             </p>
