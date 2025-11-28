@@ -1,4 +1,5 @@
 import Image from "next/image"
+import Link from "next/link"
 import { formatPrice, formatVariantSpecs } from "@/lib/utils"
 
 interface Product {
@@ -23,9 +24,10 @@ interface OrderItemData {
 
 interface OrderItemProps {
   item: OrderItemData
+  linkHref?: string
 }
 
-export function OrderItem({ item }: OrderItemProps) {
+export function OrderItem({ item, linkHref }: OrderItemProps) {
   const lineTotal = item.price * item.quantity
   const variantSpecs = item.productVariant
     ? formatVariantSpecs(item.productVariant.stemLength, item.productVariant.countPerBunch)
@@ -49,7 +51,13 @@ export function OrderItem({ item }: OrderItemProps) {
       <div className="flex-1">
         <div className="flex justify-between">
           <div>
-            <p className="font-medium">{item.product.name}</p>
+            {linkHref ? (
+              <Link href={linkHref} className="font-medium hover:text-primary hover:underline">
+                {item.product.name}
+              </Link>
+            ) : (
+              <p className="font-medium">{item.product.name}</p>
+            )}
             <p className="text-sm text-muted-foreground mt-1">
               {formatPrice(item.price)} × {item.quantity}
               {variantSpecs && ` • ${variantSpecs}`}

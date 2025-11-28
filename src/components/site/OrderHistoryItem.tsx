@@ -32,7 +32,7 @@ export default function OrderHistoryItem({ order }: OrderHistoryItemProps) {
     <div className="border-b last:border-b-0 pb-4 last:pb-0">
       <div className="flex items-start justify-between gap-2 mb-2">
         <div>
-          <Link href={`/orders/${order.id}`} className="font-medium hover:underline">
+          <Link href={`/account/order-history/${order.id}`} className="font-medium hover:underline">
             {order.orderNumber}
           </Link>
           <p className="text-xs text-muted-foreground">{formatDate(order.createdAt)}</p>
