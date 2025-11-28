@@ -1,3 +1,5 @@
+import { Suspense } from "react"
+import { BoxlotFilter } from "@/components/site/BoxlotFilter"
 import { ProductCard } from "@/components/site/ProductCard"
 import type { ProductWhereInput } from "@/generated/models/Product"
 import { getCurrentUser } from "@/lib/auth-utils"
@@ -27,6 +29,7 @@ export default async function ShopPage({ searchParams }: ShopPageProps) {
     typeof params.stemLengthMax === "string" ? parseInt(params.stemLengthMax, 10) : undefined
   const priceMin = typeof params.priceMin === "string" ? params.priceMin : undefined
   const priceMax = typeof params.priceMax === "string" ? params.priceMax : undefined
+  const boxlotOnly = params.boxlotOnly === "true"
 
   if (collectionId && collectionId !== "") {
     where.collectionId = collectionId
@@ -73,12 +76,29 @@ export default async function ShopPage({ searchParams }: ShopPageProps) {
     }
   }
 
+  // Filter by boxlot variants only
+  if (boxlotOnly) {
+    where.variants = {
+      ...where.variants,
+      some: {
+        ...(where.variants?.some || {}),
+        isBoxlot: true,
+      },
+    }
+  }
+
   // Fetch filtered products
   const products = await db.product.findMany({
     where,
     include: {
       collection: true,
-      variants: true,
+      variants: boxlotOnly
+        ? {
+            where: {
+              isBoxlot: true,
+            },
+          }
+        : true,
     },
     orderBy: {
       createdAt: "desc",
@@ -95,6 +115,16 @@ export default async function ShopPage({ searchParams }: ShopPageProps) {
       </div>
 
       {/* Filters - Horizontal Bar */}
+      <div className="mb-8 flex flex-wrap gap-4 items-center">
+        <Suspense fallback={null}>
+          <BoxlotFilter />
+        </Suspense>
+        {boxlotOnly && (
+          <p className="text-sm text-muted-foreground">
+            Showing bulk boxlot products for large-scale event planners
+          </p>
+        )}
+      </div>
 
       {/* Products Grid */}
       {products.length === 0 ? (

@@ -1,5 +1,5 @@
-import { db } from "@/lib/db"
 import { type NextRequest, NextResponse } from "next/server"
+import { db } from "@/lib/db"
 
 /**
  * GET /api/products/[id]
@@ -93,10 +93,12 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
                   price: number
                   stemLength?: number | null
                   countPerBunch?: number | null
+                  isBoxlot?: boolean
                 }) => ({
                   price: v.price,
                   stemLength: v.stemLength ?? null,
                   countPerBunch: v.countPerBunch ?? null,
+                  isBoxlot: v.isBoxlot ?? false,
                 })
               ),
             },

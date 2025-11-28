@@ -1,5 +1,5 @@
-import { db } from "@/lib/db"
 import { type NextRequest, NextResponse } from "next/server"
+import { db } from "@/lib/db"
 
 /**
  * GET /api/products
@@ -15,6 +15,7 @@ export async function GET(request: NextRequest) {
     const stemLength = searchParams.get("stemLength")
     const priceMin = searchParams.get("priceMin")
     const priceMax = searchParams.get("priceMax")
+    const boxlotOnly = searchParams.get("boxlotOnly")
 
     const where: Record<string, unknown> = {}
 
@@ -38,6 +39,10 @@ export async function GET(request: NextRequest) {
 
     if (stemLength !== null && stemLength !== "") {
       variantsFilter.stemLength = parseInt(stemLength as string, 10)
+    }
+
+    if (boxlotOnly === "true") {
+      variantsFilter.isBoxlot = true
     }
 
     if (priceMin !== null || priceMax !== null) {
@@ -113,10 +118,16 @@ export async function POST(request: NextRequest) {
         featured: featured === true,
         variants: {
           create: variants.map(
-            (v: { price: number; stemLength?: number | null; countPerBunch?: number | null }) => ({
+            (v: {
+              price: number
+              stemLength?: number | null
+              countPerBunch?: number | null
+              isBoxlot?: boolean
+            }) => ({
               price: v.price,
               stemLength: v.stemLength ?? null,
               countPerBunch: v.countPerBunch ?? null,
+              isBoxlot: v.isBoxlot ?? false,
             })
           ),
         },

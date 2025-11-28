@@ -3,7 +3,7 @@
 import Image from "next/image"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
-import { useState } from "react"
+import { useCallback, useEffect, useState } from "react"
 import { toast } from "sonner"
 import SlugInput from "@/components/admin/SlugInput"
 import { Button } from "@/components/ui/button"
@@ -30,6 +30,7 @@ interface ProductVariant {
   price: string
   stemLength: string
   countPerBunch: string
+  isBoxlot: boolean
 }
 
 interface ProductFormProps {
@@ -48,8 +49,116 @@ interface ProductFormProps {
       price: number
       stemLength: number | null
       countPerBunch: number | null
+      isBoxlot: boolean
     }[]
   }
+}
+
+// Separate component to manage local state for each variant row
+// This prevents re-renders of all variants when typing in one field
+interface VariantRowProps {
+  variant: ProductVariant
+  index: number
+  onUpdate: (index: number, variant: ProductVariant) => void
+  onRemove: (index: number) => void
+  canRemove: boolean
+}
+
+function VariantRow({ variant, index, onUpdate, onRemove, canRemove }: VariantRowProps) {
+  const [localVariant, setLocalVariant] = useState(variant)
+
+  // Sync local state when parent variant changes (e.g., after form reset)
+  useEffect(() => {
+    setLocalVariant(variant)
+  }, [variant])
+
+  const handleFieldChange = (field: keyof ProductVariant, value: string | boolean) => {
+    setLocalVariant((prev) => ({ ...prev, [field]: value }))
+  }
+
+  const handleBlur = useCallback(() => {
+    onUpdate(index, localVariant)
+  }, [index, localVariant, onUpdate])
+
+  const handleCheckboxChange = (checked: boolean) => {
+    const updated = { ...localVariant, isBoxlot: checked }
+    setLocalVariant(updated)
+    onUpdate(index, updated)
+  }
+
+  return (
+    <div className="grid gap-4 md:grid-cols-5 items-end p-4 border border-border rounded-md bg-muted/30">
+      {/* Price */}
+      <div className="space-y-2">
+        <Label htmlFor={`variant-price-${index}`}>Price *</Label>
+        <Input
+          id={`variant-price-${index}`}
+          type="number"
+          step="0.01"
+          min="0"
+          value={localVariant.price}
+          onChange={(e) => handleFieldChange("price", e.target.value)}
+          onBlur={handleBlur}
+          placeholder="0.00"
+        />
+      </div>
+
+      {/* Stem Length */}
+      <div className="space-y-2">
+        <Label htmlFor={`variant-stemLength-${index}`}>Stem Length (cm)</Label>
+        <Input
+          id={`variant-stemLength-${index}`}
+          type="number"
+          min="0"
+          value={localVariant.stemLength}
+          onChange={(e) => handleFieldChange("stemLength", e.target.value)}
+          onBlur={handleBlur}
+          placeholder="e.g., 50"
+        />
+      </div>
+
+      {/* Count Per Bunch */}
+      <div className="space-y-2">
+        <Label htmlFor={`variant-countPerBunch-${index}`}>Stems Per Bunch</Label>
+        <Input
+          id={`variant-countPerBunch-${index}`}
+          type="number"
+          min="0"
+          value={localVariant.countPerBunch}
+          onChange={(e) => handleFieldChange("countPerBunch", e.target.value)}
+          onBlur={handleBlur}
+          placeholder="e.g., 10"
+        />
+      </div>
+
+      {/* Boxlot Checkbox */}
+      <div className="flex items-center gap-2 h-10">
+        <Checkbox
+          id={`variant-isBoxlot-${index}`}
+          checked={localVariant.isBoxlot}
+          onChange={(e) => handleCheckboxChange(e.target.checked)}
+        />
+        <Label htmlFor={`variant-isBoxlot-${index}`} className="cursor-pointer text-sm">
+          Boxlot (Bulk)
+        </Label>
+      </div>
+
+      {/* Remove Button */}
+      <div>
+        <Button
+          type="button"
+          variant="outline"
+          size="sm"
+          onClick={() => onRemove(index)}
+          disabled={!canRemove}
+          className="w-full border-destructive text-destructive hover:bg-destructive hover:text-white disabled:opacity-50"
+        >
+          <IconTrash className="h-4 w-4 mr-1" />
+          Remove
+        </Button>
+      </div>
+    </div>
+  )
 }
 
 export default function ProductForm({ collections, product }: ProductFormProps) {
@@ -73,10 +182,11 @@ export default function ProductForm({ collections, product }: ProductFormProps) 
         price: v.price.toString(),
         stemLength: v.stemLength?.toString() || "",
         countPerBunch: v.countPerBunch?.toString() || "",
+        isBoxlot: v.isBoxlot || false,
       }))
     }
     // Start with one empty variant for new products
-    return [{ price: "", stemLength: "", countPerBunch: "" }]
+    return [{ price: "", stemLength: "", countPerBunch: "", isBoxlot: false }]
   })
 
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -109,6 +219,7 @@ export default function ProductForm({ collections, product }: ProductFormProps) 
             price: parseFloat(v.price),
             stemLength: v.stemLength ? parseInt(v.stemLength) : null,
             countPerBunch: v.countPerBunch ? parseInt(v.countPerBunch) : null,
+            isBoxlot: v.isBoxlot,
           })),
         }),
       })
@@ -139,12 +250,15 @@ export default function ProductForm({ collections, product }: ProductFormProps) 
     }))
   }
 
-  const handleVariantChange = (index: number, field: keyof ProductVariant, value: string) => {
-    setVariants((prev) => prev.map((v, i) => (i === index ? { ...v, [field]: value } : v)))
-  }
+  const handleVariantUpdate = useCallback((index: number, updatedVariant: ProductVariant) => {
+    setVariants((prev) => prev.map((v, i) => (i === index ? updatedVariant : v)))
+  }, [])
 
   const addVariant = () => {
-    setVariants((prev) => [...prev, { price: "", stemLength: "", countPerBunch: "" }])
+    setVariants((prev) => [
+      ...prev,
+      { price: "", stemLength: "", countPerBunch: "", isBoxlot: false },
+    ])
   }
 
   const removeVariant = (index: number) => {
@@ -300,65 +414,14 @@ export default function ProductForm({ collections, product }: ProductFormProps) 
         </p>
         <div className="space-y-3">
           {variants.map((variant, index) => (
-            <div
-              key={variant.id}
-              className="grid gap-4 md:grid-cols-4 items-end p-4 border border-border rounded-md bg-muted/30"
-            >
-              {/* Price */}
-              <div className="space-y-2">
-                <Label htmlFor={`variant-price-${index}`}>Price *</Label>
-                <Input
-                  id={`variant-price-${index}`}
-                  type="number"
-                  step="0.01"
-                  min="0"
-                  value={variant.price}
-                  onChange={(e) => handleVariantChange(index, "price", e.target.value)}
-                  placeholder="0.00"
-                />
-              </div>
-
-              {/* Stem Length */}
-              <div className="space-y-2">
-                <Label htmlFor={`variant-stemLength-${index}`}>Stem Length (cm)</Label>
-                <Input
-                  id={`variant-stemLength-${index}`}
-                  type="number"
-                  min="0"
-                  value={variant.stemLength}
-                  onChange={(e) => handleVariantChange(index, "stemLength", e.target.value)}
-                  placeholder="e.g., 50"
-                />
-              </div>
-
-              {/* Count Per Bunch */}
-              <div className="space-y-2">
-                <Label htmlFor={`variant-countPerBunch-${index}`}>Stems Per Bunch</Label>
-                <Input
-                  id={`variant-countPerBunch-${index}`}
-                  type="number"
-                  min="0"
-                  value={variant.countPerBunch}
-                  onChange={(e) => handleVariantChange(index, "countPerBunch", e.target.value)}
-                  placeholder="e.g., 10"
-                />
-              </div>
-
-              {/* Remove Button */}
-              <div>
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  onClick={() => removeVariant(index)}
-                  disabled={variants.length === 1}
-                  className="w-full border-destructive text-destructive hover:bg-destructive hover:text-white disabled:opacity-50"
-                >
-                  <IconTrash className="h-4 w-4 mr-1" />
-                  Remove
-                </Button>
-              </div>
-            </div>
+            <VariantRow
+              key={variant.id ?? `new-${index}`}
+              variant={variant}
+              index={index}
+              onUpdate={handleVariantUpdate}
+              onRemove={removeVariant}
+              canRemove={variants.length > 1}
+            />
           ))}
         </div>
       </div>

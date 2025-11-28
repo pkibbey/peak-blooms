@@ -3,15 +3,18 @@
 import Link from "next/link"
 import { useCallback, useMemo, useState } from "react"
 import AddToCartButton from "@/components/site/AddToCartButton"
+import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
+import { IconPackage } from "@/components/ui/icons"
 import { Label } from "@/components/ui/label"
-import { cn, formatVariantSpecs } from "@/lib/utils"
+import { cn } from "@/lib/utils"
 
 interface ProductVariant {
   id: string
   price: number
   stemLength: number | null
   countPerBunch: number | null
+  isBoxlot: boolean
 }
 
 interface Product {

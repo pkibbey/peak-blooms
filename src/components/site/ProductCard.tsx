@@ -3,8 +3,9 @@
 import Image from "next/image"
 import Link from "next/link"
 import { ProductControls } from "@/components/site/ProductControls"
+import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import { IconArrowRight } from "@/components/ui/icons"
+import { IconArrowRight, IconPackage } from "@/components/ui/icons"
 import type { ProductModel, ProductVariantModel } from "@/generated/models"
 
 interface ProductCardProps {
@@ -17,6 +18,8 @@ interface ProductCardProps {
 }
 
 export function ProductCard({ product, user }: ProductCardProps) {
+  const hasBoxlotVariant = product.variants?.some((v) => v.isBoxlot) ?? false
+
   return (
     <div className="group flex flex-col overflow-hidden rounded-xs shadow-md transition-shadow hover:shadow-lg">
       {/* Image Container */}
@@ -29,6 +32,16 @@ export function ProductCard({ product, user }: ProductCardProps) {
             sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
             className="object-cover transition-transform duration-300 group-hover:scale-105"
           />
+        )}
+        {/* Boxlot Badge */}
+        {hasBoxlotVariant && (
+          <Badge
+            variant="secondary"
+            className="absolute top-2 right-2 gap-1 bg-amber-100 text-amber-800 hover:bg-amber-100"
+          >
+            <IconPackage className="h-3 w-3" />
+            Boxlot
+          </Badge>
         )}
       </div>
 
