@@ -1,4 +1,5 @@
 import { CollectionCard } from "@/components/site/CollectionCard"
+import { PageHeader } from "@/components/site/PageHeader"
 import { db } from "@/lib/db"
 
 export const metadata = {
@@ -18,12 +19,10 @@ export default async function CollectionsPage() {
   return (
     <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 py-10">
       {/* Page Header */}
-      <div className="mb-12">
-        <h1 className="text-4xl font-extrabold font-serif">Collections</h1>
-        <p className="mt-2 text-lg text-muted-foreground">
-          Discover our curated selection of premium flower collections
-        </p>
-      </div>
+      <PageHeader
+        title="Collections"
+        description="Discover our curated selection of premium flower collections"
+      />
 
       {/* Collections Grid */}
       <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">

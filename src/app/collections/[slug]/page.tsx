@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation"
 import BackLink from "@/components/site/BackLink"
+import { PageHeader } from "@/components/site/PageHeader"
 import { ProductCard } from "@/components/site/ProductCard"
 import { getCurrentUser } from "@/lib/auth-utils"
 import { db } from "@/lib/db"
@@ -60,10 +61,7 @@ export default async function CollectionDetailPage({ params }: CollectionDetailP
         <BackLink href="/admin/collections" label="Collections" />
 
         {/* Collection Header */}
-        <div className="mb-12">
-          <h1 className="text-4xl font-extrabold font-serif">{collection.name}</h1>
-          <p className="mt-2 text-lg text-muted-foreground">{collection.description}</p>
-        </div>
+        <PageHeader title={collection.name} description={collection.description ?? undefined} />
 
         {/* Products Section */}
         <div>

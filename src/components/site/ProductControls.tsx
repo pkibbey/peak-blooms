@@ -3,9 +3,7 @@
 import Link from "next/link"
 import { useCallback, useMemo, useState } from "react"
 import AddToCartButton from "@/components/site/AddToCartButton"
-import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import { IconPackage } from "@/components/ui/icons"
 import { Label } from "@/components/ui/label"
 import { cn } from "@/lib/utils"
 
@@ -274,7 +272,7 @@ export function ProductControls({ product, user, mode = "card" }: ProductControl
             <div
               className={cn(
                 "text-muted-foreground mt-1",
-                mode === "detail" ? "text-xl" : "text-lg"
+                mode === "detail" ? "text-xl" : "text-base"
               )}
             >
               {variantSummary}

@@ -1,5 +1,6 @@
 import { Suspense } from "react"
 import { BoxlotFilter } from "@/components/site/BoxlotFilter"
+import { PageHeader } from "@/components/site/PageHeader"
 import { ProductCard } from "@/components/site/ProductCard"
 import type { ProductWhereInput } from "@/generated/models/Product"
 import { getCurrentUser } from "@/lib/auth-utils"
@@ -107,12 +108,7 @@ export default async function ShopPage({ searchParams }: ShopPageProps) {
 
   return (
     <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 py-10">
-      <div className="mb-8">
-        <h1 className="text-4xl font-extrabold font-serif">Shop</h1>
-        <p className="mt-2 text-lg text-muted-foreground">
-          Browse our full catalog of premium flowers
-        </p>
-      </div>
+      <PageHeader title="Shop" description="Browse our full catalog of premium flowers" />
 
       {/* Filters - Horizontal Bar */}
       <div className="mb-8 flex flex-wrap gap-4 items-center">

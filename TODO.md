@@ -2,8 +2,6 @@
 
 ### 🌟 Features to Add
 
-- [ ] Add image upload for content management instead of url fields
-- [ ] Allow download of content as CSV, so that data can be edited offline and uploaded to modify the content, or just backed up and restored
 - [ ] Validate all form fields using zod + react-hook-form instead of relying on html validation
 - [ ] Add ability to send emails to any account, not just the test account
 - [ ] Add ability to accept payments
@@ -13,7 +11,7 @@
 - [ ] Create separate development and production databases
 - [ ] Product colour should be able to be generated from the image, maybe the predominant colour, or a colour picker?
 - [ ] Add quantity selector to the inspirations page
-
+- [ ] Add pagination once we have a large number of products to view
 
 ### 🎨 Design Changes
 

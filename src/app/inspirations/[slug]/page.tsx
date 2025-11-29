@@ -3,6 +3,7 @@ import Link from "next/link"
 import { notFound } from "next/navigation"
 import AddAllToCartButton from "@/components/site/AddAllToCartButton"
 import BackLink from "@/components/site/BackLink"
+import { PageHeader } from "@/components/site/PageHeader"
 import {
   Table,
   TableBody,
@@ -90,10 +91,7 @@ export default async function InspirationDetailPage({ params }: InspirationDetai
         </div>
 
         {/* Set Title and Subtitle */}
-        <div className="mb-8">
-          <h1 className="text-4xl font-extrabold font-serif">{inspiration.name}</h1>
-          <p className="mt-2 text-lg text-muted-foreground">{inspiration.subtitle}</p>
-        </div>
+        <PageHeader title={inspiration.name} description={inspiration.subtitle} />
 
         {/* Inspiration Text */}
         <div className="mb-12 p-6 bg-secondary/30 rounded-xs">
