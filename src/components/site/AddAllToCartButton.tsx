@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button"
 interface AddAllToCartButtonProps {
   productIds: string[]
   productVariantIds?: (string | null)[]
+  quantities?: number[]
   setName?: string
   user?: { approved: boolean } | null
 }
@@ -16,6 +17,7 @@ interface AddAllToCartButtonProps {
 export default function AddAllToCartButton({
   productIds,
   productVariantIds,
+  quantities,
   setName,
   user,
 }: AddAllToCartButtonProps) {
@@ -41,9 +43,14 @@ export default function AddAllToCartButton({
     setError(null)
 
     try {
-      type Payload = { productIds: string[]; productVariantIds?: (string | null)[] }
+      type Payload = {
+        productIds: string[]
+        productVariantIds?: (string | null)[]
+        quantities?: number[]
+      }
       const payload: Payload = { productIds }
       if (Array.isArray(productVariantIds)) payload.productVariantIds = productVariantIds
+      if (Array.isArray(quantities)) payload.quantities = quantities
 
       const response = await fetch("/api/cart/batch", {
         method: "POST",

@@ -9,7 +9,6 @@
 - [ ] Add price multiplier per account
 - [ ] Add unit tests and e2e tests to ensure complete site functionality
 - [ ] Create separate development and production databases
-- [ ] Product colour should be able to be generated from the image, maybe the predominant colour, or a colour picker?
 - [ ] Add quantity selector to the inspirations page
 - [ ] Add pagination once we have a large number of products to view
 
@@ -36,5 +35,6 @@
 - [ ] Maybe when the boxlot option is selected, we should automatically highlight the boxlot option on the product
 - [ ] Add a feature section to the homepage which sells the idea of boxlots to users, which just takes them to the shop page with the boxlot filter on
 - [ ] Editing product details should be saved automatically without needed to press save?
+- [ ] Product colour should be able to be generated from the image, maybe the predominant colour, or a colour picker?
 - [ ] Add the ability to upload different hero images
 - [ ] Improve the blog post of the inspiration page, get some more ideas about how this could look in the real world and where we would source this information from

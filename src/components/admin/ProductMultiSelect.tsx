@@ -24,6 +24,7 @@ interface Product {
 interface ProductSelection {
   productId: string
   productVariantId: string
+  quantity: number
 }
 
 interface ProductMultiSelectProps {
@@ -70,7 +71,7 @@ export default function ProductMultiSelect({
         if (firstVariantId) {
           onSelectionsChange([
             ...productSelections,
-            { productId, productVariantId: firstVariantId },
+            { productId, productVariantId: firstVariantId, quantity: 1 },
           ])
         }
       }
@@ -99,7 +100,7 @@ export default function ProductMultiSelect({
       for (const p of filteredProducts) {
         const firstVariantId = p.variants?.[0]?.id
         if (!existingProductIds.has(p.id) && firstVariantId) {
-          newSelections.push({ productId: p.id, productVariantId: firstVariantId })
+          newSelections.push({ productId: p.id, productVariantId: firstVariantId, quantity: 1 })
         }
       }
       onSelectionsChange([...productSelections, ...newSelections])
@@ -120,6 +121,21 @@ export default function ProductMultiSelect({
   const getSelectedVariantId = (productId: string): string | null => {
     const selection = productSelections.find((s) => s.productId === productId)
     return selection?.productVariantId ?? null
+  }
+
+  const getSelectedQuantity = (productId: string): number => {
+    const selection = productSelections.find((s) => s.productId === productId)
+    return selection?.quantity ?? 1
+  }
+
+  const handleQuantityChange = (productId: string, quantity: number) => {
+    if (disabled || !onSelectionsChange) return
+
+    const newQuantity = Math.max(1, quantity) // Minimum of 1
+    const updatedSelections = productSelections.map((s) =>
+      s.productId === productId ? { ...s, quantity: newQuantity } : s
+    )
+    onSelectionsChange(updatedSelections)
   }
 
   const selectedCount = selectedIds.length
@@ -173,9 +189,11 @@ export default function ProductMultiSelect({
                 product={product}
                 isSelected={selectedIds.includes(product.id)}
                 selectedVariantId={getSelectedVariantId(product.id)}
+                selectedQuantity={getSelectedQuantity(product.id)}
                 disabled={disabled}
                 onToggle={handleToggle}
                 onVariantChange={onSelectionsChange ? handleVariantChange : undefined}
+                onQuantityChange={onSelectionsChange ? handleQuantityChange : undefined}
               />
             ))}
           </ul>

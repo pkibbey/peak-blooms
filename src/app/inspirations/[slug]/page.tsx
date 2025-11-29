@@ -71,6 +71,7 @@ export default async function InspirationDetailPage({ params }: InspirationDetai
     selectedVariant: sp.productVariant,
     // Use the selected variant or fall back to first variant
     displayVariant: sp.productVariant ?? sp.product.variants[0] ?? null,
+    quantity: sp.quantity ?? 1,
   }))
 
   return (
@@ -111,7 +112,7 @@ export default async function InspirationDetailPage({ params }: InspirationDetai
                   <TableHead>Image</TableHead>
                   <TableHead>Product</TableHead>
                   <TableHead>Variant</TableHead>
-                  <TableHead>Status</TableHead>
+                  <TableHead>Quantity</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -168,20 +169,8 @@ export default async function InspirationDetailPage({ params }: InspirationDetai
                       )}
                     </TableCell>
                     <TableCell>
-                      <span className="inline-flex items-center gap-2 text-sm text-muted-foreground">
-                        <svg
-                          className="h-5 w-5 text-primary"
-                          fill="currentColor"
-                          viewBox="0 0 20 20"
-                        >
-                          <title>Included</title>
-                          <path
-                            fillRule="evenodd"
-                            d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                            clipRule="evenodd"
-                          />
-                        </svg>
-                        Included
+                      <span className="inline-flex items-center justify-center min-w-8 px-2 py-1 text-sm font-medium bg-secondary rounded">
+                        ×{product.quantity}
                       </span>
                     </TableCell>
                   </TableRow>
@@ -196,6 +185,7 @@ export default async function InspirationDetailPage({ params }: InspirationDetai
           <AddAllToCartButton
             productIds={productsWithVariants.map((p) => p.id)}
             productVariantIds={productsWithVariants.map((p) => p.displayVariant?.id ?? null)}
+            quantities={productsWithVariants.map((p) => p.quantity)}
             setName={inspiration.name}
             user={user}
           />

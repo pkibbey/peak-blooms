@@ -31,6 +31,7 @@ interface Product {
 interface ProductSelection {
   productId: string
   productVariantId: string
+  quantity: number
 }
 
 interface InspirationFormProps {
@@ -46,6 +47,7 @@ interface InspirationFormProps {
     products: Array<{
       productId: string
       productVariantId: string
+      quantity: number
     }>
   }
 }
@@ -74,6 +76,7 @@ export default function InspirationForm({ products, inspiration }: InspirationFo
     inspiration?.products?.map((p) => ({
       productId: p.productId,
       productVariantId: p.productVariantId,
+      quantity: p.quantity ?? 1,
     })) || []
   )
 

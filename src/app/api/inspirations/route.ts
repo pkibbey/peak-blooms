@@ -36,6 +36,7 @@ export async function GET() {
 interface ProductSelection {
   productId: string
   productVariantId: string
+  quantity?: number
 }
 
 /**
@@ -90,6 +91,7 @@ export async function POST(request: NextRequest) {
             create: selections.map((sel: ProductSelection) => ({
               productId: sel.productId,
               productVariantId: sel.productVariantId,
+              quantity: Math.max(1, sel.quantity || 1),
             })),
           },
         }),

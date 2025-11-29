@@ -41,6 +41,7 @@ export async function GET(_request: NextRequest, { params }: { params: Promise<{
 interface ProductSelection {
   productId: string
   productVariantId: string
+  quantity?: number
 }
 
 /**
@@ -111,6 +112,7 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
           create: selections.map((sel: ProductSelection) => ({
             productId: sel.productId,
             productVariantId: sel.productVariantId,
+            quantity: Math.max(1, sel.quantity || 1),
           })),
         }
       }

@@ -146,6 +146,7 @@ model InspirationProduct {
   inspirationId     String
   productId         String
   productVariantId  String
+  quantity          Int              @default(1)
   createdAt         DateTime         @default(now())
 
   inspiration       Inspiration      @relation(fields: [inspirationId], references: [id], onDelete: Cascade)

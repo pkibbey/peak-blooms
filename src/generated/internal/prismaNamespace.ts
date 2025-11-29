@@ -1612,6 +1612,7 @@ export const InspirationProductScalarFieldEnum = {
   inspirationId: 'inspirationId',
   productId: 'productId',
   productVariantId: 'productVariantId',
+  quantity: 'quantity',
   createdAt: 'createdAt'
 } as const
 

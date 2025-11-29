@@ -18,6 +18,7 @@ export default async function EditInspirationPage({ params }: EditInspirationPag
           select: {
             productId: true,
             productVariantId: true,
+            quantity: true,
           },
         },
       },
