@@ -2,7 +2,8 @@ import { notFound } from "next/navigation"
 import BackLink from "@/components/site/BackLink"
 import { PageHeader } from "@/components/site/PageHeader"
 import { ProductCard } from "@/components/site/ProductCard"
-import { applyPriceMultiplierToProducts, getCurrentUser } from "@/lib/auth-utils"
+import { getCurrentUser } from "@/lib/auth-utils"
+import { getAllCollectionSlugs, getCollectionBySlug } from "@/lib/data"
 import { db } from "@/lib/db"
 
 interface CollectionDetailPageProps {
@@ -12,9 +13,7 @@ interface CollectionDetailPageProps {
 }
 
 export async function generateStaticParams() {
-  const collections = await db.collection.findMany({
-    select: { slug: true },
-  })
+  const collections = await getAllCollectionSlugs()
   return collections.map((collection) => ({
     slug: collection.slug,
   }))
@@ -35,28 +34,13 @@ export async function generateMetadata({ params }: CollectionDetailPageProps) {
 export default async function CollectionDetailPage({ params }: CollectionDetailPageProps) {
   const { slug } = await params
   const user = await getCurrentUser()
+  const multiplier = user?.priceMultiplier ?? 1.0
 
-  const collection = await db.collection.findUnique({
-    where: { slug },
-    include: {
-      products: {
-        orderBy: {
-          createdAt: "desc",
-        },
-        include: {
-          variants: true,
-        },
-      },
-    },
-  })
+  const collection = await getCollectionBySlug(slug, multiplier)
 
   if (!collection) {
     notFound()
   }
-
-  // Apply user's price multiplier to all product prices
-  const multiplier = user?.priceMultiplier ?? 1.0
-  const adjustedProducts = applyPriceMultiplierToProducts(collection.products, multiplier)
 
   return (
     <div className="flex flex-col items-center justify-start bg-white py-16 font-sans">
@@ -71,13 +55,13 @@ export default async function CollectionDetailPage({ params }: CollectionDetailP
         <div>
           <h2 className="text-2xl font-bold mb-6 font-serif">Products in this collection</h2>
 
-          {adjustedProducts.length === 0 ? (
+          {collection.products.length === 0 ? (
             <div className="text-center py-12">
               <p className="text-muted-foreground">No products available in this collection yet.</p>
             </div>
           ) : (
             <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
-              {adjustedProducts.map((product) => (
+              {collection.products.map((product) => (
                 <ProductCard key={product.slug} product={product} user={user} />
               ))}
             </div>

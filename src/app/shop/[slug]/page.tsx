@@ -4,7 +4,8 @@ import { notFound } from "next/navigation"
 import BackLink from "@/components/site/BackLink"
 import { FeaturedInInspirations } from "@/components/site/FeaturedInInspirations"
 import { ProductControls } from "@/components/site/ProductControls"
-import { applyPriceMultiplierToProduct, getCurrentUser } from "@/lib/auth-utils"
+import { getCurrentUser } from "@/lib/auth-utils"
+import { getAllProductSlugs, getProductWithInspirations } from "@/lib/data"
 import { db } from "@/lib/db"
 
 interface ProductDetailPageProps {
@@ -14,9 +15,7 @@ interface ProductDetailPageProps {
 }
 
 export async function generateStaticParams() {
-  const products = await db.product.findMany({
-    select: { slug: true },
-  })
+  const products = await getAllProductSlugs()
   return products.map((product) => ({
     slug: product.slug,
   }))
@@ -37,33 +36,13 @@ export async function generateMetadata({ params }: ProductDetailPageProps) {
 export default async function ProductDetailPage({ params }: ProductDetailPageProps) {
   const { slug } = await params
   const user = await getCurrentUser()
+  const multiplier = user?.priceMultiplier ?? 1.0
 
-  const product = await db.product.findUnique({
-    where: { slug },
-    include: {
-      collection: true,
-      inspirations: {
-        include: {
-          inspiration: {
-            include: {
-              _count: {
-                select: { products: true },
-              },
-            },
-          },
-        },
-      },
-      variants: true,
-    },
-  })
+  const product = await getProductWithInspirations(slug, multiplier)
 
   if (!product) {
     notFound()
   }
-
-  // Apply user's price multiplier to product prices
-  const multiplier = user?.priceMultiplier ?? 1.0
-  const adjustedProduct = applyPriceMultiplierToProduct(product, multiplier)
 
   return (
     <div className="flex flex-col items-center justify-start bg-white py-16 font-sans">
@@ -96,31 +75,31 @@ export default async function ProductDetailPage({ params }: ProductDetailPagePro
                 Shop
               </Link>
               <span className="mx-2">/</span>
-              <Link href={`/collections/${adjustedProduct.collection.slug}`} className="hover:underline">
-                {adjustedProduct.collection.name}
+              <Link href={`/collections/${product.collection.slug}`} className="hover:underline">
+                {product.collection.name}
               </Link>
               <span className="mx-2">/</span>
-              <span>{adjustedProduct.name}</span>
+              <span>{product.name}</span>
             </div>
 
             {/* Product Title */}
             <div>
-              <h1 className="text-4xl font-extrabold font-serif mb-2">{adjustedProduct.name}</h1>
-              <p className="text-muted-foreground">{adjustedProduct.collection.name}</p>
+              <h1 className="text-4xl font-extrabold font-serif mb-2">{product.name}</h1>
+              <p className="text-muted-foreground">{product.collection.name}</p>
             </div>
 
             {/* Description */}
             <div>
-              <p className="text-lg text-muted-foreground">{adjustedProduct.description}</p>
+              <p className="text-lg text-muted-foreground">{product.description}</p>
             </div>
 
             {/* Product Controls */}
-            <ProductControls product={adjustedProduct} user={user} mode="detail" />
+            <ProductControls product={product} user={user} mode="detail" />
           </div>
         </div>
 
         {/* Featured in Inspirations */}
-        <FeaturedInInspirations inspirations={adjustedProduct.inspirations} />
+        <FeaturedInInspirations inspirations={product.inspirations} />
       </div>
     </div>
   )

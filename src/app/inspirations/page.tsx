@@ -1,6 +1,6 @@
 import { InspirationCard } from "@/components/site/InspirationCard"
 import { PageHeader } from "@/components/site/PageHeader"
-import { db } from "@/lib/db"
+import { getInspirationsWithCounts } from "@/lib/data"
 
 export const metadata = {
   title: "Peak Blooms - Inspirations",
@@ -8,13 +8,7 @@ export const metadata = {
 }
 
 export default async function InspirationPage() {
-  const inspirations = await db.inspiration.findMany({
-    include: {
-      _count: {
-        select: { products: true },
-      },
-    },
-  })
+  const inspirations = await getInspirationsWithCounts()
 
   return (
     <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 py-10">

@@ -1,7 +1,7 @@
 import { type NextRequest, NextResponse } from "next/server"
 import { auth } from "@/lib/auth"
+import { getProducts } from "@/lib/data"
 import { db } from "@/lib/db"
-import { adjustPrice } from "@/lib/utils"
 
 /**
  * GET /api/products
@@ -28,79 +28,23 @@ export async function GET(request: NextRequest) {
     const collectionId = searchParams.get("collectionId")
     const featured = searchParams.get("featured")
     const color = searchParams.get("color")
-    const stemLength = searchParams.get("stemLength")
     const priceMin = searchParams.get("priceMin")
     const priceMax = searchParams.get("priceMax")
     const boxlotOnly = searchParams.get("boxlotOnly")
 
-    const where: Record<string, unknown> = {}
-
-    if (collectionId) {
-      where.collectionId = collectionId
-    }
-
-    if (featured === "true") {
-      where.featured = true
-    }
-
-    if (color && color !== "") {
-      where.color = {
-        equals: color,
-        mode: "insensitive",
-      }
-    }
-
-    // Filter by variant properties (stemLength, price)
-    const variantsFilter: Record<string, unknown> = {}
-
-    if (stemLength !== null && stemLength !== "") {
-      variantsFilter.stemLength = parseInt(stemLength as string, 10)
-    }
-
-    if (boxlotOnly === "true") {
-      variantsFilter.isBoxlot = true
-    }
-
-    if (priceMin !== null || priceMax !== null) {
-      const priceFilter: Record<string, unknown> = {}
-      if (priceMin !== null && priceMin !== "") {
-        priceFilter.gte = parseFloat(priceMin as string)
-      }
-      if (priceMax !== null && priceMax !== "") {
-        priceFilter.lte = parseFloat(priceMax as string)
-      }
-      if (Object.keys(priceFilter).length > 0) {
-        variantsFilter.price = priceFilter
-      }
-    }
-
-    if (Object.keys(variantsFilter).length > 0) {
-      where.variants = {
-        some: variantsFilter,
-      }
-    }
-
-    const products = await db.product.findMany({
-      where,
-      include: {
-        collection: true,
-        variants: true,
+    const products = await getProducts(
+      {
+        collectionId: collectionId || undefined,
+        featured: featured === "true",
+        color: color || undefined,
+        priceMin: priceMin ? parseFloat(priceMin) : undefined,
+        priceMax: priceMax ? parseFloat(priceMax) : undefined,
+        boxlotOnly: boxlotOnly === "true",
       },
-      orderBy: {
-        createdAt: "desc",
-      },
-    })
+      priceMultiplier
+    )
 
-    // Apply price multiplier to all variant prices
-    const adjustedProducts = products.map((product) => ({
-      ...product,
-      variants: product.variants.map((variant) => ({
-        ...variant,
-        price: adjustPrice(variant.price, priceMultiplier),
-      })),
-    }))
-
-    return NextResponse.json(adjustedProducts)
+    return NextResponse.json(products)
   } catch (error) {
     console.error("GET /api/products error:", error)
     return NextResponse.json({ error: "Failed to fetch products" }, { status: 500 })

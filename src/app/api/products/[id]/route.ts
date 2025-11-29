@@ -1,7 +1,7 @@
 import { type NextRequest, NextResponse } from "next/server"
 import { auth } from "@/lib/auth"
+import { getProductById } from "@/lib/data"
 import { db } from "@/lib/db"
-import { adjustPrice } from "@/lib/utils"
 
 /**
  * GET /api/products/[id]
@@ -25,33 +25,13 @@ export async function GET(_request: NextRequest, { params }: { params: Promise<{
       }
     }
 
-    const product = await db.product.findUnique({
-      where: { id },
-      include: {
-        collection: true,
-        variants: true,
-        inspirations: {
-          include: {
-            inspiration: true,
-          },
-        },
-      },
-    })
+    const product = await getProductById(id, priceMultiplier)
 
     if (!product) {
       return NextResponse.json({ error: "Product not found" }, { status: 404 })
     }
 
-    // Apply price multiplier to variant prices
-    const adjustedProduct = {
-      ...product,
-      variants: product.variants.map((variant) => ({
-        ...variant,
-        price: adjustPrice(variant.price, priceMultiplier),
-      })),
-    }
-
-    return NextResponse.json(adjustedProduct)
+    return NextResponse.json(product)
   } catch (error) {
     console.error("GET /api/products/[id] error:", error)
     return NextResponse.json({ error: "Failed to fetch product" }, { status: 500 })

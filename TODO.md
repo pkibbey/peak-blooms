@@ -7,7 +7,6 @@
 - [ ] Create separate development and production databases
 - [ ] Add pagination once we have a large number of products to view
 - [ ] Add real products in there
-- [ ] Make a more solid solution for the price multiplier
 
 ### 💰 Payment Processing 
 

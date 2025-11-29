@@ -1,5 +1,6 @@
-import { db } from "@/lib/db"
 import { type NextRequest, NextResponse } from "next/server"
+import { getAllCollections } from "@/lib/data"
+import { db } from "@/lib/db"
 
 /**
  * GET /api/collections
@@ -7,12 +8,7 @@ import { type NextRequest, NextResponse } from "next/server"
  */
 export async function GET() {
   try {
-    const collections = await db.collection.findMany({
-      orderBy: {
-        name: "asc",
-      },
-    })
-
+    const collections = await getAllCollections()
     return NextResponse.json(collections)
   } catch (error) {
     console.error("GET /api/collections error:", error)

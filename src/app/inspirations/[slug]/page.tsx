@@ -13,8 +13,8 @@ import {
   TableRow,
 } from "@/components/ui/table"
 import { getCurrentUser } from "@/lib/auth-utils"
+import { getAllInspirationSlugs, getInspirationBySlug } from "@/lib/data"
 import { db } from "@/lib/db"
-import { adjustPrice } from "@/lib/utils"
 
 interface InspirationDetailPageProps {
   params: Promise<{
@@ -23,9 +23,7 @@ interface InspirationDetailPageProps {
 }
 
 export async function generateStaticParams() {
-  const inspirations = await db.inspiration.findMany({
-    select: { slug: true },
-  })
+  const inspirations = await getAllInspirationSlugs()
   return inspirations.map((inspiration) => ({
     slug: inspiration.slug,
   }))
@@ -46,42 +44,21 @@ export async function generateMetadata({ params }: InspirationDetailPageProps) {
 export default async function InspirationDetailPage({ params }: InspirationDetailPageProps) {
   const { slug } = await params
   const user = await getCurrentUser()
-  const inspiration = await db.inspiration.findUnique({
-    where: { slug },
-    include: {
-      products: {
-        include: {
-          product: {
-            include: {
-              variants: true,
-            },
-          },
-          productVariant: true,
-        },
-      },
-    },
-  })
+  const multiplier = user?.priceMultiplier ?? 1.0
+
+  const inspiration = await getInspirationBySlug(slug, multiplier)
 
   if (!inspiration) {
     notFound()
   }
 
-  // Get user's price multiplier
-  const multiplier = user?.priceMultiplier ?? 1.0
-
   // Extract products with their selected variants from the join table
-  // Apply price multiplier to variant prices
+  // Prices are already adjusted by the DAL
   const productsWithVariants = inspiration.products.map((sp) => ({
     ...sp.product,
-    selectedVariant: sp.productVariant
-      ? { ...sp.productVariant, price: adjustPrice(sp.productVariant.price, multiplier) }
-      : null,
+    selectedVariant: sp.productVariant,
     // Use the selected variant or fall back to first variant
-    displayVariant: sp.productVariant
-      ? { ...sp.productVariant, price: adjustPrice(sp.productVariant.price, multiplier) }
-      : sp.product.variants[0]
-        ? { ...sp.product.variants[0], price: adjustPrice(sp.product.variants[0].price, multiplier) }
-        : null,
+    displayVariant: sp.productVariant ?? sp.product.variants[0] ?? null,
     quantity: sp.quantity ?? 1,
   }))
 

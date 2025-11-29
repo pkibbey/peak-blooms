@@ -1,6 +1,6 @@
 import { CollectionCard } from "@/components/site/CollectionCard"
 import { PageHeader } from "@/components/site/PageHeader"
-import { db } from "@/lib/db"
+import { getAllCollections } from "@/lib/data"
 
 export const metadata = {
   title: "Peak Blooms - Collections",
@@ -8,13 +8,7 @@ export const metadata = {
 }
 
 export default async function CollectionsPage() {
-  const collections = await db.collection.findMany({
-    include: {
-      _count: {
-        select: { products: true },
-      },
-    },
-  })
+  const collections = await getAllCollections()
 
   return (
     <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 py-10">
