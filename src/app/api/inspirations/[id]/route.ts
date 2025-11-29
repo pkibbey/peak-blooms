@@ -1,13 +1,29 @@
 import { type NextRequest, NextResponse } from "next/server"
+import { auth } from "@/lib/auth"
 import { db } from "@/lib/db"
+import { adjustPrice } from "@/lib/utils"
 
 /**
  * GET /api/inspirations/[id]
  * Get a single inspiration by ID
+ * Prices are adjusted based on the authenticated user's price multiplier
  */
 export async function GET(_request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const { id } = await params
+
+    // Get current user's price multiplier if authenticated
+    let priceMultiplier = 1.0
+    const session = await auth()
+    if (session?.user?.email) {
+      const user = await db.user.findUnique({
+        where: { email: session.user.email },
+        select: { priceMultiplier: true },
+      })
+      if (user) {
+        priceMultiplier = user.priceMultiplier
+      }
+    }
 
     const inspiration = await db.inspiration.findUnique({
       where: { id },
@@ -30,7 +46,28 @@ export async function GET(_request: NextRequest, { params }: { params: Promise<{
       return NextResponse.json({ error: "Inspiration not found" }, { status: 404 })
     }
 
-    return NextResponse.json(inspiration)
+    // Apply price multiplier to product variant prices
+    const adjustedInspiration = {
+      ...inspiration,
+      products: inspiration.products.map((p) => ({
+        ...p,
+        product: {
+          ...p.product,
+          variants: p.product.variants.map((variant) => ({
+            ...variant,
+            price: adjustPrice(variant.price, priceMultiplier),
+          })),
+        },
+        productVariant: p.productVariant
+          ? {
+              ...p.productVariant,
+              price: adjustPrice(p.productVariant.price, priceMultiplier),
+            }
+          : null,
+      })),
+    }
+
+    return NextResponse.json(adjustedInspiration)
   } catch (error) {
     console.error("GET /api/inspirations/[id] error:", error)
     return NextResponse.json({ error: "Failed to fetch inspiration" }, { status: 500 })

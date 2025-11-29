@@ -17,6 +17,7 @@ declare module "next-auth" {
     id: string
     approved: boolean
     role: "CUSTOMER" | "ADMIN"
+    priceMultiplier: number
   }
 
   interface Session {
@@ -76,6 +77,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           session.user.id = freshUser.id
           session.user.approved = freshUser.approved
           session.user.role = freshUser.role
+          session.user.priceMultiplier = freshUser.priceMultiplier
         }
       }
       return session

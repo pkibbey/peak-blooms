@@ -2,13 +2,17 @@
 
 import { useRouter } from "next/navigation"
 import { useState } from "react"
+import { toast } from "sonner"
 import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { MAX_PRICE_MULTIPLIER, MIN_PRICE_MULTIPLIER } from "@/lib/utils"
 
 interface User {
   id: string
   email: string | null
   name: string | null
   approved: boolean
+  priceMultiplier: number
   createdAt: string
 }
 
@@ -18,27 +22,35 @@ interface PendingUserCardProps {
 
 export default function PendingUserCard({ user }: PendingUserCardProps) {
   const router = useRouter()
-  const [approving, setApproving] = useState<string | null>(null)
+  const [approving, setApproving] = useState(false)
+  const [multiplier, setMultiplier] = useState(user.priceMultiplier.toString())
 
   const handleApprove = async () => {
-    setApproving(user.id)
+    const numValue = Number.parseFloat(multiplier)
+    if (Number.isNaN(numValue) || numValue < MIN_PRICE_MULTIPLIER || numValue > MAX_PRICE_MULTIPLIER) {
+      toast.error(`Multiplier must be between ${MIN_PRICE_MULTIPLIER} and ${MAX_PRICE_MULTIPLIER}`)
+      return
+    }
+
+    setApproving(true)
     try {
       const response = await fetch(`/api/admin/users/${user.id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ approved: true }),
+        body: JSON.stringify({ approved: true, priceMultiplier: numValue }),
       })
 
       if (response.ok) {
-        // Refresh to update the user list
+        toast.success("User approved")
         router.refresh()
       } else {
-        console.error("Failed to approve user")
+        toast.error("Failed to approve user")
       }
     } catch (error) {
       console.error("Error approving user:", error)
+      toast.error("Failed to approve user")
     } finally {
-      setApproving(null)
+      setApproving(false)
     }
   }
 
@@ -51,8 +63,23 @@ export default function PendingUserCard({ user }: PendingUserCardProps) {
           Signed up: {new Date(user.createdAt).toLocaleDateString()}
         </p>
       </div>
-      <div className="ml-4 flex gap-2">
-        <Button size="sm" onClick={handleApprove} disabled={approving === user.id}>
+      <div className="ml-4 flex items-center gap-3">
+        <div className="flex items-center gap-2">
+          <label htmlFor={`multiplier-${user.id}`} className="text-sm text-muted-foreground whitespace-nowrap">
+            Price ×
+          </label>
+          <Input
+            id={`multiplier-${user.id}`}
+            type="number"
+            step="0.01"
+            min={MIN_PRICE_MULTIPLIER}
+            max={MAX_PRICE_MULTIPLIER}
+            value={multiplier}
+            onChange={(e) => setMultiplier(e.target.value)}
+            className="w-20 h-8"
+          />
+        </div>
+        <Button size="sm" onClick={handleApprove} disabled={approving}>
           Approve
         </Button>
       </div>

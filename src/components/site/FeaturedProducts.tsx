@@ -1,7 +1,7 @@
 import Link from "next/link"
+import { applyPriceMultiplierToProducts, getCurrentUser } from "@/lib/auth-utils"
 import { db } from "@/lib/db"
 import { ProductCard } from "./ProductCard"
-import { getCurrentUser } from "@/lib/auth-utils"
 
 export default async function FeaturedProducts() {
   const user = await getCurrentUser()
@@ -14,6 +14,10 @@ export default async function FeaturedProducts() {
     },
     take: 4,
   })
+
+  // Apply user's price multiplier to all product prices
+  const multiplier = user?.priceMultiplier ?? 1.0
+  const adjustedProducts = applyPriceMultiplierToProducts(products, multiplier)
 
   return (
     <div className="flex flex-col items-center justify-start bg-white py-16 font-sans">
@@ -31,7 +35,7 @@ export default async function FeaturedProducts() {
         </div>
 
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-          {products.map((product) => (
+          {adjustedProducts.map((product) => (
             <ProductCard key={product.slug} product={product} user={user} />
           ))}
         </div>

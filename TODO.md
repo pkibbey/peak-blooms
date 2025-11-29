@@ -3,14 +3,17 @@
 ### 🌟 Features to Add
 
 - [ ] Validate all form fields using zod + react-hook-form instead of relying on html validation
+- [ ] Add unit tests and e2e tests to ensure complete site functionality
+- [ ] Create separate development and production databases
+- [ ] Add pagination once we have a large number of products to view
+- [ ] Add real products in there
+- [ ] Make a more solid solution for the price multiplier
+
+### 💰 Payment Processing 
+
 - [ ] Add ability to send emails to any account, not just the test account
 - [ ] Add ability to accept payments
 - [ ] Add shipping charges to checkout process
-- [ ] Add price multiplier per account
-- [ ] Add unit tests and e2e tests to ensure complete site functionality
-- [ ] Create separate development and production databases
-- [ ] Add quantity selector to the inspirations page
-- [ ] Add pagination once we have a large number of products to view
 
 ### 🎨 Design Changes
 

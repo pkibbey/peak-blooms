@@ -3,7 +3,7 @@ import { BoxlotFilter } from "@/components/site/BoxlotFilter"
 import { PageHeader } from "@/components/site/PageHeader"
 import { ProductCard } from "@/components/site/ProductCard"
 import type { ProductWhereInput } from "@/generated/models/Product"
-import { getCurrentUser } from "@/lib/auth-utils"
+import { applyPriceMultiplierToProducts, getCurrentUser } from "@/lib/auth-utils"
 import { db } from "@/lib/db"
 
 interface ShopPageProps {
@@ -106,6 +106,10 @@ export default async function ShopPage({ searchParams }: ShopPageProps) {
     },
   })
 
+  // Apply user's price multiplier to all product prices
+  const multiplier = user?.priceMultiplier ?? 1.0
+  const adjustedProducts = applyPriceMultiplierToProducts(products, multiplier)
+
   return (
     <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 py-10">
       <PageHeader title="Shop" description="Browse our full catalog of premium flowers" />
@@ -129,7 +133,7 @@ export default async function ShopPage({ searchParams }: ShopPageProps) {
         </div>
       ) : (
         <div className="grid grid-cols-2 gap-4 sm:gap-6 md:grid-cols-3 lg:grid-cols-4">
-          {products.map((product) => (
+          {adjustedProducts.map((product) => (
             <ProductCard key={product.slug} product={product} user={user} />
           ))}
         </div>

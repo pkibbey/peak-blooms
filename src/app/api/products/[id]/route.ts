@@ -1,13 +1,29 @@
 import { type NextRequest, NextResponse } from "next/server"
+import { auth } from "@/lib/auth"
 import { db } from "@/lib/db"
+import { adjustPrice } from "@/lib/utils"
 
 /**
  * GET /api/products/[id]
  * Get a single product by ID
+ * Prices are adjusted based on the authenticated user's price multiplier
  */
 export async function GET(_request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const { id } = await params
+
+    // Get current user's price multiplier if authenticated
+    let priceMultiplier = 1.0
+    const session = await auth()
+    if (session?.user?.email) {
+      const user = await db.user.findUnique({
+        where: { email: session.user.email },
+        select: { priceMultiplier: true },
+      })
+      if (user) {
+        priceMultiplier = user.priceMultiplier
+      }
+    }
 
     const product = await db.product.findUnique({
       where: { id },
@@ -26,7 +42,16 @@ export async function GET(_request: NextRequest, { params }: { params: Promise<{
       return NextResponse.json({ error: "Product not found" }, { status: 404 })
     }
 
-    return NextResponse.json(product)
+    // Apply price multiplier to variant prices
+    const adjustedProduct = {
+      ...product,
+      variants: product.variants.map((variant) => ({
+        ...variant,
+        price: adjustPrice(variant.price, priceMultiplier),
+      })),
+    }
+
+    return NextResponse.json(adjustedProduct)
   } catch (error) {
     console.error("GET /api/products/[id] error:", error)
     return NextResponse.json({ error: "Failed to fetch product" }, { status: 500 })

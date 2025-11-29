@@ -2,6 +2,7 @@ import { NextResponse } from "next/server"
 import { auth } from "@/lib/auth"
 import { isApproved } from "@/lib/auth-utils"
 import { db } from "@/lib/db"
+import { adjustPrice } from "@/lib/utils"
 
 /**
  * Generate the next order number in sequence (PB-00001, PB-00002, etc.)
@@ -96,11 +97,17 @@ export async function POST(request: Request) {
 
     const user = await db.user.findUnique({
       where: { email: session.user.email },
+      select: {
+        id: true,
+        priceMultiplier: true,
+      },
     })
 
     if (!user) {
       return NextResponse.json({ error: "User not found" }, { status: 404 })
     }
+
+    const priceMultiplier = user.priceMultiplier
 
     // Parse request body
     const body = await request.json()
@@ -136,10 +143,11 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Cart is empty" }, { status: 400 })
     }
 
-    // Calculate total using variant pricing (required)
+    // Calculate total using variant pricing with price multiplier applied
     const total = cart.items.reduce((sum: number, item) => {
-      const price = item.productVariant?.price ?? 0
-      return sum + price * item.quantity
+      const basePrice = item.productVariant?.price ?? 0
+      const adjustedPrice = adjustPrice(basePrice, priceMultiplier)
+      return sum + adjustedPrice * item.quantity
     }, 0)
 
     // Handle shipping address
@@ -206,12 +214,12 @@ export async function POST(request: Request) {
     // Generate order number
     const orderNumber = await generateOrderNumber()
 
-    // Create order with items
+    // Create order with items (storing adjusted prices)
     const order = await db.order.create({
       data: {
         orderNumber,
         userId: user.id,
-        total,
+        total: Math.round(total * 100) / 100,
         status: "PENDING",
         email,
         phone: phone || null,
@@ -223,7 +231,7 @@ export async function POST(request: Request) {
             productId: item.productId,
             productVariantId: item.productVariantId,
             quantity: item.quantity,
-            price: item.productVariant?.price ?? 0,
+            price: adjustPrice(item.productVariant?.price ?? 0, priceMultiplier),
           })),
         },
       },

@@ -14,6 +14,7 @@ import {
 } from "@/components/ui/table"
 import { getCurrentUser } from "@/lib/auth-utils"
 import { db } from "@/lib/db"
+import { adjustPrice } from "@/lib/utils"
 
 interface InspirationDetailPageProps {
   params: Promise<{
@@ -65,12 +66,22 @@ export default async function InspirationDetailPage({ params }: InspirationDetai
     notFound()
   }
 
+  // Get user's price multiplier
+  const multiplier = user?.priceMultiplier ?? 1.0
+
   // Extract products with their selected variants from the join table
+  // Apply price multiplier to variant prices
   const productsWithVariants = inspiration.products.map((sp) => ({
     ...sp.product,
-    selectedVariant: sp.productVariant,
+    selectedVariant: sp.productVariant
+      ? { ...sp.productVariant, price: adjustPrice(sp.productVariant.price, multiplier) }
+      : null,
     // Use the selected variant or fall back to first variant
-    displayVariant: sp.productVariant ?? sp.product.variants[0] ?? null,
+    displayVariant: sp.productVariant
+      ? { ...sp.productVariant, price: adjustPrice(sp.productVariant.price, multiplier) }
+      : sp.product.variants[0]
+        ? { ...sp.product.variants[0], price: adjustPrice(sp.product.variants[0].price, multiplier) }
+        : null,
     quantity: sp.quantity ?? 1,
   }))
 

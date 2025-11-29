@@ -128,6 +128,7 @@ export const UserScalarFieldEnum = {
   image: 'image',
   role: 'role',
   approved: 'approved',
+  priceMultiplier: 'priceMultiplier',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const

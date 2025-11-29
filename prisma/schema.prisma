@@ -48,15 +48,16 @@ model VerificationToken {
 
 // Peak Blooms Models
 model User {
-  id            String     @id @default(cuid())
-  email         String?    @unique
-  emailVerified DateTime?
-  name          String?
-  image         String?
-  role          Role       @default(CUSTOMER)
-  approved      Boolean    @default(false)
-  createdAt     DateTime   @default(now())
-  updatedAt     DateTime   @updatedAt
+  id              String     @id @default(cuid())
+  email           String?    @unique
+  emailVerified   DateTime?
+  name            String?
+  image           String?
+  role            Role       @default(CUSTOMER)
+  approved        Boolean    @default(false)
+  priceMultiplier Float      @default(1.0) // Multiplier applied to all prices (0.5-2.0)
+  createdAt       DateTime   @default(now())
+  updatedAt       DateTime   @updatedAt
 
   accounts      Account[]
   sessions      Session[]

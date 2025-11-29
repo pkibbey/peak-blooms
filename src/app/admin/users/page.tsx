@@ -8,6 +8,7 @@ interface User {
   email: string | null
   name: string | null
   approved: boolean
+  priceMultiplier: number
   createdAt: string
 }
 
@@ -21,6 +22,7 @@ export default async function UsersPage() {
         email: true,
         name: true,
         approved: true,
+        priceMultiplier: true,
         createdAt: true,
       },
       orderBy: [{ approved: "asc" }, { createdAt: "desc" }],

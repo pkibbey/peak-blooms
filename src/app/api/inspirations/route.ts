@@ -1,12 +1,28 @@
 import { type NextRequest, NextResponse } from "next/server"
+import { auth } from "@/lib/auth"
 import { db } from "@/lib/db"
+import { adjustPrice } from "@/lib/utils"
 
 /**
  * GET /api/inspirations
  * Get all inspirations
+ * Prices are adjusted based on the authenticated user's price multiplier
  */
 export async function GET() {
   try {
+    // Get current user's price multiplier if authenticated
+    let priceMultiplier = 1.0
+    const session = await auth()
+    if (session?.user?.email) {
+      const user = await db.user.findUnique({
+        where: { email: session.user.email },
+        select: { priceMultiplier: true },
+      })
+      if (user) {
+        priceMultiplier = user.priceMultiplier
+      }
+    }
+
     const inspirations = await db.inspiration.findMany({
       include: {
         products: {
@@ -25,7 +41,21 @@ export async function GET() {
       },
     })
 
-    return NextResponse.json(inspirations)
+    // Apply price multiplier to product variant prices
+    const adjustedInspirations = inspirations.map((inspiration) => ({
+      ...inspiration,
+      products: inspiration.products.map((p) => ({
+        ...p,
+        productVariant: p.productVariant
+          ? {
+              ...p.productVariant,
+              price: adjustPrice(p.productVariant.price, priceMultiplier),
+            }
+          : null,
+      })),
+    }))
+
+    return NextResponse.json(adjustedInspirations)
   } catch (error) {
     console.error("GET /api/inspirations error:", error)
     return NextResponse.json({ error: "Failed to fetch inspirations" }, { status: 500 })

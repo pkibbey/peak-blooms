@@ -1,11 +1,12 @@
-import { auth } from "@/lib/auth"
-import { db } from "@/lib/db"
-import { getOrCreateCart, calculateCartTotal, isApproved } from "@/lib/auth-utils"
 import { type NextRequest, NextResponse } from "next/server"
+import { auth } from "@/lib/auth"
+import { calculateCartTotal, getOrCreateCart, isApproved } from "@/lib/auth-utils"
+import { db } from "@/lib/db"
 
 /**
  * GET /api/cart
  * Get current user's shopping cart (approved users only)
+ * Prices are automatically adjusted by user's price multiplier via getOrCreateCart()
  */
 export async function GET() {
   try {
@@ -24,6 +25,7 @@ export async function GET() {
       )
     }
 
+    // Get cart with prices already adjusted by multiplier
     const cart = await getOrCreateCart()
 
     if (!cart) {

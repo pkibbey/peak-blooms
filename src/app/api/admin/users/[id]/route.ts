@@ -1,6 +1,7 @@
+import { type NextRequest, NextResponse } from "next/server"
 import { auth } from "@/lib/auth"
 import { db } from "@/lib/db"
-import { type NextRequest, NextResponse } from "next/server"
+import { isValidPriceMultiplier } from "@/lib/utils"
 
 interface RouteParams {
   params: Promise<{ id: string }>
@@ -8,7 +9,7 @@ interface RouteParams {
 
 /**
  * PATCH /api/admin/users/[id]
- * Approve or reject a user (admin only)
+ * Update a user's approval status or price multiplier (admin only)
  */
 export async function PATCH(request: NextRequest, { params }: RouteParams) {
   try {
@@ -20,20 +21,38 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
 
     const { id } = await params
     const body = await request.json()
-    const { approved } = body
+    const { approved, priceMultiplier } = body
 
-    if (typeof approved !== "boolean") {
-      return NextResponse.json({ error: "Invalid request body" }, { status: 400 })
+    // Build update data object
+    const updateData: { approved?: boolean; priceMultiplier?: number } = {}
+
+    if (typeof approved === "boolean") {
+      updateData.approved = approved
+    }
+
+    if (priceMultiplier !== undefined) {
+      if (!isValidPriceMultiplier(priceMultiplier)) {
+        return NextResponse.json(
+          { error: "Price multiplier must be between 0.5 and 2.0" },
+          { status: 400 }
+        )
+      }
+      updateData.priceMultiplier = priceMultiplier
+    }
+
+    if (Object.keys(updateData).length === 0) {
+      return NextResponse.json({ error: "No valid fields to update" }, { status: 400 })
     }
 
     const user = await db.user.update({
       where: { id },
-      data: { approved },
+      data: updateData,
       select: {
         id: true,
         email: true,
         name: true,
         approved: true,
+        priceMultiplier: true,
         createdAt: true,
       },
     })

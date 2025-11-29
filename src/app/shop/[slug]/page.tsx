@@ -4,7 +4,7 @@ import { notFound } from "next/navigation"
 import BackLink from "@/components/site/BackLink"
 import { FeaturedInInspirations } from "@/components/site/FeaturedInInspirations"
 import { ProductControls } from "@/components/site/ProductControls"
-import { getCurrentUser } from "@/lib/auth-utils"
+import { applyPriceMultiplierToProduct, getCurrentUser } from "@/lib/auth-utils"
 import { db } from "@/lib/db"
 
 interface ProductDetailPageProps {
@@ -61,6 +61,10 @@ export default async function ProductDetailPage({ params }: ProductDetailPagePro
     notFound()
   }
 
+  // Apply user's price multiplier to product prices
+  const multiplier = user?.priceMultiplier ?? 1.0
+  const adjustedProduct = applyPriceMultiplierToProduct(product, multiplier)
+
   return (
     <div className="flex flex-col items-center justify-start bg-white py-16 font-sans">
       <div className="w-full max-w-5xl px-6">
@@ -92,31 +96,31 @@ export default async function ProductDetailPage({ params }: ProductDetailPagePro
                 Shop
               </Link>
               <span className="mx-2">/</span>
-              <Link href={`/collections/${product.collection.slug}`} className="hover:underline">
-                {product.collection.name}
+              <Link href={`/collections/${adjustedProduct.collection.slug}`} className="hover:underline">
+                {adjustedProduct.collection.name}
               </Link>
               <span className="mx-2">/</span>
-              <span>{product.name}</span>
+              <span>{adjustedProduct.name}</span>
             </div>
 
             {/* Product Title */}
             <div>
-              <h1 className="text-4xl font-extrabold font-serif mb-2">{product.name}</h1>
-              <p className="text-muted-foreground">{product.collection.name}</p>
+              <h1 className="text-4xl font-extrabold font-serif mb-2">{adjustedProduct.name}</h1>
+              <p className="text-muted-foreground">{adjustedProduct.collection.name}</p>
             </div>
 
             {/* Description */}
             <div>
-              <p className="text-lg text-muted-foreground">{product.description}</p>
+              <p className="text-lg text-muted-foreground">{adjustedProduct.description}</p>
             </div>
 
             {/* Product Controls */}
-            <ProductControls product={product} user={user} mode="detail" />
+            <ProductControls product={adjustedProduct} user={user} mode="detail" />
           </div>
         </div>
 
         {/* Featured in Inspirations */}
-        <FeaturedInInspirations inspirations={product.inspirations} />
+        <FeaturedInInspirations inspirations={adjustedProduct.inspirations} />
       </div>
     </div>
   )

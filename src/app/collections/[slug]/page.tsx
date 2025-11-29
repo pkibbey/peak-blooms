@@ -2,7 +2,7 @@ import { notFound } from "next/navigation"
 import BackLink from "@/components/site/BackLink"
 import { PageHeader } from "@/components/site/PageHeader"
 import { ProductCard } from "@/components/site/ProductCard"
-import { getCurrentUser } from "@/lib/auth-utils"
+import { applyPriceMultiplierToProducts, getCurrentUser } from "@/lib/auth-utils"
 import { db } from "@/lib/db"
 
 interface CollectionDetailPageProps {
@@ -54,6 +54,10 @@ export default async function CollectionDetailPage({ params }: CollectionDetailP
     notFound()
   }
 
+  // Apply user's price multiplier to all product prices
+  const multiplier = user?.priceMultiplier ?? 1.0
+  const adjustedProducts = applyPriceMultiplierToProducts(collection.products, multiplier)
+
   return (
     <div className="flex flex-col items-center justify-start bg-white py-16 font-sans">
       <div className="w-full max-w-5xl px-6">
@@ -67,13 +71,13 @@ export default async function CollectionDetailPage({ params }: CollectionDetailP
         <div>
           <h2 className="text-2xl font-bold mb-6 font-serif">Products in this collection</h2>
 
-          {collection.products.length === 0 ? (
+          {adjustedProducts.length === 0 ? (
             <div className="text-center py-12">
               <p className="text-muted-foreground">No products available in this collection yet.</p>
             </div>
           ) : (
             <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
-              {collection.products.map((product) => (
+              {adjustedProducts.map((product) => (
                 <ProductCard key={product.slug} product={product} user={user} />
               ))}
             </div>

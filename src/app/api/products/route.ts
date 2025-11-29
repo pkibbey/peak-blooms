@@ -1,13 +1,29 @@
 import { type NextRequest, NextResponse } from "next/server"
+import { auth } from "@/lib/auth"
 import { db } from "@/lib/db"
+import { adjustPrice } from "@/lib/utils"
 
 /**
  * GET /api/products
  * Get all products (with optional filtering)
  * Query params: collectionId, featured, color, stemLength, priceMin, priceMax
+ * Prices are adjusted based on the authenticated user's price multiplier
  */
 export async function GET(request: NextRequest) {
   try {
+    // Get current user's price multiplier if authenticated
+    let priceMultiplier = 1.0
+    const session = await auth()
+    if (session?.user?.email) {
+      const user = await db.user.findUnique({
+        where: { email: session.user.email },
+        select: { priceMultiplier: true },
+      })
+      if (user) {
+        priceMultiplier = user.priceMultiplier
+      }
+    }
+
     const { searchParams } = new URL(request.url)
     const collectionId = searchParams.get("collectionId")
     const featured = searchParams.get("featured")
@@ -75,7 +91,16 @@ export async function GET(request: NextRequest) {
       },
     })
 
-    return NextResponse.json(products)
+    // Apply price multiplier to all variant prices
+    const adjustedProducts = products.map((product) => ({
+      ...product,
+      variants: product.variants.map((variant) => ({
+        ...variant,
+        price: adjustPrice(variant.price, priceMultiplier),
+      })),
+    }))
+
+    return NextResponse.json(adjustedProducts)
   } catch (error) {
     console.error("GET /api/products error:", error)
     return NextResponse.json({ error: "Failed to fetch products" }, { status: 500 })
