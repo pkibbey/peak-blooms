@@ -2,6 +2,7 @@ import { type NextRequest, NextResponse } from "next/server"
 import { auth } from "@/lib/auth"
 import { db } from "@/lib/db"
 import { adjustPrice } from "@/lib/utils"
+import { createInspirationSchema, type ProductSelection } from "@/lib/validations/inspiration"
 
 /**
  * GET /api/inspirations/[id]
@@ -74,13 +75,6 @@ export async function GET(_request: NextRequest, { params }: { params: Promise<{
   }
 }
 
-// Type for product selection with required variant
-interface ProductSelection {
-  productId: string
-  productVariantId: string
-  quantity?: number
-}
-
 /**
  * PUT /api/inspirations/[id]
  * Update an inspiration (admin only)
@@ -97,6 +91,17 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
     const { id } = await params
     const body = await request.json()
 
+    // Partial validation - allow partial updates
+    const validationResult = createInspirationSchema.partial().safeParse(body)
+
+    if (!validationResult.success) {
+      const firstError = validationResult.error.issues[0]
+      return NextResponse.json(
+        { error: firstError?.message || "Invalid request data" },
+        { status: 400 }
+      )
+    }
+
     const {
       name,
       slug,
@@ -104,8 +109,8 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
       image,
       excerpt,
       inspirationText,
-      productSelections, // Array of { productId, productVariantId }
-    } = body
+      productSelections, // Array of { productId, productVariantId, quantity }
+    } = validationResult.data
 
     // Check if inspiration exists
     const existingInspiration = await db.inspiration.findUnique({

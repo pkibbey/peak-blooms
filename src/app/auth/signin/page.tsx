@@ -1,12 +1,22 @@
 "use client"
 
+import { zodResolver } from "@hookform/resolvers/zod"
 import Link from "next/link"
 import { useSearchParams } from "next/navigation"
 import { signIn } from "next-auth/react"
-import { type FormEvent, useState } from "react"
+import { useState } from "react"
+import { useForm } from "react-hook-form"
 import { Button } from "@/components/ui/button"
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
+import { type SignInFormData, signInSchema } from "@/lib/validations/auth"
 
 export default function SignInPage() {
   const searchParams = useSearchParams()
@@ -18,30 +28,34 @@ export default function SignInPage() {
     searchParams.get("callbackUrl") || `/auth/redirect?next=${encodeURIComponent("/")}`
   const error = searchParams.get("error")
 
-  const [email, setEmail] = useState("")
-  const [loading, setLoading] = useState(false)
   const [submitted, setSubmitted] = useState(false)
+  const [submittedEmail, setSubmittedEmail] = useState("")
 
-  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault()
-    setLoading(true)
+  const form = useForm<SignInFormData>({
+    resolver: zodResolver(signInSchema),
+    defaultValues: {
+      email: "",
+    },
+  })
 
+  const onSubmit = async (data: SignInFormData) => {
     try {
       const result = await signIn("email", {
-        email,
+        email: data.email,
         callbackUrl,
         redirect: false,
       })
 
       if (result?.ok) {
+        setSubmittedEmail(data.email)
         setSubmitted(true)
       } else {
+        form.setError("root", { message: "Failed to send sign-in email. Please try again." })
         console.error("Sign in failed:", result?.error)
       }
     } catch (error) {
+      form.setError("root", { message: "An error occurred. Please try again." })
       console.error("Error signing in:", error)
-    } finally {
-      setLoading(false)
     }
   }
 
@@ -52,7 +66,7 @@ export default function SignInPage() {
           <div className="space-y-2 text-center">
             <h1 className="text-2xl font-bold">Check your email</h1>
             <p className="text-sm text-muted-foreground">
-              We&apos;ve sent a sign-in link to <strong>{email}</strong>
+              We&apos;ve sent a sign-in link to <strong>{submittedEmail}</strong>
             </p>
           </div>
           <div className="space-y-4 text-center text-sm text-muted-foreground">
@@ -85,23 +99,36 @@ export default function SignInPage() {
           </div>
         )}
 
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="email">Email</Label>
-            <Input
-              id="email"
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="you@example.com"
-              required
-              className="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+            {form.formState.errors.root && (
+              <div className="rounded-lg bg-destructive/10 p-3 text-sm text-destructive">
+                {form.formState.errors.root.message}
+              </div>
+            )}
+            <FormField
+              control={form.control}
+              name="email"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Email</FormLabel>
+                  <FormControl>
+                    <Input
+                      {...field}
+                      type="email"
+                      placeholder="you@example.com"
+                      className="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
             />
-          </div>
-          <Button type="submit" disabled={loading} className="w-full">
-            Sign in with Email
-          </Button>
-        </form>
+            <Button type="submit" disabled={form.formState.isSubmitting} className="w-full">
+              {form.formState.isSubmitting ? "Signing in..." : "Sign in with Email"}
+            </Button>
+          </form>
+        </Form>
 
         <p className="text-center text-xs text-muted-foreground">
           By signing in, you agree to our terms of service.

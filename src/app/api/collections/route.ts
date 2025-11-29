@@ -1,6 +1,7 @@
 import { type NextRequest, NextResponse } from "next/server"
 import { getAllCollections } from "@/lib/data"
 import { db } from "@/lib/db"
+import { collectionSchema } from "@/lib/validations/collection"
 
 /**
  * GET /api/collections
@@ -30,19 +31,24 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json()
+    const validationResult = collectionSchema.safeParse(body)
 
-    const { name, slug, image, description } = body
-
-    if (!name || !slug) {
-      return NextResponse.json({ error: "Name and slug are required" }, { status: 400 })
+    if (!validationResult.success) {
+      const firstError = validationResult.error.issues[0]
+      return NextResponse.json(
+        { error: firstError?.message || "Invalid request data" },
+        { status: 400 }
+      )
     }
+
+    const { name, slug, image, description } = validationResult.data
 
     const collection = await db.collection.create({
       data: {
         name,
         slug,
-        image,
-        description,
+        image: image || null,
+        description: description || null,
       },
     })
 

@@ -2,6 +2,7 @@ import { type NextRequest, NextResponse } from "next/server"
 import { auth } from "@/lib/auth"
 import { getProductById } from "@/lib/data"
 import { db } from "@/lib/db"
+import { createProductSchema } from "@/lib/validations/product"
 
 /**
  * GET /api/products/[id]
@@ -54,7 +55,19 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
     const { id } = await params
     const body = await request.json()
 
-    const { name, slug, description, image, color, collectionId, featured, variants } = body
+    // Partial validation - allow partial updates
+    const validationResult = createProductSchema.partial().safeParse(body)
+
+    if (!validationResult.success) {
+      const firstError = validationResult.error.issues[0]
+      return NextResponse.json(
+        { error: firstError?.message || "Invalid request data" },
+        { status: 400 }
+      )
+    }
+
+    const { name, slug, description, image, color, collectionId, featured, variants } =
+      validationResult.data
 
     // Check if product exists
     const existingProduct = await db.product.findUnique({
@@ -93,19 +106,12 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
           ...(featured !== undefined && { featured }),
           ...(variants !== undefined && {
             variants: {
-              create: variants.map(
-                (v: {
-                  price: number
-                  stemLength?: number | null
-                  countPerBunch?: number | null
-                  isBoxlot?: boolean
-                }) => ({
-                  price: v.price,
-                  stemLength: v.stemLength ?? null,
-                  countPerBunch: v.countPerBunch ?? null,
-                  isBoxlot: v.isBoxlot ?? false,
-                })
-              ),
+              create: variants.map((v) => ({
+                price: v.price,
+                stemLength: v.stemLength ?? null,
+                countPerBunch: v.countPerBunch ?? null,
+                isBoxlot: v.isBoxlot ?? false,
+              })),
             },
           }),
         },

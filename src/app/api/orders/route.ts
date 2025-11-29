@@ -3,6 +3,7 @@ import { auth } from "@/lib/auth"
 import { isApproved } from "@/lib/auth-utils"
 import { db } from "@/lib/db"
 import { adjustPrice } from "@/lib/utils"
+import { createOrderSchema } from "@/lib/validations/checkout"
 
 /**
  * Generate the next order number in sequence (PB-00001, PB-00002, etc.)
@@ -109,8 +110,18 @@ export async function POST(request: Request) {
 
     const priceMultiplier = user.priceMultiplier
 
-    // Parse request body
+    // Parse and validate request body
     const body = await request.json()
+    const validationResult = createOrderSchema.safeParse(body)
+
+    if (!validationResult.success) {
+      const firstError = validationResult.error.issues[0]
+      return NextResponse.json(
+        { error: firstError?.message || "Invalid request data" },
+        { status: 400 }
+      )
+    }
+
     const {
       shippingAddressId,
       shippingAddress,
@@ -119,12 +130,7 @@ export async function POST(request: Request) {
       email,
       phone,
       notes,
-    } = body
-
-    // Validate email
-    if (!email || typeof email !== "string") {
-      return NextResponse.json({ error: "Email is required" }, { status: 400 })
-    }
+    } = validationResult.data
 
     // Get user's cart
     const cart = await db.shoppingCart.findUnique({

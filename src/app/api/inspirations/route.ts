@@ -2,6 +2,7 @@ import { type NextRequest, NextResponse } from "next/server"
 import { auth } from "@/lib/auth"
 import { db } from "@/lib/db"
 import { adjustPrice } from "@/lib/utils"
+import { createInspirationSchema, type ProductSelection } from "@/lib/validations/inspiration"
 
 /**
  * GET /api/inspirations
@@ -62,13 +63,6 @@ export async function GET() {
   }
 }
 
-// Type for product selection with required variant
-interface ProductSelection {
-  productId: string
-  productVariantId: string
-  quantity?: number
-}
-
 /**
  * POST /api/inspirations
  * Create a new inspiration (admin only)
@@ -83,6 +77,15 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json()
+    const validationResult = createInspirationSchema.safeParse(body)
+
+    if (!validationResult.success) {
+      const firstError = validationResult.error.issues[0]
+      return NextResponse.json(
+        { error: firstError?.message || "Invalid request data" },
+        { status: 400 }
+      )
+    }
 
     const {
       name,
@@ -91,12 +94,8 @@ export async function POST(request: NextRequest) {
       image,
       excerpt,
       inspirationText,
-      productSelections, // Array of { productId, productVariantId }
-    } = body
-
-    if (!name || !slug || !subtitle || !image || !excerpt || !inspirationText) {
-      return NextResponse.json({ error: "Missing required fields" }, { status: 400 })
-    }
+      productSelections, // Array of { productId, productVariantId, quantity }
+    } = validationResult.data
 
     // Validate product selections - each must have a variant
     const selections: ProductSelection[] = productSelections || []

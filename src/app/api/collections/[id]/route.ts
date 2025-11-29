@@ -1,5 +1,6 @@
-import { db } from "@/lib/db"
 import { type NextRequest, NextResponse } from "next/server"
+import { db } from "@/lib/db"
+import { collectionSchema } from "@/lib/validations/collection"
 
 /**
  * GET /api/collections/[id]
@@ -43,7 +44,18 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
     const { id } = await params
     const body = await request.json()
 
-    const { name, slug, image, description } = body
+    // Partial validation - allow partial updates
+    const validationResult = collectionSchema.partial().safeParse(body)
+
+    if (!validationResult.success) {
+      const firstError = validationResult.error.issues[0]
+      return NextResponse.json(
+        { error: firstError?.message || "Invalid request data" },
+        { status: 400 }
+      )
+    }
+
+    const { name, slug, image, description } = validationResult.data
 
     // Check if collection exists
     const existingCollection = await db.collection.findUnique({

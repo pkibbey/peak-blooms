@@ -7,6 +7,7 @@
 - [ ] Create separate development and production databases
 - [ ] Add pagination once we have a large number of products to view
 - [ ] Add real products in there
+- [ ] Add type safe database queries, instead of using manual typing
 
 ### 💰 Payment Processing 
 

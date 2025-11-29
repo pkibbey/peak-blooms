@@ -116,7 +116,8 @@ export default function ApprovedUserCard({ user }: ApprovedUserCardProps) {
         </div>
         <Button
           size="sm"
-          variant="outline-destructive"
+          variant="outline"
+          className="border-destructive text-destructive hover:bg-destructive hover:text-white"
           onClick={handleUnapprove}
           disabled={unapproving}
         >

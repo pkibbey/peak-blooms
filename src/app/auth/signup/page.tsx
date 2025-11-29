@@ -1,19 +1,34 @@
 "use client"
 
+import { zodResolver } from "@hookform/resolvers/zod"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { signIn, useSession } from "next-auth/react"
-import { type FormEvent, useEffect, useState } from "react"
+import { useEffect, useState } from "react"
+import { useForm } from "react-hook-form"
 import { Button } from "@/components/ui/button"
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
+import { type SignUpFormData, signUpSchema } from "@/lib/validations/auth"
 
 export default function SignUpPage() {
   const router = useRouter()
   const { data: session, status } = useSession()
-  const [email, setEmail] = useState("")
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState("")
+  const [submittedEmail, setSubmittedEmail] = useState("")
+
+  const form = useForm<SignUpFormData>({
+    resolver: zodResolver(signUpSchema),
+    defaultValues: {
+      email: "",
+    },
+  })
 
   // Redirect if already authenticated
   useEffect(() => {
@@ -22,29 +37,24 @@ export default function SignUpPage() {
     }
   }, [status, session, router])
 
-  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault()
-    setLoading(true)
-    setError("")
-
+  const onSubmit = async (data: SignUpFormData) => {
     try {
       const result = await signIn("email", {
-        email,
+        email: data.email,
         redirect: false,
       })
 
       if (result?.ok) {
+        setSubmittedEmail(data.email)
         // Redirect to pending approval page
-        router.push(`/auth/pending-approval?email=${encodeURIComponent(email)}`)
+        router.push(`/auth/pending-approval?email=${encodeURIComponent(data.email)}`)
       } else {
-        setError("Failed to send sign-up email. Please try again.")
+        form.setError("root", { message: "Failed to send sign-up email. Please try again." })
         console.error("Sign up failed:", result?.error)
       }
     } catch (error) {
-      setError("An error occurred. Please try again.")
+      form.setError("root", { message: "An error occurred. Please try again." })
       console.error("Error signing up:", error)
-    } finally {
-      setLoading(false)
     }
   }
 
@@ -58,27 +68,36 @@ export default function SignUpPage() {
           </p>
         </div>
 
-        {error && (
-          <div className="rounded-lg bg-destructive/10 p-3 text-sm text-destructive">{error}</div>
-        )}
-
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="email">Email</Label>
-            <Input
-              id="email"
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="you@example.com"
-              required
-              className="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+            {form.formState.errors.root && (
+              <div className="rounded-lg bg-destructive/10 p-3 text-sm text-destructive">
+                {form.formState.errors.root.message}
+              </div>
+            )}
+            <FormField
+              control={form.control}
+              name="email"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Email</FormLabel>
+                  <FormControl>
+                    <Input
+                      {...field}
+                      type="email"
+                      placeholder="you@example.com"
+                      className="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
             />
-          </div>
-          <Button type="submit" disabled={loading} className="w-full">
-            Sign Up with Email
-          </Button>
-        </form>
+            <Button type="submit" disabled={form.formState.isSubmitting} className="w-full">
+              {form.formState.isSubmitting ? "Signing up..." : "Sign Up with Email"}
+            </Button>
+          </form>
+        </Form>
 
         <div className="space-y-3 text-center text-sm">
           <p className="text-muted-foreground">

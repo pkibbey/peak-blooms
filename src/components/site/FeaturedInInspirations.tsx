@@ -1,10 +1,14 @@
 import { InspirationCard } from "@/components/site/InspirationCard"
-import type { InspirationModel, InspirationProductModel } from "@/generated/models"
+import type { InspirationModel } from "@/generated/models"
+
+interface InspirationJoin {
+  inspiration: InspirationModel & {
+    _count?: { products: number }
+  }
+}
 
 interface FeaturedInInspirationsProps {
-  inspirations: (InspirationProductModel & {
-    inspiration: InspirationModel
-  })[]
+  inspirations: InspirationJoin[]
 }
 
 export function FeaturedInInspirations({ inspirations }: FeaturedInInspirationsProps) {

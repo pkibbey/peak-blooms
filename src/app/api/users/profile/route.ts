@@ -1,6 +1,7 @@
+import { type NextRequest, NextResponse } from "next/server"
 import { auth } from "@/lib/auth"
 import { db } from "@/lib/db"
-import { type NextRequest, NextResponse } from "next/server"
+import { updateProfileSchema } from "@/lib/validations/auth"
 
 /**
  * GET /api/users/profile
@@ -51,13 +52,22 @@ export async function PATCH(request: NextRequest) {
     }
 
     const body = await request.json()
-    const { name, image } = body
+    const validationResult = updateProfileSchema.safeParse(body)
+
+    if (!validationResult.success) {
+      const firstError = validationResult.error.issues[0]
+      return NextResponse.json(
+        { error: firstError?.message || "Invalid request data" },
+        { status: 400 }
+      )
+    }
+
+    const { name } = validationResult.data
 
     const user = await db.user.update({
       where: { email: session.user.email },
       data: {
-        ...(name && { name }),
-        ...(image && { image }),
+        ...(name !== undefined && { name: name || null }),
       },
       select: {
         id: true,

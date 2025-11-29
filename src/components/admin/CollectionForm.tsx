@@ -3,14 +3,24 @@
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { useState } from "react"
+import { useForm } from "react-hook-form"
+import { zodResolver } from "@hookform/resolvers/zod"
 import { toast } from "sonner"
 import { ImageUpload } from "@/components/admin/ImageUpload"
 import SlugInput from "@/components/admin/SlugInput"
 import { Button } from "@/components/ui/button"
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { IconTrash } from "../ui/icons"
+import { collectionSchema, type CollectionFormData } from "@/lib/validations/collection"
 
 interface CollectionFormProps {
   collection?: {
@@ -31,22 +41,21 @@ export default function CollectionForm({ collection }: CollectionFormProps) {
 
   // Track original image URL to clean up old blob when image changes
   const [originalImage] = useState(collection?.image || "")
-
-  const [formData, setFormData] = useState({
-    name: collection?.name || "",
-    slug: collection?.slug || "",
-    image: collection?.image || "",
-    description: collection?.description || "",
-  })
-
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [isDeleting, setIsDeleting] = useState(false)
-  const [error, setError] = useState<string | null>(null)
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
+  const form = useForm<CollectionFormData>({
+    resolver: zodResolver(collectionSchema),
+    defaultValues: {
+      name: collection?.name || "",
+      slug: collection?.slug || "",
+      image: collection?.image || "",
+      description: collection?.description || "",
+    },
+  })
+
+  const onSubmit = async (data: CollectionFormData) => {
     setIsSubmitting(true)
-    setError(null)
 
     try {
       const url = isEditing ? `/api/collections/${collection.id}` : "/api/collections"
@@ -55,7 +64,7 @@ export default function CollectionForm({ collection }: CollectionFormProps) {
       const response = await fetch(url, {
         method,
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
+        body: JSON.stringify(data),
       })
 
       if (response.ok) {
@@ -65,11 +74,11 @@ export default function CollectionForm({ collection }: CollectionFormProps) {
         router.push("/admin/collections")
         router.refresh()
       } else {
-        const data = await response.json()
-        setError(data.error || "Failed to save collection")
+        const responseData = await response.json()
+        form.setError("root", { message: responseData.error || "Failed to save collection" })
       }
     } catch (err) {
-      setError("An error occurred. Please try again.")
+      form.setError("root", { message: "An error occurred. Please try again." })
       console.error(err)
     } finally {
       setIsSubmitting(false)
@@ -98,93 +107,100 @@ export default function CollectionForm({ collection }: CollectionFormProps) {
         router.push("/admin/collections")
         router.refresh()
       } else {
-        setError("Failed to delete collection. Please try again.")
+        form.setError("root", { message: "Failed to delete collection. Please try again." })
       }
     } catch (err) {
-      setError("An error occurred. Please try again.")
+      form.setError("root", { message: "An error occurred. Please try again." })
       console.error(err)
     } finally {
       setIsDeleting(false)
     }
   }
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { name, value } = e.target
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }))
-  }
+  // Watch the slug for ImageUpload
+  const watchedSlug = form.watch("slug")
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
-      {error && (
-        <div className="rounded-md bg-destructive/10 p-4 text-sm text-destructive">{error}</div>
-      )}
+    <Form {...form}>
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+        {form.formState.errors.root && (
+          <div className="rounded-md bg-destructive/10 p-4 text-sm text-destructive">
+            {form.formState.errors.root.message}
+          </div>
+        )}
 
-      <div className="grid gap-6 md:grid-cols-2">
-        {/* Name */}
-        <div className="space-y-2">
-          <Label htmlFor="name">Name *</Label>
-          <Input
-            id="name"
+        <div className="grid gap-6 md:grid-cols-2">
+          {/* Name */}
+          <FormField
+            control={form.control}
             name="name"
-            type="text"
-            required
-            value={formData.name}
-            onChange={handleChange}
-            placeholder="Collection name"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Name *</FormLabel>
+                <FormControl>
+                  <Input {...field} placeholder="Collection name" />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          {/* Slug */}
+          <SlugInput
+            name={form.watch("name")}
+            slug={form.watch("slug")}
+            onSlugChange={(slug) => form.setValue("slug", slug)}
           />
         </div>
 
-        {/* Slug */}
-        <SlugInput
-          name={formData.name}
-          slug={formData.slug}
-          onSlugChange={(slug) => setFormData((prev) => ({ ...prev, slug }))}
-        />
-      </div>
-
-      {/* Description */}
-      <div className="space-y-2">
-        <Label htmlFor="description">Description</Label>
-        <Textarea
-          id="description"
+        {/* Description */}
+        <FormField
+          control={form.control}
           name="description"
-          value={formData.description}
-          onChange={handleChange}
-          rows={4}
-          placeholder="Collection description..."
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Description</FormLabel>
+              <FormControl>
+                <Textarea {...field} rows={4} placeholder="Collection description..." />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
         />
-      </div>
 
-      {/* Image */}
-      <ImageUpload
-        value={formData.image}
-        onChange={(url) => setFormData((prev) => ({ ...prev, image: url }))}
-        folder="collections"
-        slug={formData.slug}
-        previousUrl={originalImage}
-        label="Image"
-      />
+        {/* Image */}
+        <ImageUpload
+          value={form.watch("image")}
+          onChange={(url) => form.setValue("image", url)}
+          folder="collections"
+          slug={watchedSlug}
+          previousUrl={originalImage}
+          label="Image"
+        />
 
-      {/* Actions */}
-      <div className="flex gap-4 justify-between">
-        <div className="flex gap-4">
-          <Button type="submit" disabled={isSubmitting}>
-            Save Collection
-          </Button>
-          <Button type="button" variant="outline" asChild>
-            <Link href="/admin/collections">Cancel</Link>
-          </Button>
+        {/* Actions */}
+        <div className="flex gap-4 justify-between">
+          <div className="flex gap-4">
+            <Button type="submit" disabled={isSubmitting}>
+              {isSubmitting ? "Saving..." : "Save Collection"}
+            </Button>
+            <Button type="button" variant="outline" asChild>
+              <Link href="/admin/collections">Cancel</Link>
+            </Button>
+          </div>
+          {isEditing && (
+            <Button
+              type="button"
+              variant="destructive"
+              onClick={handleDelete}
+              disabled={isDeleting}
+            >
+              <IconTrash className="mr-2 inline-block" />
+              {isDeleting ? "Deleting..." : "Delete Collection"}
+            </Button>
+          )}
         </div>
-        {isEditing && (
-          <Button type="button" variant="destructive" onClick={handleDelete} disabled={isDeleting}>
-            <IconTrash className="mr-2 inline-block" />
-            Delete Collection
-          </Button>
-        )}
-      </div>
-    </form>
+      </form>
+    </Form>
   )
 }

@@ -2,6 +2,7 @@ import { type NextRequest, NextResponse } from "next/server"
 import { auth } from "@/lib/auth"
 import { getProducts } from "@/lib/data"
 import { db } from "@/lib/db"
+import { createProductSchema } from "@/lib/validations/product"
 
 /**
  * GET /api/products
@@ -65,16 +66,18 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json()
+    const validationResult = createProductSchema.safeParse(body)
 
-    const { name, slug, description, image, color, collectionId, featured, variants } = body
-
-    if (!name || !slug || !collectionId) {
-      return NextResponse.json({ error: "Missing required fields" }, { status: 400 })
+    if (!validationResult.success) {
+      const firstError = validationResult.error.issues[0]
+      return NextResponse.json(
+        { error: firstError?.message || "Invalid request data" },
+        { status: 400 }
+      )
     }
 
-    if (!variants || !Array.isArray(variants) || variants.length === 0) {
-      return NextResponse.json({ error: "At least one variant is required" }, { status: 400 })
-    }
+    const { name, slug, description, image, color, collectionId, featured, variants } =
+      validationResult.data
 
     const product = await db.product.create({
       data: {
@@ -86,19 +89,12 @@ export async function POST(request: NextRequest) {
         collectionId,
         featured: featured === true,
         variants: {
-          create: variants.map(
-            (v: {
-              price: number
-              stemLength?: number | null
-              countPerBunch?: number | null
-              isBoxlot?: boolean
-            }) => ({
-              price: v.price,
-              stemLength: v.stemLength ?? null,
-              countPerBunch: v.countPerBunch ?? null,
-              isBoxlot: v.isBoxlot ?? false,
-            })
-          ),
+          create: variants.map((v) => ({
+            price: v.price,
+            stemLength: v.stemLength ?? null,
+            countPerBunch: v.countPerBunch ?? null,
+            isBoxlot: v.isBoxlot ?? false,
+          })),
         },
       },
       include: {

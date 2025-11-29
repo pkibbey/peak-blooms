@@ -50,6 +50,7 @@ export type InspirationBasic = {
   slug: string
   subtitle: string
   image: string
+  excerpt: string
   inspirationText: string
   createdAt: Date
   updatedAt: Date
