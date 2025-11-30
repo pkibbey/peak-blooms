@@ -5,7 +5,6 @@
 - [ ] Create separate development and production databases
 - [ ] Add real products
 - [ ] Add pagination once we have a large number of products to view
-- [ ] If the user is already signed in and they try to go to the sign in page, it should redirect them to the homepage
 - [ ] The dropdown menu doesn't show the menu item being highlighted when tabbing through it
 - [ ] Product colour should be able to be generated from the image, maybe the predominant colour, or a colour picker?
 
@@ -32,6 +31,7 @@
 - [ ] Improve the blog post of the inspiration page, get some more ideas about how this could look in the real world and where we would source this information from
  
 ### 🛍️ Tracking / Marketing
+
 - [ ] Add tracking to learn how the users are using the site
 - [ ] Coupon code / discount offers
 - [ ] Collect user contact email for newsletter (overstock or flash sales)
