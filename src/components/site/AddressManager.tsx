@@ -4,15 +4,12 @@ import { useRouter } from "next/navigation"
 import { useState } from "react"
 import { toast } from "sonner"
 import AddressCard, { type Address } from "@/components/site/AddressCard"
-import AddressForm, {
-  type AddressFormData,
-  emptyAddress,
-  validateAddress,
-} from "@/components/site/AddressForm"
+import AddressForm, { validateAddress } from "@/components/site/AddressForm"
 import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
 import { IconPlus, IconX } from "@/components/ui/icons"
 import { Label } from "@/components/ui/label"
+import { type AddressFormData, emptyAddress } from "@/lib/validations/address"
 
 interface AddressManagerProps {
   addresses: Address[]

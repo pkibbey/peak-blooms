@@ -186,6 +186,3 @@ export default function AddressFields({
     </div>
   )
 }
-
-// Re-export types and utilities from validation schema
-export { type AddressFormData, addressSchema, emptyAddress } from "@/lib/validations/address"

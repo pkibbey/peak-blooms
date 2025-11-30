@@ -16,7 +16,6 @@ export default async function CartPage() {
   }
 
   // Fetch cart data server-side
-  const cart = await getOrCreateCart()
   const cart = await getOrCreateCart(user)
 
   // This shouldn't happen since user is authenticated, but handle it

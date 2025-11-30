@@ -2,12 +2,10 @@
 
 ### 🌟 Features to Add
 
-- [ ] Validate all form fields using zod + react-hook-form instead of relying on html validation
 - [ ] Add unit tests and e2e tests to ensure complete site functionality
 - [ ] Create separate development and production databases
+- [ ] Add real products
 - [ ] Add pagination once we have a large number of products to view
-- [ ] Add real products in there
-- [ ] Add type safe database queries, instead of using manual typing
 
 ### 💰 Payment Processing 
 

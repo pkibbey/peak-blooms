@@ -4,71 +4,15 @@
  */
 
 import { db } from "@/lib/db"
+import type {
+  ProductVariantWhereInput,
+  ProductWhereInput,
+  ProductWithInspirations,
+  ProductWithVariants,
+  ProductWithVariantsAndCollection,
+} from "@/lib/types/prisma"
 import { adjustPrice } from "@/lib/utils"
 import { withTiming } from "./logger"
-
-// Base types for variants
-type ProductVariant = {
-  id: string
-  price: number
-  stemLength: number | null
-  countPerBunch: number | null
-  isBoxlot: boolean
-  productId: string
-  createdAt: Date
-  updatedAt: Date
-}
-
-type Collection = {
-  id: string
-  name: string
-  slug: string
-  description: string | null
-  image: string | null
-  createdAt: Date
-  updatedAt: Date
-}
-
-type InspirationCount = {
-  _count: { products: number }
-}
-
-type InspirationProductJoin = {
-  inspiration: {
-    id: string
-    name: string
-    slug: string
-    subtitle: string
-    image: string
-    excerpt: string
-    inspirationText: string
-    createdAt: Date
-    updatedAt: Date
-  } & InspirationCount
-}
-
-// Types for products with variants
-export type ProductWithVariants = {
-  id: string
-  name: string
-  slug: string
-  description: string | null
-  image: string | null
-  color: string | null
-  collectionId: string
-  featured: boolean
-  createdAt: Date
-  updatedAt: Date
-  variants: ProductVariant[]
-}
-
-export type ProductWithVariantsAndCollection = ProductWithVariants & {
-  collection: Collection
-}
-
-export type ProductWithInspirations = ProductWithVariantsAndCollection & {
-  inspirations: InspirationProductJoin[]
-}
 
 /**
  * Apply price multiplier to a single product's variants
@@ -170,8 +114,7 @@ export async function getProducts(
   priceMultiplier = 1.0
 ): Promise<ProductWithVariantsAndCollection[]> {
   return withTiming("getProducts", options as Record<string, unknown>, async () => {
-    // biome-ignore lint/suspicious/noExplicitAny: Prisma where input type
-    const where: Record<string, any> = {}
+    const where: ProductWhereInput = {}
 
     if (options.collectionId) {
       where.collectionId = options.collectionId
@@ -189,8 +132,7 @@ export async function getProducts(
     }
 
     // Build variant filters
-    // biome-ignore lint/suspicious/noExplicitAny: Prisma where input type
-    const variantFilter: Record<string, any> = {}
+    const variantFilter: ProductVariantWhereInput = {}
 
     if (options.stemLengthMin !== undefined || options.stemLengthMax !== undefined) {
       variantFilter.stemLength = {}

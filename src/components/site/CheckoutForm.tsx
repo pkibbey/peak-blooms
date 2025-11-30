@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation"
 import { useState } from "react"
 import { useForm } from "react-hook-form"
 import { toast } from "sonner"
-import AddressFields, { emptyAddress } from "@/components/site/AddressFields"
+import AddressFields from "@/components/site/AddressFields"
 import { CheckoutOrderItem } from "@/components/site/CheckoutOrderItem"
 import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
@@ -29,6 +29,7 @@ import {
 } from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
 import { formatPrice } from "@/lib/utils"
+import { emptyAddress } from "@/lib/validations/address"
 import { type CheckoutFormData, checkoutSchema } from "@/lib/validations/checkout"
 
 interface CartProduct {

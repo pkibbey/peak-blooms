@@ -4,61 +4,13 @@
  */
 
 import { db } from "@/lib/db"
+import type {
+  InspirationBasic,
+  InspirationWithCount,
+  InspirationWithProducts,
+} from "@/lib/types/prisma"
 import { adjustPrice } from "@/lib/utils"
 import { withTiming } from "./logger"
-
-// Types for inspirations
-type ProductVariant = {
-  id: string
-  price: number
-  stemLength: number | null
-  countPerBunch: number | null
-  isBoxlot: boolean
-  productId: string
-  createdAt: Date
-  updatedAt: Date
-}
-
-type ProductWithVariants = {
-  id: string
-  name: string
-  slug: string
-  description: string | null
-  image: string | null
-  color: string | null
-  collectionId: string
-  featured: boolean
-  createdAt: Date
-  updatedAt: Date
-  variants: ProductVariant[]
-}
-
-type InspirationProductJoin = {
-  id: string
-  inspirationId: string
-  productId: string
-  productVariantId: string
-  quantity: number
-  createdAt: Date
-  product: ProductWithVariants
-  productVariant: ProductVariant | null
-}
-
-export type InspirationBasic = {
-  id: string
-  name: string
-  slug: string
-  subtitle: string
-  image: string
-  excerpt: string
-  inspirationText: string
-  createdAt: Date
-  updatedAt: Date
-}
-
-export type InspirationWithProducts = InspirationBasic & {
-  products: InspirationProductJoin[]
-}
 
 /**
  * Apply price multiplier to inspiration products
@@ -78,12 +30,12 @@ function applyMultiplierToInspiration(
           price: adjustPrice(variant.price, multiplier),
         })),
       },
-      productVariant: sp.productVariant
-        ? {
-            ...sp.productVariant,
-            price: adjustPrice(sp.productVariant.price, multiplier),
-          }
-        : null,
+      ...(sp.productVariant && {
+        productVariant: {
+          ...sp.productVariant,
+          price: adjustPrice(sp.productVariant.price, multiplier),
+        },
+      }),
     })),
   }
 }
@@ -104,9 +56,7 @@ export async function getAllInspirations(): Promise<InspirationBasic[]> {
 /**
  * Get all inspirations with product counts
  */
-export async function getInspirationsWithCounts(): Promise<
-  Array<InspirationBasic & { _count: { products: number } }>
-> {
+export async function getInspirationsWithCounts(): Promise<InspirationWithCount[]> {
   return withTiming("getInspirationsWithCounts", {}, async () => {
     return db.inspiration.findMany({
       include: {

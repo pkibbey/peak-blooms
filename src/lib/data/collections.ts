@@ -4,48 +4,9 @@
  */
 
 import { db } from "@/lib/db"
+import type { CollectionBasic, CollectionWithProducts } from "@/lib/types/prisma"
 import { adjustPrice } from "@/lib/utils"
 import { withTiming } from "./logger"
-
-// Types for collections
-type ProductVariant = {
-  id: string
-  price: number
-  stemLength: number | null
-  countPerBunch: number | null
-  isBoxlot: boolean
-  productId: string
-  createdAt: Date
-  updatedAt: Date
-}
-
-type ProductWithVariants = {
-  id: string
-  name: string
-  slug: string
-  description: string | null
-  image: string | null
-  color: string | null
-  collectionId: string
-  featured: boolean
-  createdAt: Date
-  updatedAt: Date
-  variants: ProductVariant[]
-}
-
-export type CollectionBasic = {
-  id: string
-  name: string
-  slug: string
-  description: string | null
-  image: string | null
-  createdAt: Date
-  updatedAt: Date
-}
-
-export type CollectionWithProducts = CollectionBasic & {
-  products: ProductWithVariants[]
-}
 
 /**
  * Apply price multiplier to products in a collection

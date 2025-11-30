@@ -1,31 +1,8 @@
 "use client"
 
-import { Label } from "@/components/ui/label"
 import { Input } from "@/components/ui/input"
-
-export interface AddressFormData {
-  firstName: string
-  lastName: string
-  company: string
-  street1: string
-  street2: string
-  city: string
-  state: string
-  zip: string
-  country: string
-}
-
-export const emptyAddress: AddressFormData = {
-  firstName: "",
-  lastName: "",
-  company: "",
-  street1: "",
-  street2: "",
-  city: "",
-  state: "",
-  zip: "",
-  country: "US",
-}
+import { Label } from "@/components/ui/label"
+import type { AddressFormData } from "@/lib/validations/address"
 
 export function validateAddress(addr: AddressFormData): string | null {
   if (!addr.firstName.trim()) return "First name is required"
