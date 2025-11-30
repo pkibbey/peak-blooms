@@ -26,7 +26,7 @@
 - [ ] Update logos with proper graphics
 - [ ] Try out different colour schemes
 - [ ] Create container and card utility classes
-- [ ] Improve the blog post of the inspiration page, get some more ideas about how this could look in the real world and where we would source this information from
+- [ ] Improve the inspiration detail page - it's a bit dull, but needs real content to see what it can look like
  
 ### 🛍️ Tracking / Marketing
 
