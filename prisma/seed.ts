@@ -68,7 +68,8 @@ async function main() {
       description: "Lush and voluminous",
       image: "https://zvbfsgiej9tfgqre.public.blob.vercel-storage.com/products/green-fluffy.png",
       collectionId: exoticBlooms.id,
-      colors: ["#5BAE48"],
+      // Multiple shades to better exercise UI swatches
+      colors: ["#5BAE48", "#8FCC68", "#DFF6DF"],
       featured: true,
       variants: {
         create: [
@@ -88,7 +89,8 @@ async function main() {
       description: "Warm and inviting",
       image: "https://zvbfsgiej9tfgqre.public.blob.vercel-storage.com/products/peach-flower.png",
       collectionId: exoticBlooms.id,
-      colors: ["#F7A582"],
+      // Warm peach variations
+      colors: ["#F7A582", "#FFBFA0", "#FFDCCA"],
       featured: true,
       variants: {
         create: [
@@ -106,7 +108,8 @@ async function main() {
       description: "Elegant and romantic",
       image: "https://zvbfsgiej9tfgqre.public.blob.vercel-storage.com/products/pink-rose.png",
       collectionId: classicRoses.id,
-      colors: ["#FF9ECF"],
+      // Pink rose tints
+      colors: ["#FF9ECF", "#FF6BBA", "#FFD1E6"],
       featured: false,
       variants: {
         create: [
@@ -127,7 +130,8 @@ async function main() {
       description: "Pristine white beauty",
       image: "https://zvbfsgiej9tfgqre.public.blob.vercel-storage.com/products/playa-blanca.png",
       collectionId: seasonalWildflowers.id,
-      colors: ["#FFFFFF"],
+      // Whites and near-whites for Playa Blanca
+      colors: ["#FFFFFF", "#F3F4F6", "#EDEFF1"],
       featured: false,
       variants: {
         create: [

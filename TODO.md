@@ -25,11 +25,8 @@
 
 - [ ] Update logos with proper graphics
 - [ ] Try out different colour schemes
- - [x] Create reusable typography utility classes in tailwind
 - [ ] Create container and card utility classes
-- [ ] Improve the layout for the admin dashboard, it looks bland and just a load of boxes without any real overview of the state of the system
 - [ ] Improve the blog post of the inspiration page, get some more ideas about how this could look in the real world and where we would source this information from
-- [ ] Add colors and maybe other columns to the product table
  
 ### 🛍️ Tracking / Marketing
 

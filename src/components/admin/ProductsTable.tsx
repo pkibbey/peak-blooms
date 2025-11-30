@@ -24,6 +24,7 @@ interface Product {
     id: string
     price: number
   }[]
+  colors?: string[] | null
 }
 
 interface ProductsTableProps {
@@ -56,6 +57,7 @@ export default function ProductsTable({ products }: ProductsTableProps) {
             <TableHead>Name</TableHead>
             <TableHead className="hidden md:table-cell">Collection</TableHead>
             <TableHead className="hidden lg:table-cell">Price</TableHead>
+            <TableHead className="hidden md:table-cell">Colors</TableHead>
             <TableHead className="hidden lg:table-cell">Variants</TableHead>
             <TableHead>Featured</TableHead>
           </TableRow>
@@ -109,6 +111,36 @@ export default function ProductsTable({ products }: ProductsTableProps) {
                   {product.variants.length > 0 ? priceDisplay : "—"}
                 </TableCell>
 
+                {/* Colors */}
+                <TableCell className="hidden md:table-cell">
+                  {/* Render small color swatches if available */}
+                  {product.colors && product.colors.length > 0 ? (
+                    <div className="flex gap-2 items-center">
+                      <div className="flex -space-x-1">
+                        {product.colors.slice(0, 5).map((c) => (
+                          <div
+                            key={c}
+                            role="img"
+                            aria-hidden={true}
+                            title={c}
+                            className="h-4 w-4 rounded-full border border-border"
+                            style={{ backgroundColor: c }}
+                          />
+                        ))}
+                      </div>
+                      {product.colors.length > 5 ? (
+                        <span className="text-xs text-muted-foreground">
+                          +{product.colors.length - 5}
+                        </span>
+                      ) : null}
+                      {/* Screen reader description of this product's colors */}
+                      <span className="sr-only">Colors: {product.colors.join(", ")}</span>
+                    </div>
+                  ) : (
+                    <span className="text-muted-foreground">—</span>
+                  )}
+                </TableCell>
+
                 {/* Variants */}
                 <TableCell className="hidden lg:table-cell text-muted-foreground">
                   {product.variants.length}
@@ -127,6 +159,7 @@ export default function ProductsTable({ products }: ProductsTableProps) {
           })}
         </TableBody>
       </Table>
+      {/* (no global sr-only entry — per-row sr-only is provided inside the colors cell) */}
     </div>
   )
 }
