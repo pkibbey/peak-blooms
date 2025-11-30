@@ -183,7 +183,7 @@ export function ProductControls({ product, user, mode = "card" }: ProductControl
                   mode === "card" ? "text-xs font-medium text-muted-foreground mb-1 block" : ""
                 }
               >
-                {mode === "detail" ? "Stem Length" : "Length"}
+                Stem Length
               </Label>
               <div className={cn("flex flex-wrap", mode === "detail" ? "gap-2" : "gap-1")}>
                 {stemLengths.map((length) => {
@@ -221,7 +221,7 @@ export function ProductControls({ product, user, mode = "card" }: ProductControl
                   mode === "card" ? "text-xs font-medium text-muted-foreground mb-1 block" : ""
                 }
               >
-                {mode === "detail" ? "Stem Count" : "Count"}
+                Stem Count
               </Label>
               <div className={cn("flex flex-wrap", mode === "detail" ? "gap-2" : "gap-1")}>
                 {counts.map((count) => {
@@ -244,7 +244,7 @@ export function ProductControls({ product, user, mode = "card" }: ProductControl
                             : "bg-gray-100 text-gray-400 border-gray-100 cursor-not-allowed"
                       )}
                     >
-                      {count} stems
+                      x {count}
                     </Button>
                   )
                 })}
