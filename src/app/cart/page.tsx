@@ -1,13 +1,22 @@
 import { redirect } from "next/navigation"
 import Cart from "@/components/site/Cart"
+import EmptyState from "@/components/ui/EmptyState"
 import { calculateCartTotal, getCurrentUser, getOrCreateCart } from "@/lib/current-user"
 
 export default async function CartPage() {
   const user = await getCurrentUser()
 
-  // Redirect to sign in if not authenticated
+  // If not authenticated, render a viewable (empty) cart so guests can
+  // inspect the UI. Cart interactions still require signing in to modify.
   if (!user) {
-    redirect("/auth/signin?callbackUrl=/cart")
+    const total = 0
+
+    return (
+      <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 py-10">
+        <h1 className="text-3xl font-bold font-serif mb-8">Shopping Cart</h1>
+        <Cart initialCart={{ id: "", items: [], total }} />
+      </div>
+    )
   }
 
   // Redirect to pending approval if not approved
@@ -17,18 +26,14 @@ export default async function CartPage() {
 
   // Fetch cart data server-side
   const cart = await getOrCreateCart(user)
+  console.log("cart", cart)
 
-  // This shouldn't happen since user is authenticated, but handle it
-  if (!cart) {
-    redirect("/auth/signin?callbackUrl=/cart")
-  }
-
-  const total = calculateCartTotal(cart.items)
+  const total = cart ? calculateCartTotal(cart.items) : 0
 
   return (
     <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 py-10">
       <h1 className="text-3xl font-bold font-serif mb-8">Shopping Cart</h1>
-      <Cart initialCart={{ id: cart.id, items: cart.items, total }} />
+      {cart ? <Cart initialCart={{ id: cart.id, items: cart.items, total }} /> : <EmptyState />}
     </div>
   )
 }

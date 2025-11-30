@@ -5,8 +5,7 @@
 - [ ] Create separate development and production databases
 - [ ] Add real products
 - [ ] Add pagination once we have a large number of products to view
-- [ ] Product colour should be able to be generated from the image, maybe the predominant colour, or a colour picker?
-- [ ] Add empty state component and add it to the cart page
+- [x] Add empty state component and add it to the cart page
 
 ### 🪨 Code Stability
 - [ ] Add unit tests and e2e tests to ensure complete site functionality

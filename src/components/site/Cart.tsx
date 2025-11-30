@@ -7,6 +7,7 @@ import { toast } from "sonner"
 import { CartItem, type CartItemData } from "@/components/site/CartItem"
 import { Button } from "@/components/ui/button"
 import { IconShoppingBag } from "@/components/ui/icons"
+import EmptyState from "@/components/ui/EmptyState"
 import { useDebouncedCallback } from "@/lib/useDebouncedCallback"
 import { formatPrice } from "@/lib/utils"
 
@@ -133,16 +134,12 @@ export default function Cart({ initialCart }: CartProps) {
 
   if (cart.items.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center py-16 text-center">
-        <IconShoppingBag className="h-16 w-16 text-muted-foreground/50 mb-4" />
-        <h2 className="text-xl font-semibold mb-2">Your cart is empty</h2>
-        <p className="text-muted-foreground mb-6">
-          Looks like you haven&apos;t added any flowers to your cart yet.
-        </p>
-        <Button asChild>
-          <Link href="/shop">Browse Products</Link>
-        </Button>
-      </div>
+      <EmptyState
+        icon={<IconShoppingBag className="h-16 w-16 text-muted-foreground/50 mb-4" />}
+        title="Your cart is empty"
+        description={"Looks like you haven't added any flowers to your cart yet."}
+        primaryAction={<Button asChild><Link href="/shop">Browse Products</Link></Button>}
+      />
     )
   }
 
