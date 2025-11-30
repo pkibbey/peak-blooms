@@ -53,7 +53,7 @@ export default function UserMenu({ user }: UserMenuProps) {
         </div>
 
         {user.role === "ADMIN" && (
-          <DropdownMenuItem asChild>
+          <DropdownMenuItem asChild className="focus:bg-secondary focus:text-secondary-foreground">
             <Link href="/admin" className="flex items-center gap-2">
               <IconSettings aria-hidden="true" />
               <span>Admin Dashboard</span>
@@ -61,7 +61,7 @@ export default function UserMenu({ user }: UserMenuProps) {
           </DropdownMenuItem>
         )}
 
-        <DropdownMenuItem asChild>
+        <DropdownMenuItem asChild className="focus:bg-secondary focus:text-secondary-foreground">
           <Link href="/account" className="flex items-center gap-2">
             <IconUser aria-hidden="true" />
             <span>Account settings</span>
@@ -71,8 +71,9 @@ export default function UserMenu({ user }: UserMenuProps) {
         <DropdownMenuSeparator />
 
         <DropdownMenuItem
+          asChild
           onSelect={() => signOut({ callbackUrl: "/" })}
-          className="text-destructive"
+          className="focus:bg-secondary focus:text-secondary-foreground text-destructive"
         >
           <div className="flex items-center gap-2">
             <IconLogOut aria-hidden="true" />

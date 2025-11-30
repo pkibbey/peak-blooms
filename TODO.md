@@ -5,7 +5,6 @@
 - [ ] Create separate development and production databases
 - [ ] Add real products
 - [ ] Add pagination once we have a large number of products to view
-- [ ] The dropdown menu doesn't show the menu item being highlighted when tabbing through it
 - [ ] Product colour should be able to be generated from the image, maybe the predominant colour, or a colour picker?
 
 ### 🪨 Code Stability
