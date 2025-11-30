@@ -20,7 +20,11 @@ import {
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
-import { inspirationSchema, type InspirationFormData, type ProductSelection } from "@/lib/validations/inspiration"
+import {
+  inspirationSchema,
+  type InspirationFormData,
+  type ProductSelection,
+} from "@/lib/validations/inspiration"
 
 interface ProductVariant {
   id: string

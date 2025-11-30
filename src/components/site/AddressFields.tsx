@@ -1,13 +1,7 @@
 "use client"
 
 import { useFormContext } from "react-hook-form"
-import {
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form"
+import { FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 
 interface AddressFieldsProps {
@@ -29,10 +23,7 @@ interface AddressFieldsProps {
  * </FormProvider>
  * ```
  */
-export default function AddressFields({
-  fieldPrefix = "",
-  disabled = false,
-}: AddressFieldsProps) {
+export default function AddressFields({ fieldPrefix = "", disabled = false }: AddressFieldsProps) {
   const { control } = useFormContext()
 
   const fieldName = (name: string) => `${fieldPrefix}${name}` as const
@@ -47,11 +38,7 @@ export default function AddressFields({
             <FormItem>
               <FormLabel>First Name *</FormLabel>
               <FormControl>
-                <Input
-                  {...field}
-                  placeholder="First name"
-                  disabled={disabled}
-                />
+                <Input {...field} placeholder="First name" disabled={disabled} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -64,11 +51,7 @@ export default function AddressFields({
             <FormItem>
               <FormLabel>Last Name *</FormLabel>
               <FormControl>
-                <Input
-                  {...field}
-                  placeholder="Last name"
-                  disabled={disabled}
-                />
+                <Input {...field} placeholder="Last name" disabled={disabled} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -83,11 +66,7 @@ export default function AddressFields({
           <FormItem>
             <FormLabel>Company *</FormLabel>
             <FormControl>
-              <Input
-                {...field}
-                placeholder="Company name"
-                disabled={disabled}
-              />
+              <Input {...field} placeholder="Company name" disabled={disabled} />
             </FormControl>
             <FormMessage />
           </FormItem>
@@ -101,11 +80,7 @@ export default function AddressFields({
           <FormItem>
             <FormLabel>Street Address *</FormLabel>
             <FormControl>
-              <Input
-                {...field}
-                placeholder="123 Main St"
-                disabled={disabled}
-              />
+              <Input {...field} placeholder="123 Main St" disabled={disabled} />
             </FormControl>
             <FormMessage />
           </FormItem>
@@ -119,11 +94,7 @@ export default function AddressFields({
           <FormItem>
             <FormLabel>Apartment, suite, etc. (optional)</FormLabel>
             <FormControl>
-              <Input
-                {...field}
-                placeholder="Apt 4B"
-                disabled={disabled}
-              />
+              <Input {...field} placeholder="Apt 4B" disabled={disabled} />
             </FormControl>
             <FormMessage />
           </FormItem>
@@ -138,11 +109,7 @@ export default function AddressFields({
             <FormItem>
               <FormLabel>City *</FormLabel>
               <FormControl>
-                <Input
-                  {...field}
-                  placeholder="City"
-                  disabled={disabled}
-                />
+                <Input {...field} placeholder="City" disabled={disabled} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -155,11 +122,7 @@ export default function AddressFields({
             <FormItem>
               <FormLabel>State *</FormLabel>
               <FormControl>
-                <Input
-                  {...field}
-                  placeholder="State"
-                  disabled={disabled}
-                />
+                <Input {...field} placeholder="State" disabled={disabled} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -172,11 +135,7 @@ export default function AddressFields({
             <FormItem>
               <FormLabel>ZIP Code *</FormLabel>
               <FormControl>
-                <Input
-                  {...field}
-                  placeholder="12345"
-                  disabled={disabled}
-                />
+                <Input {...field} placeholder="12345" disabled={disabled} />
               </FormControl>
               <FormMessage />
             </FormItem>

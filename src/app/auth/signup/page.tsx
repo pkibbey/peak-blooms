@@ -4,7 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { signIn, useSession } from "next-auth/react"
-import { useEffect, useState } from "react"
+import { useEffect } from "react"
 import { useForm } from "react-hook-form"
 import { Button } from "@/components/ui/button"
 import {
@@ -21,7 +21,6 @@ import { type SignUpFormData, signUpSchema } from "@/lib/validations/auth"
 export default function SignUpPage() {
   const router = useRouter()
   const { data: session, status } = useSession()
-  const [submittedEmail, setSubmittedEmail] = useState("")
 
   const form = useForm<SignUpFormData>({
     resolver: zodResolver(signUpSchema),
@@ -45,7 +44,6 @@ export default function SignUpPage() {
       })
 
       if (result?.ok) {
-        setSubmittedEmail(data.email)
         // Redirect to pending approval page
         router.push(`/auth/pending-approval?email=${encodeURIComponent(data.email)}`)
       } else {

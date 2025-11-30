@@ -51,7 +51,11 @@ export default function ApprovedUserCard({ user }: ApprovedUserCardProps) {
 
   const handleMultiplierSave = async () => {
     const numValue = Number.parseFloat(multiplier)
-    if (Number.isNaN(numValue) || numValue < MIN_PRICE_MULTIPLIER || numValue > MAX_PRICE_MULTIPLIER) {
+    if (
+      Number.isNaN(numValue) ||
+      numValue < MIN_PRICE_MULTIPLIER ||
+      numValue > MAX_PRICE_MULTIPLIER
+    ) {
       toast.error(`Multiplier must be between ${MIN_PRICE_MULTIPLIER} and ${MAX_PRICE_MULTIPLIER}`)
       return
     }
@@ -92,7 +96,12 @@ export default function ApprovedUserCard({ user }: ApprovedUserCardProps) {
       </div>
       <div className="ml-4 flex items-center gap-3">
         <div className="flex items-center gap-2">
-          <label htmlFor={`multiplier-${user.id}`} className="text-sm text-muted-foreground whitespace-nowrap">Price Multiplier ×</label>
+          <label
+            htmlFor={`multiplier-${user.id}`}
+            className="text-sm text-muted-foreground whitespace-nowrap"
+          >
+            Price Multiplier ×
+          </label>
           <Input
             id={`multiplier-${user.id}`}
             type="number"
