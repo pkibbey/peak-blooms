@@ -84,7 +84,7 @@ export default async function InspirationDetailPage({ params }: InspirationDetai
 
         {/* Inspiration Text */}
         <div className="mb-12 p-6 bg-secondary/30 rounded-xs">
-          <h2 className="text-lg font-semibold mb-4">The Story</h2>
+          <h2 className="heading-2 mb-4">The Story</h2>
           <p className="text-base leading-relaxed text-gray-700">{inspiration.inspirationText}</p>
         </div>
 

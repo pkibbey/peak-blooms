@@ -56,7 +56,7 @@ export default function Footer() {
           {/* Links */}
           <div className="grid grid-cols-2 gap-6 sm:grid-cols-3 md:grid-cols-4 flex-1">
             <div>
-              <h4 className="text-sm font-medium">Shop</h4>
+              <h4 className="heading-4">Shop</h4>
               <ul className="mt-3 text-sm text-muted-foreground space-y-2">
                 <li>
                   <Link href="/shop" className="hover:underline inline-flex items-center gap-2">
@@ -77,7 +77,7 @@ export default function Footer() {
             </div>
 
             <div>
-              <h4 className="text-sm font-medium">Company</h4>
+              <h4 className="heading-4">Company</h4>
               <ul className="mt-3 text-sm text-muted-foreground space-y-2">
                 <li>
                   <Link href="/about" className="hover:underline inline-flex items-center gap-2">
@@ -93,7 +93,7 @@ export default function Footer() {
             </div>
 
             <div>
-              <h4 className="text-sm font-medium">Support</h4>
+              <h4 className="heading-4">Support</h4>
               <ul className="mt-3 text-sm text-muted-foreground space-y-2">
                 <li>
                   <Link href="/faq" className="hover:underline">
@@ -114,7 +114,7 @@ export default function Footer() {
             </div>
 
             <div>
-              <h4 className="text-sm font-medium">Legal</h4>
+              <h4 className="heading-4">Legal</h4>
               <ul className="mt-3 text-sm text-muted-foreground space-y-2">
                 <li>
                   <Link href="/privacy" className="hover:underline">

@@ -48,7 +48,7 @@ export default async function AdminOrderDetailPage({ params }: AdminOrderDetailP
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
         <div>
           <div className="flex items-center gap-3 mb-2">
-            <h1 className="text-3xl font-bold">Order {order.orderNumber}</h1>
+            <h1 className="heading-1">Order {order.orderNumber}</h1>
             <OrderStatusBadge status={order.status as OrderStatus} className="text-sm" />
           </div>
           <p className="text-muted-foreground">Placed on {formatDate(order.createdAt)}</p>
@@ -68,7 +68,7 @@ export default async function AdminOrderDetailPage({ params }: AdminOrderDetailP
           {/* Order Notes */}
           {order.notes && (
             <div className="bg-white rounded-xs shadow-sm border p-6">
-              <h2 className="text-lg font-semibold font-serif mb-2">Order Notes</h2>
+              <h2 className="heading-3 mb-2">Order Notes</h2>
               <p className="text-muted-foreground whitespace-pre-wrap">{order.notes}</p>
             </div>
           )}
@@ -78,13 +78,13 @@ export default async function AdminOrderDetailPage({ params }: AdminOrderDetailP
         <div className="lg:col-span-1 space-y-4">
           {/* Status Update */}
           <div className="bg-white rounded-xs shadow-sm border p-6">
-            <h2 className="text-lg font-semibold font-serif mb-4">Update Status</h2>
+            <h2 className="heading-3 mb-4">Update Status</h2>
             <OrderStatusForm orderId={order.id} currentStatus={order.status} />
           </div>
 
           {/* Customer Info */}
           <div className="bg-white rounded-xs shadow-sm border p-6">
-            <h2 className="text-lg font-semibold font-serif mb-4">Customer</h2>
+            <h2 className="heading-3 mb-4">Customer</h2>
             <div className="text-sm space-y-2">
               <p className="font-medium">{order.user.name || "—"}</p>
               <p className="text-muted-foreground">{order.user.email}</p>
@@ -93,7 +93,7 @@ export default async function AdminOrderDetailPage({ params }: AdminOrderDetailP
 
           {/* Contact Information */}
           <div className="bg-white rounded-xs shadow-sm border p-6">
-            <h2 className="text-lg font-semibold font-serif mb-4">Contact</h2>
+            <h2 className="heading-3 mb-4">Contact</h2>
             <div className="text-sm space-y-2">
               <p>
                 <span className="text-muted-foreground">Email:</span>{" "}
@@ -110,7 +110,7 @@ export default async function AdminOrderDetailPage({ params }: AdminOrderDetailP
 
           {/* Shipping Address */}
           <div className="bg-white rounded-xs shadow-sm border p-6">
-            <h2 className="text-lg font-semibold font-serif mb-4 flex items-center gap-2">
+            <h2 className="heading-3 mb-4 flex items-center gap-2">
               <IconMapPin className="h-5 w-5" />
               Shipping Address
             </h2>
@@ -120,7 +120,7 @@ export default async function AdminOrderDetailPage({ params }: AdminOrderDetailP
           {/* Billing Address (if different) */}
           {order.billingAddress && (
             <div className="bg-white rounded-xs shadow-sm border p-6">
-              <h2 className="text-lg font-semibold font-serif mb-4">Billing Address</h2>
+              <h2 className="heading-3 mb-4">Billing Address</h2>
               <AddressDisplay address={order.billingAddress} />
             </div>
           )}

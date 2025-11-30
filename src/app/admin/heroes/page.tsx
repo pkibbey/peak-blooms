@@ -14,7 +14,7 @@ export default async function AdminHeroesPage() {
       <BackLink href="/admin" label="Dashboard" />
       <div className="mb-8 flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold">Hero Banners</h1>
+          <h1 className="heading-1">Hero Banners</h1>
           <p className="mt-2 text-muted-foreground">
             Manage homepage hero banners ({heroes.length} total)
           </p>

@@ -1,5 +1,5 @@
-import type * as React from "react"
 import Link from "next/link"
+import type * as React from "react"
 
 import { Button } from "./button"
 import { IconShoppingBag } from "./icons"
@@ -27,15 +27,9 @@ export default function EmptyState({
     <div className={`flex flex-col items-center justify-center py-16 text-center ${className}`}>
       {icon ?? <IconShoppingBag className="h-16 w-16 text-muted-foreground/50 mb-4" />}
 
-      {typeof title === "string" ? (
-        <h2 className="text-xl font-semibold mb-2">{title}</h2>
-      ) : (
-        title
-      )}
+      {typeof title === "string" ? <h2 className="heading-2 mb-2">{title}</h2> : title}
 
-      {description ? (
-        <p className="text-muted-foreground mb-6">{description}</p>
-      ) : null}
+      {description ? <p className="text-muted-foreground mb-6">{description}</p> : null}
 
       {primaryAction ?? (
         <Button asChild>

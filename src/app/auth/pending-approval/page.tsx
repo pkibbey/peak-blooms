@@ -54,7 +54,7 @@ export default async function PendingApprovalPage({ searchParams }: PendingAppro
           <div className="space-y-8 rounded-lg border border-border bg-secondary/5 p-8">
             {/* Email Confirmation */}
             <div className="space-y-3">
-              <h2 className="text-xl font-semibold">What&apos;s Next?</h2>
+              <h2 className="heading-2">What&apos;s Next?</h2>
               <p className="text-muted-foreground">
                 We&apos;ve sent a confirmation email to{" "}
                 <strong className="text-foreground">{email}</strong>. Click the link in that email
@@ -71,7 +71,7 @@ export default async function PendingApprovalPage({ searchParams }: PendingAppro
 
             {/* First-Time Discount Info */}
             <div className="space-y-3 border-t border-t-border pt-6">
-              <h2 className="text-xl font-semibold">First-Time Customer Bonus</h2>
+              <h2 className="heading-2">First-Time Customer Bonus</h2>
               <p className="text-muted-foreground">
                 As a new Peak Blooms customer, you&apos;ll receive an exclusive discount on your
                 first order once your account is approved. This is our way of welcoming you to our
@@ -81,7 +81,7 @@ export default async function PendingApprovalPage({ searchParams }: PendingAppro
 
             {/* Contact for Urgent Approval */}
             <div className="space-y-3 border-t border-t-border pt-6">
-              <h2 className="text-xl font-semibold">Need Faster Approval?</h2>
+              <h2 className="heading-2">Need Faster Approval?</h2>
               <p className="text-muted-foreground">
                 If you need your account approved urgently, please reach out to our team:
               </p>

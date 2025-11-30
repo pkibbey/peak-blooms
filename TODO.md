@@ -5,7 +5,6 @@
 - [ ] Create separate development and production databases
 - [ ] Add real products
 - [ ] Add pagination once we have a large number of products to view
-- [x] Add empty state component and add it to the cart page
 
 ### 🪨 Code Stability
 - [ ] Add unit tests and e2e tests to ensure complete site functionality
@@ -26,7 +25,7 @@
 
 - [ ] Update logos with proper graphics
 - [ ] Try out different colour schemes
-- [ ] Create reusable typography utility classes in tailwind
+ - [x] Create reusable typography utility classes in tailwind
 - [ ] Create container and card utility classes
 - [ ] Improve the layout for the admin dashboard, it looks bland and just a load of boxes without any real overview of the state of the system
 - [ ] Improve the blog post of the inspiration page, get some more ideas about how this could look in the real world and where we would source this information from

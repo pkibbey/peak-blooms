@@ -212,7 +212,7 @@ export default function CheckoutForm({ cart, savedAddresses, userEmail }: Checko
 
           {/* Contact Information */}
           <div className="bg-white rounded-xs shadow-sm border p-6">
-            <h2 className="text-lg font-semibold font-serif mb-4">Contact Information</h2>
+            <h2 className="heading-3 mb-4">Contact Information</h2>
             <div className="grid gap-4 md:grid-cols-2">
               <FormField
                 control={form.control}
@@ -245,7 +245,7 @@ export default function CheckoutForm({ cart, savedAddresses, userEmail }: Checko
 
           {/* Shipping Address */}
           <div className="bg-white rounded-xs shadow-sm border p-6">
-            <h2 className="text-lg font-semibold font-serif mb-4 flex items-center gap-2">
+            <h2 className="heading-3 mb-4 flex items-center gap-2">
               <IconMapPin className="h-5 w-5" />
               Shipping Address
             </h2>
@@ -307,10 +307,7 @@ export default function CheckoutForm({ cart, savedAddresses, userEmail }: Checko
                       onChange={(e) => field.onChange(e.target.checked)}
                     />
                   </FormControl>
-                  <FormLabel
-                    htmlFor="differentBilling"
-                    className="cursor-pointer font-semibold"
-                  >
+                  <FormLabel htmlFor="differentBilling" className="cursor-pointer font-semibold">
                     Billing address is different from shipping
                   </FormLabel>
                 </FormItem>
@@ -326,7 +323,7 @@ export default function CheckoutForm({ cart, savedAddresses, userEmail }: Checko
 
           {/* Order Notes */}
           <div className="bg-white rounded-xs shadow-sm border p-6">
-            <h2 className="text-lg font-semibold font-serif mb-4">Order Notes (optional)</h2>
+            <h2 className="heading-3 mb-4">Order Notes (optional)</h2>
             <FormField
               control={form.control}
               name="notes"
@@ -349,7 +346,7 @@ export default function CheckoutForm({ cart, savedAddresses, userEmail }: Checko
         {/* Right Column - Order Summary */}
         <div className="lg:col-span-1">
           <div className="bg-white rounded-xs shadow-sm border p-6 sticky top-24">
-            <h2 className="text-lg font-semibold font-serif mb-4">Order Summary</h2>
+            <h2 className="heading-3 mb-4">Order Summary</h2>
 
             {/* Cart Items */}
             <div className="space-y-4 mb-4">

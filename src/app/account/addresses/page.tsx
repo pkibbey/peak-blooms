@@ -18,7 +18,7 @@ export default async function AddressesPage() {
     <>
       <BackLink href="/account" label="Account" />
       <div className="mb-8">
-        <h1 className="text-3xl font-bold font-serif">Delivery Addresses</h1>
+        <h1 className="heading-1">Delivery Addresses</h1>
         <p className="mt-2 text-muted-foreground">
           {addresses.length > 0
             ? `Manage your ${addresses.length} saved address${addresses.length === 1 ? "" : "es"}`

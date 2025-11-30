@@ -17,7 +17,7 @@ export default async function NewInspirationPage() {
     <>
       <BackLink href="/admin/inspirations" label="Inspirations" />
       <div className="mb-8">
-        <h1 className="text-3xl font-bold">Add New Inspiration</h1>
+        <h1 className="heading-1">Add New Inspiration</h1>
         <p className="mt-2 text-muted-foreground">Create a new inspiration</p>
       </div>
 

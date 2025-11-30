@@ -12,7 +12,7 @@ export default async function ProfilePage() {
     <>
       <BackLink href="/account" label="Account" />
       <div className="mb-8">
-        <h1 className="text-3xl font-bold font-serif">Edit Profile</h1>
+        <h1 className="heading-1">Edit Profile</h1>
         <p className="mt-2 text-muted-foreground">Update your account details</p>
       </div>
 

@@ -42,7 +42,7 @@ export default async function EditInspirationPage({ params }: EditInspirationPag
     <>
       <BackLink href="/admin/inspirations" label="Inspirations" />
       <div className="mb-8">
-        <h1 className="text-3xl font-bold">Edit Inspiration</h1>
+        <h1 className="heading-1">Edit Inspiration</h1>
         <p className="mt-2 text-muted-foreground">Update &ldquo;{inspiration.name}&rdquo;</p>
       </div>
 

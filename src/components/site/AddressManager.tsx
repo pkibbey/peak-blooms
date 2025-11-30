@@ -115,9 +115,7 @@ export default function AddressManager({ addresses }: AddressManagerProps) {
       {isAdding ? (
         <div className="bg-white rounded-xs shadow-sm border p-6">
           <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-semibold font-serif">
-              {isEditing ? "Edit Address" : "Add New Address"}
-            </h3>
+            <h3 className="heading-3">{isEditing ? "Edit Address" : "Add New Address"}</h3>
             <Button variant="ghost" size="sm" onClick={handleCancel}>
               <IconX className="h-4 w-4" />
             </Button>

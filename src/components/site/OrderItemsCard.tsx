@@ -31,7 +31,7 @@ interface OrderItemsCardProps {
 export function OrderItemsCard({ items, total, getItemLinkHref }: OrderItemsCardProps) {
   return (
     <div className="bg-white rounded-xs shadow-sm border p-6">
-      <h2 className="text-lg font-semibold font-serif mb-4">Order Items</h2>
+      <h2 className="heading-3 mb-4">Order Items</h2>
       <div className="space-y-4">
         {items.map((item) => (
           <OrderItem key={item.id} item={item} linkHref={getItemLinkHref?.(item)} />

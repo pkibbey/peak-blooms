@@ -27,7 +27,7 @@ export default async function EditCollectionPage({ params }: EditCollectionPageP
     <>
       <BackLink href="/admin/collections" label="Collections" />
       <div className="mb-8">
-        <h1 className="text-3xl font-bold">Edit Collection</h1>
+        <h1 className="heading-1">Edit Collection</h1>
         <p className="mt-2 text-muted-foreground">Update &ldquo;{collection.name}&rdquo;</p>
       </div>
 

@@ -21,7 +21,7 @@ export default async function AdminInspirationsPage() {
       <BackLink href="/admin" label="Dashboard" />
       <div className="mb-8 flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold">Inspirations</h1>
+          <h1 className="heading-1">Inspirations</h1>
           <p className="mt-2 text-muted-foreground">
             Curate inspirations ({inspirations.length} total)
           </p>

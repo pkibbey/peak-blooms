@@ -25,7 +25,7 @@ export default async function AdminProductsPage() {
       <BackLink href="/admin" label="Dashboard" />
       <div className="mb-8 flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold">Products</h1>
+          <h1 className="heading-1">Products</h1>
           <p className="mt-2 text-muted-foreground">
             Manage your product catalog ({products.length} total)
           </p>

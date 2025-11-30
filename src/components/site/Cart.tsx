@@ -6,8 +6,8 @@ import { useState } from "react"
 import { toast } from "sonner"
 import { CartItem, type CartItemData } from "@/components/site/CartItem"
 import { Button } from "@/components/ui/button"
-import { IconShoppingBag } from "@/components/ui/icons"
 import EmptyState from "@/components/ui/EmptyState"
+import { IconShoppingBag } from "@/components/ui/icons"
 import { useDebouncedCallback } from "@/lib/useDebouncedCallback"
 import { formatPrice } from "@/lib/utils"
 
@@ -138,7 +138,11 @@ export default function Cart({ initialCart }: CartProps) {
         icon={<IconShoppingBag className="h-16 w-16 text-muted-foreground/50 mb-4" />}
         title="Your cart is empty"
         description={"Looks like you haven't added any flowers to your cart yet."}
-        primaryAction={<Button asChild><Link href="/shop">Browse Products</Link></Button>}
+        primaryAction={
+          <Button asChild>
+            <Link href="/shop">Browse Products</Link>
+          </Button>
+        }
       />
     )
   }
@@ -161,7 +165,7 @@ export default function Cart({ initialCart }: CartProps) {
       {/* Order Summary */}
       <div className="lg:col-span-1">
         <div className="bg-white rounded-xs shadow-sm border p-6 sticky top-24">
-          <h2 className="text-lg font-semibold mb-4 font-serif">Order Summary</h2>
+          <h2 className="heading-2 mb-4 font-serif">Order Summary</h2>
 
           <div className="space-y-2 text-sm">
             <div className="flex justify-between">

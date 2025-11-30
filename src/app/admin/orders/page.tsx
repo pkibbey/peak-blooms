@@ -42,7 +42,7 @@ export default async function AdminOrdersPage({ searchParams }: AdminOrdersPageP
       <BackLink href="/admin" label="Dashboard" />
       <div className="flex items-center justify-between mb-8">
         <div>
-          <h1 className="text-3xl font-bold">Orders</h1>
+          <h1 className="heading-1">Orders</h1>
           <p className="mt-2 text-muted-foreground">View and manage customer orders</p>
         </div>
       </div>

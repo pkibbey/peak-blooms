@@ -41,7 +41,7 @@ export default async function CheckoutPage() {
       <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 py-10">
         <div className="flex flex-col items-center justify-center py-16 text-center">
           <IconShoppingBag className="h-16 w-16 text-muted-foreground/50 mb-4" />
-          <h2 className="text-xl font-semibold mb-2">Your cart is empty</h2>
+          <h2 className="heading-2 mb-2">Your cart is empty</h2>
           <p className="text-muted-foreground mb-6">
             Add some items to your cart before checking out.
           </p>
@@ -55,7 +55,7 @@ export default async function CheckoutPage() {
 
   return (
     <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 py-10">
-      <h1 className="text-3xl font-bold font-serif mb-8">Checkout</h1>
+      <h1 className="heading-1 mb-8">Checkout</h1>
       <CheckoutForm
         cart={{ ...cart, total }}
         savedAddresses={savedAddresses}

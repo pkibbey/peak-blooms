@@ -6,7 +6,7 @@ export default async function NewCollectionPage() {
     <>
       <BackLink href="/admin/collections" label="Collections" />
       <div className="mb-8">
-        <h1 className="text-3xl font-bold">Add New Collection</h1>
+        <h1 className="heading-1">Add New Collection</h1>
         <p className="mt-2 text-muted-foreground">Create a new product collection</p>
       </div>
 

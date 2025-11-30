@@ -11,7 +11,7 @@ export default async function NewProductPage() {
     <>
       <BackLink href="/admin/products" label="Products" />
       <div className="mb-8">
-        <h1 className="text-3xl font-bold">Add New Product</h1>
+        <h1 className="heading-1">Add New Product</h1>
         <p className="mt-2 text-muted-foreground">Create a new product listing</p>
       </div>
 

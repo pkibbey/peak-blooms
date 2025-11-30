@@ -29,7 +29,7 @@ export default async function OrderHistoryPage() {
     <>
       <BackLink href="/account" label="Account" />
       <div className="mb-8">
-        <h1 className="text-3xl font-bold font-serif">Order History</h1>
+        <h1 className="heading-1">Order History</h1>
         <p className="mt-2 text-muted-foreground">
           {orders.length > 0
             ? `You have ${orders.length} order${orders.length === 1 ? "" : "s"}`

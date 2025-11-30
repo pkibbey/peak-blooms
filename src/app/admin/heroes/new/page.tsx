@@ -6,7 +6,7 @@ export default async function NewHeroPage() {
     <>
       <BackLink href="/admin/heroes" label="Hero Banners" />
       <div className="mb-8">
-        <h1 className="text-3xl font-bold">Add New Hero Banner</h1>
+        <h1 className="heading-1">Add New Hero Banner</h1>
         <p className="mt-2 text-muted-foreground">Create a new homepage hero banner</p>
       </div>
 

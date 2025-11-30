@@ -13,7 +13,7 @@ export default async function AdminDashboard() {
   return (
     <>
       <div className="mb-8">
-        <h1 className="text-3xl font-bold">Admin Dashboard</h1>
+        <h1 className="heading-1">Admin Dashboard</h1>
         <p className="mt-2 text-muted-foreground">Manage Peak Blooms content and user approvals</p>
       </div>
 
@@ -22,7 +22,7 @@ export default async function AdminDashboard() {
         <div className="flex items-start justify-between gap-4">
           <div>
             <div className="flex items-center gap-3">
-              <h2 className="text-xl font-semibold">Orders</h2>
+              <h2 className="heading-2">Orders</h2>
               {pendingOrdersCount > 0 && (
                 <Badge variant="secondary" className="flex items-center gap-1">
                   <IconClock className="h-3 w-3" />
@@ -49,7 +49,7 @@ export default async function AdminDashboard() {
       <div className="mb-6 rounded-lg border border-border p-6">
         <div className="flex items-start justify-between gap-4">
           <div>
-            <h2 className="text-xl font-semibold">User Accounts</h2>
+            <h2 className="heading-2">User Accounts</h2>
             <p className="mt-2 text-sm text-muted-foreground">
               Review and approve pending user accounts
             </p>
@@ -66,7 +66,7 @@ export default async function AdminDashboard() {
       <div className="rounded-lg border border-border p-6">
         <div className="flex items-center justify-between">
           <div>
-            <h2 className="text-xl font-semibold">Content Management</h2>
+            <h2 className="heading-2">Content Management</h2>
             <p className="mt-2 text-sm text-muted-foreground">
               Manage products, collections, and inspirations
             </p>
@@ -75,7 +75,7 @@ export default async function AdminDashboard() {
 
         <div className="mt-6 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           <div className="rounded-md border border-border p-4">
-            <h3 className="text-lg font-semibold">Products</h3>
+            <h3 className="heading-3">Products</h3>
             <p className="mt-1 text-sm text-muted-foreground">
               Add, edit, and manage product listings
             </p>
@@ -87,7 +87,7 @@ export default async function AdminDashboard() {
           </div>
 
           <div className="rounded-md border border-border p-4">
-            <h3 className="text-lg font-semibold">Collections</h3>
+            <h3 className="heading-3">Collections</h3>
             <p className="mt-1 text-sm text-muted-foreground">Organize products into collections</p>
             <div className="mt-4 flex flex-col gap-2">
               <Button asChild size="sm">
@@ -97,7 +97,7 @@ export default async function AdminDashboard() {
           </div>
 
           <div className="rounded-md border border-border p-4">
-            <h3 className="text-lg font-semibold">Inspirations</h3>
+            <h3 className="heading-3">Inspirations</h3>
             <p className="mt-1 text-sm text-muted-foreground">Curate inspiration sets</p>
             <div className="mt-4 flex flex-col gap-2">
               <Button asChild size="sm">
@@ -107,7 +107,7 @@ export default async function AdminDashboard() {
           </div>
 
           <div className="rounded-md border border-border p-4">
-            <h3 className="text-lg font-semibold">Hero Banners</h3>
+            <h3 className="heading-3">Hero Banners</h3>
             <p className="mt-1 text-sm text-muted-foreground">Manage homepage hero banners</p>
             <div className="mt-4 flex flex-col gap-2">
               <Button asChild size="sm">

@@ -22,7 +22,7 @@ export default async function EditHeroPage({ params }: EditHeroPageProps) {
     <>
       <BackLink href="/admin/heroes" label="Hero Banners" />
       <div className="mb-8">
-        <h1 className="text-3xl font-bold">Edit Hero Banner</h1>
+        <h1 className="heading-1">Edit Hero Banner</h1>
         <p className="mt-2 text-muted-foreground">Update hero banner details</p>
       </div>
 
