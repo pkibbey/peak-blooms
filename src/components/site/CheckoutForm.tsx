@@ -309,7 +309,7 @@ export default function CheckoutForm({ cart, savedAddresses, userEmail }: Checko
                   </FormControl>
                   <FormLabel
                     htmlFor="differentBilling"
-                    className="cursor-pointer font-semibold font-normal"
+                    className="cursor-pointer font-semibold"
                   >
                     Billing address is different from shipping
                   </FormLabel>

@@ -13,8 +13,6 @@
 
 // Collections
 export {
-  type CollectionBasic,
-  type CollectionWithProducts,
   getAllCollectionSlugs,
   getAllCollections,
   getCollectionById,
@@ -27,8 +25,6 @@ export {
   getInspirationById,
   getInspirationBySlug,
   getInspirationsWithCounts,
-  type InspirationBasic,
-  type InspirationWithProducts,
 } from "./inspirations"
 // Logger utilities (for custom usage)
 export { logError, logNotFound, withTiming } from "./logger"
@@ -41,7 +37,4 @@ export {
   getProductBySlug,
   getProducts,
   getProductWithInspirations,
-  type ProductWithInspirations,
-  type ProductWithVariants,
-  type ProductWithVariantsAndCollection,
 } from "./products"

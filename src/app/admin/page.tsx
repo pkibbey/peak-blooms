@@ -105,6 +105,16 @@ export default async function AdminDashboard() {
               </Button>
             </div>
           </div>
+
+          <div className="rounded-md border border-border p-4">
+            <h3 className="text-lg font-semibold">Hero Banners</h3>
+            <p className="mt-1 text-sm text-muted-foreground">Manage homepage hero banners</p>
+            <div className="mt-4 flex flex-col gap-2">
+              <Button asChild size="sm">
+                <Link href="/admin/heroes">Manage Heroes</Link>
+              </Button>
+            </div>
+          </div>
         </div>
       </div>
     </>

@@ -20,7 +20,7 @@ interface ImageUploadProps {
   previousUrl?: string // Original image URL for cleanup when slug changes
   label?: string
   required?: boolean
-  aspectRatio?: "square" | "16:9" // Default is square (1:1)
+  aspectRatio?: "square" | "16:9" | "4:1" // Default is square (1:1)
   className?: string
 }
 
@@ -180,7 +180,11 @@ export function ImageUpload({
         onDragLeave={!isDisabled ? handleDragLeave : undefined}
         className={cn(
           "relative flex items-center justify-center overflow-hidden rounded-md border-2 border-dashed transition-colors",
-          aspectRatio === "square" ? "h-48 w-48" : "h-48 w-[340px]", // 16:9 at h-48 (192px) = 341px width
+          aspectRatio === "square"
+            ? "h-48 w-48"
+            : aspectRatio === "16:9"
+              ? "h-48 w-[340px]" // 16:9 at h-48 (192px) = 341px width
+              : "h-36 w-[576px]", // 4:1 at h-36 (144px) = 576px width
           isDisabled && "cursor-not-allowed opacity-60",
           isDragging && !isDisabled && "border-primary bg-primary/5",
           !value &&

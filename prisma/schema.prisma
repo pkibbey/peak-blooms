@@ -252,3 +252,28 @@ enum OrderStatus {
   DELIVERED
   CANCELLED
 }
+
+enum HeroBackgroundType {
+  IMAGE
+  GRADIENT
+}
+
+model HeroBanner {
+  id              String             @id @default(cuid())
+  name            String
+  slug            String             @unique
+  title           String
+  subtitle        String             @db.Text
+  ctaText         String?
+  ctaLink         String?
+  backgroundType  HeroBackgroundType @default(GRADIENT)
+  backgroundImage String?
+  gradientPreset  String?            // e.g., "slate-green", "forest", "rose", "ocean", "earth"
+  slotPosition    Int?               // 1, 2, or 3 (null = not displayed)
+  // Optional text position for the hero content area: "left", "center" or "right"
+  textPosition    String?
+  createdAt       DateTime           @default(now())
+  updatedAt       DateTime           @updatedAt
+
+  @@index([slotPosition])
+}

@@ -85,6 +85,22 @@
   .bg-hero-gradient {
     background: radial-gradient(circle at 33% 40%, var(--hero-gradient-1), var(--hero-gradient-2));
   }
+  /* Hero gradient presets - all designed for white text readability */
+  .bg-hero-gradient-slate-green {
+    background: radial-gradient(circle at 33% 40%, rgb(78, 102, 91), rgb(45, 47, 56));
+  }
+  .bg-hero-gradient-forest {
+    background: radial-gradient(circle at 33% 40%, rgb(34, 87, 76), rgb(22, 44, 43));
+  }
+  .bg-hero-gradient-rose {
+    background: radial-gradient(circle at 33% 40%, rgb(136, 84, 100), rgb(71, 48, 56));
+  }
+  .bg-hero-gradient-ocean {
+    background: radial-gradient(circle at 33% 40%, rgb(70, 95, 117), rgb(40, 48, 58));
+  }
+  .bg-hero-gradient-earth {
+    background: radial-gradient(circle at 33% 40%, rgb(139, 90, 67), rgb(66, 49, 42));
+  }
   /* extra-small radius utility (smaller than rounded-sm) */
   .rounded-xs {
     border-radius: var(--radius-xs);

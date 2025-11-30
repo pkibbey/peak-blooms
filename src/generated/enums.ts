@@ -26,3 +26,11 @@ export const OrderStatus = {
 } as const
 
 export type OrderStatus = (typeof OrderStatus)[keyof typeof OrderStatus]
+
+
+export const HeroBackgroundType = {
+  IMAGE: 'IMAGE',
+  GRADIENT: 'GRADIENT'
+} as const
+
+export type HeroBackgroundType = (typeof HeroBackgroundType)[keyof typeof HeroBackgroundType]

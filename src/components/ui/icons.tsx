@@ -1,33 +1,34 @@
-import type React from "react"
 import {
-  ShoppingCart,
-  ShoppingBag,
-  Menu,
-  X,
-  Info,
-  Mail,
-  Flower,
   ArrowRight,
-  Instagram,
-  Facebook,
-  Rose,
-  Phone,
-  Settings,
-  Plus,
-  Trash2,
-  Minus,
-  Pencil,
-  MapPin,
-  Package,
-  Clock,
   CheckCircle,
-  XCircle,
-  Truck,
+  Clock,
   Eye,
-  Star,
-  User,
+  Facebook,
+  Flower,
+  Info,
+  Instagram,
+  LogOut,
+  Mail,
+  MapPin,
+  Menu,
+  Minus,
+  Package,
+  Pencil,
+  Phone,
+  Plus,
   RefreshCw,
+  Rose,
+  Settings,
+  ShoppingBag,
+  ShoppingCart,
+  Star,
+  Trash2,
+  Truck,
+  User,
+  X,
+  XCircle,
 } from "lucide-react"
+import type React from "react"
 
 // Small re-exports used across the UI so we have a single place to tweak sizing & classes
 export const IconSizeClass = "h-4 w-4"
@@ -174,6 +175,12 @@ export function IconUser(props: React.ComponentProps<typeof User>) {
 export function IconRefresh(props: React.ComponentProps<typeof RefreshCw>) {
   return (
     <RefreshCw {...props} className={[IconSizeClass, props.className].filter(Boolean).join(" ")} />
+  )
+}
+
+export function IconLogOut(props: React.ComponentProps<typeof LogOut>) {
+  return (
+    <LogOut {...props} className={[IconSizeClass, props.className].filter(Boolean).join(" ")} />
   )
 }
 
