@@ -66,7 +66,7 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
       )
     }
 
-    const { name, slug, description, image, color, collectionId, featured, variants } =
+    const { name, slug, description, image, colors, collectionId, featured, variants } =
       validationResult.data
 
     // Check if product exists
@@ -101,7 +101,7 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
           ...(slug !== undefined && { slug }),
           ...(description !== undefined && { description }),
           ...(image !== undefined && { image }),
-          ...(color !== undefined && { color: color || null }),
+          ...(colors !== undefined && { colors }),
           ...(collectionId !== undefined && { collectionId }),
           ...(featured !== undefined && { featured }),
           ...(variants !== undefined && {

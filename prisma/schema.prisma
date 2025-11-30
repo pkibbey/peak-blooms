@@ -125,7 +125,7 @@ model Product {
   slug            String    @unique
   description     String?   @db.Text
   image           String?
-  color           String?
+  colors          String[]
   collectionId    String
   featured        Boolean   @default(false)
   createdAt       DateTime  @default(now())

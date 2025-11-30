@@ -6,6 +6,7 @@
 - [ ] Add real products
 - [ ] Add pagination once we have a large number of products to view
 - [ ] Product colour should be able to be generated from the image, maybe the predominant colour, or a colour picker?
+- [ ] Add empty state component and add it to the cart page
 
 ### 🪨 Code Stability
 - [ ] Add unit tests and e2e tests to ensure complete site functionality
@@ -13,6 +14,8 @@
 - [ ] Update Github Readme with screenshots and updated site features/design/functionality
 - [ ] Allow users to change their email address
 - [ ] Make the site more responsive and put loading animations in using client side components
+- [ ] Add database indexes
+- [ ] Use local db server in dev environments
 
 ### 💰 Payment Processing 
 
@@ -28,6 +31,7 @@
 - [ ] Create container and card utility classes
 - [ ] Improve the layout for the admin dashboard, it looks bland and just a load of boxes without any real overview of the state of the system
 - [ ] Improve the blog post of the inspiration page, get some more ideas about how this could look in the real world and where we would source this information from
+- [ ] Add colors and maybe other columns to the product table
  
 ### 🛍️ Tracking / Marketing
 

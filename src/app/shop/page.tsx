@@ -21,7 +21,16 @@ export default async function ShopPage({ searchParams }: ShopPageProps) {
 
   // Parse filter parameters
   const collectionId = typeof params.collectionId === "string" ? params.collectionId : undefined
-  const color = typeof params.color === "string" ? params.color : undefined
+  // Accept multiple colors passed as `colors` param (comma separated or repeated keys)
+  const colors =
+    typeof params.colors === "string"
+      ? params.colors
+          .split(",")
+          .map((c) => c.trim())
+          .filter(Boolean)
+      : Array.isArray(params.colors)
+        ? params.colors
+        : undefined
   const stemLengthMin =
     typeof params.stemLengthMin === "string" ? parseInt(params.stemLengthMin, 10) : undefined
   const stemLengthMax =
@@ -34,7 +43,7 @@ export default async function ShopPage({ searchParams }: ShopPageProps) {
   const products = await getProducts(
     {
       collectionId: collectionId || undefined,
-      color: color || undefined,
+      colors: colors,
       stemLengthMin:
         stemLengthMin !== undefined && !Number.isNaN(stemLengthMin) ? stemLengthMin : undefined,
       stemLengthMax:

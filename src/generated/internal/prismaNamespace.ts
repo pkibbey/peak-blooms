@@ -1673,7 +1673,7 @@ export const ProductScalarFieldEnum = {
   slug: 'slug',
   description: 'description',
   image: 'image',
-  color: 'color',
+  colors: 'colors',
   collectionId: 'collectionId',
   featured: 'featured',
   createdAt: 'createdAt',

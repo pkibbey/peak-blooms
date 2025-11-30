@@ -112,10 +112,18 @@ export async function getOrCreateCart(existingUser?: CartUser | null) {
   })
 
   if (!cart) {
+    // Ensure the user still exists in the database before creating a cart.
+    // A missing user would cause a FK violation (P2003) — bail out gracefully.
+    const dbUser = await db.user.findUnique({ where: { id: user.id } })
+    if (!dbUser) {
+      console.warn(
+        `getOrCreateCart: session user ${user.id} not found in database — not creating cart`
+      )
+      return null
+    }
+
     cart = await db.shoppingCart.create({
-      data: {
-        userId: user.id,
-      },
+      data: { userId: user.id },
       include: {
         items: {
           include: {

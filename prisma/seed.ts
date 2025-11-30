@@ -31,7 +31,8 @@ async function main() {
     data: {
       name: "Classic Roses",
       slug: "classic-roses",
-      image: "/categories/classic-roses.png",
+      image:
+        "https://zvbfsgiej9tfgqre.public.blob.vercel-storage.com/collections/classic-roses.png",
       description:
         "Timeless elegance and beauty in every bloom. Our classic rose collection features the most beloved varieties, perfect for traditional arrangements and timeless celebrations.",
     },
@@ -41,7 +42,8 @@ async function main() {
     data: {
       name: "Exotic Blooms",
       slug: "exotic-blooms",
-      image: "/categories/exotic-blooms.png",
+      image:
+        "https://zvbfsgiej9tfgqre.public.blob.vercel-storage.com/collections/exotic-blooms.png",
       description:
         "Bold and vibrant arrangements that bring drama and sophistication to any space. Discover unique textures and rich colors from around the world.",
     },
@@ -51,7 +53,8 @@ async function main() {
     data: {
       name: "Seasonal Wildflowers",
       slug: "seasonal-wildflowers",
-      image: "/categories/seasonal-wildflowers.png",
+      image:
+        "https://zvbfsgiej9tfgqre.public.blob.vercel-storage.com/collections/seasonal-wildflowers.png",
       description:
         "Nature's finest seasonal selections capturing the essence of each time of year. Fresh, vibrant, and sustainably sourced for maximum impact.",
     },
@@ -63,8 +66,9 @@ async function main() {
       name: "Green Fluffy",
       slug: "green-fluffy",
       description: "Lush and voluminous",
-      image: "/products/green-fluffy.jpg",
+      image: "https://zvbfsgiej9tfgqre.public.blob.vercel-storage.com/products/green-fluffy.png",
       collectionId: exoticBlooms.id,
+      colors: ["#5BAE48"],
       featured: true,
       variants: {
         create: [
@@ -82,8 +86,9 @@ async function main() {
       name: "Peach Flower",
       slug: "peach-flower",
       description: "Warm and inviting",
-      image: "/products/peach-flower.jpg",
+      image: "https://zvbfsgiej9tfgqre.public.blob.vercel-storage.com/products/peach-flower.png",
       collectionId: exoticBlooms.id,
+      colors: ["#F7A582"],
       featured: true,
       variants: {
         create: [
@@ -99,8 +104,9 @@ async function main() {
       name: "Pink Rose",
       slug: "pink-rose",
       description: "Elegant and romantic",
-      image: "/products/pink-rose.jpg",
+      image: "https://zvbfsgiej9tfgqre.public.blob.vercel-storage.com/products/pink-rose.png",
       collectionId: classicRoses.id,
+      colors: ["#FF9ECF"],
       featured: false,
       variants: {
         create: [
@@ -119,8 +125,9 @@ async function main() {
       name: "Playa Blanca",
       slug: "playa-blanca",
       description: "Pristine white beauty",
-      image: "/products/playa-blanca.jpg",
+      image: "https://zvbfsgiej9tfgqre.public.blob.vercel-storage.com/products/playa-blanca.png",
       collectionId: seasonalWildflowers.id,
+      colors: ["#FFFFFF"],
       featured: false,
       variants: {
         create: [
@@ -140,7 +147,8 @@ async function main() {
       name: "Sunset Romance",
       slug: "sunset-romance",
       subtitle: "Warm hues for evening celebrations",
-      image: "/inspiration/sunset-romance.png",
+      image:
+        "https://zvbfsgiej9tfgqre.public.blob.vercel-storage.com/inspiration/sunset-romance.png",
       excerpt:
         "A stunning combination of warm peach and amber tones that evoke the magical hour just before dusk. Perfect for evening receptions and intimate celebrations.",
       inspirationText:
@@ -153,7 +161,8 @@ async function main() {
       name: "Romantic Elegance",
       slug: "romantic-elegance",
       subtitle: "Timeless pink and white arrangement",
-      image: "/inspiration/romantic-elegance.png",
+      image:
+        "https://zvbfsgiej9tfgqre.public.blob.vercel-storage.com/inspiration/romantic-elegance.png",
       excerpt:
         "A classic combination that exudes sophistication and grace. The soft pink roses paired with lush greenery create an arrangement that transcends trends.",
       inspirationText:
@@ -166,7 +175,8 @@ async function main() {
       name: "Pure Serenity",
       slug: "pure-serenity",
       subtitle: "Pristine white and green sanctuary",
-      image: "/inspiration/pure-serenity.png",
+      image:
+        "https://zvbfsgiej9tfgqre.public.blob.vercel-storage.com/inspiration/pure-serenity.png",
       excerpt:
         "Simplicity meets sophistication in this minimalist arrangement. The pristine white blooms paired with lush greenery create a calming, elegant presence.",
       inspirationText:
@@ -179,7 +189,7 @@ async function main() {
       name: "Lush Garden",
       slug: "lush-garden",
       subtitle: "Abundant greenery with vibrant accents",
-      image: "/inspiration/lush-garden.png",
+      image: "https://zvbfsgiej9tfgqre.public.blob.vercel-storage.com/inspiration/lush-garden.png",
       excerpt:
         "Nature's bounty meets artful arrangement. This set celebrates the beauty of layered textures and verdant tones for creating immersive botanical spaces.",
       inspirationText:

@@ -27,6 +27,7 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
+import COLORS from "@/lib/colors"
 import { type ProductFormData, productSchema } from "@/lib/validations/product"
 import { IconPlus, IconTrash } from "../ui/icons"
 
@@ -43,7 +44,7 @@ interface ProductFormProps {
     slug: string
     description: string | null
     image: string | null
-    color: string | null
+    colors?: string[] | null
     collectionId: string
     featured: boolean
     variants?: {
@@ -65,6 +66,14 @@ export default function ProductForm({ collections, product }: ProductFormProps) 
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [isDeleting, setIsDeleting] = useState(false)
 
+  // Normalize existing stored product colors
+  const initialColors = (() => {
+    const explicit = product?.colors as string[] | undefined
+    if (explicit && explicit.length > 0) return explicit
+
+    return []
+  })()
+
   const form = useForm<ProductFormData>({
     resolver: zodResolver(productSchema),
     defaultValues: {
@@ -72,7 +81,7 @@ export default function ProductForm({ collections, product }: ProductFormProps) 
       slug: product?.slug || "",
       description: product?.description || "",
       image: product?.image || "",
-      color: product?.color || "",
+      colors: initialColors,
       collectionId: product?.collectionId || "",
       featured: product?.featured || false,
       variants:
@@ -220,58 +229,166 @@ export default function ProductForm({ collections, product }: ProductFormProps) 
           )}
         />
 
-        {/* Image */}
-        <ImageUpload
-          value={form.watch("image")}
-          onChange={(url) => form.setValue("image", url)}
-          folder="products"
-          slug={watchedSlug}
-          previousUrl={originalImage}
-          label="Image"
-        />
+        <div className="flex gap-6 md:grid-cols-auto_1">
+          {/* Image */}
+          <ImageUpload
+            value={form.watch("image")}
+            onChange={(url) => form.setValue("image", url)}
+            folder="products"
+            slug={watchedSlug}
+            previousUrl={originalImage}
+            label="Image"
+          />
 
-        <div className="grid gap-6 md:grid-cols-2">
           {/* Color */}
           <FormField
             control={form.control}
-            name="color"
+            name="colors"
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Color</FormLabel>
-                <FormControl>
-                  <Input {...field} placeholder="e.g., Red, Pink, White" />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+                <div className="flex flex-col gap-2">
+                  <div className="flex flex-wrap gap-2">
+                    {COLORS.map((c) => {
+                      const activeValues = Array.isArray(field.value) ? field.value : []
+                      const isActive = activeValues.some(
+                        (v) => v?.toLowerCase() === c.hex.toLowerCase()
+                      )
+                      return (
+                        <button
+                          key={c.id}
+                          type="button"
+                          aria-label={c.label}
+                          onClick={() => {
+                            const curr = Array.isArray(field.value) ? field.value.slice() : []
+                            const foundIndex = curr.findIndex(
+                              (v) => v?.toLowerCase() === c.hex.toLowerCase()
+                            )
+                            if (foundIndex >= 0) curr.splice(foundIndex, 1)
+                            else curr.push(c.hex)
+                            form.setValue("colors", curr)
+                          }}
+                          className={`h-8 w-8 rounded-full border transition-shadow focus:outline-none ${
+                            isActive ? "ring-2 ring-offset-1 ring-primary" : ""
+                          }`}
+                          style={{ backgroundColor: c.hex }}
+                        />
+                      )
+                    })}
+                    {/* Clear button */}
+                    <button
+                      type="button"
+                      onClick={() => form.setValue("colors", [])}
+                      className="h-8 px-2 rounded-md border flex items-center text-sm text-muted-foreground"
+                    >
+                      Clear
+                    </button>
+                  </div>
 
-          {/* Collection */}
-          <FormField
-            control={form.control}
-            name="collectionId"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Collection *</FormLabel>
-                <Select onValueChange={field.onChange} value={field.value}>
-                  <FormControl>
-                    <SelectTrigger className="w-full">
-                      <SelectValue placeholder="Select a collection" />
-                    </SelectTrigger>
-                  </FormControl>
-                  <SelectContent>
-                    {collections.map((col) => (
-                      <SelectItem key={col.id} value={col.id}>
-                        {col.name}
-                      </SelectItem>
+                  <div className="flex items-center gap-2">
+                    <FormControl>
+                      {/* allow entering a custom hex - will add to the selection */}
+                      <Input
+                        placeholder="#RRGGBB (e.g. #FF6B6B)"
+                        value={
+                          Array.isArray(field.value) && field.value.length ? field.value[0] : ""
+                        }
+                        onChange={(e) => {
+                          // set first / primary value as typed; don't modify others here
+                          const curr = Array.isArray(field.value) ? field.value.slice() : []
+                          const v = e.target.value
+                          // if typed value is empty remove first
+                          if (!v) {
+                            curr.shift()
+                            form.setValue("colors", curr)
+                          } else {
+                            // keep if present, else set as first
+                            if (curr.length && curr[0] && curr[0] === v) {
+                              // same
+                            } else {
+                              if (curr.length) curr[0] = v
+                              else curr.unshift(v)
+                              form.setValue("colors", curr)
+                            }
+                          }
+                        }}
+                      />
+                    </FormControl>
+
+                    {/* native colour picker for convenience - adds to list if not already present */}
+                    <input
+                      aria-label="Pick custom color"
+                      type="color"
+                      value={(Array.isArray(field.value) && field.value[0]) || "#000000"}
+                      onChange={(e) => {
+                        const val = e.target.value
+                        const curr = Array.isArray(field.value) ? field.value.slice() : []
+                        if (!curr.includes(val)) curr.push(val)
+                        form.setValue("colors", curr)
+                      }}
+                      className="h-10 w-10 rounded-md border p-0"
+                    />
+                  </div>
+
+                  {/* Show selected colors */}
+                  <div className="flex gap-2 items-center flex-wrap">
+                    {(Array.isArray(field.value) ? field.value : []).map((hex) => (
+                      <div
+                        key={hex}
+                        className="flex items-center gap-2 px-2 py-1 border rounded-md"
+                      >
+                        <div
+                          className="h-6 w-6 rounded-full border"
+                          style={{ backgroundColor: hex }}
+                        />
+                        <div className="text-sm">{hex}</div>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const curr = Array.isArray(field.value) ? field.value.slice() : []
+                            const idx = curr.indexOf(hex)
+                            if (idx >= 0) curr.splice(idx, 1)
+                            form.setValue("colors", curr)
+                          }}
+                          className="text-sm text-destructive"
+                        >
+                          remove
+                        </button>
+                      </div>
                     ))}
-                  </SelectContent>
-                </Select>
+                  </div>
+                </div>
                 <FormMessage />
               </FormItem>
             )}
           />
         </div>
+
+        {/* Collection */}
+        <FormField
+          control={form.control}
+          name="collectionId"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Collection *</FormLabel>
+              <Select onValueChange={field.onChange} value={field.value}>
+                <FormControl>
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="Select a collection" />
+                  </SelectTrigger>
+                </FormControl>
+                <SelectContent>
+                  {collections.map((col) => (
+                    <SelectItem key={col.id} value={col.id}>
+                      {col.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
 
         {/* Variants Section */}
         <div className="space-y-4">

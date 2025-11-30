@@ -7,7 +7,7 @@ import { createProductSchema } from "@/lib/validations/product"
 /**
  * GET /api/products
  * Get all products (with optional filtering)
- * Query params: collectionId, featured, color, stemLength, priceMin, priceMax
+ * Query params: collectionId, featured, colors, stemLength, priceMin, priceMax
  * Prices are adjusted based on the authenticated user's price multiplier
  */
 export async function GET(request: NextRequest) {
@@ -28,7 +28,8 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url)
     const collectionId = searchParams.get("collectionId")
     const featured = searchParams.get("featured")
-    const color = searchParams.get("color")
+    // Support multi-color query param: ?colors=#FF0000&colors=#00FF00 or ?colors=#FF0000,#00FF00
+    const colorsFromQuery = searchParams.getAll("colors")
     const priceMin = searchParams.get("priceMin")
     const priceMax = searchParams.get("priceMax")
     const boxlotOnly = searchParams.get("boxlotOnly")
@@ -37,7 +38,17 @@ export async function GET(request: NextRequest) {
       {
         collectionId: collectionId || undefined,
         featured: featured === "true",
-        color: color || undefined,
+        // Prefer explicit `colors` query params if provided
+        colors:
+          colorsFromQuery.length > 0
+            ? // allow comma separated in a single param as well
+              colorsFromQuery.flatMap((c) =>
+                c
+                  .split(",")
+                  .map((v) => v.trim())
+                  .filter(Boolean)
+              )
+            : undefined,
         priceMin: priceMin ? parseFloat(priceMin) : undefined,
         priceMax: priceMax ? parseFloat(priceMax) : undefined,
         boxlotOnly: boxlotOnly === "true",
@@ -76,7 +87,7 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    const { name, slug, description, image, color, collectionId, featured, variants } =
+    const { name, slug, description, image, colors, collectionId, featured, variants } =
       validationResult.data
 
     const product = await db.product.create({
@@ -85,7 +96,8 @@ export async function POST(request: NextRequest) {
         slug,
         description,
         image,
-        color: color || null,
+        // Save provided colors array (no legacy single color field)
+        ...(colors !== undefined && { colors }),
         collectionId,
         featured: featured === true,
         variants: {

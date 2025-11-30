@@ -96,7 +96,7 @@ export async function getProductById(
 export interface GetProductsOptions {
   collectionId?: string
   featured?: boolean
-  color?: string
+  colors?: string[]
   stemLengthMin?: number
   stemLengthMax?: number
   priceMin?: number
@@ -114,7 +114,8 @@ export async function getProducts(
   priceMultiplier = 1.0
 ): Promise<ProductWithVariantsAndCollection[]> {
   return withTiming("getProducts", options as Record<string, unknown>, async () => {
-    const where: ProductWhereInput = {}
+    // Use a flexible typed placeholder for `where` so we can add new array filters
+    const where = {} as unknown as ProductWhereInput
 
     if (options.collectionId) {
       where.collectionId = options.collectionId
@@ -124,11 +125,9 @@ export async function getProducts(
       where.featured = true
     }
 
-    if (options.color) {
-      where.color = {
-        equals: options.color,
-        mode: "insensitive",
-      }
+    // Accept a colors array for filtering; find products that contain at least one of the values
+    if (options.colors) {
+      where.colors = { hasSome: options.colors }
     }
 
     // Build variant filters
