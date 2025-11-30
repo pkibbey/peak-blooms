@@ -284,6 +284,67 @@ async function main() {
     })
   }
 
+  console.log("✨ Creating hero banners...")
+
+  // Upsert two hero banners so running the seed is idempotent
+  await prisma.heroBanner.upsert({
+    where: { slug: "main-hero" },
+    update: {
+      title: "Peak Blooms — Fresh flowers for every occasion",
+      subtitle:
+        "Beautiful, sustainably sourced flowers delivered to your door — designed by florists, loved by everyone.",
+      ctaText: "Shop flowers",
+      ctaLink: "/shop",
+      backgroundType: "IMAGE",
+      backgroundImage: "https://zvbfsgiej9tfgqre.public.blob.vercel-storage.com/heroes/welcome.png",
+      slotPosition: 1,
+      textPosition: "left",
+    },
+    create: {
+      name: "Main Home Hero",
+      slug: "main-hero",
+      title: "Peak Blooms — Fresh flowers for every occasion",
+      subtitle:
+        "Beautiful, sustainably sourced flowers delivered to your door — designed by florists, loved by everyone.",
+      ctaText: "Shop flowers",
+      ctaLink: "/shop",
+      backgroundType: "IMAGE",
+      backgroundImage: "https://zvbfsgiej9tfgqre.public.blob.vercel-storage.com/heroes/welcome.png",
+      slotPosition: 1,
+      textPosition: "left",
+    },
+  })
+
+  await prisma.heroBanner.upsert({
+    where: { slug: "boxlot-hero" },
+    update: {
+      title: "Boxlot Deals — Bulk flowers for events & florists",
+      subtitle:
+        "Shop bulk boxlots for better value — perfect for large installs, weddings, and events.",
+      ctaText: "Shop boxlots",
+      ctaLink: "/shop?boxlotOnly=true",
+      backgroundType: "IMAGE",
+      backgroundImage: "https://zvbfsgiej9tfgqre.public.blob.vercel-storage.com/heroes/boxlots.png",
+      slotPosition: 2,
+      textPosition: "right",
+    },
+    create: {
+      name: "Boxlot CTA",
+      slug: "boxlot-hero",
+      title: "Boxlot Deals — Bulk flowers for events & florists",
+      subtitle:
+        "Shop bulk boxlots for better value — perfect for large installs, weddings, and events.",
+      ctaText: "Shop boxlots",
+      ctaLink: "/shop?boxlotOnly=true",
+      backgroundType: "IMAGE",
+      backgroundImage: "https://zvbfsgiej9tfgqre.public.blob.vercel-storage.com/heroes/boxlots.png",
+      slotPosition: 2,
+      textPosition: "right",
+    },
+  })
+
+  console.log("✅ Hero banners seeded/updated: main-hero, boxlot-hero")
+
   console.log("✅ Database seeded successfully!")
 }
 
