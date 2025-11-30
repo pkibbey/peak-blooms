@@ -1,5 +1,5 @@
 import { type NextRequest, NextResponse } from "next/server"
-import { auth } from "@/lib/auth"
+import { auth, invalidateUserSessions } from "@/lib/auth"
 import { db } from "@/lib/db"
 import { isValidPriceMultiplier } from "@/lib/utils"
 
@@ -56,6 +56,9 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
         createdAt: true,
       },
     })
+
+    // Invalidate user's sessions so they must re-authenticate with new permissions
+    await invalidateUserSessions(id)
 
     return NextResponse.json(user)
   } catch (error) {

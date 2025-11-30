@@ -1,6 +1,5 @@
 import { type NextRequest, NextResponse } from "next/server"
-import { auth } from "@/lib/auth"
-import { calculateCartTotal, getOrCreateCart, isApproved } from "@/lib/auth-utils"
+import { calculateCartTotal, getCurrentUser, getOrCreateCart } from "@/lib/current-user"
 import { db } from "@/lib/db"
 
 /**
@@ -10,23 +9,21 @@ import { db } from "@/lib/db"
  */
 export async function GET() {
   try {
-    const session = await auth()
+    const user = await getCurrentUser()
 
-    if (!session?.user?.email) {
+    if (!user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }
 
-    // Check if user is approved
-    const approved = await isApproved()
-    if (!approved) {
+    if (!user.approved) {
       return NextResponse.json(
         { error: "Your account is not approved for purchases" },
         { status: 403 }
       )
     }
 
-    // Get cart with prices already adjusted by multiplier
-    const cart = await getOrCreateCart()
+    // Get cart with prices already adjusted by multiplier (pass user to avoid redundant DB call)
+    const cart = await getOrCreateCart(user)
 
     if (!cart) {
       return NextResponse.json({ error: "Cart not found" }, { status: 404 })
@@ -50,15 +47,13 @@ export async function GET() {
  */
 export async function POST(request: NextRequest) {
   try {
-    const session = await auth()
+    const user = await getCurrentUser()
 
-    if (!session?.user?.email) {
+    if (!user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }
 
-    // Check if user is approved
-    const approved = await isApproved()
-    if (!approved) {
+    if (!user.approved) {
       return NextResponse.json(
         { error: "Your account is not approved for purchases" },
         { status: 403 }
@@ -70,14 +65,6 @@ export async function POST(request: NextRequest) {
 
     if (!productId || quantity < 1) {
       return NextResponse.json({ error: "Invalid product or quantity" }, { status: 400 })
-    }
-
-    const user = await db.user.findUnique({
-      where: { email: session.user.email },
-    })
-
-    if (!user) {
-      return NextResponse.json({ error: "User not found" }, { status: 404 })
     }
 
     // Get or create cart

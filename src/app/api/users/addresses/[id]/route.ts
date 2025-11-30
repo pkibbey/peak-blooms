@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server"
-import { getCurrentUser } from "@/lib/auth-utils"
+import { getCurrentUser } from "@/lib/current-user"
 import { db } from "@/lib/db"
 
 interface RouteParams {

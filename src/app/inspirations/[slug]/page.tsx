@@ -12,7 +12,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
-import { getCurrentUser } from "@/lib/auth-utils"
+import { getCurrentUser } from "@/lib/current-user"
 import { getAllInspirationSlugs, getInspirationBySlug } from "@/lib/data"
 import { db } from "@/lib/db"
 

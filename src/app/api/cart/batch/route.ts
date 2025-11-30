@@ -1,6 +1,5 @@
 import { type NextRequest, NextResponse } from "next/server"
-import { auth } from "@/lib/auth"
-import { isApproved } from "@/lib/auth-utils"
+import { getCurrentUser } from "@/lib/current-user"
 import { db } from "@/lib/db"
 
 /**
@@ -10,14 +9,13 @@ import { db } from "@/lib/db"
  */
 export async function POST(request: NextRequest) {
   try {
-    const session = await auth()
+    const user = await getCurrentUser()
 
-    if (!session?.user?.email) {
+    if (!user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }
 
-    const approved = await isApproved()
-    if (!approved) {
+    if (!user.approved) {
       return NextResponse.json(
         { error: "Your account is not approved for purchases" },
         { status: 403 }
@@ -66,13 +64,7 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Find user
-    const user = await db.user.findUnique({ where: { email: session.user.email } })
-    if (!user) {
-      return NextResponse.json({ error: "User not found" }, { status: 404 })
-    }
-
-    // Get or create cart
+    // Get or create cart (user already fetched above)
     let cart = await db.shoppingCart.findUnique({ where: { userId: user.id } })
     if (!cart) {
       cart = await db.shoppingCart.create({ data: { userId: user.id } })

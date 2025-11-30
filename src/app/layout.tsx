@@ -5,7 +5,7 @@ import { Toaster } from "sonner"
 import "./globals.css"
 import Footer from "@/components/site/Footer"
 import Nav from "@/components/site/Nav"
-import { getCurrentUser, getOrCreateCart } from "@/lib/auth-utils"
+import { getCurrentUser, getOrCreateCart } from "@/lib/current-user"
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -46,7 +46,7 @@ export default async function RootLayout({
   // Fetch cart count for approved users (count of unique items, not total quantity)
   let cartCount = 0
   if (currentUser?.approved) {
-    const cart = await getOrCreateCart()
+    const cart = await getOrCreateCart(currentUser)
     if (cart?.items) {
       cartCount = cart.items.length
     }

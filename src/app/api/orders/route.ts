@@ -1,6 +1,5 @@
 import { NextResponse } from "next/server"
-import { auth } from "@/lib/auth"
-import { isApproved } from "@/lib/auth-utils"
+import { getCurrentUser } from "@/lib/current-user"
 import { db } from "@/lib/db"
 import { adjustPrice } from "@/lib/utils"
 import { createOrderSchema } from "@/lib/validations/checkout"
@@ -31,27 +30,17 @@ async function generateOrderNumber(): Promise<string> {
  */
 export async function GET() {
   try {
-    const session = await auth()
+    const user = await getCurrentUser()
 
-    if (!session?.user?.email) {
+    if (!user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }
 
-    // Check if user is approved
-    const approved = await isApproved()
-    if (!approved) {
+    if (!user.approved) {
       return NextResponse.json(
         { error: "Your account is not approved for purchases" },
         { status: 403 }
       )
-    }
-
-    const user = await db.user.findUnique({
-      where: { email: session.user.email },
-    })
-
-    if (!user) {
-      return NextResponse.json({ error: "User not found" }, { status: 404 })
     }
 
     const orders = await db.order.findMany({
@@ -81,31 +70,17 @@ export async function GET() {
  */
 export async function POST(request: Request) {
   try {
-    const session = await auth()
+    const user = await getCurrentUser()
 
-    if (!session?.user?.email) {
+    if (!user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }
 
-    // Check if user is approved
-    const approved = await isApproved()
-    if (!approved) {
+    if (!user.approved) {
       return NextResponse.json(
         { error: "Your account is not approved for purchases" },
         { status: 403 }
       )
-    }
-
-    const user = await db.user.findUnique({
-      where: { email: session.user.email },
-      select: {
-        id: true,
-        priceMultiplier: true,
-      },
-    })
-
-    if (!user) {
-      return NextResponse.json({ error: "User not found" }, { status: 404 })
     }
 
     const priceMultiplier = user.priceMultiplier

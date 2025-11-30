@@ -1,5 +1,5 @@
 import Link from "next/link"
-import { getCurrentUser } from "@/lib/auth-utils"
+import { getCurrentUser } from "@/lib/current-user"
 import { getFeaturedProducts } from "@/lib/data"
 import { ProductCard } from "./ProductCard"
 

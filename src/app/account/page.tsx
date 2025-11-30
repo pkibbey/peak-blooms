@@ -2,14 +2,8 @@ import Link from "next/link"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { IconCheckCircle, IconClock } from "@/components/ui/icons"
-import { getCurrentUser } from "@/lib/auth-utils"
+import { getCurrentUser } from "@/lib/current-user"
 import { db } from "@/lib/db"
-
-const formatDate = (date: Date) => {
-  return new Intl.DateTimeFormat("en-US", {
-    dateStyle: "medium",
-  }).format(new Date(date))
-}
 
 export default async function AccountPage() {
   const user = await getCurrentUser()
@@ -113,10 +107,6 @@ export default async function AccountPage() {
                     </Badge>
                   )}
                 </div>
-              </div>
-              <div>
-                <p className="text-sm text-muted-foreground">Member Since</p>
-                <p className="font-medium">{formatDate(user.createdAt)}</p>
               </div>
             </div>
           </div>

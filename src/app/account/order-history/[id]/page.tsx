@@ -6,7 +6,7 @@ import { OrderItemsCard } from "@/components/site/OrderItemsCard"
 import { type OrderStatus, OrderStatusBadge } from "@/components/site/OrderStatusBadge"
 import { Button } from "@/components/ui/button"
 import { IconCheckCircle, IconMapPin } from "@/components/ui/icons"
-import { getCurrentUser } from "@/lib/auth-utils"
+import { getCurrentUser } from "@/lib/current-user"
 import { db } from "@/lib/db"
 import { formatDate } from "@/lib/utils"
 

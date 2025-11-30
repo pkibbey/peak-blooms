@@ -1,6 +1,6 @@
 import BackLink from "@/components/site/BackLink"
 import ProfileForm from "@/components/site/ProfileForm"
-import { getCurrentUser } from "@/lib/auth-utils"
+import { getCurrentUser } from "@/lib/current-user"
 
 export default async function ProfilePage() {
   const user = await getCurrentUser()

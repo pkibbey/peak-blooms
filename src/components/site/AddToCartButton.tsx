@@ -69,7 +69,7 @@ export default function AddToCartButton({
   return (
     <>
       <Button
-        size="lg"
+        size="sm"
         className="w-full md:w-auto"
         onClick={handleAddToCart}
         disabled={loading || !!disabled}

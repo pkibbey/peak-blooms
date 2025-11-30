@@ -2,7 +2,7 @@ import { Suspense } from "react"
 import { BoxlotFilter } from "@/components/site/BoxlotFilter"
 import { PageHeader } from "@/components/site/PageHeader"
 import { ProductCard } from "@/components/site/ProductCard"
-import { getCurrentUser } from "@/lib/auth-utils"
+import { getCurrentUser } from "@/lib/current-user"
 import { getProducts } from "@/lib/data"
 
 interface ShopPageProps {

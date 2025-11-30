@@ -139,6 +139,7 @@ model Product {
 
   @@index([collectionId])
   @@index([slug])
+  @@index([createdAt])
 }
 
 // Explicit join table for Inspiration <-> Product with variant support

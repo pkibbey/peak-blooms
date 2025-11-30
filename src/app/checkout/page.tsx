@@ -3,7 +3,7 @@ import { redirect } from "next/navigation"
 import CheckoutForm from "@/components/site/CheckoutForm"
 import { Button } from "@/components/ui/button"
 import { IconShoppingBag } from "@/components/ui/icons"
-import { calculateCartTotal, getCurrentUser, getOrCreateCart } from "@/lib/auth-utils"
+import { calculateCartTotal, getCurrentUser, getOrCreateCart } from "@/lib/current-user"
 import { db } from "@/lib/db"
 
 export default async function CheckoutPage() {
@@ -20,7 +20,7 @@ export default async function CheckoutPage() {
   }
 
   // Fetch cart data
-  const cart = await getOrCreateCart()
+  const cart = await getOrCreateCart(user)
 
   // Redirect to cart if empty
   if (!cart || cart.items.length === 0) {

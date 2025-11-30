@@ -80,7 +80,7 @@ export default function Nav({ user, cartCount = 0 }: NavProps) {
                 <Link href="/cart" className="inline-flex items-center gap-2">
                   <IconShoppingCart aria-hidden="true" />
                   <span>Cart</span>
-                  {cartCount > 0 && <Badge variant="destructive">{cartCount}</Badge>}
+                  {cartCount > 0 && <Badge variant="default">{cartCount}</Badge>}
                 </Link>
               </div>
             )}
@@ -141,7 +141,7 @@ export default function Nav({ user, cartCount = 0 }: NavProps) {
                   <Link href="/cart" className="inline-flex items-center gap-2 px-4 py-2">
                     <IconShoppingCart aria-hidden="true" />
                     <span>Cart</span>
-                    {cartCount > 0 && <Badge variant="destructive">{cartCount}</Badge>}
+                    {cartCount > 0 && <Badge variant="default">{cartCount}</Badge>}
                   </Link>
                 </Button>
               )}

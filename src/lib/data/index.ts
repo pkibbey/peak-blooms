@@ -31,7 +31,7 @@ export {
   type InspirationWithProducts,
 } from "./inspirations"
 // Logger utilities (for custom usage)
-export { logDataAccess, logError, logNotFound, withTiming } from "./logger"
+export { logError, logNotFound, withTiming } from "./logger"
 // Products
 export {
   type GetProductsOptions,

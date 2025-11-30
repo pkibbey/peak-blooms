@@ -2,7 +2,7 @@ import { notFound } from "next/navigation"
 import BackLink from "@/components/site/BackLink"
 import { PageHeader } from "@/components/site/PageHeader"
 import { ProductCard } from "@/components/site/ProductCard"
-import { getCurrentUser } from "@/lib/auth-utils"
+import { getCurrentUser } from "@/lib/current-user"
 import { getAllCollectionSlugs, getCollectionBySlug } from "@/lib/data"
 import { db } from "@/lib/db"
 

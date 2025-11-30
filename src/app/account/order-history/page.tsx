@@ -3,7 +3,7 @@ import BackLink from "@/components/site/BackLink"
 import OrderHistoryItem from "@/components/site/OrderHistoryItem"
 import { Button } from "@/components/ui/button"
 import { IconPackage } from "@/components/ui/icons"
-import { getCurrentUser } from "@/lib/auth-utils"
+import { getCurrentUser } from "@/lib/current-user"
 import { db } from "@/lib/db"
 
 export default async function OrderHistoryPage() {

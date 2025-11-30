@@ -1,7 +1,6 @@
 import { redirect } from "next/navigation"
-import { getCurrentUser } from "@/lib/auth-utils"
-import { getOrCreateCart, calculateCartTotal } from "@/lib/auth-utils"
 import Cart from "@/components/site/Cart"
+import { calculateCartTotal, getCurrentUser, getOrCreateCart } from "@/lib/current-user"
 
 export default async function CartPage() {
   const user = await getCurrentUser()
@@ -18,6 +17,7 @@ export default async function CartPage() {
 
   // Fetch cart data server-side
   const cart = await getOrCreateCart()
+  const cart = await getOrCreateCart(user)
 
   // This shouldn't happen since user is authenticated, but handle it
   if (!cart) {

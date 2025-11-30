@@ -1,6 +1,6 @@
-import { PrismaClient } from "../generated/client"
-import { Pool } from "pg"
 import { PrismaPg } from "@prisma/adapter-pg"
+import { Pool } from "pg"
+import { PrismaClient } from "../generated/client"
 
 const globalForPrisma = globalThis as unknown as { prisma: PrismaClient }
 
@@ -10,7 +10,7 @@ const createPrismaClient = () => {
   const adapter = new PrismaPg(pool)
   return new PrismaClient({
     adapter,
-    log: ["info", "warn", "error"],
+    log: ["warn", "error"],
   })
 }
 

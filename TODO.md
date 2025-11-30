@@ -41,3 +41,4 @@
 - [ ] Product colour should be able to be generated from the image, maybe the predominant colour, or a colour picker?
 - [ ] Add the ability to upload different hero images
 - [ ] Improve the blog post of the inspiration page, get some more ideas about how this could look in the real world and where we would source this information from
+- [ ] Price multipier is stored in jwt token so could be publicly available. Instead, give account an obfuscated letter, which translates into a multiplier value.

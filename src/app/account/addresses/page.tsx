@@ -1,6 +1,6 @@
 import AddressManager from "@/components/site/AddressManager"
 import BackLink from "@/components/site/BackLink"
-import { getCurrentUser } from "@/lib/auth-utils"
+import { getCurrentUser } from "@/lib/current-user"
 import { db } from "@/lib/db"
 
 export default async function AddressesPage() {

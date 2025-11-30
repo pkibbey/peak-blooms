@@ -63,7 +63,7 @@ toast.success(`Added "${productName}" to cart!`);
 // ✅ Good: Server component with redirect
 // app/cart/page.tsx
 import { redirect } from "next/navigation"
-import { getCurrentUser } from "@/lib/auth-utils"
+import { getCurrentUser } from "@/lib/current-user"
 
 export default async function CartPage() {
   const user = await getCurrentUser()

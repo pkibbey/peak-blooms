@@ -1,47 +1,35 @@
+import { cache } from "react"
 import { auth } from "./auth"
 import { db } from "./db"
 import { adjustPrice } from "./utils"
 
 /**
  * Get the current authenticated user with their approval and role status
+ * Wrapped in React cache() to deduplicate calls within a single request
+ *
+ * Note: User data comes from the session callback in auth.ts which already
+ * fetches fresh user data from the database on each request.
  */
-export async function getCurrentUser() {
+export const getCurrentUser = cache(async () => {
+  const start = performance.now()
+
   const session = await auth()
+  console.log(`[getCurrentUser] auth() done: ${(performance.now() - start).toFixed(0)}ms`)
+
   if (!session?.user?.email) {
     return null
   }
 
-  const user = await db.user.findUnique({
-    where: { email: session.user.email },
-    select: {
-      id: true,
-      email: true,
-      name: true,
-      role: true,
-      approved: true,
-      priceMultiplier: true,
-      createdAt: true,
-    },
-  })
-
-  return user
-}
-
-/**
- * Check if the current user is an admin
- */
-export async function isAdmin() {
-  const user = await getCurrentUser()
-  return user?.role === "ADMIN"
-}
-
-/**
- * Check if the current user is approved
- */
-export async function isApproved() {
-  const user = await getCurrentUser()
-  return user?.approved === true
-}
+  // Return user data from session (already fetched in auth.ts session callback)
+  return {
+    id: session.user.id,
+    email: session.user.email,
+    name: session.user.name ?? null,
+    role: session.user.role,
+    approved: session.user.approved,
+    priceMultiplier: session.user.priceMultiplier,
+  }
+})
 
 /**
  * Get the current user's price multiplier (defaults to 1.0 for unauthenticated users)
@@ -93,12 +81,20 @@ export function applyPriceMultiplierToCartItems<
   }))
 }
 
+/** User type for cart operations */
+type CartUser = {
+  id: string
+  priceMultiplier: number
+}
+
 /**
  * Get the current user's shopping cart (creates one if it doesn't exist)
  * Returns cart with prices adjusted by user's price multiplier
+ *
+ * @param existingUser - Optional: pass the user if you already have it to avoid redundant DB call
  */
-export async function getOrCreateCart() {
-  const user = await getCurrentUser()
+export async function getOrCreateCart(existingUser?: CartUser | null) {
+  const user = existingUser ?? (await getCurrentUser())
   if (!user) {
     return null
   }
