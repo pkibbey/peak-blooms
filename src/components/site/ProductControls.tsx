@@ -1,7 +1,7 @@
 "use client"
 
 import Link from "next/link"
-import { useCallback, useMemo, useState } from "react"
+import { useCallback, useEffect, useMemo, useState } from "react"
 import AddToCartButton from "@/components/site/AddToCartButton"
 import { Button } from "@/components/ui/button"
 import { Label } from "@/components/ui/label"
@@ -35,37 +35,53 @@ export function ProductControls({ product, user, mode = "card" }: ProductControl
   const isApproved = !!user?.approved
 
   // Get variants data - memoize to prevent dependency issues
-  const variants = useMemo(() => product.variants ?? [], [product.variants])
-  const hasVariants = variants.length > 0
+  const productVariants = useMemo(() => product.variants ?? [], [product.variants])
+  const hasVariants = productVariants.length > 0
 
-  // Get unique stem lengths and counts from variants
+  // Detect when we're in a "boxlot" context: all variants present are boxlots.
+  // In that case we should only consider variants which have both stemLength and
+  // countPerBunch populated when deriving the selectable options.
+  const isBoxlotMode = productVariants.length > 0 && productVariants.every((v) => v.isBoxlot)
+
+  // Source variants used for selectors.
+  // When in boxlot mode, only use variants that have both stemLength and countPerBunch
+  // populated (complete boxlot variants). Otherwise use all product variants.
+  const srcVariants = useMemo(
+    () =>
+      isBoxlotMode
+        ? productVariants.filter((v) => v.stemLength !== null && v.countPerBunch !== null)
+        : productVariants,
+    [productVariants, isBoxlotMode]
+  )
+
+  // Get unique stem lengths and counts from source variants
   const stemLengths = useMemo(
     () =>
       Array.from(
-        new Set(variants.map((v) => v.stemLength).filter((l): l is number => l !== null))
+        new Set(srcVariants.map((v) => v.stemLength).filter((l): l is number => l !== null))
       ).sort((a, b) => a - b),
-    [variants]
+    [srcVariants]
   )
 
   const counts = useMemo(
     () =>
       Array.from(
-        new Set(variants.map((v) => v.countPerBunch).filter((c): c is number => c !== null))
+        new Set(srcVariants.map((v) => v.countPerBunch).filter((c): c is number => c !== null))
       ).sort((a, b) => a - b),
-    [variants]
+    [srcVariants]
   )
 
   // State for selected options - initialize from first values in computed arrays
   const [selectedStemLength, setSelectedStemLength] = useState<number | null>(() => {
     const lengths = Array.from(
-      new Set(variants.map((v) => v.stemLength).filter((l): l is number => l !== null))
+      new Set(srcVariants.map((v) => v.stemLength).filter((l): l is number => l !== null))
     ).sort((a, b) => a - b)
     return lengths.length > 0 ? lengths[0] : null
   })
 
   const [selectedCount, setSelectedCount] = useState<number | null>(() => {
     const cnts = Array.from(
-      new Set(variants.map((v) => v.countPerBunch).filter((c): c is number => c !== null))
+      new Set(srcVariants.map((v) => v.countPerBunch).filter((c): c is number => c !== null))
     ).sort((a, b) => a - b)
     return cnts.length > 0 ? cnts[0] : null
   })
@@ -75,26 +91,26 @@ export function ProductControls({ product, user, mode = "card" }: ProductControl
     if (selectedStemLength === null) return counts
     return Array.from(
       new Set(
-        variants
+        srcVariants
           .filter((v) => v.stemLength === selectedStemLength)
           .map((v) => v.countPerBunch)
           .filter((c): c is number => c !== null)
       )
     ).sort((a, b) => a - b)
-  }, [selectedStemLength, variants, counts])
+  }, [selectedStemLength, srcVariants, counts])
 
   // Compute available stem lengths for the currently selected count
   const availableLengthsForCount = useMemo(() => {
     if (selectedCount === null) return stemLengths
     return Array.from(
       new Set(
-        variants
+        srcVariants
           .filter((v) => v.countPerBunch === selectedCount)
           .map((v) => v.stemLength)
           .filter((l): l is number => l !== null)
       )
     ).sort((a, b) => a - b)
-  }, [selectedCount, variants, stemLengths])
+  }, [selectedCount, srcVariants, stemLengths])
 
   // Handler for stem length selection - auto-adjusts count if needed
   const handleStemLengthChange = useCallback(
@@ -103,7 +119,7 @@ export function ProductControls({ product, user, mode = "card" }: ProductControl
       // Check if current count is available for the new stem length
       const availableCounts = Array.from(
         new Set(
-          variants
+          srcVariants
             .filter((v) => v.stemLength === length)
             .map((v) => v.countPerBunch)
             .filter((c): c is number => c !== null)
@@ -117,7 +133,7 @@ export function ProductControls({ product, user, mode = "card" }: ProductControl
         setSelectedCount(availableCounts[0])
       }
     },
-    [variants, selectedCount]
+    [srcVariants, selectedCount]
   )
 
   // Handler for count selection - auto-adjusts stem length if needed
@@ -127,7 +143,7 @@ export function ProductControls({ product, user, mode = "card" }: ProductControl
       // Check if current stem length is available for the new count
       const availableLengths = Array.from(
         new Set(
-          variants
+          srcVariants
             .filter((v) => v.countPerBunch === count)
             .map((v) => v.stemLength)
             .filter((l): l is number => l !== null)
@@ -141,25 +157,40 @@ export function ProductControls({ product, user, mode = "card" }: ProductControl
         setSelectedStemLength(availableLengths[0])
       }
     },
-    [variants, selectedStemLength]
+    [srcVariants, selectedStemLength]
   )
 
   // Derive selectedVariantId from the chosen stem length / count
   const selectedVariant = useMemo(() => {
     if (!hasVariants) return null
 
-    const variant = variants.find(
+    const variant = srcVariants.find(
       (v) =>
         (v.stemLength === selectedStemLength ||
           (v.stemLength === null && selectedStemLength === null)) &&
         (v.countPerBunch === selectedCount || (v.countPerBunch === null && selectedCount === null))
     )
 
-    return variant ?? variants[0]
-  }, [selectedStemLength, selectedCount, hasVariants, variants])
+    return variant ?? srcVariants[0] ?? productVariants[0]
+  }, [selectedStemLength, selectedCount, hasVariants, srcVariants, productVariants])
+  // Reset selected defaults whenever our available source variants change
+  // (for example, when toggling the bulk boxlots filter on the shop page).
+  useEffect(() => {
+    const lengths = Array.from(
+      new Set(srcVariants.map((v) => v.stemLength).filter((l): l is number => l !== null))
+    ).sort((a, b) => a - b)
+
+    const cnts = Array.from(
+      new Set(srcVariants.map((v) => v.countPerBunch).filter((c): c is number => c !== null))
+    ).sort((a, b) => a - b)
+
+    setSelectedStemLength(lengths.length > 0 ? lengths[0] : null)
+    setSelectedCount(cnts.length > 0 ? cnts[0] : null)
+  }, [srcVariants])
 
   // Determine the display price based on selected variant (variants required)
-  const currentPrice = selectedVariant?.price ?? variants[0]?.price ?? 0
+  const currentPrice =
+    selectedVariant?.price ?? srcVariants[0]?.price ?? productVariants[0]?.price ?? 0
 
   // Build variant summary string
   const variantSummary = [

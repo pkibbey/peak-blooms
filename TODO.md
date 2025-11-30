@@ -12,6 +12,9 @@
 ### 🪨 Code Stability
 - [ ] Add unit tests and e2e tests to ensure complete site functionality
 - [ ] Price multipier is stored in jwt token so could be publicly available. Instead, give account an obfuscated letter, which translates into a multiplier value.
+- [ ] Update Github Readme with screenshots and updated site features/design/functionality
+- [ ] Allow users to change their email address
+- [ ] Make the site more responsive and put loading animations in using client side components
 
 ### 💰 Payment Processing 
 
@@ -36,7 +39,6 @@
 
 ### 🔍 Questions Features
 
-- [ ] Allow users to change their email address?
 - [ ] Should repeat orders add to the existing cart, or replace it? This should probably be a user preference that pops up when the user clicks on the reorder button?
 - [ ] Boxlot selection behaviour?
 - [ ] Editing product details should be saved automatically without needed to press save?

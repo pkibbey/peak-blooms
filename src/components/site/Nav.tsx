@@ -50,7 +50,7 @@ export default function Nav({ user, cartCount = 0 }: NavProps) {
               />
             </Link>
 
-            <nav className="hidden md:flex md:items-center md:gap-1 md:ml-2" aria-label="Primary">
+            <nav className="hidden md:flex md:items-center md:gap-1" aria-label="Primary">
               {links.map((l) => (
                 <NavLink key={l.href} href={l.href}>
                   {l.label}
