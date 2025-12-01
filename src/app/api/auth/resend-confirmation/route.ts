@@ -9,8 +9,6 @@ const emailFromDomain =
     ? "onboarding@resend.dev"
     : process.env.EMAIL_FROM_DOMAIN || "onboarding@resend.dev"
 
-console.log("emailFromDomain: ", emailFromDomain)
-
 export async function POST(request: NextRequest) {
   try {
     const { email } = await request.json()

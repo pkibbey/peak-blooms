@@ -15,7 +15,7 @@ type ProductColor = {
   category: "flower" | "greenery" | "neutral"
 }
 
-const COLORS: ProductColor[] = [
+export const COLORS: ProductColor[] = [
   // Flowers / warm
   { id: "coral", label: "Coral", hex: "#FF6B6B", category: "flower" },
   { id: "peach", label: "Peach", hex: "#F7A582", category: "flower" },
