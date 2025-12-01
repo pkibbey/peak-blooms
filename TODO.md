@@ -6,7 +6,6 @@
 - [ ] Create separate development and production databases
 - [ ] Add real products
 - [ ] Add pagination once we have a large number of products to view
-- [x] Add company, support, and legal pages, as well as a complete site map
 
 ### 🪨 Code Stability
 - [ ] Add unit tests and e2e tests to ensure complete site functionality
@@ -14,7 +13,6 @@
 - [ ] Update Github Readme with screenshots and updated site features/design/functionality
 - [ ] Allow users to change their email address
 - [ ] Make the site feel more responsive by puting loading animations in using client side components
-- [ ] Use local db server in dev environments
 
 ### 💰 Payment Processing 
 
@@ -25,7 +23,6 @@
 
 - [ ] Update logos with proper graphics
 - [ ] Try out different colour schemes
-- [ ] Create container and card utility classes
 - [ ] Improve the inspiration detail page - it's a bit dull, but needs real content to see what it can look like
  
 ### 🛍️ Tracking / Marketing
