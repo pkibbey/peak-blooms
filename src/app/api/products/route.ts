@@ -97,8 +97,9 @@ export async function POST(request: NextRequest) {
         description,
         image,
         // Save provided colors array (no legacy single color field)
-        ...(colors !== undefined && { colors }),
-        collectionId,
+        ...(colors !== undefined && { colors: colors ?? [] }),
+        // Connect collection by id rather than sending raw scalar (keeps Prisma input consistent with nested variants)
+        collection: { connect: { id: collectionId } },
         featured: featured === true,
         variants: {
           create: variants.map((v) => ({

@@ -5,10 +5,10 @@ export async function GET() {
   try {
     const [colors, stemLengths] = await Promise.all([
       // Collect distinct colors from the `colors` array column
+      // Note: querying for "not null" on list columns is not supported by the
+      // generated list filter type. We'll just fetch the colors column for all
+      // products and filter empties in code.
       db.product.findMany({
-        where: {
-          colors: { not: null },
-        },
         select: {
           colors: true,
         },

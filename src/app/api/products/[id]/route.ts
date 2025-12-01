@@ -101,8 +101,11 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
           ...(slug !== undefined && { slug }),
           ...(description !== undefined && { description }),
           ...(image !== undefined && { image }),
-          ...(colors !== undefined && { colors }),
-          ...(collectionId !== undefined && { collectionId }),
+          ...(colors !== undefined && { colors: colors ?? [] }),
+          ...(collectionId !== undefined && {
+            // Use relation connect so Prisma's checked update input accepts it
+            collection: { connect: { id: collectionId } },
+          }),
           ...(featured !== undefined && { featured }),
           ...(variants !== undefined && {
             variants: {
