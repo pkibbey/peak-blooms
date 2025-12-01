@@ -1,2 +1,0 @@
--- AlterTable
-ALTER TABLE "User" ADD COLUMN     "priceMultiplier" DOUBLE PRECISION NOT NULL DEFAULT 1.0;

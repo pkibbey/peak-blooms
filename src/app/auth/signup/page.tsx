@@ -3,7 +3,6 @@
 import { zodResolver } from "@hookform/resolvers/zod"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
-import { signIn, useSession } from "next-auth/react"
 import { useEffect } from "react"
 import { useForm } from "react-hook-form"
 import { Button } from "@/components/ui/button"
@@ -16,11 +15,12 @@ import {
   FormMessage,
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
+import { authClient, useSession } from "@/lib/auth-client"
 import { type SignUpFormData, signUpSchema } from "@/lib/validations/auth"
 
 export default function SignUpPage() {
   const router = useRouter()
-  const { data: session, status } = useSession()
+  const { data: session, isPending } = useSession()
 
   const form = useForm<SignUpFormData>({
     resolver: zodResolver(signUpSchema),
@@ -31,27 +31,21 @@ export default function SignUpPage() {
 
   // Redirect if already authenticated
   useEffect(() => {
-    if (status === "authenticated" && session) {
+    if (!isPending && session) {
       router.push("/")
     }
-  }, [status, session, router])
+  }, [isPending, session, router])
 
   const onSubmit = async (data: SignUpFormData) => {
     try {
-      const result = await signIn("email", {
+      await authClient.signIn.magicLink({
         email: data.email,
-        redirect: false,
+        callbackURL: "/auth/pending-approval",
       })
-
-      if (result?.ok) {
-        // Redirect to pending approval page
-        router.push(`/auth/pending-approval?email=${encodeURIComponent(data.email)}`)
-      } else {
-        form.setError("root", { message: "Failed to send sign-up email. Please try again." })
-        console.error("Sign up failed:", result?.error)
-      }
+      // Redirect to pending approval page
+      router.push(`/auth/pending-approval?email=${encodeURIComponent(data.email)}`)
     } catch (error) {
-      form.setError("root", { message: "An error occurred. Please try again." })
+      form.setError("root", { message: "Failed to send sign-up email. Please try again." })
       console.error("Error signing up:", error)
     }
   }

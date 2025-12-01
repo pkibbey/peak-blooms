@@ -1,9 +1,9 @@
 import { redirect } from "next/navigation"
 import AdminSidebar from "@/components/admin/AdminSidebar"
-import { auth } from "@/lib/auth"
+import { getSession } from "@/lib/auth"
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
-  const session = await auth()
+  const session = await getSession()
 
   if (!session?.user || session.user.role !== "ADMIN") {
     redirect("/admin/unauthorized")

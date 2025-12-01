@@ -1,7 +1,7 @@
-import { auth } from "@/lib/auth"
-import { db } from "@/lib/db"
 import { NextResponse } from "next/server"
 import { OrderStatus } from "@/generated/enums"
+import { getSession } from "@/lib/auth"
+import { db } from "@/lib/db"
 
 interface RouteParams {
   params: Promise<{ id: string }>
@@ -13,7 +13,7 @@ interface RouteParams {
  */
 export async function GET(_request: Request, { params }: RouteParams) {
   try {
-    const session = await auth()
+    const session = await getSession()
 
     if (!session?.user || session.user.role !== "ADMIN") {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
@@ -59,7 +59,7 @@ export async function GET(_request: Request, { params }: RouteParams) {
  */
 export async function PATCH(request: Request, { params }: RouteParams) {
   try {
-    const session = await auth()
+    const session = await getSession()
 
     if (!session?.user || session.user.role !== "ADMIN") {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })

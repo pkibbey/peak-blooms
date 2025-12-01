@@ -1,6 +1,6 @@
 import { PrismaPg } from "@prisma/adapter-pg"
 import { Pool } from "pg"
-import { PrismaClient } from "../src/generated/client"
+import { type Prisma, PrismaClient } from "../src/generated/client"
 
 const connectionString = process.env.DATABASE_URL
 
@@ -25,6 +25,49 @@ async function main() {
   await prisma.product.deleteMany({})
   await prisma.collection.deleteMany({})
   await prisma.inspiration.deleteMany({})
+  await prisma.user.deleteMany({})
+
+  // Create test users for development/testing
+  await prisma.user.create({
+    data: {
+      email: "phineas.kibbey@gmail.com",
+      name: "Phineas",
+      emailVerified: true,
+      approved: true,
+      role: "ADMIN",
+      priceMultiplier: 1.0,
+    },
+  })
+  console.log("✅ Created admin user: phineas.kibbey@gmail.com")
+
+  await prisma.user.create({
+    data: {
+      email: "pending@peakblooms.com",
+      name: "Pending User",
+      emailVerified: true,
+      approved: false, // Pending approval
+      role: "CUSTOMER",
+      priceMultiplier: 1.0,
+    },
+  })
+  console.log("✅ Created pending user: pending@peakblooms.com")
+
+  const approvedCustomer = await prisma.user.create({
+    data: {
+      email: "customer@peakblooms.com",
+      name: "Approved Customer",
+      emailVerified: true,
+      approved: true,
+      role: "CUSTOMER",
+      priceMultiplier: 0.8, // 20% discount
+    },
+  })
+  console.log("✅ Created approved customer: customer@peakblooms.com (20% discount)")
+
+  // Get the approved customer for orders
+  await prisma.user.findUnique({
+    where: { email: "customer@peakblooms.com" },
+  })
 
   // Create collections
   const classicRoses = await prisma.collection.create({
@@ -376,6 +419,144 @@ async function main() {
   })
 
   console.log("✅ Hero banners seeded/updated: main-hero, boxlot-hero, boxlot-hero-center")
+
+  // Create sample orders for the approved customer
+  if (approvedCustomer) {
+    // Get some product variants for the orders
+    const peachFlowerVariant = await prisma.productVariant.findFirst({
+      where: {
+        product: { slug: "peach-flower" },
+      },
+    })
+
+    const pinkRoseVariant = await prisma.productVariant.findFirst({
+      where: {
+        product: { slug: "pink-rose" },
+      },
+    })
+
+    const greenFluffyVariant = await prisma.productVariant.findFirst({
+      where: {
+        product: { slug: "green-fluffy" },
+      },
+    })
+
+    // Create first order (completed order from 30 days ago)
+    const order1Date = new Date()
+    order1Date.setDate(order1Date.getDate() - 30)
+
+    // Create shipping address for first order
+    const shippingAddress1 = await prisma.address.create({
+      data: {
+        firstName: "Test",
+        lastName: "Customer",
+        street1: "123 Flower Lane",
+        city: "Portland",
+        state: "OR",
+        zip: "97201",
+        country: "USA",
+        isDefault: true,
+      },
+    })
+
+    const order1 = await prisma.order.create({
+      data: {
+        orderNumber: `ORD-${Date.now()}-1`,
+        userId: approvedCustomer.id,
+        email: approvedCustomer.email,
+        status: "DELIVERED",
+        total: 242.0,
+        createdAt: order1Date,
+        shippingAddressId: shippingAddress1.id,
+        items: {
+          create: [
+            peachFlowerVariant
+              ? {
+                  productId: peachFlowerVariant.productId,
+                  productVariantId: peachFlowerVariant.id,
+                  quantity: 2,
+                  price: 55.0,
+                }
+              : undefined,
+            greenFluffyVariant
+              ? {
+                  productId: greenFluffyVariant.productId,
+                  productVariantId: greenFluffyVariant.id,
+                  quantity: 1,
+                  price: 110.0,
+                }
+              : undefined,
+          ].filter(
+            (item) => item !== undefined
+          ) as unknown as Prisma.OrderItemCreateWithoutOrderInput[],
+        },
+      },
+    })
+
+    console.log(`✅ Created completed order from 30 days ago: ${order1.id}`)
+
+    // Create second order (processing order from 5 days ago)
+    const order2Date = new Date()
+    order2Date.setDate(order2Date.getDate() - 5)
+
+    // Create shipping address for second order
+    const shippingAddress2 = await prisma.address.create({
+      data: {
+        firstName: "Test",
+        lastName: "Customer",
+        street1: "456 Rose Garden Ln",
+        city: "Seattle",
+        state: "WA",
+        zip: "98101",
+        country: "USA",
+        isDefault: false,
+      },
+    })
+
+    const order2 = await prisma.order.create({
+      data: {
+        orderNumber: `ORD-${Date.now()}-2`,
+        userId: approvedCustomer.id,
+        email: approvedCustomer.email,
+        status: "CONFIRMED",
+        total: 374.0,
+        createdAt: order2Date,
+        shippingAddressId: shippingAddress2.id,
+        items: {
+          create: [
+            pinkRoseVariant
+              ? {
+                  productId: pinkRoseVariant.productId,
+                  productVariantId: pinkRoseVariant.id,
+                  quantity: 1,
+                  price: 75.0,
+                }
+              : undefined,
+            greenFluffyVariant
+              ? {
+                  productId: greenFluffyVariant.productId,
+                  productVariantId: greenFluffyVariant.id,
+                  quantity: 2,
+                  price: 130.0,
+                }
+              : undefined,
+            peachFlowerVariant
+              ? {
+                  productId: peachFlowerVariant.productId,
+                  productVariantId: peachFlowerVariant.id,
+                  quantity: 1,
+                  price: 55.0,
+                }
+              : undefined,
+          ].filter(
+            (item) => item !== undefined
+          ) as unknown as Prisma.OrderItemCreateWithoutOrderInput[],
+        },
+      },
+    })
+
+    console.log(`✅ Created confirmed order from 5 days ago: ${order2.id}`)
+  }
 
   console.log("✅ Database seeded successfully!")
 }

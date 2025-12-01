@@ -1,7 +1,6 @@
 "use client"
 
 import Link from "next/link"
-import { signOut } from "next-auth/react"
 import { Button } from "@/components/ui/button"
 import {
   DropdownMenu,
@@ -11,6 +10,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { IconLogOut, IconSettings, IconUser } from "@/components/ui/icons"
+import { signOut } from "@/lib/auth-client"
 
 interface UserMenuProps {
   user: {
@@ -72,7 +72,9 @@ export default function UserMenu({ user }: UserMenuProps) {
 
         <DropdownMenuItem
           asChild
-          onSelect={() => signOut({ callbackUrl: "/" })}
+          onSelect={async () => {
+            await signOut()
+          }}
           className="focus:bg-secondary focus:text-secondary-foreground text-destructive"
         >
           <div className="flex items-center gap-2">

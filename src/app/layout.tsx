@@ -1,6 +1,5 @@
 import type { Metadata } from "next"
 import { Geist, Geist_Mono, Playfair_Display } from "next/font/google"
-import { SessionProvider } from "next-auth/react"
 import { Toaster } from "sonner"
 import "./globals.css"
 import Footer from "@/components/site/Footer"
@@ -57,14 +56,12 @@ export default async function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} ${playfairDisplay.variable} antialiased`}
       >
-        <SessionProvider>
-          <Nav user={user} cartCount={cartCount} />
+        <Nav user={user} cartCount={cartCount} />
 
-          <main id="content">{children}</main>
+        <main id="content">{children}</main>
 
-          <Footer />
-          <Toaster position="bottom-center" />
-        </SessionProvider>
+        <Footer />
+        <Toaster position="bottom-center" />
       </body>
     </html>
   )

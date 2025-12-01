@@ -31,8 +31,8 @@ export async function GET(_request: NextRequest, { params }: { params: Promise<{
  */
 export async function PUT(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
-    const { auth } = await import("@/lib/auth")
-    const session = await auth()
+    const { getSession } = await import("@/lib/auth")
+    const session = await getSession()
 
     if (!session || session.user.role !== "ADMIN") {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
@@ -119,8 +119,8 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { auth } = await import("@/lib/auth")
-    const session = await auth()
+    const { getSession } = await import("@/lib/auth")
+    const session = await getSession()
 
     if (!session || session.user.role !== "ADMIN") {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })

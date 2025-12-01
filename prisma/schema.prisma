@@ -7,58 +7,80 @@ datasource db {
   provider = "postgresql"
 }
 
-model Account {
-  id                String  @id @default(cuid())
-  userId            String
-  type              String
-  provider          String
-  providerAccountId String
-  refresh_token     String?
-  access_token      String?
-  expires_at        Int?
-  token_type        String?
-  scope             String?
-  id_token          String?
-  session_state     String?
-  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+// Better Auth Models
+model User {
+  id            String         @id @default(cuid())
+  email         String         @unique
+  emailVerified Boolean        @default(false)
+  name          String?
+  image         String?
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  
+  // Custom fields for Peak Blooms
+  approved        Boolean       @default(false)
+  role            Role          @default(CUSTOMER)
+  priceMultiplier Float         @default(1.0)
+  
+  accounts       Account[]
+  sessions       Session[]
+  verifications  Verification[]
+  addresses      Address[]
+  orders         Order[]
+  cart           ShoppingCart?
+}
 
-  @@unique([provider, providerAccountId])
+model Account {
+  id                       String  @id @default(cuid())
+  accountId                String
+  providerId               String
+  userId                   String
+  accessToken              String?
+  refreshToken             String?
+  accessTokenExpiresAt     DateTime?
+  refreshTokenExpiresAt    DateTime?
+  scope                    String?
+  password                 String?
+  createdAt                DateTime @default(now())
+  updatedAt                DateTime @updatedAt
+  
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@unique([providerId, accountId])
+  @@index([userId])
 }
 
 model Session {
-  id           String   @id @default(cuid())
-  sessionToken String   @unique
-  userId       String
-  expires      DateTime
-  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id        String   @id @default(cuid())
+  expiresAt DateTime
+  token     String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  ipAddress String?
+  userAgent String?
+  userId    String
+  
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@index([userId])
 }
 
-model VerificationToken {
+model Verification {
+  id        String   @id @default(cuid())
   identifier String
-  token      String   @unique
-  expires    DateTime
-
-  @@unique([identifier, token])
+  value     String
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  userId    String?
+  
+  user User? @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@unique([identifier, value])
+  @@index([userId])
 }
 
-model User {
-  id              String        @id @default(cuid())
-  email           String?       @unique
-  emailVerified   DateTime?
-  name            String?
-  image           String?
-  role            Role          @default(CUSTOMER)
-  approved        Boolean       @default(false)
-  priceMultiplier Float         @default(1.0)
-  createdAt       DateTime      @default(now())
-  updatedAt       DateTime      @updatedAt
-  accounts        Account[]
-  addresses       Address[]
-  orders          Order[]
-  sessions        Session[]
-  cart            ShoppingCart?
-}
-
+// Peak Blooms Models
 model Address {
   id             String   @id @default(cuid())
   userId         String?

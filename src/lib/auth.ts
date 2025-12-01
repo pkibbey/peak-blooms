@@ -1,121 +1,99 @@
-import { PrismaAdapter } from "@auth/prisma-adapter"
-import NextAuth from "next-auth"
-import Email from "next-auth/providers/email"
+import { betterAuth } from "better-auth"
+import { prismaAdapter } from "better-auth/adapters/prisma"
+import { nextCookies } from "better-auth/next-js"
+import { magicLink } from "better-auth/plugins"
+import { headers } from "next/headers"
 import { Resend } from "resend"
 import { db } from "./db"
 
 const resend = new Resend(process.env.RESEND_API_KEY)
 
-// Determine email domain based on environment
-const emailFromDomain =
-  process.env.NODE_ENV === "development"
-    ? "onboarding@resend.dev"
-    : process.env.EMAIL_FROM_DOMAIN || "onboarding@resend.dev"
+export const auth = betterAuth({
+  database: prismaAdapter(db, {
+    provider: "postgresql",
+  }),
+  plugins: [
+    nextCookies(),
+    magicLink({
+      async sendMagicLink({ email, url }) {
+        console.log("[Magic Link] Sending magic link email")
+        console.log("[Magic Link] Email to:", email)
+        console.log("[Magic Link] URL:", url)
+        console.log("[Magic Link] RESEND_API_KEY configured:", !!process.env.RESEND_API_KEY)
+        console.log("[Magic Link] NODE_ENV:", process.env.NODE_ENV)
 
-declare module "next-auth" {
-  interface User {
-    id: string
-    approved: boolean
-    role: "CUSTOMER" | "ADMIN"
-    priceMultiplier: number
-  }
-
-  interface Session {
-    user: User & {
-      email: string
-    }
-  }
-}
-
-declare module "@auth/core/jwt" {
-  interface JWT {
-    id: string
-    approved: boolean
-    role: "CUSTOMER" | "ADMIN"
-    priceMultiplier: number
-  }
-}
-
-export const { handlers, auth } = NextAuth({
-  adapter: PrismaAdapter(db),
-  session: { strategy: "jwt" },
-  providers: [
-    Email({
-      server: {
-        host: process.env.EMAIL_SERVER_HOST,
-        port: process.env.EMAIL_SERVER_PORT,
-        auth: {
-          user: process.env.EMAIL_SERVER_USER,
-          pass: process.env.EMAIL_SERVER_PASSWORD,
-        },
-      },
-      from: process.env.EMAIL_FROM,
-      // Using Resend as the email provider
-      async sendVerificationRequest({ identifier, url }) {
         try {
-          await resend.emails.send({
-            from: `Peak Blooms <${emailFromDomain}>`,
-            to: identifier,
+          // Use Resend's test email for development
+          const emailFrom =
+            process.env.NODE_ENV === "development"
+              ? "onboarding@resend.dev"
+              : process.env.EMAIL_FROM || "noreply@peakblooms.com"
+
+          console.log("[Magic Link] Using email from:", emailFrom)
+          console.log("[Magic Link] Calling resend.emails.send()...")
+
+          const response = await resend.emails.send({
+            from: emailFrom,
+            to: email,
             subject: "Sign in to Peak Blooms",
-            html: `
-              <p>Click the link below to sign in to your Peak Blooms account:</p>
-              <a href="${url}">Sign in</a>
-              <p>This link expires in 24 hours.</p>
-            `,
+            html: `<p>Click the link below to sign in:</p><a href="${url}">Sign in</a><p>Link expires in 5 minutes.</p>`,
           })
+
+          console.log("[Magic Link] Resend response:", response)
+
+          if (response.error) {
+            console.error("[Magic Link] Resend error:", response.error)
+            throw new Error(`Failed to send email: ${response.error.message}`)
+          }
+
+          console.log("[Magic Link] Email sent successfully with ID:", response.data?.id)
         } catch (error) {
-          console.error("Email send failed:", error)
-          throw error
+          console.error("[Magic Link] Failed to send magic link email:", error)
+          throw new Error("Failed to send email")
         }
       },
     }),
   ],
-  pages: {
-    signIn: "/auth/signin",
-    error: "/auth/error",
-    verifyRequest: "/auth/verify-request",
+  appName: "Peak Blooms",
+  baseURL: process.env.BETTER_AUTH_URL || "http://localhost:3000",
+  basePath: "/api/auth",
+  secret: process.env.BETTER_AUTH_SECRET,
+  session: {
+    expiresIn: 60 * 60 * 24 * 7, // 7 days
+    updateAge: 60 * 60 * 24, // Update session every 24 hours
   },
-  callbacks: {
-    async jwt({ token, user }) {
-      // On initial sign-in, user object is available
-      if (user) {
-        // Fetch full user data from database
-        const dbUser = await db.user.findUnique({
-          where: { id: user.id },
-        })
-        if (dbUser) {
-          token.id = dbUser.id
-          token.approved = dbUser.approved
-          token.role = dbUser.role
-          token.priceMultiplier = dbUser.priceMultiplier
-        }
-      }
-      return token
-    },
-    async session({ session, token }) {
-      // Transfer token data to session (no DB query needed)
-      if (session.user) {
-        session.user.id = token.id
-        session.user.approved = token.approved
-        session.user.role = token.role
-        session.user.priceMultiplier = token.priceMultiplier
-      }
-      return session
-    },
-  },
-  events: {
-    async signIn({ user }) {
-      // User account is created with approved: false by default
-      // This event fires on successful sign-in
-      console.log(`User signed in: ${user.email}`)
+  user: {
+    additionalFields: {
+      approved: {
+        type: "boolean",
+        defaultValue: false,
+      },
+      role: {
+        type: "string",
+        defaultValue: "CUSTOMER",
+      },
+      priceMultiplier: {
+        type: "number",
+        defaultValue: 1.0,
+      },
     },
   },
 })
 
 /**
- * Invalidate all sessions for a user by deleting their sessions from the database.
+ * Get the current session on the server side
+ * For server components and route handlers
+ */
+export async function getSession() {
+  return auth.api.getSession({
+    headers: await headers(),
+  })
+}
+
+/**
+ * Revoke all sessions for a user by deleting their sessions from the database.
  * Call this when admin changes a user's permissions (approved, role, priceMultiplier).
- * The user will need to sign in again to get a new JWT with updated permissions.
+ * The user will need to sign in again to get a new session with updated permissions.
  */
 export async function invalidateUserSessions(userId: string) {
   await db.session.deleteMany({

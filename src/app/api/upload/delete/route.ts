@@ -1,10 +1,10 @@
 import { del } from "@vercel/blob"
 import { NextResponse } from "next/server"
-import { auth } from "@/lib/auth"
+import { getSession } from "@/lib/auth"
 
 export async function POST(request: Request): Promise<NextResponse> {
   try {
-    const session = await auth()
+    const session = await getSession()
 
     if (!session?.user) {
       return NextResponse.json({ error: "Not authenticated" }, { status: 401 })

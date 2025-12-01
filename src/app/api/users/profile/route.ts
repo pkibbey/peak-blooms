@@ -1,5 +1,5 @@
 import { type NextRequest, NextResponse } from "next/server"
-import { auth } from "@/lib/auth"
+import { getSession } from "@/lib/auth"
 import { db } from "@/lib/db"
 import { profileSchema } from "@/lib/validations/auth"
 
@@ -9,14 +9,14 @@ import { profileSchema } from "@/lib/validations/auth"
  */
 export async function GET() {
   try {
-    const session = await auth()
+    const session = await getSession()
 
-    if (!session?.user?.email) {
+    if (!session?.user?.id) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }
 
     const user = await db.user.findUnique({
-      where: { email: session.user.email },
+      where: { id: session.user.id },
       select: {
         id: true,
         email: true,
@@ -45,9 +45,9 @@ export async function GET() {
  */
 export async function PATCH(request: NextRequest) {
   try {
-    const session = await auth()
+    const session = await getSession()
 
-    if (!session?.user?.email) {
+    if (!session?.user?.id) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }
 

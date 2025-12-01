@@ -1,3 +1,4 @@
+import { headers } from "next/headers"
 import { type NextRequest, NextResponse } from "next/server"
 import { auth, invalidateUserSessions } from "@/lib/auth"
 import { db } from "@/lib/db"
@@ -13,9 +14,11 @@ interface RouteParams {
  */
 export async function PATCH(request: NextRequest, { params }: RouteParams) {
   try {
-    const session = await auth()
+    const session = await auth.api.getSession({
+      headers: await headers(),
+    })
 
-    if (!session || session.user.role !== "ADMIN") {
+    if (!session || (session.user.role as string) !== "ADMIN") {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }
 

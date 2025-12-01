@@ -1,6 +1,6 @@
 import { type HandleUploadBody, handleUpload } from "@vercel/blob/client"
 import { NextResponse } from "next/server"
-import { auth } from "@/lib/auth"
+import { getSession } from "@/lib/auth"
 
 const ALLOWED_CONTENT_TYPES = ["image/jpeg", "image/png", "image/webp"]
 
@@ -15,7 +15,7 @@ export async function POST(request: Request): Promise<NextResponse> {
       request,
       onBeforeGenerateToken: async (_pathname, clientPayload) => {
         // Authenticate the user - only admins can upload
-        const session = await auth()
+        const session = await getSession()
 
         if (!session?.user) {
           throw new Error("Not authenticated")

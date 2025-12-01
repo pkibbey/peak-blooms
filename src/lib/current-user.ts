@@ -1,5 +1,5 @@
 import { cache } from "react"
-import { auth } from "./auth"
+import { getSession } from "./auth"
 import { db } from "./db"
 import { adjustPrice } from "./utils"
 
@@ -7,45 +7,28 @@ import { adjustPrice } from "./utils"
  * Get the current authenticated user with their approval and role status
  * Wrapped in React cache() to deduplicate calls within a single request
  *
- * Note: User data comes from the session callback in auth.ts which already
- * fetches fresh user data from the database on each request.
+ * Better Auth provides user data directly in the session with custom fields
  */
 export const getCurrentUser = cache(async () => {
   const start = performance.now()
 
-  const session = await auth()
-  console.log(`[getCurrentUser] auth() done: ${(performance.now() - start).toFixed(0)}ms`)
+  const session = await getSession()
+  console.log(`[getCurrentUser] getSession() done: ${(performance.now() - start).toFixed(0)}ms`)
 
   if (!session?.user?.email) {
     return null
   }
 
-  // Return user data from session (already fetched in auth.ts session callback)
+  // Return user data with custom fields from better-auth session
   return {
     id: session.user.id,
     email: session.user.email,
     name: session.user.name ?? null,
-    role: session.user.role,
-    approved: session.user.approved,
-    priceMultiplier: session.user.priceMultiplier,
+    role: (session.user.role as "CUSTOMER" | "ADMIN") ?? "CUSTOMER",
+    approved: (session.user.approved as boolean) ?? false,
+    priceMultiplier: (session.user.priceMultiplier as number) ?? 1.0,
   }
 })
-
-/**
- * Apply price multiplier to a product's variants
- */
-function applyPriceMultiplierToProduct<
-  T extends { variants?: Array<{ price: number; [key: string]: unknown }> },
->(product: T, multiplier: number): T {
-  if (!product.variants) return product
-  return {
-    ...product,
-    variants: product.variants.map((variant) => ({
-      ...variant,
-      price: adjustPrice(variant.price, multiplier),
-    })),
-  }
-}
 
 /**
  * Apply price multiplier to cart items

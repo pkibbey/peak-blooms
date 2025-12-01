@@ -2,8 +2,7 @@
 
 import { zodResolver } from "@hookform/resolvers/zod"
 import Link from "next/link"
-import { useSearchParams } from "next/navigation"
-import { signIn } from "next-auth/react"
+import { useRouter, useSearchParams } from "next/navigation"
 import { useState } from "react"
 import { useForm } from "react-hook-form"
 import { Button } from "@/components/ui/button"
@@ -16,9 +15,11 @@ import {
   FormMessage,
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
+import { authClient } from "@/lib/auth-client"
 import { type SignInFormData, signInSchema } from "@/lib/validations/auth"
 
 export default function SignInPage() {
+  const router = useRouter()
   const searchParams = useSearchParams()
   // If a caller passed a callbackUrl (e.g. /admin) keep it; otherwise send
   // users through a short server-side redirect handler which will route
@@ -40,21 +41,20 @@ export default function SignInPage() {
 
   const onSubmit = async (data: SignInFormData) => {
     try {
-      const result = await signIn("email", {
+      console.log("[SignIn] Submitting magic link request for email:", data.email)
+      console.log("[SignIn] Callback URL:", callbackUrl)
+
+      const response = await authClient.signIn.magicLink({
         email: data.email,
-        callbackUrl,
-        redirect: false,
+        callbackURL: callbackUrl,
       })
 
-      if (result?.ok) {
-        setSubmittedEmail(data.email)
-        setSubmitted(true)
-      } else {
-        form.setError("root", { message: "Failed to send sign-in email. Please try again." })
-        console.error("Sign in failed:", result?.error)
-      }
+      console.log("[SignIn] Magic link response:", response)
+      setSubmittedEmail(data.email)
+      setSubmitted(true)
     } catch (error) {
-      form.setError("root", { message: "An error occurred. Please try again." })
+      console.error("[SignIn] Error during magic link submission:", error)
+      form.setError("root", { message: "Failed to send sign-in email. Please try again." })
       console.error("Error signing in:", error)
     }
   }

@@ -1,6 +1,6 @@
-import { auth } from "@/lib/auth"
-import { db } from "@/lib/db"
 import { type NextRequest, NextResponse } from "next/server"
+import { getSession } from "@/lib/auth"
+import { db } from "@/lib/db"
 
 /**
  * PATCH /api/cart/items/[id]
@@ -11,9 +11,9 @@ import { type NextRequest, NextResponse } from "next/server"
 export async function PATCH(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const { id } = await params
-    const session = await auth()
+    const session = await getSession()
 
-    if (!session?.user?.email) {
+    if (!session?.user?.id) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }
 
@@ -51,9 +51,9 @@ export async function DELETE(
 ) {
   try {
     const { id } = await params
-    const session = await auth()
+    const session = await getSession()
 
-    if (!session?.user?.email) {
+    if (!session?.user?.id) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }
 

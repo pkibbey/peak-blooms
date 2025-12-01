@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server"
-import { auth } from "@/lib/auth"
+import { getSession } from "@/lib/auth"
 import { db } from "@/lib/db"
 
 /**
@@ -8,7 +8,7 @@ import { db } from "@/lib/db"
  */
 export async function GET() {
   try {
-    const session = await auth()
+    const session = await getSession()
 
     if (!session || session.user.role !== "ADMIN") {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })

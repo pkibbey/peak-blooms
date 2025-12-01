@@ -2,11 +2,11 @@
 
 import Image from "next/image"
 import Link from "next/link"
-import { signOut } from "next-auth/react"
 import { useState } from "react"
 import NavLink from "@/components/site/NavLink"
 import UserMenu from "@/components/site/UserMenu"
 import { IconMenu, IconSettings, IconShoppingCart, IconUser, IconX } from "@/components/ui/icons"
+import { signOut } from "@/lib/auth-client"
 import { Badge } from "../ui/badge"
 import { Button } from "../ui/button"
 
@@ -118,7 +118,9 @@ export default function Nav({ user, cartCount = 0 }: NavProps) {
                   )}
                   <Button
                     variant="ghost"
-                    onClick={() => signOut({ callbackUrl: "/" })}
+                    onClick={async () => {
+                      await signOut()
+                    }}
                     className="text-destructive"
                   >
                     Sign Out

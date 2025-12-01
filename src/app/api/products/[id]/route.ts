@@ -1,5 +1,5 @@
 import { type NextRequest, NextResponse } from "next/server"
-import { auth } from "@/lib/auth"
+import { getSession } from "@/lib/auth"
 import { getProductById } from "@/lib/data"
 import { db } from "@/lib/db"
 import { createProductSchema } from "@/lib/validations/product"
@@ -15,15 +15,9 @@ export async function GET(_request: NextRequest, { params }: { params: Promise<{
 
     // Get current user's price multiplier if authenticated
     let priceMultiplier = 1.0
-    const session = await auth()
-    if (session?.user?.email) {
-      const user = await db.user.findUnique({
-        where: { email: session.user.email },
-        select: { priceMultiplier: true },
-      })
-      if (user) {
-        priceMultiplier = user.priceMultiplier
-      }
+    const session = await getSession()
+    if (session?.user) {
+      priceMultiplier = session.user.priceMultiplier ?? 1.0
     }
 
     const product = await getProductById(id, priceMultiplier)
@@ -45,8 +39,8 @@ export async function GET(_request: NextRequest, { params }: { params: Promise<{
  */
 export async function PUT(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
-    const { auth } = await import("@/lib/auth")
-    const session = await auth()
+    const { getSession } = await import("@/lib/auth")
+    const session = await getSession()
 
     if (!session || session.user.role !== "ADMIN") {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
@@ -141,8 +135,8 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { auth } = await import("@/lib/auth")
-    const session = await auth()
+    const { getSession } = await import("@/lib/auth")
+    const session = await getSession()
 
     if (!session || session.user.role !== "ADMIN") {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })

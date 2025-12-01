@@ -1,10 +1,10 @@
 "use client"
 
 import { useRouter } from "next/navigation"
-import { useSession } from "next-auth/react"
 import { useState } from "react"
 import { toast } from "sonner"
 import { Button } from "@/components/ui/button"
+import { useSession } from "@/lib/auth-client"
 
 interface AddAllToCartButtonProps {
   productIds: string[]
