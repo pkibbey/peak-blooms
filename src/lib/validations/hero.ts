@@ -78,8 +78,3 @@ export const heroSchema = z
   )
 
 export type HeroFormData = z.infer<typeof heroSchema>
-
-// Schema for API request
-export const createHeroSchema = heroSchema
-
-export type CreateHeroInput = z.infer<typeof createHeroSchema>

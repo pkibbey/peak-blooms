@@ -74,39 +74,6 @@ export async function getCollectionBySlug(
 }
 
 /**
- * Get a collection by ID with its products
- * Returns null if not found
- */
-export async function getCollectionById(
-  id: string,
-  priceMultiplier = 1.0
-): Promise<CollectionWithProducts | null> {
-  return withTiming(
-    "getCollectionById",
-    id,
-    async () => {
-      const collection = await db.collection.findUnique({
-        where: { id },
-        include: {
-          products: {
-            orderBy: {
-              createdAt: "desc",
-            },
-            include: {
-              variants: true,
-            },
-          },
-        },
-      })
-
-      if (!collection) return null
-      return applyMultiplierToCollection(collection, priceMultiplier)
-    },
-    { logNotFound: true }
-  )
-}
-
-/**
  * Get all collection slugs (for static generation)
  */
 export async function getAllCollectionSlugs(): Promise<Array<{ slug: string }>> {

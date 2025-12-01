@@ -2,7 +2,7 @@ import { type NextRequest, NextResponse } from "next/server"
 import { auth } from "@/lib/auth"
 import { db } from "@/lib/db"
 import { adjustPrice } from "@/lib/utils"
-import { createInspirationSchema, type ProductSelection } from "@/lib/validations/inspiration"
+import { inspirationSchema, type ProductSelection } from "@/lib/validations/inspiration"
 
 /**
  * GET /api/inspirations/[id]
@@ -92,7 +92,7 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
     const body = await request.json()
 
     // Partial validation - allow partial updates
-    const validationResult = createInspirationSchema.partial().safeParse(body)
+    const validationResult = inspirationSchema.partial().safeParse(body)
 
     if (!validationResult.success) {
       const firstError = validationResult.error.issues[0]

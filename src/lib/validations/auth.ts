@@ -17,8 +17,3 @@ export const profileSchema = z.object({
 })
 
 export type ProfileFormData = z.infer<typeof profileSchema>
-
-// Schema for API request
-export const updateProfileSchema = profileSchema
-
-export type UpdateProfileInput = z.infer<typeof updateProfileSchema>

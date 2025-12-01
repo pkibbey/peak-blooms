@@ -32,17 +32,9 @@ export const getCurrentUser = cache(async () => {
 })
 
 /**
- * Get the current user's price multiplier (defaults to 1.0 for unauthenticated users)
- */
-export async function getPriceMultiplier(): Promise<number> {
-  const user = await getCurrentUser()
-  return user?.priceMultiplier ?? 1.0
-}
-
-/**
  * Apply price multiplier to a product's variants
  */
-export function applyPriceMultiplierToProduct<
+function applyPriceMultiplierToProduct<
   T extends { variants?: Array<{ price: number; [key: string]: unknown }> },
 >(product: T, multiplier: number): T {
   if (!product.variants) return product
@@ -56,18 +48,9 @@ export function applyPriceMultiplierToProduct<
 }
 
 /**
- * Apply price multiplier to an array of products
- */
-export function applyPriceMultiplierToProducts<
-  T extends { variants?: Array<{ price: number; [key: string]: unknown }> },
->(products: T[], multiplier: number): T[] {
-  return products.map((product) => applyPriceMultiplierToProduct(product, multiplier))
-}
-
-/**
  * Apply price multiplier to cart items
  */
-export function applyPriceMultiplierToCartItems<
+function applyPriceMultiplierToCartItems<
   T extends { productVariant?: { price: number; [key: string]: unknown } | null },
 >(items: T[], multiplier: number): T[] {
   return items.map((item) => ({

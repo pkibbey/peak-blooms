@@ -8,14 +8,14 @@
  * - category: 'flower' | 'greenery' | 'neutral'
  */
 
-export type ProductColor = {
+type ProductColor = {
   id: string
   label: string
   hex: string
   category: "flower" | "greenery" | "neutral"
 }
 
-export const COLORS: ProductColor[] = [
+const COLORS: ProductColor[] = [
   // Flowers / warm
   { id: "coral", label: "Coral", hex: "#FF6B6B", category: "flower" },
   { id: "peach", label: "Peach", hex: "#F7A582", category: "flower" },
@@ -48,11 +48,6 @@ export const COLORS: ProductColor[] = [
   { id: "neutral", label: "Neutral", hex: "#BDB6AC", category: "neutral" },
 ]
 
-export const COLOR_BY_ID = Object.fromEntries(COLORS.map((c) => [c.id, c])) as Record<
-  string,
-  ProductColor
->
-
 export const COLOR_BY_HEX = Object.fromEntries(
   COLORS.map((c) => [c.hex.toLowerCase(), c])
 ) as Record<string, ProductColor>
@@ -60,7 +55,7 @@ export const COLOR_BY_HEX = Object.fromEntries(
 /**
  * Convert a hex string to an RGB tuple 0..255
  */
-export function hexToRgb(hex: string): [number, number, number] | null {
+function hexToRgb(hex: string): [number, number, number] | null {
   const cleaned = hex.replace(/^#/, "").trim()
   if (cleaned.length === 3) {
     const r = parseInt(cleaned[0] + cleaned[0], 16)
@@ -101,5 +96,3 @@ export function findNearestColor(hex: string): ProductColor | null {
   }
   return best
 }
-
-export default COLORS

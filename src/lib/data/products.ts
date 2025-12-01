@@ -44,7 +44,7 @@ function applyMultiplierToProducts<T extends ProductWithVariants>(
  * Get a single product by slug with variants
  * Returns null if not found
  */
-export async function getProductBySlug(
+async function getProductBySlug(
   slug: string,
   priceMultiplier = 1.0
 ): Promise<ProductWithVariantsAndCollection | null> {
@@ -93,7 +93,7 @@ export async function getProductById(
   )
 }
 
-export interface GetProductsOptions {
+interface GetProductsOptions {
   collectionId?: string
   featured?: boolean
   colors?: string[]

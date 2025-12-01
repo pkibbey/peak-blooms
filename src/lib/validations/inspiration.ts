@@ -1,6 +1,6 @@
 import { z } from "zod"
 
-export const productSelectionSchema = z.object({
+const productSelectionSchema = z.object({
   productId: z.string().min(1, "Product is required"),
   productVariantId: z.string().min(1, "Variant is required"),
   quantity: z.number().min(1, "Quantity must be at least 1"),
@@ -19,8 +19,3 @@ export const inspirationSchema = z.object({
 })
 
 export type InspirationFormData = z.infer<typeof inspirationSchema>
-
-// Schema for API request
-export const createInspirationSchema = inspirationSchema
-
-export type CreateInspirationInput = z.infer<typeof createInspirationSchema>

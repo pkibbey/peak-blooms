@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation"
 import Cart from "@/components/site/Cart"
-import EmptyState from "@/components/ui/EmptyState"
+import EmptyState from "@/components/site/EmptyState"
 import { calculateCartTotal, getCurrentUser, getOrCreateCart } from "@/lib/current-user"
 
 export default async function CartPage() {

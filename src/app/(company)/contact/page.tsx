@@ -1,9 +1,10 @@
 import type { Metadata } from "next"
-import { IconMail, IconPhone, IconInstagram } from "@/components/ui/icons"
+import { IconInstagram, IconMail, IconPhone } from "@/components/ui/icons"
 
 export const metadata: Metadata = {
   title: "Contact Peak Blooms",
-  description: "Get in touch with Peak Blooms. We're here to help with questions about orders, products, or partnership opportunities.",
+  description:
+    "Get in touch with Peak Blooms. We're here to help with questions about orders, products, or partnership opportunities.",
 }
 
 export default function ContactPage() {
@@ -20,13 +21,15 @@ export default function ContactPage() {
         <div>
           <h2 className="text-2xl font-semibold mb-4">How to Reach Us</h2>
           <p className="text-base text-foreground leading-relaxed mb-6">
-            Whether you're a new florist interested in partnering with Peak Blooms, or an existing customer with a question about an order, we're happy to help. Reach out to us through any of the methods below.
+            Whether you're a new florist interested in partnering with Peak Blooms, or an existing
+            customer with a question about an order, we're happy to help. Reach out to us through
+            any of the methods below.
           </p>
         </div>
 
         <div className="space-y-4">
           <div className="flex gap-4 items-start">
-            <IconMail className="h-5 w-5 text-[#1F332E] mt-1 flex-shrink-0" />
+            <IconMail className="h-5 w-5 text-[#1F332E] mt-1 shrink-0" />
             <div>
               <h3 className="font-semibold text-base mb-1">Email</h3>
               <a
@@ -36,26 +39,28 @@ export default function ContactPage() {
                 hello@peakblooms.com
               </a>
               <p className="text-sm text-muted-foreground mt-1">
-                Best for detailed questions, order inquiries, and partnership opportunities. We typically respond within 24 business hours.
+                Best for detailed questions, order inquiries, and partnership opportunities. We
+                typically respond within 24 business hours.
               </p>
             </div>
           </div>
 
           <div className="flex gap-4 items-start">
-            <IconPhone className="h-5 w-5 text-[#1F332E] mt-1 flex-shrink-0" />
+            <IconPhone className="h-5 w-5 text-[#1F332E] mt-1 shrink-0" />
             <div>
               <h3 className="font-semibold text-base mb-1">Phone</h3>
               <a href="tel:6199321139" className="text-base text-[#B45F68] hover:underline">
                 (619) 932-1139
               </a>
               <p className="text-sm text-muted-foreground mt-1">
-                Call us for urgent matters or to discuss your wholesale needs. Available Monday-Friday, 8am-5pm Pacific Time.
+                Call us for urgent matters or to discuss your wholesale needs. Available
+                Monday-Friday, 8am-5pm Pacific Time.
               </p>
             </div>
           </div>
 
           <div className="flex gap-4 items-start">
-            <IconInstagram className="h-5 w-5 text-[#1F332E] mt-1 flex-shrink-0" />
+            <IconInstagram className="h-5 w-5 text-[#1F332E] mt-1 shrink-0" />
             <div>
               <h3 className="font-semibold text-base mb-1">Instagram</h3>
               <a
@@ -65,7 +70,8 @@ export default function ContactPage() {
                 @peakblooms
               </a>
               <p className="text-sm text-muted-foreground mt-1">
-                Follow us for inspiration, seasonal highlights, and floral trends. Send us a DM for general inquiries.
+                Follow us for inspiration, seasonal highlights, and floral trends. Send us a DM for
+                general inquiries.
               </p>
             </div>
           </div>
@@ -89,7 +95,10 @@ export default function ContactPage() {
           </li>
           <li className="flex gap-3">
             <span className="font-semibold text-[#1F332E] min-w-fit">Partnership Inquiry</span>
-            <span>If you're a grower, distributor, or complementary business interested in working with Peak Blooms</span>
+            <span>
+              If you're a grower, distributor, or complementary business interested in working with
+              Peak Blooms
+            </span>
           </li>
           <li className="flex gap-3">
             <span className="font-semibold text-[#1F332E] min-w-fit">Feedback</span>

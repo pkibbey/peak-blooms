@@ -1,0 +1,52 @@
+{
+  "$schema": "https://unpkg.com/knip@5.71.0/schema.json",
+  "entry": [
+    "src/app/layout.{ts,tsx,js,jsx}",
+    "src/app/**/page.{ts,tsx,js,jsx}",
+    "src/app/**/route.{ts,tsx,js,jsx}",
+    "src/app/api/**/route.{ts,tsx,js,jsx}"
+  ],
+  "project": ["src/**/*.{ts,tsx,js,jsx}"],
+  "paths": {
+    "@/*": ["src/*"]
+  },
+  "ignore": [
+    "node_modules/**",
+    ".next/**",
+    "public/**",
+    "prisma/migrations/**",
+    "prisma/**",
+    "dist/**",
+    "build/**",
+    "docs/**",
+    "README.md",
+    "package.json",
+    "yarn.lock",
+    "pnpm-lock.yaml",
+    "generated/**",
+    "src/generated/**",
+    "src/components/ui/**",
+    "**/*.test.*",
+    "**/*.spec.*"
+  ],
+  "ignoreFiles": [
+    "src/**/*.d.ts",
+    "src/**/*.schema.ts",
+    "src/**/__mocks__/**",
+    "src/**/__fixtures__/**"
+  ],
+  "ignoreIssues": {
+    "src/generated/**": ["exports", "types"],
+    "src/lib/types/**": ["types"],
+    "src/lib/validations/**": ["types"],
+    "public/**": ["files"]
+  },
+  "ignoreDependencies": ["dotenv", "postcss"],
+  "next": {
+    "config": ["next.config.{js,mjs,cjs,ts}"],
+    "entry": ["src/app/**/*.tsx", "src/pages/**/*.tsx"],
+    "project": ["src/**/*.{ts,tsx,js,jsx}"]
+  },
+  "typescript": true,
+  "biome": true
+}

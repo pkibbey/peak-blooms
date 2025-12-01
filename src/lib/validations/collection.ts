@@ -8,8 +8,3 @@ export const collectionSchema = z.object({
 })
 
 export type CollectionFormData = z.infer<typeof collectionSchema>
-
-// Schema for API request
-export const createCollectionSchema = collectionSchema
-
-export type CreateCollectionInput = z.infer<typeof createCollectionSchema>

@@ -1,6 +1,6 @@
 import { z } from "zod"
 
-export const productVariantSchema = z.object({
+const productVariantSchema = z.object({
   id: z.string().optional(),
   price: z
     .string()

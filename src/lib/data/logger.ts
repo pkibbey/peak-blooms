@@ -19,7 +19,7 @@ function shouldLog(level: LogLevel): boolean {
 /**
  * Log when an operation returns null (not found)
  */
-export function logNotFound(operation: string, identifier: string | Record<string, unknown>) {
+function logNotFound(operation: string, identifier: string | Record<string, unknown>) {
   if (!shouldLog("debug")) return
 
   const timestamp = new Date().toISOString()
@@ -32,7 +32,7 @@ export function logNotFound(operation: string, identifier: string | Record<strin
 /**
  * Log an error during data access
  */
-export function logError(
+function logError(
   operation: string,
   identifier: string | Record<string, unknown>,
   error: unknown

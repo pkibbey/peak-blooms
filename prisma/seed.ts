@@ -347,7 +347,35 @@ async function main() {
     },
   })
 
-  console.log("✅ Hero banners seeded/updated: main-hero, boxlot-hero")
+  await prisma.heroBanner.upsert({
+    where: { slug: "boxlot-hero-center" },
+    update: {
+      title: "Boxlot Deals — Bulk flowers for events & florists",
+      subtitle:
+        "Shop bulk boxlots for better value — perfect for large installs, weddings, and events.",
+      ctaText: "Shop boxlots",
+      ctaLink: "/shop?boxlotOnly=true",
+      backgroundType: "IMAGE",
+      backgroundImage: "https://zvbfsgiej9tfgqre.public.blob.vercel-storage.com/heroes/boxlot2.png",
+      slotPosition: 3,
+      textPosition: "center",
+    },
+    create: {
+      name: "Boxlot hero center",
+      slug: "boxlot-hero-center",
+      title: "Boxlot Deals — Bulk flowers for events & florists",
+      subtitle:
+        "Shop bulk boxlots for better value — perfect for large installs, weddings, and events.",
+      ctaText: "Shop boxlots",
+      ctaLink: "/shop?boxlotOnly=true",
+      backgroundType: "IMAGE",
+      backgroundImage: "https://zvbfsgiej9tfgqre.public.blob.vercel-storage.com/heroes/boxlot2.png",
+      slotPosition: 3,
+      textPosition: "center",
+    },
+  })
+
+  console.log("✅ Hero banners seeded/updated: main-hero, boxlot-hero, boxlot-hero-center")
 
   console.log("✅ Database seeded successfully!")
 }

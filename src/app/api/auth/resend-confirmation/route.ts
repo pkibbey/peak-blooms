@@ -9,9 +9,12 @@ const emailFromDomain =
     ? "onboarding@resend.dev"
     : process.env.EMAIL_FROM_DOMAIN || "onboarding@resend.dev"
 
+console.log("emailFromDomain: ", emailFromDomain)
+
 export async function POST(request: NextRequest) {
   try {
     const { email } = await request.json()
+    console.log("email: ", email)
 
     if (!email) {
       return NextResponse.json({ error: "Email is required" }, { status: 400 })

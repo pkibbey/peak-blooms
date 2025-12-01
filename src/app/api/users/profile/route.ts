@@ -1,7 +1,7 @@
 import { type NextRequest, NextResponse } from "next/server"
 import { auth } from "@/lib/auth"
 import { db } from "@/lib/db"
-import { updateProfileSchema } from "@/lib/validations/auth"
+import { profileSchema } from "@/lib/validations/auth"
 
 /**
  * GET /api/users/profile
@@ -52,7 +52,7 @@ export async function PATCH(request: NextRequest) {
     }
 
     const body = await request.json()
-    const validationResult = updateProfileSchema.safeParse(body)
+    const validationResult = profileSchema.safeParse(body)
 
     if (!validationResult.success) {
       const firstError = validationResult.error.issues[0]

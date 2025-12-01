@@ -27,7 +27,7 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
-import COLORS from "@/lib/colors"
+import { COLORS } from "@/lib/colors"
 import { type ProductFormData, productSchema } from "@/lib/validations/product"
 import { IconPlus, IconTrash } from "../ui/icons"
 

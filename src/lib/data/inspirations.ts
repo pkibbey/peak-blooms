@@ -43,7 +43,7 @@ function applyMultiplierToInspiration(
 /**
  * Get all inspirations (basic info only)
  */
-export async function getAllInspirations(): Promise<InspirationBasic[]> {
+async function getAllInspirations(): Promise<InspirationBasic[]> {
   return withTiming("getAllInspirations", {}, async () => {
     return db.inspiration.findMany({
       orderBy: {
@@ -108,7 +108,7 @@ export async function getInspirationBySlug(
  * Get an inspiration by ID with all products
  * Returns null if not found
  */
-export async function getInspirationById(
+async function getInspirationById(
   id: string,
   priceMultiplier = 1.0
 ): Promise<InspirationWithProducts | null> {

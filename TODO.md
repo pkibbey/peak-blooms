@@ -27,6 +27,7 @@
  
 ### 🛍️ Tracking / Marketing
 
+- [ ] Turn the development of this into a website using git commits
 - [ ] Add tracking to learn how the users are using the site
 - [ ] Coupon code / discount offers
 - [ ] Collect user contact email for newsletter (overstock or flash sales)

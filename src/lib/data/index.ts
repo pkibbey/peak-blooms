@@ -15,26 +15,22 @@
 export {
   getAllCollectionSlugs,
   getAllCollections,
-  getCollectionById,
   getCollectionBySlug,
 } from "./collections"
 // Inspirations
 export {
   getAllInspirationSlugs,
-  getAllInspirations,
-  getInspirationById,
   getInspirationBySlug,
   getInspirationsWithCounts,
 } from "./inspirations"
 // Logger utilities (for custom usage)
-export { logError, logNotFound, withTiming } from "./logger"
+
 // Products
 export {
-  type GetProductsOptions,
   getAllProductSlugs,
   getFeaturedProducts,
   getProductById,
-  getProductBySlug,
+  
   getProducts,
   getProductWithInspirations,
 } from "./products"
