@@ -2,9 +2,11 @@
 
 ### 🌟 Next Steps
 
+- [ ] Use real email server - need to get real domain before we can implement this
 - [ ] Create separate development and production databases
 - [ ] Add real products
 - [ ] Add pagination once we have a large number of products to view
+- [ ] Add company, support, and legal pages, as well as a complete site map
 
 ### 🪨 Code Stability
 - [ ] Add unit tests and e2e tests to ensure complete site functionality
@@ -12,12 +14,10 @@
 - [ ] Update Github Readme with screenshots and updated site features/design/functionality
 - [ ] Allow users to change their email address
 - [ ] Make the site more responsive and put loading animations in using client side components
-- [ ] Add database indexes
 - [ ] Use local db server in dev environments
 
 ### 💰 Payment Processing 
 
-- [ ] Add ability to send emails to any account, not just the test account
 - [ ] Add ability to accept payments
 - [ ] Add shipping charges to checkout process
 

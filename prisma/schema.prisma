@@ -1,6 +1,3 @@
-// This is your Prisma schema file for Peak Blooms E-Commerce
-// Database schema for users, products, categories, orders, and shopping carts
-
 generator client {
   provider = "prisma-client"
   output   = "../src/generated"
@@ -10,22 +7,20 @@ datasource db {
   provider = "postgresql"
 }
 
-// NextAuth.js Models
 model Account {
-  id                 String  @id @default(cuid())
-  userId             String
-  type               String
-  provider           String
-  providerAccountId  String
-  refresh_token      String?  @db.Text
-  access_token       String?  @db.Text
-  expires_at         Int?
-  token_type         String?
-  scope              String?
-  id_token           String?  @db.Text
-  session_state      String?
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([provider, providerAccountId])
 }
@@ -46,51 +41,43 @@ model VerificationToken {
   @@unique([identifier, token])
 }
 
-// Peak Blooms Models
 model User {
-  id              String     @id @default(cuid())
-  email           String?    @unique
+  id              String        @id @default(cuid())
+  email           String?       @unique
   emailVerified   DateTime?
   name            String?
   image           String?
-  role            Role       @default(CUSTOMER)
-  approved        Boolean    @default(false)
-  priceMultiplier Float      @default(1.0) // Multiplier applied to all prices (0.5-2.0)
-  createdAt       DateTime   @default(now())
-  updatedAt       DateTime   @updatedAt
-
-  accounts      Account[]
-  sessions      Session[]
-  cart          ShoppingCart?
-  orders        Order[]
-  addresses     Address[]
+  role            Role          @default(CUSTOMER)
+  approved        Boolean       @default(false)
+  priceMultiplier Float         @default(1.0)
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+  accounts        Account[]
+  addresses       Address[]
+  orders          Order[]
+  sessions        Session[]
+  cart            ShoppingCart?
 }
 
 model Address {
-  id        String   @id @default(cuid())
-  userId    String?
-  firstName String
-  lastName  String
-  company   String?
-  street1   String
-  street2   String?
-  city      String
-  state     String
-  zip       String
-  country   String   @default("US")
-  isDefault Boolean  @default(false)
-  createdAt DateTime @default(now())
-
-  user            User?   @relation(fields: [userId], references: [id], onDelete: Cascade)
-  shippingOrders  Order[] @relation("ShippingAddress")
-  billingOrders   Order[] @relation("BillingAddress")
+  id             String   @id @default(cuid())
+  userId         String?
+  firstName      String
+  lastName       String
+  company        String?
+  street1        String
+  street2        String?
+  city           String
+  state          String
+  zip            String
+  country        String   @default("US")
+  isDefault      Boolean  @default(false)
+  createdAt      DateTime @default(now())
+  user           User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  billingOrders  Order[]  @relation("BillingAddress")
+  shippingOrders Order[]  @relation("ShippingAddress")
 
   @@index([userId])
-}
-
-enum Role {
-  CUSTOMER
-  ADMIN
 }
 
 model Collection {
@@ -98,62 +85,59 @@ model Collection {
   name        String    @unique
   slug        String    @unique
   image       String?
-  description String?   @db.Text
+  description String?
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
-
   products    Product[]
 }
 
 model Inspiration {
-  id              String    @id @default(cuid())
+  id              String               @id @default(cuid())
   name            String
-  slug            String    @unique
+  slug            String               @unique
   subtitle        String
   image           String
-  excerpt         String    @db.Text
-  inspirationText String    @db.Text
-  createdAt       DateTime  @default(now())
-  updatedAt       DateTime  @updatedAt
-
+  excerpt         String
+  inspirationText String
+  createdAt       DateTime             @default(now())
+  updatedAt       DateTime             @updatedAt
   products        InspirationProduct[]
 }
 
 model Product {
-  id              String    @id @default(cuid())
-  name            String
-  slug            String    @unique
-  description     String?   @db.Text
-  image           String?
-  colors          String[]
-  collectionId    String
-  featured        Boolean   @default(false)
-  createdAt       DateTime  @default(now())
-  updatedAt       DateTime  @updatedAt
-
-  collection      Collection  @relation(fields: [collectionId], references: [id], onDelete: Cascade)
-  cartItems       CartItem[]
-  orderItems      OrderItem[]
-  inspirations    InspirationProduct[]
-  variants        ProductVariant[]
+  id           String               @id @default(cuid())
+  name         String
+  slug         String               @unique
+  description  String?
+  image        String?
+  colors       String[]
+  collectionId String
+  featured     Boolean              @default(false)
+  createdAt    DateTime             @default(now())
+  updatedAt    DateTime             @updatedAt
+  cartItems    CartItem[]
+  inspirations InspirationProduct[]
+  orderItems   OrderItem[]
+  collection   Collection           @relation(fields: [collectionId], references: [id], onDelete: Cascade)
+  variants     ProductVariant[]
 
   @@index([collectionId])
   @@index([slug])
   @@index([createdAt])
+  @@index([collectionId, createdAt(sort: Desc)], map: "idx_product_collection_createdat")
+  @@index([colors], map: "idx_product_colors_gin", type: Gin)
 }
 
-// Explicit join table for Inspiration <-> Product with variant support
 model InspirationProduct {
-  id                String           @id @default(cuid())
-  inspirationId     String
-  productId         String
-  productVariantId  String
-  quantity          Int              @default(1)
-  createdAt         DateTime         @default(now())
-
-  inspiration       Inspiration      @relation(fields: [inspirationId], references: [id], onDelete: Cascade)
-  product           Product          @relation(fields: [productId], references: [id], onDelete: Cascade)
-  productVariant    ProductVariant   @relation(fields: [productVariantId], references: [id], onDelete: Cascade)
+  id               String         @id @default(cuid())
+  inspirationId    String
+  productId        String
+  productVariantId String
+  quantity         Int            @default(1)
+  createdAt        DateTime       @default(now())
+  inspiration      Inspiration    @relation(fields: [inspirationId], references: [id], onDelete: Cascade)
+  product          Product        @relation(fields: [productId], references: [id], onDelete: Cascade)
+  productVariant   ProductVariant @relation(fields: [productVariantId], references: [id], onDelete: Cascade)
 
   @@unique([inspirationId, productId])
   @@index([inspirationId])
@@ -161,45 +145,44 @@ model InspirationProduct {
 }
 
 model ProductVariant {
-  id            String   @id @default(cuid())
-  productId     String
-  price         Float
-  stemLength    Int?     @map("stem_length")
-  countPerBunch Int?     @map("count_per_bunch")
-  isBoxlot      Boolean  @default(false) @map("is_boxlot")
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
-
-  product                Product               @relation(fields: [productId], references: [id], onDelete: Cascade)
-  cartItems              CartItem[]
-  orderItems             OrderItem[]
-  inspirationProducts    InspirationProduct[]
+  id                  String               @id @default(cuid())
+  productId           String
+  price               Float
+  stemLength          Int?                 @map("stem_length")
+  countPerBunch       Int?                 @map("count_per_bunch")
+  isBoxlot            Boolean              @default(false) @map("is_boxlot")
+  createdAt           DateTime             @default(now())
+  updatedAt           DateTime             @updatedAt
+  cartItems           CartItem[]
+  inspirationProducts InspirationProduct[]
+  orderItems          OrderItem[]
+  product             Product              @relation(fields: [productId], references: [id], onDelete: Cascade)
 
   @@index([productId])
+  @@index([productId, price], map: "idx_variant_product_price")
+  @@index([productId, stemLength], map: "idx_variant_product_stem_length")
 }
 
 model ShoppingCart {
-  id        String    @id @default(cuid())
-  userId    String    @unique
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
-
-  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id        String     @id @default(cuid())
+  userId    String     @unique
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
   items     CartItem[]
+  user      User       @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model CartItem {
-  id        String    @id @default(cuid())
-  cartId    String
-  productId String
-  quantity  Int       @default(1)
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
-
-  cart      ShoppingCart @relation(fields: [cartId], references: [id], onDelete: Cascade)
-  product   Product      @relation(fields: [productId], references: [id], onDelete: Cascade)
-  productVariant ProductVariant? @relation(fields: [productVariantId], references: [id], onDelete: SetNull)
+  id               String          @id @default(cuid())
+  cartId           String
+  productId        String
+  quantity         Int             @default(1)
+  createdAt        DateTime        @default(now())
+  updatedAt        DateTime        @updatedAt
   productVariantId String?
+  cart             ShoppingCart    @relation(fields: [cartId], references: [id], onDelete: Cascade)
+  product          Product         @relation(fields: [productId], references: [id], onDelete: Cascade)
+  productVariant   ProductVariant? @relation(fields: [productVariantId], references: [id])
 
   @@unique([cartId, productId, productVariantId])
   @@index([cartId])
@@ -214,16 +197,15 @@ model Order {
   total             Float
   email             String
   phone             String?
-  notes             String?     @db.Text
+  notes             String?
   shippingAddressId String
   billingAddressId  String?
   createdAt         DateTime    @default(now())
   updatedAt         DateTime    @updatedAt
-
-  user            User        @relation(fields: [userId], references: [id], onDelete: Cascade)
-  shippingAddress Address     @relation("ShippingAddress", fields: [shippingAddressId], references: [id])
-  billingAddress  Address?    @relation("BillingAddress", fields: [billingAddressId], references: [id])
-  items           OrderItem[]
+  billingAddress    Address?    @relation("BillingAddress", fields: [billingAddressId], references: [id])
+  shippingAddress   Address     @relation("ShippingAddress", fields: [shippingAddressId], references: [id])
+  user              User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  items             OrderItem[]
 
   @@index([userId])
   @@index([orderNumber])
@@ -231,18 +213,41 @@ model Order {
 }
 
 model OrderItem {
-  id        String  @id @default(cuid())
-  orderId   String
-  productId String
-  quantity  Int
-  price     Float   // Price at time of purchase
-
-  order     Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
-  product   Product @relation(fields: [productId], references: [id], onDelete: SetNull)
-  productVariant ProductVariant? @relation(fields: [productVariantId], references: [id], onDelete: SetNull)
+  id               String          @id @default(cuid())
+  orderId          String
+  productId        String
+  quantity         Int
+  price            Float
   productVariantId String?
+  order            Order           @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  product          Product         @relation(fields: [productId], references: [id], onDelete: SetNull)
+  productVariant   ProductVariant? @relation(fields: [productVariantId], references: [id])
 
   @@index([orderId])
+}
+
+model HeroBanner {
+  id              String             @id @default(cuid())
+  name            String
+  slug            String             @unique
+  title           String
+  subtitle        String
+  ctaText         String?
+  ctaLink         String?
+  backgroundType  HeroBackgroundType @default(GRADIENT)
+  backgroundImage String?
+  gradientPreset  String?
+  slotPosition    Int?
+  textPosition    String?
+  createdAt       DateTime           @default(now())
+  updatedAt       DateTime           @updatedAt
+
+  @@index([slotPosition])
+}
+
+enum Role {
+  CUSTOMER
+  ADMIN
 }
 
 enum OrderStatus {
@@ -256,24 +261,4 @@ enum OrderStatus {
 enum HeroBackgroundType {
   IMAGE
   GRADIENT
-}
-
-model HeroBanner {
-  id              String             @id @default(cuid())
-  name            String
-  slug            String             @unique
-  title           String
-  subtitle        String             @db.Text
-  ctaText         String?
-  ctaLink         String?
-  backgroundType  HeroBackgroundType @default(GRADIENT)
-  backgroundImage String?
-  gradientPreset  String?            // e.g., "slate-green", "forest", "rose", "ocean", "earth"
-  slotPosition    Int?               // 1, 2, or 3 (null = not displayed)
-  // Optional text position for the hero content area: "left", "center" or "right"
-  textPosition    String?
-  createdAt       DateTime           @default(now())
-  updatedAt       DateTime           @updatedAt
-
-  @@index([slotPosition])
 }
