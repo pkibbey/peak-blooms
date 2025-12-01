@@ -139,7 +139,7 @@ export default function Footer() {
         <div className="mt-8 border-t border-t-border pt-4 text-sm text-muted-foreground flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
           <div>© {new Date().getFullYear()} Peak Blooms. All rights reserved.</div>
           <div className="flex items-center gap-4">
-            <Link href="/sitemap" className="hover:underline">
+            <Link href="/site-map" className="hover:underline">
               Sitemap
             </Link>
           </div>
