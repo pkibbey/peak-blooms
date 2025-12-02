@@ -4,7 +4,6 @@
 
 - [ ] Use real email server - need to get real domain before we can implement this
 - [ ] Add real products
-- [ ] Add pagination once we have a large number of products to view
 
 ### 🪨 Code Stability
 - [ ] Add unit tests and e2e tests to ensure complete site functionality

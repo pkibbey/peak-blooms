@@ -93,7 +93,7 @@ export async function getProductById(
   )
 }
 
-interface GetProductsOptions {
+export interface GetProductsOptions {
   collectionId?: string
   featured?: boolean
   colors?: string[]
@@ -103,16 +103,24 @@ interface GetProductsOptions {
   priceMax?: number
   boxlotOnly?: boolean
   limit?: number
+  offset?: number
+}
+
+export interface GetProductsResult {
+  products: ProductWithVariantsAndCollection[]
+  total: number
+  limit: number
+  offset: number
 }
 
 /**
- * Get multiple products with optional filters
+ * Get multiple products with optional filters and pagination
  * Prices are automatically adjusted by the provided multiplier
  */
 export async function getProducts(
   options: GetProductsOptions = {},
   priceMultiplier = 1.0
-): Promise<ProductWithVariantsAndCollection[]> {
+): Promise<GetProductsResult> {
   return withTiming("getProducts", options as Record<string, unknown>, async () => {
     // Use a flexible typed placeholder for `where` so we can add new array filters
     const where = {} as unknown as ProductWhereInput
@@ -161,6 +169,13 @@ export async function getProducts(
       where.variants = { some: variantFilter }
     }
 
+    // Set default pagination values
+    const limit = options.limit ?? 12
+    const offset = options.offset ?? 0
+
+    // Get total count for pagination metadata
+    const total = await db.product.count({ where })
+
     const products = await db.product.findMany({
       where,
       include: {
@@ -174,10 +189,16 @@ export async function getProducts(
       orderBy: {
         createdAt: "desc",
       },
-      ...(options.limit && { take: options.limit }),
+      take: limit,
+      skip: offset,
     })
 
-    return applyMultiplierToProducts(products, priceMultiplier)
+    return {
+      products: applyMultiplierToProducts(products, priceMultiplier),
+      total,
+      limit,
+      offset,
+    }
   })
 }
 
@@ -189,7 +210,8 @@ export async function getFeaturedProducts(
   priceMultiplier = 1.0,
   limit?: number
 ): Promise<ProductWithVariantsAndCollection[]> {
-  return getProducts({ featured: true, limit }, priceMultiplier)
+  const result = await getProducts({ featured: true, limit }, priceMultiplier)
+  return result.products
 }
 
 /**

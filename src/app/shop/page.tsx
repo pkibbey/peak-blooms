@@ -2,6 +2,7 @@ import { Suspense } from "react"
 import { BoxlotFilter } from "@/components/site/BoxlotFilter"
 import { PageHeader } from "@/components/site/PageHeader"
 import { ProductCard } from "@/components/site/ProductCard"
+import { ShopPagination } from "@/components/site/ShopPagination"
 import { getCurrentUser } from "@/lib/current-user"
 import { getProducts } from "@/lib/data"
 
@@ -13,6 +14,8 @@ export const metadata = {
   title: "Peak Blooms - Shop",
   description: "Browse our full catalog of premium flowers",
 }
+
+const ITEMS_PER_PAGE = 12
 
 export default async function ShopPage({ searchParams }: ShopPageProps) {
   const params = await searchParams
@@ -38,9 +41,11 @@ export default async function ShopPage({ searchParams }: ShopPageProps) {
   const priceMin = typeof params.priceMin === "string" ? parseFloat(params.priceMin) : undefined
   const priceMax = typeof params.priceMax === "string" ? parseFloat(params.priceMax) : undefined
   const boxlotOnly = params.boxlotOnly === "true"
+  const page = typeof params.page === "string" ? parseInt(params.page, 10) : 1
+  const offset = Math.max(0, (page - 1) * ITEMS_PER_PAGE)
 
-  // Fetch products using DAL
-  const products = await getProducts(
+  // Fetch products using DAL with pagination
+  const result = await getProducts(
     {
       collectionId: collectionId || undefined,
       colors: colors,
@@ -51,9 +56,13 @@ export default async function ShopPage({ searchParams }: ShopPageProps) {
       priceMin: priceMin !== undefined && !Number.isNaN(priceMin) ? priceMin : undefined,
       priceMax: priceMax !== undefined && !Number.isNaN(priceMax) ? priceMax : undefined,
       boxlotOnly,
+      limit: ITEMS_PER_PAGE,
+      offset,
     },
     multiplier
   )
+
+  const totalPages = Math.ceil(result.total / ITEMS_PER_PAGE)
 
   return (
     <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 py-10">
@@ -71,17 +80,32 @@ export default async function ShopPage({ searchParams }: ShopPageProps) {
         )}
       </div>
 
+      {/* Products Info */}
+      {result.products.length > 0 && (
+        <p className="text-sm text-muted-foreground mb-4">
+          Showing {result.offset + 1} to {Math.min(result.offset + ITEMS_PER_PAGE, result.total)} of{" "}
+          {result.total} products
+        </p>
+      )}
+
       {/* Products Grid */}
-      {products.length === 0 ? (
+      {result.products.length === 0 ? (
         <div className="flex justify-center items-center py-12">
           <p className="text-muted-foreground">No products found matching your filters.</p>
         </div>
       ) : (
-        <div className="grid grid-cols-2 gap-4 sm:gap-6 md:grid-cols-3 lg:grid-cols-4">
-          {products.map((product) => (
-            <ProductCard key={product.slug} product={product} user={user} />
-          ))}
-        </div>
+        <>
+          <div className="grid grid-cols-2 gap-4 sm:gap-6 md:grid-cols-3 lg:grid-cols-4 mb-8">
+            {result.products.map((product) => (
+              <ProductCard key={product.slug} product={product} user={user} />
+            ))}
+          </div>
+
+          {/* Pagination */}
+          {totalPages > 1 && (
+            <ShopPagination currentPage={page} totalPages={totalPages} searchParams={params} />
+          )}
+        </>
       )}
     </div>
   )

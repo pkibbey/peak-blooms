@@ -6,9 +6,10 @@ import { createProductSchema } from "@/lib/validations/product"
 
 /**
  * GET /api/products
- * Get all products (with optional filtering)
- * Query params: collectionId, featured, colors, stemLength, priceMin, priceMax
+ * Get all products (with optional filtering and pagination)
+ * Query params: collectionId, featured, colors, stemLength, priceMin, priceMax, limit, offset
  * Prices are adjusted based on the authenticated user's price multiplier
+ * Returns: { products: ProductWithVariantsAndCollection[], total: number, limit: number, offset: number }
  */
 export async function GET(request: NextRequest) {
   try {
@@ -27,8 +28,12 @@ export async function GET(request: NextRequest) {
     const priceMin = searchParams.get("priceMin")
     const priceMax = searchParams.get("priceMax")
     const boxlotOnly = searchParams.get("boxlotOnly")
+    const limitParam = searchParams.get("limit")
+    const offsetParam = searchParams.get("offset")
+    const limit = limitParam ? parseInt(limitParam, 10) : 12
+    const offset = offsetParam ? parseInt(offsetParam, 10) : 0
 
-    const products = await getProducts(
+    const result = await getProducts(
       {
         collectionId: collectionId || undefined,
         featured: featured === "true",
@@ -46,11 +51,13 @@ export async function GET(request: NextRequest) {
         priceMin: priceMin ? parseFloat(priceMin) : undefined,
         priceMax: priceMax ? parseFloat(priceMax) : undefined,
         boxlotOnly: boxlotOnly === "true",
+        limit,
+        offset,
       },
       priceMultiplier
     )
 
-    return NextResponse.json(products)
+    return NextResponse.json(result)
   } catch (error) {
     console.error("GET /api/products error:", error)
     return NextResponse.json({ error: "Failed to fetch products" }, { status: 500 })
