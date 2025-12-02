@@ -46,6 +46,7 @@ interface ProductFormProps {
     image: string | null
     colors?: string[] | null
     collectionId: string
+    productType?: "FLOWER" | "FILLER"
     featured: boolean
     variants?: {
       id: string
@@ -83,6 +84,7 @@ export default function ProductForm({ collections, product }: ProductFormProps) 
       image: product?.image || "",
       colors: initialColors,
       collectionId: product?.collectionId || "",
+      productType: product?.productType || "FLOWER",
       featured: product?.featured || false,
       variants:
         product?.variants && product.variants.length > 0
@@ -383,6 +385,29 @@ export default function ProductForm({ collections, product }: ProductFormProps) 
                       {col.name}
                     </SelectItem>
                   ))}
+                </SelectContent>
+              </Select>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        {/* Product Type */}
+        <FormField
+          control={form.control}
+          name="productType"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Product Type *</FormLabel>
+              <Select onValueChange={field.onChange} value={field.value}>
+                <FormControl>
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="Select a product type" />
+                  </SelectTrigger>
+                </FormControl>
+                <SelectContent>
+                  <SelectItem value="FLOWER">Flower</SelectItem>
+                  <SelectItem value="FILLER">Filler / Green</SelectItem>
                 </SelectContent>
               </Select>
               <FormMessage />

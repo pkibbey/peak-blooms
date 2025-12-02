@@ -135,6 +135,7 @@ model Product {
   colors       String[]
   collectionId String
   featured     Boolean              @default(false)
+  productType  ProductType          @default(FLOWER)
   createdAt    DateTime             @default(now())
   updatedAt    DateTime             @updatedAt
   cartItems    CartItem[]
@@ -146,6 +147,7 @@ model Product {
   @@index([collectionId])
   @@index([slug])
   @@index([createdAt])
+  @@index([productType])
   @@index([collectionId, createdAt(sort: Desc)], map: "idx_product_collection_createdat")
   @@index([colors], map: "idx_product_colors_gin", type: Gin)
 }
@@ -283,4 +285,9 @@ enum OrderStatus {
 enum HeroBackgroundType {
   IMAGE
   GRADIENT
+}
+
+enum ProductType {
+  FLOWER
+  FILLER
 }

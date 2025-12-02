@@ -60,8 +60,17 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
       )
     }
 
-    const { name, slug, description, image, colors, collectionId, featured, variants } =
-      validationResult.data
+    const {
+      name,
+      slug,
+      description,
+      image,
+      colors,
+      collectionId,
+      productType,
+      featured,
+      variants,
+    } = validationResult.data
 
     // Check if product exists
     const existingProduct = await db.product.findUnique({
@@ -100,6 +109,7 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
             // Use relation connect so Prisma's checked update input accepts it
             collection: { connect: { id: collectionId } },
           }),
+          ...(productType !== undefined && { productType }),
           ...(featured !== undefined && { featured }),
           ...(variants !== undefined && {
             variants: {

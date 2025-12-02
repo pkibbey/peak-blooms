@@ -81,8 +81,17 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    const { name, slug, description, image, colors, collectionId, featured, variants } =
-      validationResult.data
+    const {
+      name,
+      slug,
+      description,
+      image,
+      colors,
+      collectionId,
+      productType,
+      featured,
+      variants,
+    } = validationResult.data
 
     const product = await db.product.create({
       data: {
@@ -94,6 +103,7 @@ export async function POST(request: NextRequest) {
         ...(colors !== undefined && { colors: colors ?? [] }),
         // Connect collection by id rather than sending raw scalar (keeps Prisma input consistent with nested variants)
         collection: { connect: { id: collectionId } },
+        productType: productType ?? "FLOWER",
         featured: featured === true,
         variants: {
           create: variants.map((v) => ({

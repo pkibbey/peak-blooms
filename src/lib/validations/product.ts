@@ -29,6 +29,7 @@ export const productSchema = z.object({
     )
     .optional(),
   collectionId: z.string().min(1, "Collection is required"),
+  productType: z.enum(["FLOWER", "FILLER"]),
   featured: z.boolean(),
   variants: z
     .array(productVariantSchema)
@@ -53,6 +54,7 @@ export const createProductSchema = z.object({
     )
     .nullable(),
   collectionId: z.string().min(1, "Collection is required"),
+  productType: z.enum(["FLOWER", "FILLER"]).default("FLOWER"),
   featured: z.boolean().default(false),
   variants: z
     .array(

@@ -201,6 +201,7 @@ export const ProductScalarFieldEnum = {
   colors: 'colors',
   collectionId: 'collectionId',
   featured: 'featured',
+  productType: 'productType',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const

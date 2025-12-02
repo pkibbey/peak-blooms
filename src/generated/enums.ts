@@ -34,3 +34,11 @@ export const HeroBackgroundType = {
 } as const
 
 export type HeroBackgroundType = (typeof HeroBackgroundType)[keyof typeof HeroBackgroundType]
+
+
+export const ProductType = {
+  FLOWER: 'FLOWER',
+  FILLER: 'FILLER'
+} as const
+
+export type ProductType = (typeof ProductType)[keyof typeof ProductType]

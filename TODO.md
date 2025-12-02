@@ -3,7 +3,6 @@
 ### 🌟 Next Steps
 
 - [ ] Use real email server - need to get real domain before we can implement this
-- [ ] Create separate development and production databases
 - [ ] Add real products
 - [ ] Add pagination once we have a large number of products to view
 
@@ -35,7 +34,18 @@
 
 ### 🔍 Questions Features
 
-- [ ] Should repeat orders add to the existing cart, or replace it? This should probably be a user preference that pops up when the user clicks on the reorder button?
-- [ ] Boxlot selection behaviour?
+- [ ] Should repeat orders add to the existing cart, or replace it? This should probably be a user preference that pops up when the user clicks on the reorder button? -  add to cart
 - [ ] Editing product details should be saved automatically without needed to press save?
 - [ ] Figure out a fair way to figure out the value of this app?
+
+
+# Meeting Notes
+Stem length will only apply for roses
+
+Quantity
+
+Non-intrusive collection of email to sign up for newsletter for weekly specials
+
+
+
+
