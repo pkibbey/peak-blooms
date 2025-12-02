@@ -52,21 +52,29 @@ export default function UserMenu({ user }: UserMenuProps) {
           {user.email && <div className="text-xs opacity-80 truncate">{user.email}</div>}
         </div>
 
-        {user.role === "ADMIN" && (
-          <DropdownMenuItem asChild className="focus:bg-secondary focus:text-secondary-foreground">
-            <Link href="/admin" className="flex items-center gap-2">
-              <IconSettings aria-hidden="true" />
-              <span>Admin Dashboard</span>
+        <div className="flex flex-col gap-1 py-1">
+          {user.role === "ADMIN" && (
+            <DropdownMenuItem
+              asChild
+              className="focus:bg-secondary/50 focus:text-secondary-foreground"
+            >
+              <Link href="/admin" className="flex items-center gap-2">
+                <IconSettings aria-hidden="true" />
+                <span>Admin Dashboard</span>
+              </Link>
+            </DropdownMenuItem>
+          )}
+
+          <DropdownMenuItem
+            asChild
+            className="focus:bg-secondary/50 focus:text-secondary-foreground"
+          >
+            <Link href="/account" className="flex items-center gap-2">
+              <IconUser aria-hidden="true" />
+              <span>Account settings</span>
             </Link>
           </DropdownMenuItem>
-        )}
-
-        <DropdownMenuItem asChild className="focus:bg-secondary focus:text-secondary-foreground">
-          <Link href="/account" className="flex items-center gap-2">
-            <IconUser aria-hidden="true" />
-            <span>Account settings</span>
-          </Link>
-        </DropdownMenuItem>
+        </div>
 
         <DropdownMenuSeparator />
 
@@ -75,7 +83,7 @@ export default function UserMenu({ user }: UserMenuProps) {
           onSelect={async () => {
             await signOut()
           }}
-          className="focus:bg-secondary focus:text-secondary-foreground text-destructive"
+          className="focus:bg-secondary/50 focus:text-secondary-foreground text-destructive"
         >
           <div className="flex items-center gap-2">
             <IconLogOut aria-hidden="true" />
