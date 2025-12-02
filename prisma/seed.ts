@@ -1,3 +1,5 @@
+import * as fs from "node:fs"
+import * as path from "node:path"
 import { PrismaPg } from "@prisma/adapter-pg"
 import { Pool } from "pg"
 import { type Prisma, PrismaClient } from "../src/generated/client"
@@ -12,6 +14,76 @@ console.log("Connecting to database...")
 const pool = new Pool({ connectionString })
 const adapter = new PrismaPg(pool)
 const prisma = new PrismaClient({ adapter })
+
+// Helper function to parse price strings from CSV
+function parsePrice(priceString: string): number {
+  if (!priceString || priceString.includes("N/A")) return 0
+  if (priceString.includes("Market Price")) return 0
+
+  // Remove "US$" prefix and "per stem" suffix, handle whitespace
+  const cleaned = priceString.replace(/US\$|per stem/gi, "").trim()
+
+  // Extract the first number (handles ranges like "$23.00-$26.00")
+  const match = cleaned.match(/\d+\.?\d*/)
+  if (match) {
+    return parseFloat(match[0])
+  }
+
+  return 0
+}
+
+// Helper function to determine stem count from price string
+function getStemCount(priceString: string): number {
+  // If it contains "per stem", assume 1 stem per unit
+  if (priceString.toLowerCase().includes("per stem")) {
+    return 1
+  }
+  // Default to 10 stems per bunch
+  return 10
+}
+
+// Helper function to read and parse CSV file
+function readProductsFromCSV(): Array<{
+  name: string
+  price: number
+  type: "FLOWER" | "FILLER"
+  stemCount: number
+}> {
+  const csvPath = path.join(__dirname, "products.csv")
+  const fileContent = fs.readFileSync(csvPath, "utf-8")
+  const lines = fileContent.split("\n")
+
+  const products: Array<{
+    name: string
+    price: number
+    type: "FLOWER" | "FILLER"
+    stemCount: number
+  }> = []
+
+  // Skip header row (line 0)
+  for (let i = 1; i < lines.length; i++) {
+    const line = lines[i].trim()
+    if (!line) continue
+
+    // Parse CSV line (handle quoted fields with commas)
+    const match = line.match(/"([^"]*)"|([^,]+)/g) || []
+    if (match.length < 3) continue
+
+    const name = (match[0] || "").replace(/"/g, "").trim()
+    const priceStr = (match[1] || "").replace(/"/g, "").trim()
+    const typeStr = (match[2] || "").replace(/"/g, "").trim()
+
+    const price = parsePrice(priceStr)
+    const stemCount = getStemCount(priceStr)
+    const type = typeStr === "FILLER" ? "FILLER" : "FLOWER"
+
+    if (name) {
+      products.push({ name, price, type, stemCount })
+    }
+  }
+
+  return products
+}
 
 async function main() {
   console.log("🌸 Seeding database with collections and products...")
@@ -83,6 +155,38 @@ async function main() {
   })
 
   // Create collections
+  const flowersCollection = await prisma.collection.upsert({
+    create: {
+      name: "Flowers",
+      slug: "flowers",
+      image: "https://zvbfsgiej9tfgqre.public.blob.vercel-storage.com/collections/flowers.png",
+      description: "Beautiful fresh flowers for all occasions",
+    },
+    where: { slug: "flowers" },
+    update: {
+      name: "Flowers",
+      image: "https://zvbfsgiej9tfgqre.public.blob.vercel-storage.com/collections/flowers.png",
+      description: "Beautiful fresh flowers for all occasions",
+      slug: "flowers",
+    },
+  })
+
+  const fillersCollection = await prisma.collection.upsert({
+    create: {
+      name: "Fillers",
+      slug: "fillers",
+      image: "https://zvbfsgiej9tfgqre.public.blob.vercel-storage.com/collections/fillers.png",
+      description: "Greenery and filler materials for arrangements",
+    },
+    where: { slug: "fillers" },
+    update: {
+      name: "Fillers",
+      image: "https://zvbfsgiej9tfgqre.public.blob.vercel-storage.com/collections/fillers.png",
+      description: "Greenery and filler materials for arrangements",
+      slug: "fillers",
+    },
+  })
+
   const classicRoses = await prisma.collection.upsert({
     create: {
       name: "Classic Roses",
@@ -262,6 +366,59 @@ async function main() {
       featured: false,
     },
   })
+
+  // Seed products from CSV file
+  console.log("📦 Seeding products from CSV...")
+  const csvProducts = readProductsFromCSV()
+  let productsCreated = 0
+  let productsSkipped = 0
+
+  for (const csvProduct of csvProducts) {
+    try {
+      const slug = csvProduct.name
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, "-")
+        .replace(/^-|-$/g, "")
+
+      // Determine which collection to use
+      const collection = csvProduct.type === "FILLER" ? fillersCollection : flowersCollection
+
+      // Create or update product with single variant
+      await prisma.product.upsert({
+        create: {
+          name: csvProduct.name,
+          slug: slug,
+          collectionId: collection.id,
+          productType: csvProduct.type,
+          colors: [], // No colors specified from CSV, can be added manually later
+          featured: false,
+          variants: {
+            create: [
+              {
+                price: csvProduct.price,
+                countPerBunch: csvProduct.stemCount,
+              },
+            ],
+          },
+        },
+        where: { slug: slug },
+        update: {
+          name: csvProduct.name,
+          collectionId: collection.id,
+          productType: csvProduct.type,
+        },
+      })
+
+      productsCreated++
+    } catch (error) {
+      console.warn(`⚠️  Skipped product: ${csvProduct.name} (${(error as Error).message})`)
+      productsSkipped++
+    }
+  }
+
+  console.log(
+    `✅ CSV seeding complete: ${productsCreated} products created/updated, ${productsSkipped} skipped`
+  )
 
   console.log("✨ Creating inspirations...")
 
