@@ -13,7 +13,7 @@ interface CartVariant {
   id: string
   price: number
   stemLength: number | null
-  countPerBunch: number | null
+  quantityPerBunch: number | null
 }
 
 interface CartItemData {
@@ -33,7 +33,7 @@ export function CheckoutOrderItem({ item }: CheckoutOrderItemProps) {
   const price = item.productVariant?.price ?? 0
   const lineTotal = price * item.quantity
   const variantSpecs = item.productVariant
-    ? formatVariantSpecs(item.productVariant.stemLength, item.productVariant.countPerBunch)
+    ? formatVariantSpecs(item.productVariant.stemLength, item.productVariant.quantityPerBunch)
     : null
 
   return (

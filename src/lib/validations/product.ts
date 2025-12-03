@@ -9,7 +9,7 @@ const productVariantSchema = z.object({
       message: "Price must be a valid positive number",
     }),
   stemLength: z.string(),
-  countPerBunch: z.string(),
+  quantityPerBunch: z.string(),
   isBoxlot: z.boolean(),
 })
 
@@ -61,7 +61,7 @@ export const createProductSchema = z.object({
       z.object({
         price: z.number().min(0, "Price must be a positive number"),
         stemLength: z.number().nullable(),
-        countPerBunch: z.number().nullable(),
+        quantityPerBunch: z.number().nullable(),
         isBoxlot: z.boolean().default(false),
       })
     )

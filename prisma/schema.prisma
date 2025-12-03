@@ -173,7 +173,7 @@ model ProductVariant {
   productId           String
   price               Float
   stemLength          Int?                 @map("stem_length")
-  countPerBunch       Int?                 @map("count_per_bunch")
+  quantityPerBunch    Int?                 @map("quantity_per_bunch")
   isBoxlot            Boolean              @default(false) @map("is_boxlot")
   createdAt           DateTime             @default(now())
   updatedAt           DateTime             @updatedAt

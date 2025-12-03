@@ -11,7 +11,7 @@ interface ProductVariant {
   id: string
   price: number
   stemLength: number | null
-  countPerBunch: number | null
+  quantityPerBunch: number | null
   isBoxlot: boolean
 }
 
@@ -40,16 +40,16 @@ export function ProductControls({ product, user, mode = "card" }: ProductControl
 
   // Detect when we're in a "boxlot" context: all variants present are boxlots.
   // In that case we should only consider variants which have both stemLength and
-  // countPerBunch populated when deriving the selectable options.
+  // quantityPerBunch populated when deriving the selectable options.
   const isBoxlotMode = productVariants.length > 0 && productVariants.every((v) => v.isBoxlot)
 
   // Source variants used for selectors.
-  // When in boxlot mode, only use variants that have both stemLength and countPerBunch
+  // When in boxlot mode, only use variants that have both stemLength and quantityPerBunch
   // populated (complete boxlot variants). Otherwise use all product variants.
   const srcVariants = useMemo(
     () =>
       isBoxlotMode
-        ? productVariants.filter((v) => v.stemLength !== null && v.countPerBunch !== null)
+        ? productVariants.filter((v) => v.stemLength !== null && v.quantityPerBunch !== null)
         : productVariants,
     [productVariants, isBoxlotMode]
   )
@@ -66,7 +66,7 @@ export function ProductControls({ product, user, mode = "card" }: ProductControl
   const counts = useMemo(
     () =>
       Array.from(
-        new Set(srcVariants.map((v) => v.countPerBunch).filter((c): c is number => c !== null))
+        new Set(srcVariants.map((v) => v.quantityPerBunch).filter((c): c is number => c !== null))
       ).sort((a, b) => a - b),
     [srcVariants]
   )
@@ -81,7 +81,7 @@ export function ProductControls({ product, user, mode = "card" }: ProductControl
 
   const [selectedCount, setSelectedCount] = useState<number | null>(() => {
     const cnts = Array.from(
-      new Set(srcVariants.map((v) => v.countPerBunch).filter((c): c is number => c !== null))
+      new Set(srcVariants.map((v) => v.quantityPerBunch).filter((c): c is number => c !== null))
     ).sort((a, b) => a - b)
     return cnts.length > 0 ? cnts[0] : null
   })
@@ -93,7 +93,7 @@ export function ProductControls({ product, user, mode = "card" }: ProductControl
       new Set(
         srcVariants
           .filter((v) => v.stemLength === selectedStemLength)
-          .map((v) => v.countPerBunch)
+          .map((v) => v.quantityPerBunch)
           .filter((c): c is number => c !== null)
       )
     ).sort((a, b) => a - b)
@@ -105,7 +105,7 @@ export function ProductControls({ product, user, mode = "card" }: ProductControl
     return Array.from(
       new Set(
         srcVariants
-          .filter((v) => v.countPerBunch === selectedCount)
+          .filter((v) => v.quantityPerBunch === selectedCount)
           .map((v) => v.stemLength)
           .filter((l): l is number => l !== null)
       )
@@ -121,7 +121,7 @@ export function ProductControls({ product, user, mode = "card" }: ProductControl
         new Set(
           srcVariants
             .filter((v) => v.stemLength === length)
-            .map((v) => v.countPerBunch)
+            .map((v) => v.quantityPerBunch)
             .filter((c): c is number => c !== null)
         )
       ).sort((a, b) => a - b)
@@ -144,7 +144,7 @@ export function ProductControls({ product, user, mode = "card" }: ProductControl
       const availableLengths = Array.from(
         new Set(
           srcVariants
-            .filter((v) => v.countPerBunch === count)
+            .filter((v) => v.quantityPerBunch === count)
             .map((v) => v.stemLength)
             .filter((l): l is number => l !== null)
         )
@@ -168,7 +168,8 @@ export function ProductControls({ product, user, mode = "card" }: ProductControl
       (v) =>
         (v.stemLength === selectedStemLength ||
           (v.stemLength === null && selectedStemLength === null)) &&
-        (v.countPerBunch === selectedCount || (v.countPerBunch === null && selectedCount === null))
+        (v.quantityPerBunch === selectedCount ||
+          (v.quantityPerBunch === null && selectedCount === null))
     )
 
     return variant ?? srcVariants[0] ?? productVariants[0]
@@ -181,7 +182,7 @@ export function ProductControls({ product, user, mode = "card" }: ProductControl
     ).sort((a, b) => a - b)
 
     const cnts = Array.from(
-      new Set(srcVariants.map((v) => v.countPerBunch).filter((c): c is number => c !== null))
+      new Set(srcVariants.map((v) => v.quantityPerBunch).filter((c): c is number => c !== null))
     ).sort((a, b) => a - b)
 
     setSelectedStemLength(lengths.length > 0 ? lengths[0] : null)
@@ -252,7 +253,7 @@ export function ProductControls({ product, user, mode = "card" }: ProductControl
                   mode === "card" ? "text-xs font-medium text-muted-foreground mb-1 block" : ""
                 }
               >
-                Stem Count
+                Quantity
               </Label>
               <div className={cn("flex flex-wrap", mode === "detail" ? "gap-2" : "gap-1")}>
                 {counts.map((count) => {
@@ -275,7 +276,7 @@ export function ProductControls({ product, user, mode = "card" }: ProductControl
                             : "bg-gray-100 text-gray-400 border-gray-100 cursor-not-allowed"
                       )}
                     >
-                      x {count}
+                      {count}
                     </Button>
                   )
                 })}

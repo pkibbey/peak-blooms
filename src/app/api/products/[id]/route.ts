@@ -116,7 +116,7 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
               create: variants.map((v) => ({
                 price: v.price,
                 stemLength: v.stemLength ?? null,
-                countPerBunch: v.countPerBunch ?? null,
+                quantityPerBunch: v.quantityPerBunch ?? null,
                 isBoxlot: v.isBoxlot ?? false,
               })),
             },

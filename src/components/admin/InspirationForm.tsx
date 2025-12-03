@@ -1,10 +1,10 @@
 "use client"
 
+import { zodResolver } from "@hookform/resolvers/zod"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { useState } from "react"
 import { useForm } from "react-hook-form"
-import { zodResolver } from "@hookform/resolvers/zod"
 import { toast } from "sonner"
 import { ImageUpload } from "@/components/admin/ImageUpload"
 import ProductMultiSelect from "@/components/admin/ProductMultiSelect"
@@ -21,8 +21,8 @@ import {
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import {
-  inspirationSchema,
   type InspirationFormData,
+  inspirationSchema,
   type ProductSelection,
 } from "@/lib/validations/inspiration"
 
@@ -30,7 +30,7 @@ interface ProductVariant {
   id: string
   price: number
   stemLength: number | null
-  countPerBunch: number | null
+  quantityPerBunch: number | null
 }
 
 interface Product {

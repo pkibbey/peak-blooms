@@ -11,7 +11,7 @@ interface Product {
 interface ProductVariant {
   id: string
   stemLength: number | null
-  countPerBunch: number | null
+  quantityPerBunch: number | null
 }
 
 interface OrderItemData {
@@ -30,7 +30,7 @@ interface OrderItemProps {
 export function OrderItem({ item, linkHref }: OrderItemProps) {
   const lineTotal = item.price * item.quantity
   const variantSpecs = item.productVariant
-    ? formatVariantSpecs(item.productVariant.stemLength, item.productVariant.countPerBunch)
+    ? formatVariantSpecs(item.productVariant.stemLength, item.productVariant.quantityPerBunch)
     : null
 
   return (

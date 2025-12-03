@@ -56,16 +56,16 @@ export function formatDate(date: Date | string): string {
 }
 
 /**
- * Format variant specs (stem length and count per bunch) into a display string
- * @example formatVariantSpecs(50, 10) => "50cm • 10 stems"
+ * Formats product variant specifications for display
+ * @example formatVariantSpecs(50, 10) => "50cm • 10"
  * @example formatVariantSpecs(50, null) => "50cm"
- * @example formatVariantSpecs(null, 10) => "10 stems"
+ * @example formatVariantSpecs(null, 10) => "10"
  */
 export function formatVariantSpecs(
   stemLength: number | null | undefined,
-  countPerBunch: number | null | undefined
+  quantityPerBunch: number | null | undefined
 ): string {
-  return [stemLength ? `${stemLength}cm` : null, countPerBunch ? `${countPerBunch} stems` : null]
+  return [stemLength ? `${stemLength}cm` : null, quantityPerBunch ? `${quantityPerBunch}` : null]
     .filter(Boolean)
     .join(" • ")
 }

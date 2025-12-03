@@ -3,7 +3,6 @@ import Link from "next/link"
 import { notFound } from "next/navigation"
 import AddAllToCartButton from "@/components/site/AddAllToCartButton"
 import BackLink from "@/components/site/BackLink"
-import { PageHeader } from "@/components/site/PageHeader"
 import {
   Table,
   TableBody,
@@ -63,13 +62,13 @@ export default async function InspirationDetailPage({ params }: InspirationDetai
   }))
 
   return (
-    <div className="flex flex-col items-center justify-start bg-white py-16 font-sans">
-      <div className="w-full max-w-5xl px-6">
+    <div className="flex flex-col items-center justify-start bg-white py-12 md:py-20 font-sans">
+      <div className="w-full max-w-5xl px-4 md:px-6">
         {/* Navigation Back Link */}
         <BackLink href="/inspirations" label="inspirations" className="mb-8" />
 
-        {/* Featured Image */}
-        <div className="relative aspect-video overflow-hidden rounded-xs shadow-md mb-12">
+        {/* Featured Image - Enhanced with larger aspect ratio */}
+        <div className="relative aspect-video overflow-hidden rounded-lg shadow-lg mb-12 md:mb-16">
           <Image
             src={inspiration.image}
             alt={inspiration.name}
@@ -79,86 +78,100 @@ export default async function InspirationDetailPage({ params }: InspirationDetai
           />
         </div>
 
-        {/* Set Title and Subtitle */}
-        <PageHeader title={inspiration.name} description={inspiration.subtitle} />
-
-        {/* Inspiration Text */}
-        <div className="mb-12 p-6 bg-secondary/30 rounded-xs">
-          <h2 className="heading-2 mb-4">The Story</h2>
-          <p className="text-base leading-relaxed text-gray-700">{inspiration.inspirationText}</p>
+        {/* Header Section - Enhanced typography and spacing */}
+        <div className="mb-12 md:mb-16">
+          <h1 className="heading-1 text-4xl md:text-5xl mb-3 text-primary">{inspiration.name}</h1>
+          <p className="text-lg md:text-xl text-gray-600 leading-relaxed font-medium">
+            {inspiration.subtitle}
+          </p>
         </div>
 
-        {/* Products Section */}
-        <div>
-          <h2 className="text-2xl font-bold mb-6">Flowers in This Set</h2>
+        {/* Inspiration Story Section - Enhanced styling */}
+        <div className="mb-12 md:mb-16 p-8 md:p-10 bg-linear-to-br from-secondary/20 to-secondary/5 rounded-lg border border-secondary/30">
+          <div className="max-w-3xl">
+            <h2 className="heading-2 text-2xl md:text-3xl mb-6 text-primary flex items-center">
+              <span className="w-1 h-8 bg-primary rounded-full mr-4"></span>
+              The Story
+            </h2>
+            <p className="text-base md:text-lg leading-relaxed text-gray-700 whitespace-pre-line">
+              {inspiration.inspirationText}
+            </p>
+          </div>
+        </div>
 
-          {/* Product Checklist Table */}
-          <div className="rounded-md border">
+        {/* Products Section - Enhanced with better visual hierarchy */}
+        <div className="w-full">
+          <h2 className="heading-2 text-2xl md:text-3xl mb-2 text-primary">Flowers in This Set</h2>
+          <p className="text-gray-600 mb-8 text-sm md:text-base">
+            Carefully curated combinations for your inspirations
+          </p>
+
+          {/* Product Table with Enhanced Styling */}
+          <div className="rounded-lg border border-gray-200 overflow-hidden shadow-sm">
             <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Image</TableHead>
-                  <TableHead>Product</TableHead>
-                  <TableHead>Variant</TableHead>
-                  <TableHead>Quantity</TableHead>
+              <TableHeader className="bg-gray-50">
+                <TableRow className="hover:bg-gray-50">
+                  <TableHead className="font-semibold text-primary">Image</TableHead>
+                  <TableHead className="font-semibold text-primary">Product</TableHead>
+                  <TableHead className="font-semibold text-primary">Details</TableHead>
+                  <TableHead className="font-semibold text-primary text-right">Qty</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {productsWithVariants.map((product) => (
-                  <TableRow key={product.slug}>
-                    <TableCell>
+                {productsWithVariants.map((product, index) => (
+                  <TableRow
+                    key={product.slug}
+                    className={index % 2 === 0 ? "bg-white" : "bg-gray-50/40 hover:bg-gray-50"}
+                  >
+                    <TableCell className="py-4">
                       <Link href={`/shop/${product.slug}`} className="block">
                         {product.image ? (
-                          <div className="relative h-16 w-16 overflow-hidden rounded-sm bg-muted">
+                          <div className="relative h-20 w-20 overflow-hidden rounded-md bg-muted shadow-sm hover:shadow-md transition-shadow">
                             <Image
                               src={product.image}
                               alt={product.name}
                               fill
-                              className="object-cover"
-                              sizes="64px"
+                              className="object-cover hover:scale-105 transition-transform duration-300"
+                              sizes="80px"
                             />
                           </div>
                         ) : (
-                          <div className="h-16 w-16 rounded-sm bg-muted flex items-center justify-center text-xs text-muted-foreground">
+                          <div className="h-20 w-20 rounded-md bg-muted flex items-center justify-center text-xs text-muted-foreground">
                             No image
                           </div>
                         )}
                       </Link>
                     </TableCell>
-                    <TableCell>
+                    <TableCell className="py-4">
                       <Link
                         href={`/shop/${product.slug}`}
-                        className="text-primary font-medium hover:underline"
+                        className="text-primary font-semibold hover:underline text-base"
                       >
                         {product.name}
                       </Link>
                     </TableCell>
-                    <TableCell>
+                    <TableCell className="py-4">
                       {product.displayVariant ? (
-                        <div className="text-sm text-muted-foreground">
-                          <div className="font-medium">
+                        <div className="text-sm">
+                          <div className="font-semibold text-gray-900 mb-1">
                             ${product.displayVariant.price.toFixed(2)}
                           </div>
-                          <div className="text-xs">
-                            {product.displayVariant.stemLength
-                              ? `${product.displayVariant.stemLength}cm`
-                              : ""}
-                            {product.displayVariant.stemLength &&
-                            product.displayVariant.countPerBunch
-                              ? " · "
-                              : ""}
-                            {product.displayVariant.countPerBunch
-                              ? `${product.displayVariant.countPerBunch} stems`
-                              : ""}
+                          <div className="text-xs text-gray-600 space-y-0.5">
+                            {product.displayVariant.stemLength && (
+                              <div>Stem length: {product.displayVariant.stemLength}cm</div>
+                            )}
+                            {product.displayVariant.quantityPerBunch && (
+                              <div>{product.displayVariant.quantityPerBunch} per bunch</div>
+                            )}
                           </div>
                         </div>
                       ) : (
                         <div className="text-sm text-muted-foreground">No variant</div>
                       )}
                     </TableCell>
-                    <TableCell>
-                      <span className="inline-flex items-center justify-center min-w-8 px-2 py-1 text-sm font-medium bg-secondary rounded">
-                        ×{product.quantity}
+                    <TableCell className="py-4 text-right">
+                      <span className="inline-flex items-center justify-center min-w-10 px-3 py-1 text-sm font-semibold bg-primary/10 text-primary rounded-full">
+                        {product.quantity}
                       </span>
                     </TableCell>
                   </TableRow>
@@ -168,15 +181,29 @@ export default async function InspirationDetailPage({ params }: InspirationDetai
           </div>
         </div>
 
-        {/* Add All to Cart Button */}
-        <div className="mt-12">
-          <AddAllToCartButton
-            productIds={productsWithVariants.map((p) => p.id)}
-            productVariantIds={productsWithVariants.map((p) => p.displayVariant?.id ?? null)}
-            quantities={productsWithVariants.map((p) => p.quantity)}
-            setName={inspiration.name}
-            user={user}
-          />
+        {/* Call to Action Section - Enhanced styling and positioning */}
+        <div className="mt-16 md:mt-20 w-full">
+          <div className="bg-linear-to-r from-primary/5 to-secondary/5 rounded-lg p-8 md:p-12 border border-primary/10">
+            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
+              <div>
+                <h3 className="heading-3 text-xl md:text-2xl text-primary mb-2">
+                  Add This Set to Your Cart
+                </h3>
+                <p className="text-gray-600 text-sm md:text-base">
+                  Get all flowers from this inspiration in one seamless order
+                </p>
+              </div>
+              <div className="md:shrink-0">
+                <AddAllToCartButton
+                  productIds={productsWithVariants.map((p) => p.id)}
+                  productVariantIds={productsWithVariants.map((p) => p.displayVariant?.id ?? null)}
+                  quantities={productsWithVariants.map((p) => p.quantity)}
+                  setName={inspiration.name}
+                  user={user}
+                />
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>

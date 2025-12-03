@@ -9,7 +9,7 @@ interface ProductVariant {
   id: string
   price: number
   stemLength: number | null
-  countPerBunch: number | null
+  quantityPerBunch: number | null
 }
 
 interface Product {

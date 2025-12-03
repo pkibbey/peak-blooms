@@ -26,7 +26,6 @@ export default async function CartPage() {
 
   // Fetch cart data server-side
   const cart = await getOrCreateCart(user)
-  console.log("cart", cart)
 
   const total = cart ? calculateCartTotal(cart.items) : 0
 

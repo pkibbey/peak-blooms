@@ -93,7 +93,7 @@ export async function getProductById(
   )
 }
 
-export interface GetProductsOptions {
+interface GetProductsOptions {
   collectionId?: string
   featured?: boolean
   colors?: string[]
@@ -106,7 +106,7 @@ export interface GetProductsOptions {
   offset?: number
 }
 
-export interface GetProductsResult {
+interface GetProductsResult {
   products: ProductWithVariantsAndCollection[]
   total: number
   limit: number

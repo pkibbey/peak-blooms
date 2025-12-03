@@ -52,7 +52,7 @@ interface ProductFormProps {
       id: string
       price: number
       stemLength: number | null
-      countPerBunch: number | null
+      quantityPerBunch: number | null
       isBoxlot: boolean
     }[]
   }
@@ -92,10 +92,10 @@ export default function ProductForm({ collections, product }: ProductFormProps) 
               id: v.id,
               price: v.price.toString(),
               stemLength: v.stemLength?.toString() || "",
-              countPerBunch: v.countPerBunch?.toString() || "",
+              quantityPerBunch: v.quantityPerBunch?.toString() || "",
               isBoxlot: v.isBoxlot || false,
             }))
-          : [{ price: "", stemLength: "", countPerBunch: "", isBoxlot: false }],
+          : [{ price: "", stemLength: "", quantityPerBunch: "", isBoxlot: false }],
     },
   })
 
@@ -117,7 +117,7 @@ export default function ProductForm({ collections, product }: ProductFormProps) 
         .map((v) => ({
           price: Number.parseFloat(v.price),
           stemLength: v.stemLength ? Number.parseInt(v.stemLength) : null,
-          countPerBunch: v.countPerBunch ? Number.parseInt(v.countPerBunch) : null,
+          quantityPerBunch: v.quantityPerBunch ? Number.parseInt(v.quantityPerBunch) : null,
           isBoxlot: v.isBoxlot,
         }))
 
@@ -177,7 +177,7 @@ export default function ProductForm({ collections, product }: ProductFormProps) 
   }
 
   const addVariant = () => {
-    append({ price: "", stemLength: "", countPerBunch: "", isBoxlot: false })
+    append({ price: "", stemLength: "", quantityPerBunch: "", isBoxlot: false })
   }
 
   // Watch the slug for ImageUpload
@@ -474,10 +474,10 @@ export default function ProductForm({ collections, product }: ProductFormProps) 
                   )}
                 />
 
-                {/* Count Per Bunch */}
+                {/* Quantity Per Bunch */}
                 <FormField
                   control={form.control}
-                  name={`variants.${index}.countPerBunch`}
+                  name={`variants.${index}.quantityPerBunch`}
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Stems Per Bunch</FormLabel>

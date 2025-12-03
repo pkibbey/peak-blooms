@@ -15,7 +15,7 @@ export default async function EditProductPage({ params }: EditProductPageProps) 
       where: { id },
       include: {
         variants: {
-          orderBy: [{ stemLength: "asc" }, { countPerBunch: "asc" }],
+          orderBy: [{ stemLength: "asc" }, { quantityPerBunch: "asc" }],
         },
       },
     }),

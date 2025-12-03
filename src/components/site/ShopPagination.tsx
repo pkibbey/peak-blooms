@@ -59,7 +59,6 @@ export function ShopPagination({ currentPage, totalPages, searchParams }: ShopPa
       {/* Page Numbers */}
       <div className="flex items-center gap-1">
         {pages.map((page, index) => {
-          console.log("page: ", page)
           if (page === "...") {
             return (
               <span

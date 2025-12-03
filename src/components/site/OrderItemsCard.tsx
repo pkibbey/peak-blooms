@@ -10,7 +10,7 @@ interface Product {
 interface ProductVariant {
   id: string
   stemLength: number | null
-  countPerBunch: number | null
+  quantityPerBunch: number | null
 }
 
 interface OrderItemData {

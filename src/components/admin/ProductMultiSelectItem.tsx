@@ -15,7 +15,7 @@ interface ProductVariant {
   id: string
   price: number
   stemLength: number | null
-  countPerBunch: number | null
+  quantityPerBunch: number | null
 }
 
 interface Product {
@@ -41,7 +41,7 @@ interface ProductMultiSelectItemProps {
 function formatVariantLabel(variant: ProductVariant): string {
   const parts = []
   if (variant.stemLength) parts.push(`${variant.stemLength}cm`)
-  if (variant.countPerBunch) parts.push(`${variant.countPerBunch} stems`)
+  if (variant.quantityPerBunch) parts.push(`${variant.quantityPerBunch}`)
   parts.push(`$${variant.price.toFixed(2)}`)
   return parts.join(" • ")
 }
