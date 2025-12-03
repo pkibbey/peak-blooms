@@ -47,6 +47,7 @@ export default async function ShopPage({ searchParams }: ShopPageProps) {
     typeof params.stemLengthMax === "string" ? parseInt(params.stemLengthMax, 10) : undefined
   const priceMin = typeof params.priceMin === "string" ? parseFloat(params.priceMin) : undefined
   const priceMax = typeof params.priceMax === "string" ? parseFloat(params.priceMax) : undefined
+  const search = typeof params.search === "string" ? params.search : undefined
   const boxlotOnly = params.boxlotOnly === "true"
   const viewMode = typeof params.view === "string" ? params.view : "grid"
   const page = typeof params.page === "string" ? parseInt(params.page, 10) : 1
@@ -63,6 +64,7 @@ export default async function ShopPage({ searchParams }: ShopPageProps) {
         stemLengthMax !== undefined && !Number.isNaN(stemLengthMax) ? stemLengthMax : undefined,
       priceMin: priceMin !== undefined && !Number.isNaN(priceMin) ? priceMin : undefined,
       priceMax: priceMax !== undefined && !Number.isNaN(priceMax) ? priceMax : undefined,
+      search: search || undefined,
       boxlotOnly,
       limit: ITEMS_PER_PAGE,
       offset,
@@ -116,12 +118,18 @@ export default async function ShopPage({ searchParams }: ShopPageProps) {
           </div>
 
           {/* Products Info */}
-          {result.products.length > 0 && (
-            <p className="text-sm text-muted-foreground mb-4">
-              Showing {result.offset + 1} to{" "}
-              {Math.min(result.offset + ITEMS_PER_PAGE, result.total)} of {result.total} products
-            </p>
-          )}
+          <div className="flex gap-4 justify-between items-center mb-4">
+            {result.products.length > 0 && (
+              <p className="text-sm text-muted-foreground">
+                Showing {result.offset + 1} to{" "}
+                {Math.min(result.offset + ITEMS_PER_PAGE, result.total)} of {result.total} products
+              </p>
+            )}
+            {/* Pagination */}
+            {totalPages > 1 && (
+              <ShopPagination currentPage={page} totalPages={totalPages} searchParams={params} />
+            )}
+          </div>
 
           {/* Products Grid or Table */}
           {result.products.length === 0 ? (
@@ -130,7 +138,7 @@ export default async function ShopPage({ searchParams }: ShopPageProps) {
             </div>
           ) : viewMode === "table" ? (
             <>
-              <div className="rounded-md border mb-8">
+              <div className="rounded-md border mb-4">
                 <Table>
                   <TableHeader>
                     <TableRow>
@@ -151,7 +159,13 @@ export default async function ShopPage({ searchParams }: ShopPageProps) {
 
               {/* Pagination */}
               {totalPages > 1 && (
-                <ShopPagination currentPage={page} totalPages={totalPages} searchParams={params} />
+                <div className="flex justify-end">
+                  <ShopPagination
+                    currentPage={page}
+                    totalPages={totalPages}
+                    searchParams={params}
+                  />
+                </div>
               )}
             </>
           ) : (

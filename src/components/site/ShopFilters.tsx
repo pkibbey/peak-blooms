@@ -3,6 +3,7 @@
 import { ChevronDown, Filter, X } from "lucide-react"
 import { useRouter, useSearchParams } from "next/navigation"
 import { useCallback, useState } from "react"
+import { SearchInput } from "@/components/site/SearchInput"
 import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
 import { cn } from "@/lib/utils"
@@ -237,6 +238,9 @@ export function ShopFilters({ availableColors = [], availableCollections = [] }:
         </div>
 
         <div className="space-y-6">
+          {/* Search Filter */}
+          <SearchInput />
+
           {/* Colors Filter */}
           {availableColors.length > 0 && (
             <FilterSection title="Color">

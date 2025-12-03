@@ -2,7 +2,6 @@ import Link from "next/link"
 import { Badge } from "@/components/ui/badge"
 import {
   IconClock,
-  IconInfo,
   IconMapPin,
   IconPackage,
   IconShoppingCart,

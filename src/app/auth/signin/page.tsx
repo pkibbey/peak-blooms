@@ -2,7 +2,7 @@
 
 import { zodResolver } from "@hookform/resolvers/zod"
 import Link from "next/link"
-import { useRouter, useSearchParams } from "next/navigation"
+import { useSearchParams } from "next/navigation"
 import { useState } from "react"
 import { useForm } from "react-hook-form"
 import { Button } from "@/components/ui/button"
@@ -19,7 +19,6 @@ import { authClient } from "@/lib/auth-client"
 import { type SignInFormData, signInSchema } from "@/lib/validations/auth"
 
 export default function SignInPage() {
-  const router = useRouter()
   const searchParams = useSearchParams()
   // If a caller passed a callbackUrl (e.g. /admin) keep it; otherwise send
   // users through a short server-side redirect handler which will route

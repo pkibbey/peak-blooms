@@ -102,6 +102,7 @@ interface GetProductsOptions {
   priceMin?: number
   priceMax?: number
   boxlotOnly?: boolean
+  search?: string
   limit?: number
   offset?: number
 }
@@ -136,6 +137,14 @@ export async function getProducts(
     // Accept a colors array for filtering; find products that contain at least one of the values
     if (options.colors) {
       where.colors = { hasSome: options.colors }
+    }
+
+    // Search by product name or description (case-insensitive)
+    if (options.search) {
+      where.OR = [
+        { name: { contains: options.search, mode: "insensitive" } },
+        { description: { contains: options.search, mode: "insensitive" } },
+      ]
     }
 
     // Build variant filters

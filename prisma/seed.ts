@@ -48,6 +48,7 @@ function readProductsFromCSV(): Array<{
   price: number
   type: "FLOWER" | "FILLER"
   quantity: number
+  description: string
 }> {
   const csvPath = path.join(__dirname, "products.csv")
   const fileContent = fs.readFileSync(csvPath, "utf-8")
@@ -58,6 +59,7 @@ function readProductsFromCSV(): Array<{
     price: number
     type: "FLOWER" | "FILLER"
     quantity: number
+    description: string
   }> = []
 
   // Skip header row (line 0)
@@ -67,18 +69,19 @@ function readProductsFromCSV(): Array<{
 
     // Parse CSV line (handle quoted fields with commas)
     const match = line.match(/"([^"]*)"|([^,]+)/g) || []
-    if (match.length < 3) continue
+    if (match.length < 4) continue
 
     const name = (match[0] || "").replace(/"/g, "").trim()
     const priceStr = (match[1] || "").replace(/"/g, "").trim()
     const typeStr = (match[2] || "").replace(/"/g, "").trim()
+    const description = (match[3] || "").replace(/"/g, "").trim()
 
     const price = parsePrice(priceStr)
     const quantity = getQuantity(priceStr)
     const type = typeStr === "FILLER" ? "FILLER" : "FLOWER"
 
     if (name) {
-      products.push({ name, price, type, quantity })
+      products.push({ name, price, type, quantity, description })
     }
   }
 
@@ -470,7 +473,6 @@ async function main() {
   // Seed products from CSV file
   console.log("📦 Seeding products from CSV...")
   const csvProducts = readProductsFromCSV()
-  console.log("csvProducts: ", csvProducts)
   let productsCreated = 0
   let productsSkipped = 0
 
@@ -489,6 +491,7 @@ async function main() {
         create: {
           name: csvProduct.name,
           slug: slug,
+          description: csvProduct.description,
           collectionId: collection.id,
           productType: csvProduct.type,
           colors: [], // No colors specified from CSV, can be added manually later
@@ -505,6 +508,7 @@ async function main() {
         where: { slug: slug },
         update: {
           name: csvProduct.name,
+          description: csvProduct.description,
           collectionId: collection.id,
           productType: csvProduct.type,
         },

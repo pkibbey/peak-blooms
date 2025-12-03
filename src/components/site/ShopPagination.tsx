@@ -36,7 +36,7 @@ export function ShopPagination({ currentPage, totalPages, searchParams }: ShopPa
   const pages = getPaginationRange(currentPage, totalPages)
 
   return (
-    <div className="flex items-center justify-center gap-2 mt-8">
+    <div className="flex items-center justify-center gap-2">
       {/* Previous Button */}
       <Button
         variant="outline"

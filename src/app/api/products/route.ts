@@ -7,7 +7,7 @@ import { createProductSchema } from "@/lib/validations/product"
 /**
  * GET /api/products
  * Get all products (with optional filtering and pagination)
- * Query params: collectionId, featured, colors, stemLength, priceMin, priceMax, limit, offset
+ * Query params: collectionId, featured, colors, stemLength, priceMin, priceMax, search, limit, offset
  * Prices are adjusted based on the authenticated user's price multiplier
  * Returns: { products: ProductWithVariantsAndCollection[], total: number, limit: number, offset: number }
  */
@@ -27,6 +27,7 @@ export async function GET(request: NextRequest) {
     const colorsFromQuery = searchParams.getAll("colors")
     const priceMin = searchParams.get("priceMin")
     const priceMax = searchParams.get("priceMax")
+    const search = searchParams.get("search")
     const boxlotOnly = searchParams.get("boxlotOnly")
     const limitParam = searchParams.get("limit")
     const offsetParam = searchParams.get("offset")
@@ -50,6 +51,7 @@ export async function GET(request: NextRequest) {
             : undefined,
         priceMin: priceMin ? parseFloat(priceMin) : undefined,
         priceMax: priceMax ? parseFloat(priceMax) : undefined,
+        search: search || undefined,
         boxlotOnly: boxlotOnly === "true",
         limit,
         offset,
