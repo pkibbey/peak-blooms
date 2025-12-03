@@ -5,6 +5,7 @@ import { useState } from "react"
 import { IconPackage } from "@/components/ui/icons"
 import { Label } from "@/components/ui/label"
 import { Switch } from "@/components/ui/switch"
+import { ITEMS_PER_PAGE } from "@/lib/consts"
 
 export function BoxlotFilter() {
   const router = useRouter()
@@ -13,7 +14,6 @@ export function BoxlotFilter() {
 
   // Keep the page param within valid range when filters reduce result size.
   const [isCounting, setIsCounting] = useState(false)
-  const ITEMS_PER_PAGE = 12 // must match /src/app/shop/page.tsx
 
   const toggleBoxlotFilter = async (checked: boolean) => {
     const params = new URLSearchParams(searchParams.toString())

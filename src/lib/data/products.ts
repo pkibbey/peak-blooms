@@ -12,6 +12,7 @@ import type {
   ProductWithVariantsAndCollection,
 } from "@/lib/types/prisma"
 import { adjustPrice } from "@/lib/utils"
+import { ITEMS_PER_PAGE } from "../consts"
 import { withTiming } from "./logger"
 
 /**
@@ -160,7 +161,7 @@ export async function getProducts(
     }
 
     // Set default pagination values
-    const limit = options.limit ?? 12
+    const limit = options.limit ?? ITEMS_PER_PAGE
     const offset = options.offset ?? 0
 
     // Get total count for pagination metadata

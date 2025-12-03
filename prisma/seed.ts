@@ -50,8 +50,11 @@ function readProductsFromCSV(): Array<{
   quantity: number
   description: string
   colors: string[]
+  image?: string
 }> {
-  const csvPath = path.join(__dirname, "products.csv")
+  // Get the CSV path using process.cwd() since __dirname may be unreliable with tsx
+  const csvPath = path.join(process.cwd(), "prisma", "products.csv")
+  console.log(`Reading CSV from: ${csvPath}`)
   const fileContent = fs.readFileSync(csvPath, "utf-8")
   const lines = fileContent.split("\n")
 
@@ -62,6 +65,7 @@ function readProductsFromCSV(): Array<{
     quantity: number
     description: string
     colors: string[]
+    image?: string
   }> = []
 
   // Skip header row (line 0)
@@ -78,6 +82,7 @@ function readProductsFromCSV(): Array<{
     const typeStr = (match[2] || "").replace(/"/g, "").trim()
     const description = (match[3] || "").replace(/"/g, "").trim()
     const colorsStr = (match[4] || "").replace(/"/g, "").trim()
+    const imageStr = (match[5] || "").replace(/"/g, "").trim()
 
     const price = parsePrice(priceStr)
     const quantity = getQuantity(priceStr)
@@ -89,7 +94,15 @@ function readProductsFromCSV(): Array<{
       .filter(Boolean)
 
     if (name) {
-      products.push({ name, price, type, quantity, description, colors })
+      products.push({
+        name,
+        price,
+        type,
+        quantity,
+        description,
+        colors,
+        image: imageStr || undefined,
+      })
     }
   }
 
@@ -261,6 +274,7 @@ async function main() {
           description: csvProduct.description,
           productType: csvProduct.type,
           colors: csvProduct.colors, // Color IDs from CSV
+          image: csvProduct.image || null, // Image from CSV (or null if not set)
           featured: false,
           variants: {
             create: [
@@ -277,6 +291,7 @@ async function main() {
           description: csvProduct.description,
           productType: csvProduct.type,
           colors: csvProduct.colors, // Update colors from CSV
+          image: csvProduct.image || null, // Update image from CSV
         },
       })
 

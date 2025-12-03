@@ -1,5 +1,6 @@
 import { type NextRequest, NextResponse } from "next/server"
 import { getSession } from "@/lib/auth"
+import { ITEMS_PER_PAGE } from "@/lib/consts"
 import { getProducts } from "@/lib/data"
 import { db } from "@/lib/db"
 import { createProductSchema } from "@/lib/validations/product"
@@ -33,7 +34,6 @@ export async function GET(request: NextRequest) {
           )
         : undefined
     const featured = searchParams.get("featured")
-    // Support multi-color query param: ?colors=#FF0000&colors=#00FF00 or ?colors=#FF0000,#00FF00
     const colorsFromQuery = searchParams.getAll("colors")
     const priceMin = searchParams.get("priceMin")
     const priceMax = searchParams.get("priceMax")
@@ -41,7 +41,7 @@ export async function GET(request: NextRequest) {
     const boxlotOnly = searchParams.get("boxlotOnly")
     const limitParam = searchParams.get("limit")
     const offsetParam = searchParams.get("offset")
-    const limit = limitParam ? parseInt(limitParam, 10) : 12
+    const limit = limitParam ? parseInt(limitParam, 10) : ITEMS_PER_PAGE
     const offset = offsetParam ? parseInt(offsetParam, 10) : 0
 
     const result = await getProducts(

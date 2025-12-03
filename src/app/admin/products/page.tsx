@@ -3,6 +3,7 @@ import { AdminPagination } from "@/components/admin/AdminPagination"
 import ProductsTable from "@/components/admin/ProductsTable"
 import BackLink from "@/components/site/BackLink"
 import { Button } from "@/components/ui/button"
+import { ITEMS_PER_PAGE } from "@/lib/consts"
 
 // no direct db usage here — use DAL
 
@@ -10,12 +11,10 @@ interface AdminProductsPageProps {
   searchParams: Promise<Record<string, string | string[] | undefined>>
 }
 
-const ITEMS_PER_PAGE = 20
-
 export default async function AdminProductsPage({ searchParams }: AdminProductsPageProps) {
   const params = await searchParams
   // Parse page from search params (1-indexed), reset to 1 on sort change
-  const page = typeof params?.page === "string" ? parseInt(params.page, 20) : 1
+  const page = typeof params?.page === "string" ? parseInt(params.page, 10) : 1
   const offset = Math.max(0, (page - 1) * ITEMS_PER_PAGE)
 
   // Parse sort params

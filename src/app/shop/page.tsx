@@ -8,6 +8,7 @@ import { ShopProductTableRow } from "@/components/site/ShopProductTableRow"
 import { ViewToggle } from "@/components/site/ViewToggle"
 import { SortableTableHead } from "@/components/ui/SortableTableHead"
 import { Table, TableBody, TableHead, TableHeader, TableRow } from "@/components/ui/table"
+import { ITEMS_PER_PAGE } from "@/lib/consts"
 import { getCurrentUser } from "@/lib/current-user"
 import { getProducts, getShopFilterOptions } from "@/lib/data"
 
@@ -19,8 +20,6 @@ export const metadata = {
   title: "Peak Blooms - Shop",
   description: "Browse our full catalog of premium flowers",
 }
-
-const ITEMS_PER_PAGE = 12
 
 export default async function ShopPage({ searchParams }: ShopPageProps) {
   const params = await searchParams
@@ -169,7 +168,7 @@ export default async function ShopPage({ searchParams }: ShopPageProps) {
 
           {/* Products Grid or Table */}
           {products.length === 0 ? (
-            <div className="flex justify-center items-center py-12">
+            <div className="flex justify-center items-center py-20">
               <p className="text-muted-foreground">No products found matching your filters.</p>
             </div>
           ) : viewMode === "table" ? (

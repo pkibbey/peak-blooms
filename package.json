@@ -2,6 +2,7 @@
   "name": "peak-blooms",
   "version": "0.1.0",
   "private": true,
+  "type": "module",
   "scripts": {
     "dev": "next dev --turbopack",
     "build": "next build",
@@ -26,6 +27,7 @@
     "better-auth": "^1.4.4",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
+    "dotenv": "^17.2.3",
     "lucide-react": "^0.555.0",
     "next": "^15",
     "pg": "^8.16.3",
