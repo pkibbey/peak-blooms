@@ -10,6 +10,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
+import { formatPrice } from "@/lib/utils"
 
 interface ProductVariant {
   id: string
@@ -42,7 +43,7 @@ function formatVariantLabel(variant: ProductVariant): string {
   const parts = []
   if (variant.stemLength) parts.push(`${variant.stemLength}cm`)
   if (variant.quantityPerBunch) parts.push(`${variant.quantityPerBunch}`)
-  parts.push(`$${variant.price.toFixed(2)}`)
+  parts.push(formatPrice(variant.price))
   return parts.join(" • ")
 }
 

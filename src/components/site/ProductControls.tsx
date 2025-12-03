@@ -5,7 +5,7 @@ import { useCallback, useEffect, useMemo, useState } from "react"
 import AddToCartButton from "@/components/site/AddToCartButton"
 import { Button } from "@/components/ui/button"
 import { Label } from "@/components/ui/label"
-import { cn } from "@/lib/utils"
+import { cn, formatPrice } from "@/lib/utils"
 
 interface ProductVariant {
   id: string
@@ -298,7 +298,7 @@ export function ProductControls({ product, user, mode = "card" }: ProductControl
           <div
             className={cn("font-bold text-primary", mode === "detail" ? "text-4xl" : "text-3xl")}
           >
-            ${currentPrice.toFixed(2)}
+            {formatPrice(currentPrice)}
           </div>
           {variantSummary && (
             <div

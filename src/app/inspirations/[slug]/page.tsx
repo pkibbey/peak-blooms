@@ -14,6 +14,7 @@ import {
 import { getCurrentUser } from "@/lib/current-user"
 import { getAllInspirationSlugs, getInspirationBySlug } from "@/lib/data"
 import { db } from "@/lib/db"
+import { formatPrice } from "@/lib/utils"
 
 interface InspirationDetailPageProps {
   params: Promise<{
@@ -154,7 +155,7 @@ export default async function InspirationDetailPage({ params }: InspirationDetai
                       {product.displayVariant ? (
                         <div className="text-sm">
                           <div className="font-semibold text-gray-900 mb-1">
-                            ${product.displayVariant.price.toFixed(2)}
+                            {formatPrice(product.displayVariant.price)}
                           </div>
                           <div className="text-xs text-gray-600 space-y-0.5">
                             {product.displayVariant.stemLength && (

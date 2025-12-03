@@ -9,6 +9,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
+import { formatPrice } from "@/lib/utils"
 
 interface Product {
   id: string
@@ -67,8 +68,8 @@ export default function ProductsTable({ products }: ProductsTableProps) {
             const { minPrice, maxPrice } = getPriceRange(product.variants)
             const priceDisplay =
               minPrice === maxPrice
-                ? `$${minPrice.toFixed(2)}`
-                : `$${minPrice.toFixed(2)} - $${maxPrice.toFixed(2)}`
+                ? `${formatPrice(minPrice)}`
+                : `${formatPrice(minPrice)} - ${formatPrice(maxPrice)}`
 
             return (
               <TableRow key={product.id}>

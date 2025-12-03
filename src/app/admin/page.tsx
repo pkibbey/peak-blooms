@@ -1,6 +1,7 @@
 import ActivityFeed from "@/components/admin/ActivityFeed"
 import QuickActions from "@/components/admin/QuickActions"
 import { db } from "@/lib/db"
+import { formatPrice } from "@/lib/utils"
 
 export default async function AdminDashboard() {
   // Recent items for activity feed
@@ -18,7 +19,7 @@ export default async function AdminDashboard() {
       id: o.id,
       type: "order",
       title: `Order ${o.orderNumber} placed`,
-      subtitle: `${o.user?.name ?? o.user?.email ?? "Unknown"} — $${o.total.toFixed(2)}`,
+      subtitle: `${o.user?.name ?? o.user?.email ?? "Unknown"} — ${formatPrice(o.total)}`,
       createdAt: o.createdAt.toISOString(),
       href: `/admin/orders/${o.id}`,
     })),

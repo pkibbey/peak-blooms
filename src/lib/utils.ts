@@ -40,6 +40,9 @@ export function isValidPriceMultiplier(multiplier: number): boolean {
  * Format a number as USD currency
  */
 export function formatPrice(price: number): string {
+  // If a product's price is 0, we display 'Market Price' instead of "$0.00"
+  if (price === 0) return "market"
+
   return new Intl.NumberFormat("en-US", {
     style: "currency",
     currency: "USD",
