@@ -11,12 +11,9 @@ interface ShopProductTableRowProps {
   product: ProductModel & {
     variants?: ProductVariantModel[]
   }
-  user?: {
-    approved: boolean
-  } | null
 }
 
-export function ShopProductTableRow({ product, user }: ShopProductTableRowProps) {
+export function ShopProductTableRow({ product }: ShopProductTableRowProps) {
   const hasBoxlotVariant = product.variants?.some((v) => v.isBoxlot) ?? false
 
   // Calculate price range

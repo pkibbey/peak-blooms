@@ -75,7 +75,7 @@ export default async function ShopPage({ searchParams }: ShopPageProps) {
   const totalPages = Math.ceil(result.total / ITEMS_PER_PAGE)
 
   return (
-    <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-10">
+    <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 py-10">
       <PageHeader title="Shop" description="Browse our full catalog of premium flowers" />
 
       <div className="flex gap-6 lg:gap-8">
@@ -152,7 +152,7 @@ export default async function ShopPage({ searchParams }: ShopPageProps) {
                   </TableHeader>
                   <TableBody>
                     {result.products.map((product) => (
-                      <ShopProductTableRow key={product.slug} product={product} user={user} />
+                      <ShopProductTableRow key={product.slug} product={product} />
                     ))}
                   </TableBody>
                 </Table>
@@ -171,7 +171,7 @@ export default async function ShopPage({ searchParams }: ShopPageProps) {
             </>
           ) : (
             <>
-              <div className="grid grid-cols-2 gap-4 sm:gap-6 md:grid-cols-3 lg:grid-cols-4 mb-8">
+              <div className="grid grid-cols-2 gap-4 sm:gap-6 md:grid-cols-3 mb-8">
                 {result.products.map((product) => (
                   <ProductCard key={product.slug} product={product} user={user} />
                 ))}

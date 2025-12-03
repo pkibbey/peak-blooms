@@ -52,11 +52,11 @@ export function SearchInput() {
         <input
           id="search"
           type="text"
-          placeholder="Search by name or description..."
+          placeholder="Search by name or description"
           value={searchTerm}
           onChange={(e) => onInputChange(e.target.value)}
           className={cn(
-            "w-full pl-9 pr-9 py-2 rounded-md border border-input bg-background",
+            "w-full pl-9 pr-3 py-2 rounded-md border border-input bg-background",
             "placeholder:text-muted-foreground",
             "focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-0",
             "text-sm"

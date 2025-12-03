@@ -6,7 +6,6 @@
 - [ ] Create the seed images using AI
 - [ ] Turn the development of this into a website using git commits
 - [ ] Add a banner that Non-intrusively collects of email of a user to sign up for newsletter for weekly specials
-- [ ] Add pagination to the admin products page
 - [ ] Add sortable columns to the products table
 
 ### 🪨 Code Stability
