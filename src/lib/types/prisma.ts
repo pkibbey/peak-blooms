@@ -68,6 +68,11 @@ export type ProductWithInspirations = Prisma.ProductGetPayload<{
 /** Basic collection without relations */
 export type CollectionBasic = Prisma.CollectionGetPayload<Record<string, never>>
 
+/** Basic collection including product count (_count.productCollections) */
+export type CollectionBasicWithCount = Prisma.CollectionGetPayload<{
+  include: { _count: { select: { productCollections: true } } }
+}>
+
 /** Collection with all products and their variants */
 export type CollectionWithProducts = Prisma.CollectionGetPayload<{
   include: {

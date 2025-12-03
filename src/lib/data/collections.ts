@@ -4,7 +4,7 @@
  */
 
 import { db } from "@/lib/db"
-import type { CollectionBasic, CollectionWithProducts } from "@/lib/types/prisma"
+import type { CollectionBasicWithCount, CollectionWithProducts } from "@/lib/types/prisma"
 import { adjustPrice } from "@/lib/utils"
 import { withTiming } from "./logger"
 
@@ -33,12 +33,11 @@ function applyMultiplierToCollection(
 /**
  * Get all collections (basic info only, no products)
  */
-export async function getAllCollections(): Promise<CollectionBasic[]> {
+export async function getAllCollections(): Promise<CollectionBasicWithCount[]> {
   return withTiming("getAllCollections", {}, async () => {
     return db.collection.findMany({
-      orderBy: {
-        name: "asc",
-      },
+      orderBy: { name: "asc" },
+      include: { _count: { select: { productCollections: true } } },
     })
   })
 }

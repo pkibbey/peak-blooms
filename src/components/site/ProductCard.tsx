@@ -47,7 +47,7 @@ export function ProductCard({ product, user }: ProductCardProps) {
         )}
         {/* Colors Display - Bottom Right */}
         {product.colors && product.colors.length > 0 && (
-          <div className="absolute bottom-2 right-2 bg-white/90 rounded-md px-2 py-1">
+          <div className="absolute bottom-2 left-2 bg-white/90 rounded-md px-2 py-1">
             <ColorsMiniDisplay colorIds={product.colors} />
           </div>
         )}

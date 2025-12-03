@@ -287,9 +287,7 @@ export function ProductControls({ product, user, mode = "card" }: ProductControl
       )}
 
       {/* Price Display & Variant Summary */}
-      {isSignedOut ? (
-        <div className="text-sm text-muted-foreground italic">Sign in to view pricing</div>
-      ) : isUnapproved ? (
+      {isSignedOut ? null : isUnapproved ? (
         <div className="text-sm text-muted-foreground italic">
           Your account is pending approval. Pricing will be available once approved.
         </div>
@@ -315,7 +313,7 @@ export function ProductControls({ product, user, mode = "card" }: ProductControl
 
       {/* Add to Cart Button */}
       {isSignedOut ? (
-        <Button size="lg" className="w-full" asChild>
+        <Button className="w-full" asChild>
           <Link href="/auth/signin">Sign in to view pricing</Link>
         </Button>
       ) : isUnapproved ? (
