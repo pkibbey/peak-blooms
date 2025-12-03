@@ -186,8 +186,29 @@ async function main() {
   })
   console.log("✅ Created newsletter subscriber: newsletter@peakblooms.com")
 
-  // Create collections
-  const flowersCollection = await prisma.collection.upsert({
+  // Create a pending newsletter subscriber user
+  await prisma.user.upsert({
+    create: {
+      email: "pending-newsletter@peakblooms.com",
+      name: "Pending Newsletter Subscriber",
+      emailVerified: true,
+      approved: false,
+      role: "NEWSLETTER_SUBSCRIBER",
+      priceMultiplier: 1.0,
+    },
+    where: { email: "pending-newsletter@peakblooms.com" },
+    update: {
+      name: "Pending Newsletter Subscriber",
+      emailVerified: true,
+      approved: false,
+      role: "NEWSLETTER_SUBSCRIBER",
+      priceMultiplier: 1.0,
+    },
+  })
+  console.log("✅ Created pending newsletter subscriber: pending-newsletter@peakblooms.com")
+
+  // Create collections (used for shop filtering)
+  await prisma.collection.upsert({
     create: {
       name: "Flowers",
       slug: "flowers",
@@ -203,7 +224,7 @@ async function main() {
     },
   })
 
-  const fillersCollection = await prisma.collection.upsert({
+  await prisma.collection.upsert({
     create: {
       name: "Fillers",
       slug: "fillers",
@@ -219,286 +240,6 @@ async function main() {
     },
   })
 
-  const classicRoses = await prisma.collection.upsert({
-    create: {
-      name: "Classic Roses",
-      slug: "classic-roses",
-      image:
-        "https://zvbfsgiej9tfgqre.public.blob.vercel-storage.com/collections/classic-roses.png",
-      description:
-        "Timeless elegance and beauty in every bloom. Our classic rose collection features the most beloved varieties, perfect for traditional arrangements and timeless celebrations.",
-    },
-    where: { slug: "classic-roses" },
-    update: {
-      name: "Classic Roses",
-      image:
-        "https://zvbfsgiej9tfgqre.public.blob.vercel-storage.com/collections/classic-roses.png",
-      description:
-        "Timeless elegance and beauty in every bloom. Our classic rose collection features the most beloved varieties, perfect for traditional arrangements and timeless celebrations.",
-      slug: "classic-roses",
-    },
-  })
-
-  const exoticBlooms = await prisma.collection.upsert({
-    create: {
-      name: "Exotic Blooms",
-      slug: "exotic-blooms",
-      image:
-        "https://zvbfsgiej9tfgqre.public.blob.vercel-storage.com/collections/exotic-blooms.png",
-      description:
-        "Bold and vibrant arrangements that bring drama and sophistication to any space. Discover unique textures and rich colors from around the world.",
-    },
-    where: { slug: "exotic-blooms" },
-    update: {
-      name: "Exotic Blooms",
-      image:
-        "https://zvbfsgiej9tfgqre.public.blob.vercel-storage.com/collections/exotic-blooms.png",
-      description:
-        "Bold and vibrant arrangements that bring drama and sophistication to any space. Discover unique textures and rich colors from around the world.",
-      slug: "exotic-blooms",
-    },
-  })
-
-  const seasonalWildflowers = await prisma.collection.upsert({
-    create: {
-      name: "Seasonal Wildflowers",
-      slug: "seasonal-wildflowers",
-      image:
-        "https://zvbfsgiej9tfgqre.public.blob.vercel-storage.com/collections/seasonal-wildflowers.png",
-      description:
-        "Nature's finest seasonal selections capturing the essence of each time of year. Fresh, vibrant, and sustainably sourced for maximum impact.",
-    },
-    where: { slug: "seasonal-wildflowers" },
-    update: {
-      name: "Seasonal Wildflowers",
-      image:
-        "https://zvbfsgiej9tfgqre.public.blob.vercel-storage.com/collections/seasonal-wildflowers.png",
-      description:
-        "Nature's finest seasonal selections capturing the essence of each time of year. Fresh, vibrant, and sustainably sourced for maximum impact.",
-      slug: "seasonal-wildflowers",
-    },
-  })
-
-  // Create or update products (upsert by slug). We will ensure variants exist later.
-  const greenFluffyVariants = [
-    { price: 65.0, stemLength: 45, quantityPerBunch: 8 },
-    { price: 75.0, stemLength: 55, quantityPerBunch: 8 },
-    { price: 120.0, stemLength: 45, quantityPerBunch: 16 },
-    { price: 450.0, stemLength: 45, quantityPerBunch: 100, isBoxlot: true },
-  ]
-
-  const greenFluffy = await prisma.product.upsert({
-    create: {
-      name: "Green Fluffy",
-      slug: "green-fluffy",
-      description: "Lush and voluminous",
-      image: "https://zvbfsgiej9tfgqre.public.blob.vercel-storage.com/products/green-fluffy.png",
-      collectionId: exoticBlooms.id,
-      // Color IDs from COLORS registry
-      colors: ["greenery", "lime", "moss"],
-      featured: true,
-      // create block helps when the product doesn't exist yet
-      variants: {
-        create: greenFluffyVariants,
-      },
-    },
-    where: { slug: "green-fluffy" },
-    update: {
-      name: "Green Fluffy",
-      description: "Lush and voluminous",
-      image: "https://zvbfsgiej9tfgqre.public.blob.vercel-storage.com/products/green-fluffy.png",
-      collectionId: exoticBlooms.id,
-      colors: ["greenery", "lime", "moss"],
-      featured: true,
-    },
-  })
-
-  // Update variants for Green Fluffy
-  for (const variantData of greenFluffyVariants) {
-    await prisma.productVariant.upsert({
-      where: {
-        id:
-          (
-            await prisma.productVariant.findFirst({
-              where: {
-                productId: greenFluffy.id,
-                price: variantData.price,
-                stemLength: variantData.stemLength,
-              },
-            })
-          )?.id || "new",
-      },
-      create: {
-        productId: greenFluffy.id,
-        ...variantData,
-      },
-      update: variantData,
-    })
-  }
-
-  const peachFlowerVariants = [
-    { price: 55.0, stemLength: 40, quantityPerBunch: 6 },
-    { price: 65.0, stemLength: 50, quantityPerBunch: 6 },
-  ]
-
-  const peachFlower = await prisma.product.upsert({
-    create: {
-      name: "Peach Flower",
-      slug: "peach-flower",
-      description: "Warm and inviting",
-      image: "https://zvbfsgiej9tfgqre.public.blob.vercel-storage.com/products/peach-flower.png",
-      collectionId: exoticBlooms.id,
-      // Color IDs from COLORS registry
-      colors: ["peach", "blush", "cream"],
-      featured: true,
-      variants: {
-        create: peachFlowerVariants,
-      },
-    },
-    where: { slug: "peach-flower" },
-    update: {
-      name: "Peach Flower",
-      description: "Warm and inviting",
-      image: "https://zvbfsgiej9tfgqre.public.blob.vercel-storage.com/products/peach-flower.png",
-      collectionId: exoticBlooms.id,
-      colors: ["peach", "blush", "cream"],
-      featured: true,
-    },
-  })
-
-  // Update variants for Peach Flower
-  for (const variantData of peachFlowerVariants) {
-    await prisma.productVariant.upsert({
-      where: {
-        id:
-          (
-            await prisma.productVariant.findFirst({
-              where: {
-                productId: peachFlower.id,
-                price: variantData.price,
-                stemLength: variantData.stemLength,
-              },
-            })
-          )?.id || "new",
-      },
-      create: {
-        productId: peachFlower.id,
-        ...variantData,
-      },
-      update: variantData,
-    })
-  }
-
-  const pinkRoseVariants = [
-    { price: 75.0, stemLength: 50, quantityPerBunch: 5 },
-    { price: 90.0, stemLength: 60, quantityPerBunch: 5 },
-    { price: 140.0, stemLength: 50, quantityPerBunch: 10 },
-    { price: 550.0, stemLength: 50, quantityPerBunch: 50, isBoxlot: true },
-    { price: 1000.0, stemLength: 60, quantityPerBunch: 100, isBoxlot: true },
-  ]
-
-  const pinkRose = await prisma.product.upsert({
-    create: {
-      name: "Pink Rose",
-      slug: "pink-rose",
-      description: "Elegant and romantic",
-      image: "https://zvbfsgiej9tfgqre.public.blob.vercel-storage.com/products/pink-rose.png",
-      collectionId: classicRoses.id,
-      // Color IDs from COLORS registry
-      colors: ["pink", "magenta", "blush"],
-      featured: false,
-      variants: {
-        create: pinkRoseVariants,
-      },
-    },
-    where: { slug: "pink-rose" },
-    update: {
-      name: "Pink Rose",
-      description: "Elegant and romantic",
-      image: "https://zvbfsgiej9tfgqre.public.blob.vercel-storage.com/products/pink-rose.png",
-      collectionId: classicRoses.id,
-      colors: ["pink", "magenta", "blush"],
-      featured: false,
-    },
-  })
-
-  // Update variants for Pink Rose
-  for (const variantData of pinkRoseVariants) {
-    await prisma.productVariant.upsert({
-      where: {
-        id:
-          (
-            await prisma.productVariant.findFirst({
-              where: {
-                productId: pinkRose.id,
-                price: variantData.price,
-                stemLength: variantData.stemLength,
-              },
-            })
-          )?.id || "new",
-      },
-      create: {
-        productId: pinkRose.id,
-        ...variantData,
-      },
-      update: variantData,
-    })
-  }
-
-  const playaBlancaVariants = [
-    { price: 45.0, stemLength: 35, quantityPerBunch: 10 },
-    { price: 55.0, stemLength: 45, quantityPerBunch: 10 },
-    { price: 380.0, stemLength: 45, quantityPerBunch: 100, isBoxlot: true },
-  ]
-
-  const playaBlanca = await prisma.product.upsert({
-    create: {
-      name: "Playa Blanca",
-      slug: "playa-blanca",
-      description: "Pristine white beauty",
-      image: "https://zvbfsgiej9tfgqre.public.blob.vercel-storage.com/products/playa-blanca.png",
-      collectionId: seasonalWildflowers.id,
-      // Color IDs from COLORS registry
-      colors: ["white", "ivory", "cream"],
-      featured: false,
-      variants: {
-        create: playaBlancaVariants,
-      },
-    },
-    where: { slug: "playa-blanca" },
-    update: {
-      name: "Playa Blanca",
-      description: "Pristine white beauty",
-      image: "https://zvbfsgiej9tfgqre.public.blob.vercel-storage.com/products/playa-blanca.png",
-      collectionId: seasonalWildflowers.id,
-      colors: ["white", "ivory", "cream"],
-      featured: false,
-    },
-  })
-
-  // Update variants for Playa Blanca
-  for (const variantData of playaBlancaVariants) {
-    await prisma.productVariant.upsert({
-      where: {
-        id:
-          (
-            await prisma.productVariant.findFirst({
-              where: {
-                productId: playaBlanca.id,
-                price: variantData.price,
-                stemLength: variantData.stemLength,
-              },
-            })
-          )?.id || "new",
-      },
-      create: {
-        productId: playaBlanca.id,
-        ...variantData,
-      },
-      update: variantData,
-    })
-  }
-
   // Seed products from CSV file
   console.log("📦 Seeding products from CSV...")
   const csvProducts = readProductsFromCSV()
@@ -512,16 +253,12 @@ async function main() {
         .replace(/[^a-z0-9]+/g, "-")
         .replace(/^-|-$/g, "")
 
-      // Determine which collection to use
-      const collection = csvProduct.type === "FILLER" ? fillersCollection : flowersCollection
-
       // Create or update product with single variant
       const csvProductRecord = await prisma.product.upsert({
         create: {
           name: csvProduct.name,
           slug: slug,
           description: csvProduct.description,
-          collectionId: collection.id,
           productType: csvProduct.type,
           colors: csvProduct.colors, // Color IDs from CSV
           featured: false,
@@ -538,7 +275,6 @@ async function main() {
         update: {
           name: csvProduct.name,
           description: csvProduct.description,
-          collectionId: collection.id,
           productType: csvProduct.type,
           colors: csvProduct.colors, // Update colors from CSV
         },
@@ -578,10 +314,60 @@ async function main() {
     `✅ CSV seeding complete: ${productsCreated} products created/updated, ${productsSkipped} skipped`
   )
 
-  console.log("✨ Creating inspirations...")
+  // Add CSV products to their appropriate collections (Flowers or Fillers)
+  console.log("🏷️  Adding products to collections...")
+  const flowersCollection = await prisma.collection.findUnique({
+    where: { slug: "flowers" },
+  })
+  const fillersCollection = await prisma.collection.findUnique({
+    where: { slug: "fillers" },
+  })
+
+  let collectionAssociations = 0
+  for (const csvProduct of csvProducts) {
+    try {
+      const slug = csvProduct.name
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, "-")
+        .replace(/^-|-$/g, "")
+
+      const product = await prisma.product.findUnique({
+        where: { slug: slug },
+      })
+
+      if (!product) continue
+
+      // Determine which collection based on product type
+      const collectionId =
+        csvProduct.type === "FILLER" ? fillersCollection?.id : flowersCollection?.id
+
+      if (!collectionId) continue
+
+      // Create association if it doesn't exist
+      await prisma.productCollection.upsert({
+        where: {
+          productId_collectionId: {
+            productId: product.id,
+            collectionId: collectionId,
+          },
+        },
+        create: {
+          productId: product.id,
+          collectionId: collectionId,
+        },
+        update: {}, // No update needed, just ensure it exists
+      })
+
+      collectionAssociations++
+    } catch (error) {
+      console.warn(`⚠️  Failed to add ${csvProduct.name} to collection: ${(error as Error).message}`)
+    }
+  }
+
+  console.log(`✅ Added ${collectionAssociations} products to collections`)
 
   // First create the inspirations without products
-  const sunsetRomance = await prisma.inspiration.upsert({
+  await prisma.inspiration.upsert({
     create: {
       name: "Sunset Romance",
       slug: "sunset-romance",
@@ -607,7 +393,7 @@ async function main() {
     },
   })
 
-  const romanticElegance = await prisma.inspiration.upsert({
+  await prisma.inspiration.upsert({
     create: {
       name: "Romantic Elegance",
       slug: "romantic-elegance",
@@ -633,7 +419,7 @@ async function main() {
     },
   })
 
-  const pureSerenity = await prisma.inspiration.upsert({
+  await prisma.inspiration.upsert({
     create: {
       name: "Pure Serenity",
       slug: "pure-serenity",
@@ -659,7 +445,7 @@ async function main() {
     },
   })
 
-  const lushGarden = await prisma.inspiration.upsert({
+  await prisma.inspiration.upsert({
     create: {
       name: "Lush Garden",
       slug: "lush-garden",
@@ -683,7 +469,7 @@ async function main() {
     },
   })
 
-  const blushBride = await prisma.inspiration.upsert({
+  await prisma.inspiration.upsert({
     create: {
       name: "Blush Bride",
       slug: "blush-bride",
@@ -707,7 +493,7 @@ async function main() {
     },
   })
 
-  const verdantOasis = await prisma.inspiration.upsert({
+  await prisma.inspiration.upsert({
     create: {
       name: "Verdant Oasis",
       slug: "verdant-oasis",
@@ -733,7 +519,7 @@ async function main() {
     },
   })
 
-  const classicBouquet = await prisma.inspiration.upsert({
+  await prisma.inspiration.upsert({
     create: {
       name: "Classic Bouquet",
       slug: "classic-bouquet",
@@ -759,7 +545,7 @@ async function main() {
     },
   })
 
-  const modernMinimal = await prisma.inspiration.upsert({
+  await prisma.inspiration.upsert({
     create: {
       name: "Modern Minimal",
       slug: "modern-minimal",
@@ -785,7 +571,7 @@ async function main() {
     },
   })
 
-  const warmCelebratory = await prisma.inspiration.upsert({
+  await prisma.inspiration.upsert({
     create: {
       name: "Warm Celebratory",
       slug: "warm-celebratory",
@@ -811,187 +597,99 @@ async function main() {
     },
   })
 
-  // Fetch the products to get their IDs for inspiration associations
-  const peachFlowerForInspirations = await prisma.product.findUnique({
-    where: { slug: "peach-flower" },
-    include: { variants: true },
-  })
-  const greenFluffyForInspirations = await prisma.product.findUnique({
-    where: { slug: "green-fluffy" },
-    include: { variants: true },
-  })
-  const pinkRoseForInspirations = await prisma.product.findUnique({
-    where: { slug: "pink-rose" },
-    include: { variants: true },
-  })
-  const playaBlancaForInspirations = await prisma.product.findUnique({
-    where: { slug: "playa-blanca" },
-    include: { variants: true },
-  })
-
   // Create the inspiration product associations with variants
-  if (peachFlowerForInspirations && greenFluffyForInspirations) {
-    await prisma.inspirationProduct.createMany({
-      data: [
-        {
-          inspirationId: sunsetRomance.id,
-          productId: peachFlowerForInspirations.id,
-          productVariantId: peachFlowerForInspirations.variants[0]?.id ?? null,
+  console.log("🎨 Adding products to inspirations...")
+
+  // Helper function to add a product to an inspiration
+  async function addProductToInspiration(
+    inspirationSlug: string,
+    productSlug: string,
+    quantity: number = 1
+  ) {
+    try {
+      const inspiration = await prisma.inspiration.findUnique({
+        where: { slug: inspirationSlug },
+      })
+      const product = await prisma.product.findUnique({
+        where: { slug: productSlug },
+      })
+
+      if (!inspiration || !product) return
+
+      // Get first variant of the product
+      const variant = await prisma.productVariant.findFirst({
+        where: { productId: product.id },
+      })
+
+      if (!variant) return
+
+      // Upsert to avoid duplicates
+      await prisma.inspirationProduct.upsert({
+        where: {
+          inspirationId_productId: {
+            inspirationId: inspiration.id,
+            productId: product.id,
+          },
         },
-        {
-          inspirationId: sunsetRomance.id,
-          productId: greenFluffyForInspirations.id,
-          productVariantId: greenFluffyForInspirations.variants[0]?.id ?? null,
+        create: {
+          inspirationId: inspiration.id,
+          productId: product.id,
+          productVariantId: variant.id,
+          quantity: quantity,
         },
-      ],
-      skipDuplicates: true,
-    })
+        update: {
+          quantity: quantity,
+        },
+      })
+    } catch (error) {
+      console.warn(
+        `⚠️  Failed to add ${productSlug} to ${inspirationSlug}: ${(error as Error).message}`
+      )
+    }
   }
 
-  if (pinkRoseForInspirations && greenFluffyForInspirations) {
-    await prisma.inspirationProduct.createMany({
-      data: [
-        {
-          inspirationId: romanticElegance.id,
-          productId: pinkRoseForInspirations.id,
-          productVariantId: pinkRoseForInspirations.variants[0]?.id ?? null,
-        },
-        {
-          inspirationId: romanticElegance.id,
-          productId: greenFluffyForInspirations.id,
-          productVariantId: greenFluffyForInspirations.variants[0]?.id ?? null,
-        },
-      ],
-      skipDuplicates: true,
-    })
-  }
+  // Add products to Sunset Romance (peach, orange, warm colors)
+  await addProductToInspiration("sunset-romance", "alstromeria", 3)
+  await addProductToInspiration("sunset-romance", "cosmos", 2)
+  await addProductToInspiration("sunset-romance", "bird-of-paradise", 2)
+  await addProductToInspiration("sunset-romance", "cremone-fall-color", 2)
 
-  if (playaBlancaForInspirations && greenFluffyForInspirations) {
-    await prisma.inspirationProduct.createMany({
-      data: [
-        {
-          inspirationId: pureSerenity.id,
-          productId: playaBlancaForInspirations.id,
-          productVariantId: playaBlancaForInspirations.variants[0]?.id ?? null,
-        },
-        {
-          inspirationId: pureSerenity.id,
-          productId: greenFluffyForInspirations.id,
-          productVariantId: greenFluffyForInspirations.variants[0]?.id ?? null,
-        },
-      ],
-      skipDuplicates: true,
-    })
-  }
+  // Add products to Romantic Elegance (pink and rose)
+  await addProductToInspiration("romantic-elegance", "50-cm-ecuadorian", 3)
+  await addProductToInspiration("romantic-elegance", "60-cm-ecuadorian", 2)
+  await addProductToInspiration("romantic-elegance", "carnation", 2)
 
-  if (greenFluffyForInspirations && peachFlowerForInspirations) {
-    await prisma.inspirationProduct.createMany({
-      data: [
-        {
-          inspirationId: lushGarden.id,
-          productId: greenFluffyForInspirations.id,
-          productVariantId: greenFluffyForInspirations.variants[0]?.id ?? null,
-        },
-        {
-          inspirationId: lushGarden.id,
-          productId: peachFlowerForInspirations.id,
-          productVariantId: peachFlowerForInspirations.variants[0]?.id ?? null,
-        },
-      ],
-      skipDuplicates: true,
-    })
-  }
+  // Add products to Pure Serenity (white blooms)
+  await addProductToInspiration("pure-serenity", "calla-lily", 3)
+  await addProductToInspiration("pure-serenity", "anemone", 2)
 
-  // New inspirations with their product associations
-  if (peachFlowerForInspirations && pinkRoseForInspirations) {
-    await prisma.inspirationProduct.createMany({
-      data: [
-        {
-          inspirationId: blushBride.id,
-          productId: peachFlowerForInspirations.id,
-          productVariantId: peachFlowerForInspirations.variants[0]?.id ?? null,
-        },
-        {
-          inspirationId: blushBride.id,
-          productId: pinkRoseForInspirations.id,
-          productVariantId: pinkRoseForInspirations.variants[0]?.id ?? null,
-        },
-      ],
-      skipDuplicates: true,
-    })
-  }
+  // Add products to Lush Garden (greenery and texture)
+  await addProductToInspiration("lush-garden", "astrantia", 3)
+  await addProductToInspiration("lush-garden", "cremone", 2)
 
-  if (greenFluffyForInspirations) {
-    await prisma.inspirationProduct.createMany({
-      data: [
-        {
-          inspirationId: verdantOasis.id,
-          productId: greenFluffyForInspirations.id,
-          productVariantId: greenFluffyForInspirations.variants[0]?.id ?? null,
-        },
-        {
-          inspirationId: verdantOasis.id,
-          productId: greenFluffyForInspirations.id,
-          productVariantId: greenFluffyForInspirations.variants[1]?.id ?? null,
-        },
-      ],
-      skipDuplicates: true,
-    })
-  }
+  // Add products to Blush Bride (peachy-pink wedding palette)
+  await addProductToInspiration("blush-bride", "alstromeria", 2)
+  await addProductToInspiration("blush-bride", "carnation-mini", 3)
+  await addProductToInspiration("blush-bride", "dahlia", 2)
 
-  if (pinkRoseForInspirations && greenFluffyForInspirations) {
-    await prisma.inspirationProduct.createMany({
-      data: [
-        {
-          inspirationId: classicBouquet.id,
-          productId: pinkRoseForInspirations.id,
-          productVariantId: pinkRoseForInspirations.variants[0]?.id ?? null,
-        },
-        {
-          inspirationId: classicBouquet.id,
-          productId: greenFluffyForInspirations.id,
-          productVariantId: greenFluffyForInspirations.variants[0]?.id ?? null,
-        },
-      ],
-      skipDuplicates: true,
-    })
-  }
+  // Add products to Verdant Oasis (tropical greenery)
+  await addProductToInspiration("verdant-oasis", "delphinium", 2)
+  await addProductToInspiration("verdant-oasis", "cremone", 3)
 
-  if (playaBlancaForInspirations && greenFluffyForInspirations) {
-    await prisma.inspirationProduct.createMany({
-      data: [
-        {
-          inspirationId: modernMinimal.id,
-          productId: playaBlancaForInspirations.id,
-          productVariantId: playaBlancaForInspirations.variants[0]?.id ?? null,
-        },
-        {
-          inspirationId: modernMinimal.id,
-          productId: greenFluffyForInspirations.id,
-          productVariantId: greenFluffyForInspirations.variants[0]?.id ?? null,
-        },
-      ],
-      skipDuplicates: true,
-    })
-  }
+  // Add products to Classic Bouquet (pink roses with greenery)
+  await addProductToInspiration("classic-bouquet", "50-cm-ecuadorian", 5)
+  await addProductToInspiration("classic-bouquet", "carnation", 3)
 
-  if (peachFlowerForInspirations && greenFluffyForInspirations) {
-    await prisma.inspirationProduct.createMany({
-      data: [
-        {
-          inspirationId: warmCelebratory.id,
-          productId: peachFlowerForInspirations.id,
-          productVariantId: peachFlowerForInspirations.variants[1]?.id ?? null,
-        },
-        {
-          inspirationId: warmCelebratory.id,
-          productId: greenFluffyForInspirations.id,
-          productVariantId: greenFluffyForInspirations.variants[0]?.id ?? null,
-        },
-      ],
-      skipDuplicates: true,
-    })
-  }
+  // Add products to Modern Minimal (white and clean)
+  await addProductToInspiration("modern-minimal", "calla-lily", 4)
+  await addProductToInspiration("modern-minimal", "anemone", 2)
+
+  // Add products to Warm Celebratory (peach and festive)
+  await addProductToInspiration("warm-celebratory", "cosmos", 3)
+  await addProductToInspiration("warm-celebratory", "aster-serenade", 2)
+  await addProductToInspiration("warm-celebratory", "carnation-mini", 2)
+
+  console.log("✅ Added products to inspirations")
 
   console.log("✨ Creating hero banners...")
 

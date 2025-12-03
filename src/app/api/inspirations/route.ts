@@ -24,7 +24,12 @@ export async function GET() {
           include: {
             product: {
               include: {
-                collection: true,
+                productCollections: {
+                  include: {
+                    collection: true,
+                  },
+                },
+                variants: true,
               },
             },
             productVariant: true,

@@ -8,13 +8,13 @@ import type { CollectionModel } from "@/generated/models"
 interface CollectionCardProps {
   collection: CollectionModel & {
     _count?: {
-      products: number
+      productCollections: number
     }
   }
 }
 
 export function CollectionCard({ collection }: CollectionCardProps) {
-  const productCount = collection._count?.products ?? 0
+  const productCount = collection._count?.productCollections ?? 0
 
   return (
     <div className="group flex flex-col overflow-hidden rounded-xs shadow-md transition-shadow hover:shadow-lg">

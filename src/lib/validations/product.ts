@@ -23,7 +23,7 @@ export const productSchema = z.object({
   // Colors array: zero or more color IDs (e.g. ["pink", "rose", "greenery"]). Use empty array instead of single string.
   // Color IDs reference the COLORS object in lib/colors.ts
   colors: z.array(z.string()).optional(),
-  collectionId: z.string().min(1, "Collection is required"),
+  collectionIds: z.array(z.string()).min(1, "At least one collection is required"),
   productType: z.enum(["FLOWER", "FILLER"]),
   featured: z.boolean(),
   variants: z
@@ -44,7 +44,7 @@ export const createProductSchema = z.object({
   image: z.string().nullable(),
   // API input: allow null or an array of valid color IDs (reference lib/colors.ts COLORS object)
   colors: z.array(z.string()).nullable(),
-  collectionId: z.string().min(1, "Collection is required"),
+  collectionIds: z.array(z.string()).min(1, "At least one collection is required"),
   productType: z.enum(["FLOWER", "FILLER"]).default("FLOWER"),
   featured: z.boolean().default(false),
   variants: z

@@ -26,19 +26,27 @@ export type ProductWithVariants = Prisma.ProductGetPayload<{
   include: { variants: true }
 }>
 
-/** Product with variants and collection included */
+/** Product with variants and collections included */
 export type ProductWithVariantsAndCollection = Prisma.ProductGetPayload<{
   include: {
     variants: true
-    collection: true
+    productCollections: {
+      include: {
+        collection: true
+      }
+    }
   }
 }>
 
-/** Product with variants, collection, and inspirations with counts */
+/** Product with variants, collections, and inspirations with counts */
 export type ProductWithInspirations = Prisma.ProductGetPayload<{
   include: {
     variants: true
-    collection: true
+    productCollections: {
+      include: {
+        collection: true
+      }
+    }
     inspirations: {
       include: {
         inspiration: {
@@ -63,9 +71,13 @@ export type CollectionBasic = Prisma.CollectionGetPayload<Record<string, never>>
 /** Collection with all products and their variants */
 export type CollectionWithProducts = Prisma.CollectionGetPayload<{
   include: {
-    products: {
+    productCollections: {
       include: {
-        variants: true
+        product: {
+          include: {
+            variants: true
+          }
+        }
       }
     }
   }
@@ -74,9 +86,6 @@ export type CollectionWithProducts = Prisma.CollectionGetPayload<{
 // =============================================================================
 // Inspiration Types
 // =============================================================================
-
-/** Basic inspiration without relations */
-export type InspirationBasic = Prisma.InspirationGetPayload<Record<string, never>>
 
 /** Inspiration with product count */
 export type InspirationWithCount = Prisma.InspirationGetPayload<{

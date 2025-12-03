@@ -25,8 +25,12 @@ export default async function EditInspirationPage({ params }: EditInspirationPag
     }),
     db.product.findMany({
       include: {
-        collection: {
-          select: { name: true },
+        productCollections: {
+          include: {
+            collection: {
+              select: { name: true },
+            },
+          },
         },
         variants: true,
       },

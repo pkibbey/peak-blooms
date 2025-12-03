@@ -17,6 +17,9 @@ export default async function EditProductPage({ params }: EditProductPageProps) 
         variants: {
           orderBy: [{ stemLength: "asc" }, { quantityPerBunch: "asc" }],
         },
+        productCollections: {
+          select: { collectionId: true },
+        },
       },
     }),
     db.collection.findMany({
@@ -28,6 +31,12 @@ export default async function EditProductPage({ params }: EditProductPageProps) 
     notFound()
   }
 
+  // Transform product to include collectionIds array for the form
+  const productForForm = {
+    ...product,
+    collectionIds: product.productCollections.map((pc) => pc.collectionId),
+  }
+
   return (
     <>
       <BackLink href="/admin/products" label="Products" />
@@ -37,7 +46,7 @@ export default async function EditProductPage({ params }: EditProductPageProps) 
       </div>
 
       <div className="rounded-lg border border-border p-6">
-        <ProductForm collections={collections} product={product} />
+        <ProductForm collections={collections} product={productForForm} />
       </div>
     </>
   )

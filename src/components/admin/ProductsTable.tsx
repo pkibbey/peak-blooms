@@ -8,10 +8,12 @@ interface Product {
   slug: string
   featured: boolean
   image: string | null
-  collection: {
-    id: string
-    name: string
-  }
+  productCollections: {
+    collection: {
+      id: string
+      name: string
+    }
+  }[]
   variants: {
     id: string
     price: number

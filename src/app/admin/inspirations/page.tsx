@@ -5,14 +5,14 @@ import { Button } from "@/components/ui/button"
 import { db } from "@/lib/db"
 
 interface AdminInspirationsPageProps {
-  searchParams: Record<string, string | string[] | undefined>
+  searchParams: Promise<Record<string, string | string[] | undefined>>
 }
 
 export default async function AdminInspirationsPage({ searchParams }: AdminInspirationsPageProps) {
+  const params = await searchParams
   // Parse sort params
-  const sort = typeof searchParams?.sort === "string" ? searchParams.sort : undefined
-  const order =
-    typeof searchParams?.order === "string" ? (searchParams.order as "asc" | "desc") : undefined
+  const sort = typeof params?.sort === "string" ? params.sort : undefined
+  const order = typeof params?.order === "string" ? (params.order as "asc" | "desc") : undefined
 
   const inspirations = await db.inspiration.findMany({
     include: {

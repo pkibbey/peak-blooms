@@ -1,8 +1,6 @@
 import Image from "next/image"
 import Link from "next/link"
-import { Badge } from "@/components/ui/badge"
 import { ColorsMiniDisplay } from "@/components/ui/ColorsMiniDisplay"
-import { IconPackage } from "@/components/ui/icons"
 import { TableCell, TableRow } from "@/components/ui/table"
 import type { ProductModel, ProductVariantModel } from "@/generated/models"
 import { formatPrice } from "@/lib/utils"
@@ -14,8 +12,6 @@ interface ShopProductTableRowProps {
 }
 
 export function ShopProductTableRow({ product }: ShopProductTableRowProps) {
-  const hasBoxlotVariant = product.variants?.some((v) => v.isBoxlot) ?? false
-
   // Calculate price range
   const getPriceRange = (variants?: ProductVariantModel[]) => {
     if (!variants || variants.length === 0) return { minPrice: 0, maxPrice: 0 }

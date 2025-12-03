@@ -4,11 +4,7 @@
  */
 
 import { db } from "@/lib/db"
-import type {
-  InspirationBasic,
-  InspirationWithCount,
-  InspirationWithProducts,
-} from "@/lib/types/prisma"
+import type { InspirationWithCount, InspirationWithProducts } from "@/lib/types/prisma"
 import { adjustPrice } from "@/lib/utils"
 import { withTiming } from "./logger"
 
@@ -38,19 +34,6 @@ function applyMultiplierToInspiration(
       }),
     })),
   }
-}
-
-/**
- * Get all inspirations (basic info only)
- */
-async function getAllInspirations(): Promise<InspirationBasic[]> {
-  return withTiming("getAllInspirations", {}, async () => {
-    return db.inspiration.findMany({
-      orderBy: {
-        createdAt: "desc",
-      },
-    })
-  })
 }
 
 /**
@@ -85,39 +68,6 @@ export async function getInspirationBySlug(
     async () => {
       const inspiration = await db.inspiration.findUnique({
         where: { slug },
-        include: {
-          products: {
-            include: {
-              product: {
-                include: { variants: true },
-              },
-              productVariant: true,
-            },
-          },
-        },
-      })
-
-      if (!inspiration) return null
-      return applyMultiplierToInspiration(inspiration, priceMultiplier)
-    },
-    { logNotFound: true }
-  )
-}
-
-/**
- * Get an inspiration by ID with all products
- * Returns null if not found
- */
-async function getInspirationById(
-  id: string,
-  priceMultiplier = 1.0
-): Promise<InspirationWithProducts | null> {
-  return withTiming(
-    "getInspirationById",
-    id,
-    async () => {
-      const inspiration = await db.inspiration.findUnique({
-        where: { id },
         include: {
           products: {
             include: {

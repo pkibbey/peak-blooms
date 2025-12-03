@@ -67,7 +67,7 @@ export async function getProductById(
 }
 
 interface GetProductsOptions {
-  collectionId?: string
+  collectionIds?: string[]
   featured?: boolean
   colors?: string[]
   stemLengthMin?: number
@@ -98,11 +98,17 @@ export async function getProducts(
   priceMultiplier = 1.0
 ): Promise<GetProductsResult> {
   return withTiming("getProducts", options as Record<string, unknown>, async () => {
-    // Use a flexible typed placeholder for `where` so we can add new array filters
-    const where = {} as unknown as ProductWhereInput
+    // Build the where clause for filtering
+    const where: ProductWhereInput = {}
 
-    if (options.collectionId) {
-      where.collectionId = options.collectionId
+    if (options.collectionIds && options.collectionIds.length > 0) {
+      where.productCollections = {
+        some: {
+          collectionId: {
+            in: options.collectionIds,
+          },
+        },
+      }
     }
 
     if (options.featured) {
@@ -175,7 +181,11 @@ export async function getProducts(
     const products = await db.product.findMany({
       where,
       include: {
-        collection: true,
+        productCollections: {
+          include: {
+            collection: true,
+          },
+        },
         variants: options.boxlotOnly
           ? {
               where: { isBoxlot: true },
@@ -188,7 +198,10 @@ export async function getProducts(
     })
 
     return {
-      products: applyMultiplierToProducts(products, priceMultiplier),
+      products: applyMultiplierToProducts(
+        products as ProductWithVariantsAndCollection[],
+        priceMultiplier
+      ),
       total,
       limit,
       offset,
@@ -236,7 +249,11 @@ export async function getProductWithInspirations(
       const product = await db.product.findUnique({
         where: { slug },
         include: {
-          collection: true,
+          productCollections: {
+            include: {
+              collection: true,
+            },
+          },
           inspirations: {
             include: {
               inspiration: {

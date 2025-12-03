@@ -55,14 +55,14 @@ export default async function CollectionDetailPage({ params }: CollectionDetailP
         <div>
           <h2 className="text-2xl font-bold mb-6 font-serif">Products in this collection</h2>
 
-          {collection.products.length === 0 ? (
+          {collection.productCollections.length === 0 ? (
             <div className="text-center py-12">
               <p className="text-muted-foreground">No products available in this collection yet.</p>
             </div>
           ) : (
             <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
-              {collection.products.map((product) => (
-                <ProductCard key={product.slug} product={product} user={user} />
+              {collection.productCollections.map((pc) => (
+                <ProductCard key={pc.product.slug} product={pc.product} user={user} />
               ))}
             </div>
           )}

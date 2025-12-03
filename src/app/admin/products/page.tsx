@@ -7,20 +7,20 @@ import { Button } from "@/components/ui/button"
 // no direct db usage here — use DAL
 
 interface AdminProductsPageProps {
-  searchParams: Record<string, string | string[] | undefined>
+  searchParams: Promise<Record<string, string | string[] | undefined>>
 }
 
 const ITEMS_PER_PAGE = 20
 
 export default async function AdminProductsPage({ searchParams }: AdminProductsPageProps) {
+  const params = await searchParams
   // Parse page from search params (1-indexed), reset to 1 on sort change
-  const page = typeof searchParams?.page === "string" ? parseInt(searchParams.page, 20) : 1
+  const page = typeof params?.page === "string" ? parseInt(params.page, 20) : 1
   const offset = Math.max(0, (page - 1) * ITEMS_PER_PAGE)
 
   // Parse sort params
-  const sort = typeof searchParams?.sort === "string" ? searchParams.sort : undefined
-  const order =
-    typeof searchParams?.order === "string" ? (searchParams.order as "asc" | "desc") : undefined
+  const sort = typeof params?.sort === "string" ? params.sort : undefined
+  const order = typeof params?.order === "string" ? (params.order as "asc" | "desc") : undefined
 
   // Use the DAL to fetch a page of products with counts
   const { getProducts } = await import("@/lib/data")
@@ -82,7 +82,7 @@ export default async function AdminProductsPage({ searchParams }: AdminProductsP
             <AdminPagination
               currentPage={page}
               totalPages={Math.ceil(result.total / ITEMS_PER_PAGE)}
-              searchParams={searchParams}
+              searchParams={params}
             />
           )}
         </div>
@@ -96,7 +96,7 @@ export default async function AdminProductsPage({ searchParams }: AdminProductsP
           <AdminPagination
             currentPage={page}
             totalPages={Math.ceil(result.total / ITEMS_PER_PAGE)}
-            searchParams={searchParams}
+            searchParams={params}
           />
         </div>
       )}

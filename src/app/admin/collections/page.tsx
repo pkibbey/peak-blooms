@@ -5,19 +5,19 @@ import { Button } from "@/components/ui/button"
 import { db } from "@/lib/db"
 
 interface AdminCollectionsPageProps {
-  searchParams: Record<string, string | string[] | undefined>
+  searchParams: Promise<Record<string, string | string[] | undefined>>
 }
 
 export default async function AdminCollectionsPage({ searchParams }: AdminCollectionsPageProps) {
+  const params = await searchParams
   // Parse sort params
-  const sort = typeof searchParams?.sort === "string" ? searchParams.sort : undefined
-  const order =
-    typeof searchParams?.order === "string" ? (searchParams.order as "asc" | "desc") : undefined
+  const sort = typeof params?.sort === "string" ? params.sort : undefined
+  const order = typeof params?.order === "string" ? (params.order as "asc" | "desc") : undefined
 
   const collections = await db.collection.findMany({
     include: {
       _count: {
-        select: { products: true },
+        select: { productCollections: true },
       },
     },
     orderBy: {
@@ -33,8 +33,8 @@ export default async function AdminCollectionsPage({ searchParams }: AdminCollec
     })
   } else if (sort === "products") {
     collections.sort((a, b) => {
-      const aCount = a._count?.products || 0
-      const bCount = b._count?.products || 0
+      const aCount = a._count?.productCollections || 0
+      const bCount = b._count?.productCollections || 0
       return order === "desc" ? bCount - aCount : aCount - bCount
     })
   } else if (sort === "slug") {

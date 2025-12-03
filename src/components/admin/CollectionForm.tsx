@@ -1,10 +1,10 @@
 "use client"
 
+import { zodResolver } from "@hookform/resolvers/zod"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { useState } from "react"
 import { useForm } from "react-hook-form"
-import { zodResolver } from "@hookform/resolvers/zod"
 import { toast } from "sonner"
 import { ImageUpload } from "@/components/admin/ImageUpload"
 import SlugInput from "@/components/admin/SlugInput"
@@ -19,8 +19,8 @@ import {
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
+import { type CollectionFormData, collectionSchema } from "@/lib/validations/collection"
 import { IconTrash } from "../ui/icons"
-import { collectionSchema, type CollectionFormData } from "@/lib/validations/collection"
 
 interface CollectionFormProps {
   collection?: {
@@ -30,7 +30,7 @@ interface CollectionFormProps {
     image: string | null
     description: string | null
     _count?: {
-      products: number
+      productCollections: number
     }
   }
 }
@@ -86,10 +86,12 @@ export default function CollectionForm({ collection }: CollectionFormProps) {
   }
 
   const handleDelete = async () => {
-    const productCount = collection?._count?.products || 0
+    const productCount = collection?._count?.productCollections || 0
     const warningMessage =
       productCount > 0
-        ? `Are you sure you want to delete "${collection?.name}"? This will also delete ${productCount} product${productCount !== 1 ? "s" : ""} in this collection. This action cannot be undone.`
+        ? `Are you sure you want to delete "${collection?.name}"? This will remove the collection association from ${productCount} product${
+            productCount !== 1 ? "s" : ""
+          } — products will remain but won't be assigned to this collection. This action cannot be undone.`
         : `Are you sure you want to delete "${collection?.name}"? This action cannot be undone.`
 
     if (!window.confirm(warningMessage)) {

@@ -80,6 +80,11 @@ export type Inspiration = Prisma.InspirationModel
  */
 export type Product = Prisma.ProductModel
 /**
+ * Model ProductCollection
+ * 
+ */
+export type ProductCollection = Prisma.ProductCollectionModel
+/**
  * Model InspirationProduct
  * 
  */

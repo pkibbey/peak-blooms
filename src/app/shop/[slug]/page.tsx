@@ -74,10 +74,17 @@ export default async function ProductDetailPage({ params }: ProductDetailPagePro
               <Link href="/shop" className="hover:underline">
                 Shop
               </Link>
-              <span className="mx-2">/</span>
-              <Link href={`/collections/${product.collection.slug}`} className="hover:underline">
-                {product.collection.name}
-              </Link>
+              {product.productCollections.length > 0 && (
+                <>
+                  <span className="mx-2">/</span>
+                  <Link
+                    href={`/collections/${product.productCollections[0].collection.slug}`}
+                    className="hover:underline"
+                  >
+                    {product.productCollections[0].collection.name}
+                  </Link>
+                </>
+              )}
               <span className="mx-2">/</span>
               <span>{product.name}</span>
             </div>
@@ -85,7 +92,11 @@ export default async function ProductDetailPage({ params }: ProductDetailPagePro
             {/* Product Title */}
             <div>
               <h1 className="text-4xl font-extrabold font-serif mb-2">{product.name}</h1>
-              <p className="text-muted-foreground">{product.collection.name}</p>
+              {product.productCollections.length > 0 && (
+                <p className="text-muted-foreground">
+                  {product.productCollections[0].collection.name}
+                </p>
+              )}
             </div>
 
             {/* Description */}

@@ -16,7 +16,7 @@ interface Collection {
   slug: string
   image: string | null
   _count?: {
-    products: number
+    productCollections: number
   }
 }
 
@@ -106,7 +106,7 @@ export default function CollectionsTable({ collections, sort, order }: Collectio
 
               {/* Products Count */}
               <TableCell className="text-muted-foreground">
-                {collection._count?.products || 0}
+                {collection._count?.productCollections || 0}
               </TableCell>
             </TableRow>
           ))}

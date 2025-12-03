@@ -28,7 +28,6 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
-import { COLORS } from "@/lib/colors"
 import { type ProductFormData, productSchema } from "@/lib/validations/product"
 import { IconPlus, IconTrash } from "../ui/icons"
 
@@ -46,7 +45,7 @@ interface ProductFormProps {
     description: string | null
     image: string | null
     colors?: string[] | null
-    collectionId: string
+    collectionIds: string[]
     productType?: "FLOWER" | "FILLER"
     featured: boolean
     variants?: {
@@ -79,7 +78,7 @@ export default function ProductForm({ collections, product }: ProductFormProps) 
       description: product?.description || "",
       image: product?.image || "",
       colors: initialColors,
-      collectionId: product?.collectionId || "",
+      collectionIds: product?.collectionIds || [],
       productType: product?.productType || "FLOWER",
       featured: product?.featured || false,
       variants:
@@ -259,27 +258,42 @@ export default function ProductForm({ collections, product }: ProductFormProps) 
           />
         </div>
 
-        {/* Collection */}
+        {/* Collections */}
         <FormField
           control={form.control}
-          name="collectionId"
-          render={({ field }) => (
+          name="collectionIds"
+          render={() => (
             <FormItem>
-              <FormLabel>Collection *</FormLabel>
-              <Select onValueChange={field.onChange} value={field.value}>
-                <FormControl>
-                  <SelectTrigger className="w-full">
-                    <SelectValue placeholder="Select a collection" />
-                  </SelectTrigger>
-                </FormControl>
-                <SelectContent>
-                  {collections.map((col) => (
-                    <SelectItem key={col.id} value={col.id}>
-                      {col.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <FormLabel>Collections *</FormLabel>
+              <div className="space-y-2">
+                {collections.map((col) => (
+                  <FormField
+                    key={col.id}
+                    control={form.control}
+                    name="collectionIds"
+                    render={({ field }) => {
+                      const isChecked = (field.value ?? []).includes(col.id)
+                      return (
+                        <FormItem className="flex items-center gap-2 space-y-0">
+                          <FormControl>
+                            <Checkbox
+                              checked={isChecked}
+                              onChange={(e) => {
+                                const checked = (e.target as HTMLInputElement).checked
+                                const newValue = checked
+                                  ? [...(field.value || []), col.id]
+                                  : (field.value || []).filter((id) => id !== col.id)
+                                field.onChange(newValue)
+                              }}
+                            />
+                          </FormControl>
+                          <FormLabel className="cursor-pointer font-normal">{col.name}</FormLabel>
+                        </FormItem>
+                      )
+                    }}
+                  />
+                ))}
+              </div>
               <FormMessage />
             </FormItem>
           )}

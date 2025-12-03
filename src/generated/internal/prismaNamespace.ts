@@ -392,6 +392,7 @@ export const ModelName = {
   Collection: 'Collection',
   Inspiration: 'Inspiration',
   Product: 'Product',
+  ProductCollection: 'ProductCollection',
   InspirationProduct: 'InspirationProduct',
   ProductVariant: 'ProductVariant',
   ShoppingCart: 'ShoppingCart',
@@ -414,7 +415,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "account" | "session" | "verification" | "address" | "collection" | "inspiration" | "product" | "inspirationProduct" | "productVariant" | "shoppingCart" | "cartItem" | "order" | "orderItem" | "heroBanner"
+    modelProps: "user" | "account" | "session" | "verification" | "address" | "collection" | "inspiration" | "product" | "productCollection" | "inspirationProduct" | "productVariant" | "shoppingCart" | "cartItem" | "order" | "orderItem" | "heroBanner"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -1007,6 +1008,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         count: {
           args: Prisma.ProductCountArgs<ExtArgs>
           result: runtime.Types.Utils.Optional<Prisma.ProductCountAggregateOutputType> | number
+        }
+      }
+    }
+    ProductCollection: {
+      payload: Prisma.$ProductCollectionPayload<ExtArgs>
+      fields: Prisma.ProductCollectionFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.ProductCollectionFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProductCollectionPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.ProductCollectionFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProductCollectionPayload>
+        }
+        findFirst: {
+          args: Prisma.ProductCollectionFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProductCollectionPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.ProductCollectionFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProductCollectionPayload>
+        }
+        findMany: {
+          args: Prisma.ProductCollectionFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProductCollectionPayload>[]
+        }
+        create: {
+          args: Prisma.ProductCollectionCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProductCollectionPayload>
+        }
+        createMany: {
+          args: Prisma.ProductCollectionCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.ProductCollectionCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProductCollectionPayload>[]
+        }
+        delete: {
+          args: Prisma.ProductCollectionDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProductCollectionPayload>
+        }
+        update: {
+          args: Prisma.ProductCollectionUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProductCollectionPayload>
+        }
+        deleteMany: {
+          args: Prisma.ProductCollectionDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.ProductCollectionUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.ProductCollectionUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProductCollectionPayload>[]
+        }
+        upsert: {
+          args: Prisma.ProductCollectionUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProductCollectionPayload>
+        }
+        aggregate: {
+          args: Prisma.ProductCollectionAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateProductCollection>
+        }
+        groupBy: {
+          args: Prisma.ProductCollectionGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ProductCollectionGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.ProductCollectionCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ProductCollectionCountAggregateOutputType> | number
         }
       }
     }
@@ -1682,7 +1757,6 @@ export const ProductScalarFieldEnum = {
   description: 'description',
   image: 'image',
   colors: 'colors',
-  collectionId: 'collectionId',
   featured: 'featured',
   productType: 'productType',
   createdAt: 'createdAt',
@@ -1690,6 +1764,16 @@ export const ProductScalarFieldEnum = {
 } as const
 
 export type ProductScalarFieldEnum = (typeof ProductScalarFieldEnum)[keyof typeof ProductScalarFieldEnum]
+
+
+export const ProductCollectionScalarFieldEnum = {
+  id: 'id',
+  productId: 'productId',
+  collectionId: 'collectionId',
+  createdAt: 'createdAt'
+} as const
+
+export type ProductCollectionScalarFieldEnum = (typeof ProductCollectionScalarFieldEnum)[keyof typeof ProductCollectionScalarFieldEnum]
 
 
 export const InspirationProductScalarFieldEnum = {
@@ -2026,6 +2110,7 @@ export type GlobalOmitConfig = {
   collection?: Prisma.CollectionOmit
   inspiration?: Prisma.InspirationOmit
   product?: Prisma.ProductOmit
+  productCollection?: Prisma.ProductCollectionOmit
   inspirationProduct?: Prisma.InspirationProductOmit
   productVariant?: Prisma.ProductVariantOmit
   shoppingCart?: Prisma.ShoppingCartOmit

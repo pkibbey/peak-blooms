@@ -6,7 +6,7 @@ export default async function FeaturedCollections() {
   const collections = await db.collection.findMany({
     include: {
       _count: {
-        select: { products: true },
+        select: { productCollections: true },
       },
     },
   })

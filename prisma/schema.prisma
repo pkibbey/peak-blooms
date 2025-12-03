@@ -110,7 +110,7 @@ model Collection {
   description String?
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
-  products    Product[]
+  productCollections ProductCollection[]
 }
 
 model Inspiration {
@@ -133,7 +133,6 @@ model Product {
   description  String?
   image        String?
   colors       String[]             // Array of color IDs (references COLORS object in lib/colors.ts)
-  collectionId String
   featured     Boolean              @default(false)
   productType  ProductType          @default(FLOWER)
   createdAt    DateTime             @default(now())
@@ -141,15 +140,27 @@ model Product {
   cartItems    CartItem[]
   inspirations InspirationProduct[]
   orderItems   OrderItem[]
-  collection   Collection           @relation(fields: [collectionId], references: [id], onDelete: Cascade)
+  productCollections ProductCollection[]
   variants     ProductVariant[]
 
-  @@index([collectionId])
   @@index([slug])
   @@index([createdAt])
   @@index([productType])
-  @@index([collectionId, createdAt(sort: Desc)], map: "idx_product_collection_createdat")
+  @@index([createdAt(sort: Desc)], map: "idx_product_createdat")
   @@index([colors], map: "idx_product_colors_gin", type: Gin)
+}
+
+model ProductCollection {
+  id           String    @id @default(cuid())
+  productId    String
+  collectionId String
+  createdAt    DateTime  @default(now())
+
+  product      Product    @relation(fields: [productId], references: [id], onDelete: Cascade)
+  collection   Collection @relation(fields: [collectionId], references: [id], onDelete: Cascade)
+
+  @@unique([productId, collectionId])
+  @@index([collectionId])
 }
 
 model InspirationProduct {

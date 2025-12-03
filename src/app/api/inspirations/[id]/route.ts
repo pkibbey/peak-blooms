@@ -27,7 +27,11 @@ export async function GET(_request: NextRequest, { params }: { params: Promise<{
           include: {
             product: {
               include: {
-                collection: true,
+                productCollections: {
+                  include: {
+                    collection: true,
+                  },
+                },
                 variants: true,
               },
             },
@@ -162,7 +166,11 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
           include: {
             product: {
               include: {
-                collection: true,
+                productCollections: {
+                  include: {
+                    collection: true,
+                  },
+                },
               },
             },
             productVariant: true,

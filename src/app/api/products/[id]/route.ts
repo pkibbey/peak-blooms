@@ -66,7 +66,7 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
       description,
       image,
       colors,
-      collectionId,
+      collectionIds,
       productType,
       featured,
       variants,
@@ -88,11 +88,18 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
       }
     }
 
-    // Use transaction to update product and replace variants
+    // Use transaction to update product and replace variants/collections
     const product = await db.$transaction(async (tx) => {
       // If variants provided, delete existing and recreate
       if (variants !== undefined) {
         await tx.productVariant.deleteMany({
+          where: { productId: id },
+        })
+      }
+
+      // If collectionIds provided, delete existing junction entries and recreate
+      if (collectionIds !== undefined) {
+        await tx.productCollection.deleteMany({
           where: { productId: id },
         })
       }
@@ -105,9 +112,12 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
           ...(description !== undefined && { description }),
           ...(image !== undefined && { image }),
           ...(colors !== undefined && { colors: colors ?? [] }),
-          ...(collectionId !== undefined && {
-            // Use relation connect so Prisma's checked update input accepts it
-            collection: { connect: { id: collectionId } },
+          ...(collectionIds !== undefined && {
+            productCollections: {
+              create: collectionIds.map((collectionId) => ({
+                collectionId,
+              })),
+            },
           }),
           ...(productType !== undefined && { productType }),
           ...(featured !== undefined && { featured }),
@@ -123,7 +133,11 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
           }),
         },
         include: {
-          collection: true,
+          productCollections: {
+            include: {
+              collection: true,
+            },
+          },
           variants: true,
         },
       })

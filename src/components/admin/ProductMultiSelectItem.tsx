@@ -22,9 +22,11 @@ interface ProductVariant {
 interface Product {
   id: string
   name: string
-  collection?: {
-    name: string
-  }
+  productCollections?: Array<{
+    collection: {
+      name: string
+    }
+  }>
   variants?: ProductVariant[]
 }
 
@@ -74,8 +76,10 @@ export function ProductMultiSelectItem({
         />
         <div className="min-w-0 flex-1">
           <p className="truncate font-medium">{product.name}</p>
-          {product.collection && (
-            <p className="truncate text-xs text-muted-foreground">{product.collection.name}</p>
+          {product.productCollections && product.productCollections.length > 0 && (
+            <p className="truncate text-xs text-muted-foreground">
+              {product.productCollections[0].collection.name}
+            </p>
           )}
         </div>
       </Label>

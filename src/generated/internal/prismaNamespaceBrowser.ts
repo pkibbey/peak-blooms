@@ -59,6 +59,7 @@ export const ModelName = {
   Collection: 'Collection',
   Inspiration: 'Inspiration',
   Product: 'Product',
+  ProductCollection: 'ProductCollection',
   InspirationProduct: 'InspirationProduct',
   ProductVariant: 'ProductVariant',
   ShoppingCart: 'ShoppingCart',
@@ -199,7 +200,6 @@ export const ProductScalarFieldEnum = {
   description: 'description',
   image: 'image',
   colors: 'colors',
-  collectionId: 'collectionId',
   featured: 'featured',
   productType: 'productType',
   createdAt: 'createdAt',
@@ -207,6 +207,16 @@ export const ProductScalarFieldEnum = {
 } as const
 
 export type ProductScalarFieldEnum = (typeof ProductScalarFieldEnum)[keyof typeof ProductScalarFieldEnum]
+
+
+export const ProductCollectionScalarFieldEnum = {
+  id: 'id',
+  productId: 'productId',
+  collectionId: 'collectionId',
+  createdAt: 'createdAt'
+} as const
+
+export type ProductCollectionScalarFieldEnum = (typeof ProductCollectionScalarFieldEnum)[keyof typeof ProductCollectionScalarFieldEnum]
 
 
 export const InspirationProductScalarFieldEnum = {

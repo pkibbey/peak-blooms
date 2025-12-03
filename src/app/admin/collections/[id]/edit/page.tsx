@@ -14,7 +14,7 @@ export default async function EditCollectionPage({ params }: EditCollectionPageP
     where: { id },
     include: {
       _count: {
-        select: { products: true },
+        select: { productCollections: true },
       },
     },
   })

@@ -17,12 +17,15 @@ function applyMultiplierToCollection(
 ): CollectionWithProducts {
   return {
     ...collection,
-    products: collection.products.map((product) => ({
-      ...product,
-      variants: product.variants.map((variant) => ({
-        ...variant,
-        price: adjustPrice(variant.price, multiplier),
-      })),
+    productCollections: collection.productCollections.map((pc) => ({
+      ...pc,
+      product: {
+        ...pc.product,
+        variants: pc.product.variants.map((variant) => ({
+          ...variant,
+          price: adjustPrice(variant.price, multiplier),
+        })),
+      },
     })),
   }
 }
@@ -55,12 +58,16 @@ export async function getCollectionBySlug(
       const collection = await db.collection.findUnique({
         where: { slug },
         include: {
-          products: {
+          productCollections: {
             orderBy: {
               createdAt: "desc",
             },
             include: {
-              variants: true,
+              product: {
+                include: {
+                  variants: true,
+                },
+              },
             },
           },
         },

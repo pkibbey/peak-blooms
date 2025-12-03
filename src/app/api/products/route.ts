@@ -7,7 +7,7 @@ import { createProductSchema } from "@/lib/validations/product"
 /**
  * GET /api/products
  * Get all products (with optional filtering and pagination)
- * Query params: collectionId, featured, colors, stemLength, priceMin, priceMax, search, limit, offset
+ * Query params: collectionIds (comma-separated or array), featured, colors, stemLength, priceMin, priceMax, search, limit, offset
  * Prices are adjusted based on the authenticated user's price multiplier
  * Returns: { products: ProductWithVariantsAndCollection[], total: number, limit: number, offset: number }
  */
@@ -21,7 +21,17 @@ export async function GET(request: NextRequest) {
     }
 
     const { searchParams } = new URL(request.url)
-    const collectionId = searchParams.get("collectionId")
+    // Support collectionIds as comma-separated or array query param: ?collectionIds=abc,def or ?collectionIds=abc&collectionIds=def
+    const collectionIdsFromQuery = searchParams.getAll("collectionIds")
+    const collectionIds =
+      collectionIdsFromQuery.length > 0
+        ? collectionIdsFromQuery.flatMap((c) =>
+            c
+              .split(",")
+              .map((v) => v.trim())
+              .filter(Boolean)
+          )
+        : undefined
     const featured = searchParams.get("featured")
     // Support multi-color query param: ?colors=#FF0000&colors=#00FF00 or ?colors=#FF0000,#00FF00
     const colorsFromQuery = searchParams.getAll("colors")
@@ -36,7 +46,7 @@ export async function GET(request: NextRequest) {
 
     const result = await getProducts(
       {
-        collectionId: collectionId || undefined,
+        collectionIds,
         featured: featured === "true",
         // Prefer explicit `colors` query params if provided
         colors:
@@ -96,7 +106,7 @@ export async function POST(request: NextRequest) {
       description,
       image,
       colors,
-      collectionId,
+      collectionIds,
       productType,
       featured,
       variants,
@@ -110,8 +120,6 @@ export async function POST(request: NextRequest) {
         image,
         // Save provided colors array (no legacy single color field)
         ...(colors !== undefined && { colors: colors ?? [] }),
-        // Connect collection by id rather than sending raw scalar (keeps Prisma input consistent with nested variants)
-        collection: { connect: { id: collectionId } },
         productType: productType ?? "FLOWER",
         featured: featured === true,
         variants: {
@@ -122,9 +130,19 @@ export async function POST(request: NextRequest) {
             isBoxlot: v.isBoxlot ?? false,
           })),
         },
+        // Create junction table entries for each collection
+        productCollections: {
+          create: collectionIds.map((collectionId) => ({
+            collectionId,
+          })),
+        },
       },
       include: {
-        collection: true,
+        productCollections: {
+          include: {
+            collection: true,
+          },
+        },
         variants: true,
       },
     })

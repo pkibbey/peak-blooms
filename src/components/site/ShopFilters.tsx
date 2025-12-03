@@ -24,7 +24,7 @@ export function ShopFilters({
 
   // Parse current filter state from URL
   const currentColors = searchParams.get("colors")?.split(",").filter(Boolean) || []
-  const currentCollectionId = searchParams.get("collectionId") || ""
+  const currentCollectionIds = searchParams.get("collectionIds")?.split(",").filter(Boolean) || []
   const currentStemLengthMin = searchParams.get("stemLengthMin") || ""
   const currentStemLengthMax = searchParams.get("stemLengthMax") || ""
   const currentPriceMin = searchParams.get("priceMin") || ""
@@ -32,7 +32,7 @@ export function ShopFilters({
 
   // Local state for filters
   const [selectedColors, setSelectedColors] = useState<string[]>(currentColors)
-  const [selectedCollection, setSelectedCollection] = useState<string>(currentCollectionId)
+  const [selectedCollectionIds, setSelectedCollectionIds] = useState<string[]>(currentCollectionIds)
   const [stemLengthMin, setStemLengthMin] = useState<string>(currentStemLengthMin)
   const [stemLengthMax, setStemLengthMax] = useState<string>(currentStemLengthMax)
   const [priceMin, setPriceMin] = useState<string>(currentPriceMin)
@@ -41,7 +41,7 @@ export function ShopFilters({
   // Count active filters
   const activeFilterCount = [
     ...selectedColors,
-    selectedCollection ? 1 : 0,
+    ...selectedCollectionIds,
     stemLengthMin ? 1 : 0,
     stemLengthMax ? 1 : 0,
     priceMin ? 1 : 0,
@@ -52,7 +52,7 @@ export function ShopFilters({
   const navigateWithFilters = useCallback(
     (
       colors: string[],
-      collection: string,
+      collectionIds: string[],
       stemMin: string,
       stemMax: string,
       priceMinVal: string,
@@ -67,10 +67,10 @@ export function ShopFilters({
         params.delete("colors")
       }
 
-      if (collection) {
-        params.set("collectionId", collection)
+      if (collectionIds.length > 0) {
+        params.set("collectionIds", collectionIds.join(","))
       } else {
-        params.delete("collectionId")
+        params.delete("collectionIds")
       }
 
       if (stemMin) {
@@ -108,7 +108,7 @@ export function ShopFilters({
       setSelectedColors(colors)
       navigateWithFilters(
         colors,
-        selectedCollection,
+        selectedCollectionIds,
         stemLengthMin,
         stemLengthMax,
         priceMin,
@@ -116,17 +116,19 @@ export function ShopFilters({
       )
       setIsOpen(false)
     },
-    [selectedCollection, stemLengthMin, stemLengthMax, priceMin, priceMax, navigateWithFilters]
+    [selectedCollectionIds, stemLengthMin, stemLengthMax, priceMin, priceMax, navigateWithFilters]
   )
 
-  // Handle collection toggle — apply instantly
+  // Handle collection toggle — add/remove from selection
   const toggleCollection = useCallback(
     (collectionId: string) => {
-      const newCollection = selectedCollection === collectionId ? "" : collectionId
-      setSelectedCollection(newCollection)
+      const newCollectionIds = selectedCollectionIds.includes(collectionId)
+        ? selectedCollectionIds.filter((id) => id !== collectionId)
+        : [...selectedCollectionIds, collectionId]
+      setSelectedCollectionIds(newCollectionIds)
       navigateWithFilters(
         selectedColors,
-        newCollection,
+        newCollectionIds,
         stemLengthMin,
         stemLengthMax,
         priceMin,
@@ -136,7 +138,7 @@ export function ShopFilters({
     },
     [
       selectedColors,
-      selectedCollection,
+      selectedCollectionIds,
       stemLengthMin,
       stemLengthMax,
       priceMin,
@@ -145,17 +147,17 @@ export function ShopFilters({
     ]
   )
 
-  // Clear collection (select "All Collections")
-  const clearCollection = useCallback(() => {
-    setSelectedCollection("")
-    navigateWithFilters(selectedColors, "", stemLengthMin, stemLengthMax, priceMin, priceMax)
+  // Clear all collections
+  const clearCollections = useCallback(() => {
+    setSelectedCollectionIds([])
+    navigateWithFilters(selectedColors, [], stemLengthMin, stemLengthMax, priceMin, priceMax)
   }, [selectedColors, stemLengthMin, stemLengthMax, priceMin, priceMax, navigateWithFilters])
 
   // Apply filters for numeric inputs (blur/Enter)
   const applyFilters = useCallback(() => {
     navigateWithFilters(
       selectedColors,
-      selectedCollection,
+      selectedCollectionIds,
       stemLengthMin,
       stemLengthMax,
       priceMin,
@@ -164,7 +166,7 @@ export function ShopFilters({
     setIsOpen(false)
   }, [
     selectedColors,
-    selectedCollection,
+    selectedCollectionIds,
     stemLengthMin,
     stemLengthMax,
     priceMin,
@@ -175,7 +177,7 @@ export function ShopFilters({
   // Clear all filters
   const clearFilters = useCallback(() => {
     setSelectedColors([])
-    setSelectedCollection("")
+    setSelectedCollectionIds([])
     setStemLengthMin("")
     setStemLengthMax("")
     setPriceMin("")
@@ -252,8 +254,8 @@ export function ShopFilters({
                 <div className="flex items-center gap-2">
                   <Checkbox
                     id="collection-all"
-                    checked={!selectedCollection}
-                    onChange={clearCollection}
+                    checked={selectedCollectionIds.length === 0}
+                    onChange={clearCollections}
                   />
                   <label htmlFor="collection-all" className="text-sm cursor-pointer">
                     All Collections
@@ -263,7 +265,7 @@ export function ShopFilters({
                   <div key={collection.id} className="flex items-center gap-2">
                     <Checkbox
                       id={`collection-${collection.id}`}
-                      checked={selectedCollection === collection.id}
+                      checked={selectedCollectionIds.includes(collection.id)}
                       onChange={() => toggleCollection(collection.id)}
                     />
                     <label

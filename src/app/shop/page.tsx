@@ -31,7 +31,15 @@ export default async function ShopPage({ searchParams }: ShopPageProps) {
   const filterOptions = await getShopFilterOptions()
 
   // Parse filter parameters
-  const collectionId = typeof params.collectionId === "string" ? params.collectionId : undefined
+  const collectionIds =
+    typeof params.collectionIds === "string"
+      ? params.collectionIds
+          .split(",")
+          .map((c) => c.trim())
+          .filter(Boolean)
+      : Array.isArray(params.collectionIds)
+        ? params.collectionIds
+        : undefined
   // Accept multiple colors passed as `colors` param (comma separated or repeated keys)
   const colors =
     typeof params.colors === "string"
@@ -61,7 +69,7 @@ export default async function ShopPage({ searchParams }: ShopPageProps) {
   // Fetch products using DAL with pagination
   const result = await getProducts(
     {
-      collectionId: collectionId || undefined,
+      collectionIds: collectionIds || undefined,
       colors: colors,
       stemLengthMin:
         stemLengthMin !== undefined && !Number.isNaN(stemLengthMin) ? stemLengthMin : undefined,
@@ -225,7 +233,13 @@ export default async function ShopPage({ searchParams }: ShopPageProps) {
 
               {/* Pagination */}
               {totalPages > 1 && (
-                <ShopPagination currentPage={page} totalPages={totalPages} searchParams={params} />
+                <div className="flex justify-end">
+                  <ShopPagination
+                    currentPage={page}
+                    totalPages={totalPages}
+                    searchParams={params}
+                  />
+                </div>
               )}
             </>
           )}

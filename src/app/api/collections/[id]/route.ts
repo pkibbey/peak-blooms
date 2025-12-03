@@ -13,7 +13,11 @@ export async function GET(_request: NextRequest, { params }: { params: Promise<{
     const collection = await db.collection.findUnique({
       where: { id },
       include: {
-        products: true,
+        productCollections: {
+          include: {
+            product: true,
+          },
+        },
       },
     })
 
@@ -86,7 +90,7 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
 /**
  * DELETE /api/collections/[id]
  * Delete a collection (admin only)
- * Note: This will cascade delete all products in the collection
+ * Note: Removing a collection will not delete products — product.collectionId will be set to null.
  */
 export async function DELETE(
   _request: NextRequest,
@@ -102,12 +106,12 @@ export async function DELETE(
 
     const { id } = await params
 
-    // Check if collection exists
+    // Check if collection exists and count affected products
     const existingCollection = await db.collection.findUnique({
       where: { id },
       include: {
         _count: {
-          select: { products: true },
+          select: { productCollections: true },
         },
       },
     })
@@ -116,13 +120,12 @@ export async function DELETE(
       return NextResponse.json({ error: "Collection not found" }, { status: 404 })
     }
 
-    await db.collection.delete({
-      where: { id },
-    })
+    // Delete the collection (ProductCollection junction entries cascade delete)
+    await db.collection.delete({ where: { id } })
 
     return NextResponse.json({
       success: true,
-      deletedProductCount: existingCollection._count.products,
+      affectedProductCount: existingCollection._count.productCollections,
     })
   } catch (error) {
     console.error("DELETE /api/collections/[id] error:", error)
