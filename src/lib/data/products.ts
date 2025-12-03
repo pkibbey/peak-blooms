@@ -78,6 +78,8 @@ interface GetProductsOptions {
   search?: string
   limit?: number
   offset?: number
+  sort?: string
+  order?: "asc" | "desc"
 }
 
 interface GetProductsResult {
@@ -158,6 +160,18 @@ export async function getProducts(
     // Get total count for pagination metadata
     const total = await db.product.count({ where })
 
+    // Build orderBy based on sort parameter
+    let orderBy: Record<string, "asc" | "desc"> = { createdAt: "desc" }
+    if (options.sort) {
+      const sortField = options.sort as keyof typeof orderBy
+      const sortOrder = options.order ?? "asc"
+      // Validate sort field to prevent injection
+      const validFields = ["name", "createdAt", "featured", "description"]
+      if (validFields.includes(options.sort)) {
+        orderBy = { [sortField]: sortOrder }
+      }
+    }
+
     const products = await db.product.findMany({
       where,
       include: {
@@ -168,9 +182,7 @@ export async function getProducts(
             }
           : true,
       },
-      orderBy: {
-        createdAt: "desc",
-      },
+      orderBy,
       take: limit,
       skip: offset,
     })

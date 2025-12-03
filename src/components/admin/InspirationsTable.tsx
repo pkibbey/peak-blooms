@@ -1,13 +1,7 @@
 import Image from "next/image"
 import Link from "next/link"
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table"
+import { SortableTableHead } from "@/components/ui/SortableTableHead"
+import { Table, TableBody, TableCell, TableHeader, TableRow } from "@/components/ui/table"
 
 interface Inspiration {
   id: string
@@ -21,9 +15,13 @@ interface Inspiration {
 
 interface InspirationsTableProps {
   inspirations: Inspiration[]
+  sort?: string | null
+  order?: "asc" | "desc" | null
 }
 
-export default function InspirationsTable({ inspirations }: InspirationsTableProps) {
+const headerUrl = "/admin/inspirations"
+
+export default function InspirationsTable({ inspirations, sort, order }: InspirationsTableProps) {
   if (inspirations.length === 0) {
     return (
       <p className="text-muted-foreground">
@@ -37,10 +35,35 @@ export default function InspirationsTable({ inspirations }: InspirationsTablePro
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead>Image</TableHead>
-            <TableHead>Name</TableHead>
-            <TableHead className="hidden md:table-cell">Slug</TableHead>
-            <TableHead>Products</TableHead>
+            <SortableTableHead
+              label="Image"
+              sortKey="image"
+              currentSort={sort}
+              currentOrder={order}
+              href={headerUrl}
+            />
+            <SortableTableHead
+              label="Name"
+              sortKey="name"
+              currentSort={sort}
+              currentOrder={order}
+              href={headerUrl}
+            />
+            <SortableTableHead
+              label="Slug"
+              sortKey="slug"
+              currentSort={sort}
+              currentOrder={order}
+              href={headerUrl}
+              className="hidden md:table-cell"
+            />
+            <SortableTableHead
+              label="Products"
+              sortKey="products"
+              currentSort={sort}
+              currentOrder={order}
+              href={headerUrl}
+            />
           </TableRow>
         </TableHeader>
         <TableBody>

@@ -16,7 +16,7 @@ export default async function AdminSidebar() {
   const pendingApprovals = await db.user.count({ where: { approved: false } })
 
   return (
-    <nav className="rounded-lg border border-border p-4 sticky top-28">
+    <nav className="rounded-lg border border-border p-4 sticky top-20 bg-primary-foreground">
       <div className="mb-4">
         <h4 className="mb-1 text-sm font-semibold">Admin</h4>
         <p className="text-xs text-muted-foreground">Quick navigation</p>

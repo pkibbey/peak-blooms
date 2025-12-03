@@ -5,8 +5,6 @@
 - [ ] Use real email server - need to get real domain before we can implement this
 - [ ] Create the seed images using AI
 - [ ] Turn the development of this into a website using git commits
-- [ ] Add a banner that Non-intrusively collects of email of a user to sign up for newsletter for weekly specials
-- [ ] Add sortable columns to the products table
 
 ### 🪨 Code Stability
 - [ ] Add unit tests and e2e tests to ensure complete site functionality

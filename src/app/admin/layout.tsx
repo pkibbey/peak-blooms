@@ -10,7 +10,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
   }
 
   return (
-    <div className="bg-background">
+    <div className="bg-primary/10">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-10">
         <div className="grid gap-6 lg:grid-cols-4">
           <aside className="lg:col-span-1 hidden lg:block">
@@ -18,7 +18,9 @@ export default async function AdminLayout({ children }: { children: React.ReactN
             <AdminSidebar />
           </aside>
 
-          <main className="lg:col-span-3">{children}</main>
+          <main className="lg:col-span-3 bg-primary-foreground border border-border px-6 py-4 rounded-sm">
+            {children}
+          </main>
         </div>
       </div>
     </div>

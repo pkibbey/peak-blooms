@@ -4,10 +4,38 @@ import BackLink from "@/components/site/BackLink"
 import { Button } from "@/components/ui/button"
 import { db } from "@/lib/db"
 
-export default async function AdminHeroesPage() {
+interface AdminHeroesPageProps {
+  searchParams: Record<string, string | string[] | undefined>
+}
+
+export default async function AdminHeroesPage({ searchParams }: AdminHeroesPageProps) {
+  // Parse sort params
+  const sort = typeof searchParams?.sort === "string" ? searchParams.sort : undefined
+  const order =
+    typeof searchParams?.order === "string" ? (searchParams.order as "asc" | "desc") : undefined
+
   const heroes = await db.heroBanner.findMany({
     orderBy: [{ slotPosition: "asc" }, { createdAt: "desc" }],
   })
+
+  // Client-side sort based on params
+  if (sort === "name") {
+    heroes.sort((a, b) => {
+      const comparison = a.name.localeCompare(b.name)
+      return order === "desc" ? -comparison : comparison
+    })
+  } else if (sort === "title") {
+    heroes.sort((a, b) => {
+      const comparison = a.title.localeCompare(b.title)
+      return order === "desc" ? -comparison : comparison
+    })
+  } else if (sort === "slot") {
+    heroes.sort((a, b) => {
+      const aPos = a.slotPosition || 999
+      const bPos = b.slotPosition || 999
+      return order === "desc" ? bPos - aPos : aPos - bPos
+    })
+  }
 
   return (
     <>
@@ -25,7 +53,7 @@ export default async function AdminHeroesPage() {
       </div>
 
       {/* Heroes Table */}
-      <HeroesTable heroes={heroes} />
+      <HeroesTable heroes={heroes} sort={sort} order={order} />
     </>
   )
 }

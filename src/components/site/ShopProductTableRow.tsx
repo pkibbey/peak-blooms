@@ -71,19 +71,6 @@ export function ShopProductTableRow({ product }: ShopProductTableRowProps) {
 
       {/* Price */}
       <TableCell>{product.variants && product.variants.length > 0 ? priceDisplay : "—"}</TableCell>
-
-      {/* Status Badge */}
-      <TableCell>
-        {hasBoxlotVariant && (
-          <Badge
-            variant="secondary"
-            className="gap-1 bg-amber-100 text-amber-800 hover:bg-amber-100"
-          >
-            <IconPackage className="h-3 w-3" />
-            Boxlot
-          </Badge>
-        )}
-      </TableCell>
     </TableRow>
   )
 }

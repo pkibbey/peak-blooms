@@ -2,6 +2,7 @@ import Link from "next/link"
 import { type OrderStatus, OrderStatusBadge } from "@/components/site/OrderStatusBadge"
 import { Button } from "@/components/ui/button"
 import { IconEye } from "@/components/ui/icons"
+import { SortableTableHead } from "@/components/ui/SortableTableHead"
 import {
   Table,
   TableBody,
@@ -34,9 +35,19 @@ interface Order {
 interface OrdersTableProps {
   orders: Order[]
   currentStatus: string
+  sort?: string | null
+  order?: "asc" | "desc" | null
 }
 
-export default function OrdersTable({ orders, currentStatus }: OrdersTableProps) {
+function buildHeaderUrl(status: string): string {
+  const baseUrl = "/admin/orders"
+  if (status === "ALL") {
+    return baseUrl
+  }
+  return `${baseUrl}?status=${status}`
+}
+
+export default function OrdersTable({ orders, currentStatus, sort, order }: OrdersTableProps) {
   const statusFilters = [
     { value: "ALL", label: "All" },
     { value: "PENDING", label: "Pending" },
@@ -45,6 +56,8 @@ export default function OrdersTable({ orders, currentStatus }: OrdersTableProps)
     { value: "DELIVERED", label: "Delivered" },
     { value: "CANCELLED", label: "Cancelled" },
   ]
+
+  const headerUrl = buildHeaderUrl(currentStatus)
 
   return (
     <div className="space-y-4">
@@ -84,13 +97,53 @@ export default function OrdersTable({ orders, currentStatus }: OrdersTableProps)
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Order</TableHead>
-                <TableHead>Customer</TableHead>
-                <TableHead className="hidden md:table-cell">Date</TableHead>
-                <TableHead className="hidden lg:table-cell">Items</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead className="text-right">Total</TableHead>
-                <TableHead className="text-right">Actions</TableHead>
+                <SortableTableHead
+                  label="Order"
+                  sortKey="orderNumber"
+                  currentSort={sort}
+                  currentOrder={order}
+                  href={headerUrl}
+                />
+                <SortableTableHead
+                  label="Customer"
+                  sortKey="customer"
+                  currentSort={sort}
+                  currentOrder={order}
+                  href={headerUrl}
+                />
+                <SortableTableHead
+                  label="Date"
+                  sortKey="date"
+                  currentSort={sort}
+                  currentOrder={order}
+                  href={headerUrl}
+                  className="hidden md:table-cell"
+                />
+                <SortableTableHead
+                  label="Items"
+                  sortKey="items"
+                  currentSort={sort}
+                  currentOrder={order}
+                  href={headerUrl}
+                  className="hidden lg:table-cell"
+                />
+                <TableHead>Items</TableHead>
+                <SortableTableHead
+                  label="Status"
+                  sortKey="status"
+                  currentSort={sort}
+                  currentOrder={order}
+                  href={headerUrl}
+                />
+                <SortableTableHead
+                  label="Total"
+                  sortKey="total"
+                  currentSort={sort}
+                  currentOrder={order}
+                  href={headerUrl}
+                  className="text-right"
+                />
+                <TableHead>Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>

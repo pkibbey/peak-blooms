@@ -4,6 +4,7 @@ import { Toaster } from "sonner"
 import "./globals.css"
 import Footer from "@/components/site/Footer"
 import Nav from "@/components/site/Nav"
+import { NewsletterBanner } from "@/components/site/NewsletterBanner"
 import { getCurrentUser, getOrCreateCart } from "@/lib/current-user"
 
 const geistSans = Geist({
@@ -60,6 +61,7 @@ export default async function RootLayout({
 
         <main id="content">{children}</main>
 
+        <NewsletterBanner />
         <Footer />
         <Toaster position="bottom-center" />
       </body>

@@ -6,6 +6,7 @@ import { ShopFilters } from "@/components/site/ShopFilters"
 import { ShopPagination } from "@/components/site/ShopPagination"
 import { ShopProductTableRow } from "@/components/site/ShopProductTableRow"
 import { ViewToggle } from "@/components/site/ViewToggle"
+import { SortableTableHead } from "@/components/ui/SortableTableHead"
 import { Table, TableBody, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { getCurrentUser } from "@/lib/current-user"
 import { getProducts, getShopFilterOptions } from "@/lib/data"
@@ -53,6 +54,10 @@ export default async function ShopPage({ searchParams }: ShopPageProps) {
   const page = typeof params.page === "string" ? parseInt(params.page, 10) : 1
   const offset = Math.max(0, (page - 1) * ITEMS_PER_PAGE)
 
+  // Parse sort params
+  const sort = typeof params.sort === "string" ? params.sort : undefined
+  const order = typeof params.order === "string" ? (params.order as "asc" | "desc") : undefined
+
   // Fetch products using DAL with pagination
   const result = await getProducts(
     {
@@ -68,11 +73,34 @@ export default async function ShopPage({ searchParams }: ShopPageProps) {
       boxlotOnly,
       limit: ITEMS_PER_PAGE,
       offset,
+      // Pass sort to data layer only for database-sortable fields
+      sort: sort && ["name", "createdAt", "featured"].includes(sort) ? sort : undefined,
+      order,
     },
     multiplier
   )
 
+  // Apply client-side sorting for price and description
+  const products = [...result.products]
+  if (sort === "price") {
+    products.sort((a, b) => {
+      const aPrice = a.variants[0]?.price ?? 0
+      const bPrice = b.variants[0]?.price ?? 0
+      return order === "desc" ? bPrice - aPrice : aPrice - bPrice
+    })
+  } else if (sort === "description") {
+    products.sort((a, b) => {
+      const aDesc = a.description ?? ""
+      const bDesc = b.description ?? ""
+      const comparison = aDesc.localeCompare(bDesc)
+      return order === "desc" ? -comparison : comparison
+    })
+  }
+
   const totalPages = Math.ceil(result.total / ITEMS_PER_PAGE)
+
+  // Build header URL preserving all filter params and sort
+  const headerUrl = new URLSearchParams(params as Record<string, string>).toString()
 
   return (
     <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 py-10">
@@ -132,7 +160,7 @@ export default async function ShopPage({ searchParams }: ShopPageProps) {
           </div>
 
           {/* Products Grid or Table */}
-          {result.products.length === 0 ? (
+          {products.length === 0 ? (
             <div className="flex justify-center items-center py-12">
               <p className="text-muted-foreground">No products found matching your filters.</p>
             </div>
@@ -143,15 +171,33 @@ export default async function ShopPage({ searchParams }: ShopPageProps) {
                   <TableHeader>
                     <TableRow>
                       <TableHead>Image</TableHead>
-                      <TableHead>Name</TableHead>
-                      <TableHead className="hidden md:table-cell">Description</TableHead>
-                      <TableHead className="hidden md:table-cell">Colors</TableHead>
-                      <TableHead>Price</TableHead>
-                      <TableHead>Status</TableHead>
+                      <SortableTableHead
+                        label="Name"
+                        sortKey="name"
+                        currentSort={sort}
+                        currentOrder={order}
+                        href={`/shop?${headerUrl}`}
+                      />
+                      <SortableTableHead
+                        label="Description"
+                        sortKey="description"
+                        currentSort={sort}
+                        currentOrder={order}
+                        href={`/shop?${headerUrl}`}
+                        className="hidden md:table-cell"
+                      />
+                      <TableHead>Colors</TableHead>
+                      <SortableTableHead
+                        label="Price"
+                        sortKey="price"
+                        currentSort={sort}
+                        currentOrder={order}
+                        href={`/shop?${headerUrl}`}
+                      />
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {result.products.map((product) => (
+                    {products.map((product) => (
                       <ShopProductTableRow key={product.slug} product={product} />
                     ))}
                   </TableBody>
@@ -172,7 +218,7 @@ export default async function ShopPage({ searchParams }: ShopPageProps) {
           ) : (
             <>
               <div className="grid grid-cols-2 gap-4 sm:gap-6 md:grid-cols-3 mb-8">
-                {result.products.map((product) => (
+                {products.map((product) => (
                   <ProductCard key={product.slug} product={product} user={user} />
                 ))}
               </div>

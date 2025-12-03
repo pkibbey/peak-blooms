@@ -3,14 +3,7 @@ import Link from "next/link"
 import { notFound } from "next/navigation"
 import AddAllToCartButton from "@/components/site/AddAllToCartButton"
 import BackLink from "@/components/site/BackLink"
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table"
+import { Table, TableBody, TableCell, TableHeader, TableRow } from "@/components/ui/table"
 import { getCurrentUser } from "@/lib/current-user"
 import { getAllInspirationSlugs, getInspirationBySlug } from "@/lib/data"
 import { db } from "@/lib/db"
@@ -108,21 +101,21 @@ export default async function InspirationDetailPage({ params }: InspirationDetai
           </p>
 
           {/* Product Table with Enhanced Styling */}
-          <div className="rounded-lg border border-gray-200 overflow-hidden shadow-sm">
+          <div className="rounded-lg border border-border overflow-hidden shadow-sm">
             <Table>
-              <TableHeader className="bg-gray-50">
-                <TableRow className="hover:bg-gray-50">
-                  <TableHead className="font-semibold text-primary">Image</TableHead>
-                  <TableHead className="font-semibold text-primary">Product</TableHead>
-                  <TableHead className="font-semibold text-primary">Details</TableHead>
-                  <TableHead className="font-semibold text-primary text-right">Qty</TableHead>
+              <TableHeader className="bg-muted/50">
+                <TableRow className="hover:bg-muted/50">
+                  <TableHeader className="font-semibold">Image</TableHeader>
+                  <TableHeader className="font-semibold">Product</TableHeader>
+                  <TableHeader className="font-semibold">Details</TableHeader>
+                  <TableHeader className="font-semibold text-right">Qty</TableHeader>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {productsWithVariants.map((product, index) => (
                   <TableRow
                     key={product.slug}
-                    className={index % 2 === 0 ? "bg-white" : "bg-gray-50/40 hover:bg-gray-50"}
+                    className={index % 2 === 0 ? "bg-white" : "bg-muted/20 hover:bg-muted/30"}
                   >
                     <TableCell className="py-4">
                       <Link href={`/shop/${product.slug}`} className="block">

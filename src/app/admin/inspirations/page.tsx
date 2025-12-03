@@ -4,7 +4,16 @@ import BackLink from "@/components/site/BackLink"
 import { Button } from "@/components/ui/button"
 import { db } from "@/lib/db"
 
-export default async function AdminInspirationsPage() {
+interface AdminInspirationsPageProps {
+  searchParams: Record<string, string | string[] | undefined>
+}
+
+export default async function AdminInspirationsPage({ searchParams }: AdminInspirationsPageProps) {
+  // Parse sort params
+  const sort = typeof searchParams?.sort === "string" ? searchParams.sort : undefined
+  const order =
+    typeof searchParams?.order === "string" ? (searchParams.order as "asc" | "desc") : undefined
+
   const inspirations = await db.inspiration.findMany({
     include: {
       products: {
@@ -15,6 +24,25 @@ export default async function AdminInspirationsPage() {
       createdAt: "desc",
     },
   })
+
+  // Client-side sort based on params
+  if (sort === "name") {
+    inspirations.sort((a, b) => {
+      const comparison = a.name.localeCompare(b.name)
+      return order === "desc" ? -comparison : comparison
+    })
+  } else if (sort === "products") {
+    inspirations.sort((a, b) => {
+      const aCount = a.products?.length || 0
+      const bCount = b.products?.length || 0
+      return order === "desc" ? bCount - aCount : aCount - bCount
+    })
+  } else if (sort === "slug") {
+    inspirations.sort((a, b) => {
+      const comparison = a.slug.localeCompare(b.slug)
+      return order === "desc" ? -comparison : comparison
+    })
+  }
 
   return (
     <>
@@ -32,7 +60,7 @@ export default async function AdminInspirationsPage() {
       </div>
 
       {/* Inspirations Table */}
-      <InspirationsTable inspirations={inspirations} />
+      <InspirationsTable inspirations={inspirations} sort={sort} order={order} />
     </>
   )
 }

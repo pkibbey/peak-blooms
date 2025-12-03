@@ -1,13 +1,7 @@
 import Link from "next/link"
 import { Badge } from "@/components/ui/badge"
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table"
+import { SortableTableHead } from "@/components/ui/SortableTableHead"
+import { Table, TableBody, TableCell, TableHeader, TableRow } from "@/components/ui/table"
 import { GRADIENT_PRESETS } from "@/lib/validations/hero"
 
 interface HeroBanner {
@@ -23,7 +17,11 @@ interface HeroBanner {
 
 interface HeroesTableProps {
   heroes: HeroBanner[]
+  sort?: string | null
+  order?: "asc" | "desc" | null
 }
+
+const headerUrl = "/admin/heroes"
 
 function GradientSwatch({ preset }: { preset: string | null }) {
   const gradient = GRADIENT_PRESETS.find((g) => g.value === preset)
@@ -56,7 +54,7 @@ function SlotBadge({ position }: { position: number | null }) {
   return <Badge variant="secondary">{labels[position] || `Slot ${position}`}</Badge>
 }
 
-export default function HeroesTable({ heroes }: HeroesTableProps) {
+export default function HeroesTable({ heroes, sort, order }: HeroesTableProps) {
   if (heroes.length === 0) {
     return (
       <p className="text-muted-foreground">
@@ -70,10 +68,35 @@ export default function HeroesTable({ heroes }: HeroesTableProps) {
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead>Name</TableHead>
-            <TableHead>Title</TableHead>
-            <TableHead className="hidden md:table-cell">Background</TableHead>
-            <TableHead>Slot</TableHead>
+            <SortableTableHead
+              label="Name"
+              sortKey="name"
+              currentSort={sort}
+              currentOrder={order}
+              href={headerUrl}
+            />
+            <SortableTableHead
+              label="Title"
+              sortKey="title"
+              currentSort={sort}
+              currentOrder={order}
+              href={headerUrl}
+            />
+            <SortableTableHead
+              label="Background"
+              sortKey="background"
+              currentSort={sort}
+              currentOrder={order}
+              href={headerUrl}
+              className="hidden md:table-cell"
+            />
+            <SortableTableHead
+              label="Slot"
+              sortKey="slot"
+              currentSort={sort}
+              currentOrder={order}
+              href={headerUrl}
+            />
           </TableRow>
         </TableHeader>
         <TableBody>

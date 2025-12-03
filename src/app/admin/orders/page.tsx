@@ -4,11 +4,11 @@ import { OrderStatus } from "@/generated/enums"
 import { db } from "@/lib/db"
 
 interface AdminOrdersPageProps {
-  searchParams: Promise<{ status?: string }>
+  searchParams: Promise<{ status?: string; sort?: string; order?: string }>
 }
 
 export default async function AdminOrdersPage({ searchParams }: AdminOrdersPageProps) {
-  const { status } = await searchParams
+  const { status, sort, order } = await searchParams
   const statusFilter = status as OrderStatus | undefined
 
   // Build where clause based on status filter
@@ -37,6 +37,29 @@ export default async function AdminOrdersPage({ searchParams }: AdminOrdersPageP
     orderBy: { createdAt: "desc" },
   })
 
+  // Client-side sort based on params
+  const sortOrder = order as "asc" | "desc" | undefined
+  if (sort === "orderNumber") {
+    orders.sort((a, b) => {
+      const comparison = a.orderNumber.localeCompare(b.orderNumber)
+      return sortOrder === "desc" ? -comparison : comparison
+    })
+  } else if (sort === "date") {
+    orders.sort((a, b) => {
+      const comparison = new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
+      return sortOrder === "desc" ? -comparison : comparison
+    })
+  } else if (sort === "total") {
+    orders.sort((a, b) => {
+      return sortOrder === "desc" ? b.total - a.total : a.total - b.total
+    })
+  } else if (sort === "items") {
+    orders.sort((a, b) => {
+      const comparison = a._count.items - b._count.items
+      return sortOrder === "desc" ? -comparison : comparison
+    })
+  }
+
   return (
     <>
       <BackLink href="/admin" label="Dashboard" />
@@ -47,7 +70,12 @@ export default async function AdminOrdersPage({ searchParams }: AdminOrdersPageP
         </div>
       </div>
 
-      <OrdersTable orders={orders} currentStatus={statusFilter || "ALL"} />
+      <OrdersTable
+        orders={orders}
+        currentStatus={statusFilter || "ALL"}
+        sort={sort}
+        order={order as "asc" | "desc" | undefined}
+      />
     </>
   )
 }

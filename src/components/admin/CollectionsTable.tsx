@@ -1,5 +1,6 @@
 import Image from "next/image"
 import Link from "next/link"
+import { SortableTableHead } from "@/components/ui/SortableTableHead"
 import {
   Table,
   TableBody,
@@ -21,9 +22,13 @@ interface Collection {
 
 interface CollectionsTableProps {
   collections: Collection[]
+  sort?: string | null
+  order?: "asc" | "desc" | null
 }
 
-export default function CollectionsTable({ collections }: CollectionsTableProps) {
+const headerUrl = "/admin/collections"
+
+export default function CollectionsTable({ collections, sort, order }: CollectionsTableProps) {
   if (collections.length === 0) {
     return (
       <p className="text-muted-foreground">
@@ -38,9 +43,28 @@ export default function CollectionsTable({ collections }: CollectionsTableProps)
         <TableHeader>
           <TableRow>
             <TableHead>Image</TableHead>
-            <TableHead>Name</TableHead>
-            <TableHead className="hidden md:table-cell">Slug</TableHead>
-            <TableHead>Products</TableHead>
+            <SortableTableHead
+              label="Name"
+              sortKey="name"
+              currentSort={sort}
+              currentOrder={order}
+              href={headerUrl}
+            />
+            <SortableTableHead
+              label="Slug"
+              sortKey="slug"
+              currentSort={sort}
+              currentOrder={order}
+              href={headerUrl}
+              className="hidden md:table-cell"
+            />
+            <SortableTableHead
+              label="Products"
+              sortKey="products"
+              currentSort={sort}
+              currentOrder={order}
+              href={headerUrl}
+            />
           </TableRow>
         </TableHeader>
         <TableBody>

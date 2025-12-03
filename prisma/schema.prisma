@@ -272,6 +272,7 @@ model HeroBanner {
 enum Role {
   CUSTOMER
   ADMIN
+  NEWSLETTER_SUBSCRIBER
 }
 
 enum OrderStatus {
