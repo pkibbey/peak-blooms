@@ -165,6 +165,27 @@ async function main() {
     where: { email: "customer@peakblooms.com" },
   })
 
+  // Create a newsletter subscriber user for testing flows that use the NEWSLETTER_SUBSCRIBER role
+  await prisma.user.upsert({
+    create: {
+      email: "newsletter@peakblooms.com",
+      name: "Newsletter Subscriber",
+      emailVerified: true,
+      approved: true,
+      role: "NEWSLETTER_SUBSCRIBER",
+      priceMultiplier: 1.0,
+    },
+    where: { email: "newsletter@peakblooms.com" },
+    update: {
+      name: "Newsletter Subscriber",
+      emailVerified: true,
+      approved: true,
+      role: "NEWSLETTER_SUBSCRIBER",
+      priceMultiplier: 1.0,
+    },
+  })
+  console.log("✅ Created newsletter subscriber: newsletter@peakblooms.com")
+
   // Create collections
   const flowersCollection = await prisma.collection.upsert({
     create: {

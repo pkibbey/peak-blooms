@@ -3,14 +3,11 @@
 ### 🌟 Next Steps
 
 - [ ] Use real email server - need to get real domain before we can implement this
-- [ ] Create the seed images using AI
 - [ ] Turn the development of this into a website using git commits
 
 ### 🪨 Code Stability
 - [ ] Add unit tests and e2e tests to ensure complete site functionality
-- [ ] Update Github Readme with screenshots and updated site features/design/functionality
 - [ ] Allow users to change their email address
-- [ ] Make the site feel more responsive by puting loading animations in using client side components
 
 ### 💰 Payment Processing 
 
@@ -21,6 +18,7 @@
 
 - [ ] Update logos with proper graphics
 - [ ] Try out different colour schemes
+- [ ] Make the site feel more responsive by puting loading animations in using client side components
  
 ### 🛍️ Tracking / Marketing
 
