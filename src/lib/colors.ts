@@ -48,9 +48,24 @@ export const COLORS: ProductColor[] = [
   { id: "neutral", label: "Neutral", hex: "#BDB6AC", category: "neutral" },
 ]
 
-export const COLOR_BY_HEX = Object.fromEntries(
-  COLORS.map((c) => [c.hex.toLowerCase(), c])
-) as Record<string, ProductColor>
+/**
+ * Map color ID to ProductColor object.
+ * Returns undefined if color ID not found.
+ */
+function getColorById(id: string): ProductColor | undefined {
+  return COLORS.find((c) => c.id === id)
+}
+
+/**
+ * Map array of color IDs to hex values.
+ * Returns array of hex values in the same order.
+ * Skips any IDs that are not found in the COLORS registry.
+ */
+export function colorIdsToHex(colorIds: string[]): string[] {
+  return colorIds
+    .map((id) => getColorById(id)?.hex)
+    .filter((hex): hex is string => hex !== undefined)
+}
 
 /**
  * Convert a hex string to an RGB tuple 0..255
@@ -70,29 +85,4 @@ function hexToRgb(hex: string): [number, number, number] | null {
     return [r, g, b]
   }
   return null
-}
-
-/**
- * Find nearest canonical color by Euclidean distance in RGB space.
- * Returns the canonical ProductColor for the closest match.
- */
-export function findNearestColor(hex: string): ProductColor | null {
-  const rgb = hexToRgb(hex)
-  if (!rgb) return null
-  const [r, g, b] = rgb
-  let best: ProductColor | null = null
-  let bestDist = Infinity
-  for (const c of COLORS) {
-    const cRgb = hexToRgb(c.hex)
-    if (!cRgb) continue
-    const dr = r - cRgb[0]
-    const dg = g - cRgb[1]
-    const db = b - cRgb[2]
-    const dist = dr * dr + dg * dg + db * db
-    if (dist < bestDist) {
-      bestDist = dist
-      best = c
-    }
-  }
-  return best
 }

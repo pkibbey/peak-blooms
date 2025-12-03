@@ -1,6 +1,7 @@
 import Image from "next/image"
 import Link from "next/link"
 import { Badge } from "@/components/ui/badge"
+import { ColorsMiniDisplay } from "@/components/ui/ColorsMiniDisplay"
 import { IconPackage } from "@/components/ui/icons"
 import { TableCell, TableRow } from "@/components/ui/table"
 import type { ProductModel, ProductVariantModel } from "@/generated/models"
@@ -64,6 +65,11 @@ export function ShopProductTableRow({ product, user }: ShopProductTableRowProps)
       {/* Description */}
       <TableCell className="hidden md:table-cell text-muted-foreground text-sm max-w-xs truncate">
         {product.description || "—"}
+      </TableCell>
+
+      {/* Colors */}
+      <TableCell className="hidden md:table-cell">
+        <ColorsMiniDisplay colorIds={product.colors} />
       </TableCell>
 
       {/* Price */}

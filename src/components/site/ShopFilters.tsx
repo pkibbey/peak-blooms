@@ -3,17 +3,21 @@
 import { ChevronDown, Filter, X } from "lucide-react"
 import { useRouter, useSearchParams } from "next/navigation"
 import { useCallback, useState } from "react"
+import { ColorSelector } from "@/components/site/ColorSelector"
 import { SearchInput } from "@/components/site/SearchInput"
 import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
 import { cn } from "@/lib/utils"
 
 interface ShopFiltersProps {
-  availableColors?: string[]
+  availableColorIds?: string[]
   availableCollections?: Array<{ id: string; name: string }>
 }
 
-export function ShopFilters({ availableColors = [], availableCollections = [] }: ShopFiltersProps) {
+export function ShopFilters({
+  availableColorIds = [],
+  availableCollections = [],
+}: ShopFiltersProps) {
   const router = useRouter()
   const searchParams = useSearchParams()
   const [isOpen, setIsOpen] = useState(false)
@@ -98,16 +102,12 @@ export function ShopFilters({ availableColors = [], availableCollections = [] }:
     [searchParams, router]
   )
 
-  // Handle color checkbox change — apply instantly
-  const toggleColor = useCallback(
-    (color: string) => {
-      const newColors = selectedColors.includes(color)
-        ? selectedColors.filter((c) => c !== color)
-        : [...selectedColors, color]
-
-      setSelectedColors(newColors)
+  // Handle color changes — apply instantly
+  const handleColorsChange = useCallback(
+    (colors: string[]) => {
+      setSelectedColors(colors)
       navigateWithFilters(
-        newColors,
+        colors,
         selectedCollection,
         stemLengthMin,
         stemLengthMax,
@@ -116,15 +116,7 @@ export function ShopFilters({ availableColors = [], availableCollections = [] }:
       )
       setIsOpen(false)
     },
-    [
-      selectedColors,
-      selectedCollection,
-      stemLengthMin,
-      stemLengthMax,
-      priceMin,
-      priceMax,
-      navigateWithFilters,
-    ]
+    [selectedCollection, stemLengthMin, stemLengthMax, priceMin, priceMax, navigateWithFilters]
   )
 
   // Handle collection toggle — apply instantly
@@ -220,7 +212,7 @@ export function ShopFilters({ availableColors = [], availableCollections = [] }:
       {/* Filter Panel */}
       <div
         className={cn(
-          "fixed left-0 top-0 bottom-0 w-72 bg-white shadow-lg overflow-y-auto transition-transform lg:static lg:shadow-none lg:w-auto lg:bg-transparent p-4 lg:p-0 z-50 lg:z-auto",
+          "fixed left-0 top-0 bottom-0 w-72 bg-white shadow-lg transition-transform lg:static lg:shadow-none lg:w-auto lg:bg-transparent p-4 lg:p-0 z-50 lg:z-auto",
           isOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
         )}
       >
@@ -242,22 +234,14 @@ export function ShopFilters({ availableColors = [], availableCollections = [] }:
           <SearchInput />
 
           {/* Colors Filter */}
-          {availableColors.length > 0 && (
+          {availableColorIds.length > 0 && (
             <FilterSection title="Color">
-              <div className="space-y-3">
-                {availableColors.map((color) => (
-                  <div key={color} className="flex items-center gap-2">
-                    <Checkbox
-                      id={`color-${color}`}
-                      checked={selectedColors.includes(color)}
-                      onChange={() => toggleColor(color)}
-                    />
-                    <label htmlFor={`color-${color}`} className="text-sm cursor-pointer capitalize">
-                      {color}
-                    </label>
-                  </div>
-                ))}
-              </div>
+              <ColorSelector
+                selectedColors={selectedColors}
+                onChange={handleColorsChange}
+                showLabel={false}
+                compact={true}
+              />
             </FilterSection>
           )}
 

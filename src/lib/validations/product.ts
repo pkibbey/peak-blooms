@@ -15,19 +15,14 @@ const productVariantSchema = z.object({
 
 export type ProductVariantFormData = z.infer<typeof productVariantSchema>
 
-const HEX_REGEX = /^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/
-
 export const productSchema = z.object({
   name: z.string().min(1, "Product name is required"),
   slug: z.string().min(1, "Slug is required"),
   description: z.string(),
   image: z.string(),
-  // Colors array: zero or more hex values (e.g. ["#FF6B6B", "#FFFFFF"]). Use empty array instead of single string.
-  colors: z
-    .array(
-      z.string().refine((val) => HEX_REGEX.test(val), { message: "Each color must be a valid hex" })
-    )
-    .optional(),
+  // Colors array: zero or more color IDs (e.g. ["pink", "rose", "greenery"]). Use empty array instead of single string.
+  // Color IDs reference the COLORS object in lib/colors.ts
+  colors: z.array(z.string()).optional(),
   collectionId: z.string().min(1, "Collection is required"),
   productType: z.enum(["FLOWER", "FILLER"]),
   featured: z.boolean(),
@@ -47,12 +42,8 @@ export const createProductSchema = z.object({
   slug: z.string().min(1, "Slug is required"),
   description: z.string().nullable(),
   image: z.string().nullable(),
-  // API input: allow null or an array of valid hex colors (use `colors` field).
-  colors: z
-    .array(
-      z.string().refine((val) => HEX_REGEX.test(val), { message: "Each color must be a valid hex" })
-    )
-    .nullable(),
+  // API input: allow null or an array of valid color IDs (reference lib/colors.ts COLORS object)
+  colors: z.array(z.string()).nullable(),
   collectionId: z.string().min(1, "Collection is required"),
   productType: z.enum(["FLOWER", "FILLER"]).default("FLOWER"),
   featured: z.boolean().default(false),

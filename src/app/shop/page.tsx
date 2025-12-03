@@ -84,7 +84,7 @@ export default async function ShopPage({ searchParams }: ShopPageProps) {
           <div className="sticky top-20">
             <Suspense fallback={null}>
               <ShopFilters
-                availableColors={filterOptions.colors}
+                availableColorIds={filterOptions.colorIds}
                 availableCollections={filterOptions.collections}
               />
             </Suspense>
@@ -99,7 +99,7 @@ export default async function ShopPage({ searchParams }: ShopPageProps) {
               <div className="flex flex-wrap gap-4 items-center flex-1 lg:hidden">
                 <Suspense fallback={null}>
                   <ShopFilters
-                    availableColors={filterOptions.colors}
+                    availableColorIds={filterOptions.colorIds}
                     availableCollections={filterOptions.collections}
                   />
                 </Suspense>
@@ -145,6 +145,7 @@ export default async function ShopPage({ searchParams }: ShopPageProps) {
                       <TableHead>Image</TableHead>
                       <TableHead>Name</TableHead>
                       <TableHead className="hidden md:table-cell">Description</TableHead>
+                      <TableHead className="hidden md:table-cell">Colors</TableHead>
                       <TableHead>Price</TableHead>
                       <TableHead>Status</TableHead>
                     </TableRow>

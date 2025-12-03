@@ -1,13 +1,9 @@
-import { COLOR_BY_HEX, findNearestColor } from "@/lib/colors"
 import { db } from "@/lib/db"
 
 export async function GET() {
   try {
     const [colors, stemLengths] = await Promise.all([
-      // Collect distinct colors from the `colors` array column
-      // Note: querying for "not null" on list columns is not supported by the
-      // generated list filter type. We'll just fetch the colors column for all
-      // products and filter empties in code.
+      // Collect distinct color IDs from the `colors` array column
       db.product.findMany({
         select: {
           colors: true,
@@ -30,20 +26,9 @@ export async function GET() {
       }),
     ])
 
-    // Flatten color arrays from each product
+    // Flatten color ID arrays from each product
     const all = colors.flatMap((p) => (p.colors?.length ? p.colors : []))
-    const distinctColors = Array.from(new Set(all.map((c) => c))).sort()
-
-    // Provide a human-friendly mapping for the returned colors
-    const colorOptions = distinctColors.map((hex) => {
-      const maybe = COLOR_BY_HEX[hex.toLowerCase()]
-      const canonical = maybe ?? findNearestColor(hex) ?? null
-      return {
-        hex,
-        label: canonical ? canonical.label : hex,
-        id: canonical ? canonical.id : hex,
-      }
-    })
+    const distinctColorIds = Array.from(new Set(all.map((c) => c))).sort()
 
     const distinctStemLengths = stemLengths
       .map((v) => v.stemLength)
@@ -51,10 +36,8 @@ export async function GET() {
       .sort((a, b) => a - b)
 
     return Response.json({
-      // Backwards-compatible: keep raw distinct string array
-      colors: distinctColors,
-      // New: richer colour metadata for UI (hex, label, id)
-      colorOptions,
+      // Only send color IDs; components use COLORS map for presentation
+      colorIds: distinctColorIds,
       stemLengths: distinctStemLengths,
     })
   } catch (error) {

@@ -3,7 +3,7 @@
  * Centralized data fetching with automatic price multiplier application
  *
  * Usage:
- * import { getProductBySlug, getCollectionBySlug } from "@/lib/data"
+ * import { getCollectionBySlug } from "@/lib/data"
  *
  * Logging:
  * - All operations log timing information by default

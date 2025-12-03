@@ -132,7 +132,7 @@ model Product {
   slug         String               @unique
   description  String?
   image        String?
-  colors       String[]
+  colors       String[]             // Array of color IDs (references COLORS object in lib/colors.ts)
   collectionId String
   featured     Boolean              @default(false)
   productType  ProductType          @default(FLOWER)

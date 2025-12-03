@@ -41,33 +41,6 @@ function applyMultiplierToProducts<T extends ProductWithVariants>(
 }
 
 /**
- * Get a single product by slug with variants
- * Returns null if not found
- */
-export async function getProductBySlug(
-  slug: string,
-  priceMultiplier = 1.0
-): Promise<ProductWithVariantsAndCollection | null> {
-  return withTiming(
-    "getProductBySlug",
-    slug,
-    async () => {
-      const product = await db.product.findUnique({
-        where: { slug },
-        include: {
-          variants: true,
-          collection: true,
-        },
-      })
-
-      if (!product) return null
-      return applyMultiplierToProduct(product, priceMultiplier)
-    },
-    { logNotFound: true }
-  )
-}
-
-/**
  * Get a single product by ID with variants
  * Returns null if not found
  */
@@ -276,24 +249,24 @@ export async function getProductWithInspirations(
 
 /**
  * Get available filter options for the shop page
- * Returns all unique colors and collections
+ * Returns color IDs and collections - hex values are computed via COLORS map in components
  */
 export async function getShopFilterOptions(): Promise<{
-  colors: string[]
+  colorIds: string[]
   collections: Array<{ id: string; name: string }>
 }> {
   return withTiming("getShopFilterOptions", {}, async () => {
-    // Get all unique colors from products
+    // Get all unique color IDs from products
     const products = await db.product.findMany({
       select: { colors: true },
     })
-    const colorsSet = new Set<string>()
+    const colorIdsSet = new Set<string>()
     products.forEach((product) => {
-      product.colors.forEach((color) => {
-        colorsSet.add(color)
+      product.colors.forEach((colorId) => {
+        colorIdsSet.add(colorId)
       })
     })
-    const colors = Array.from(colorsSet).sort()
+    const colorIds = Array.from(colorIdsSet).sort()
 
     // Get all collections
     const collections = await db.collection.findMany({
@@ -301,6 +274,6 @@ export async function getShopFilterOptions(): Promise<{
       orderBy: { name: "asc" },
     })
 
-    return { colors, collections }
+    return { colorIds, collections }
   })
 }

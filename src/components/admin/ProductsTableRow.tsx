@@ -5,6 +5,7 @@ import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { useState } from "react"
 import { toast } from "sonner"
+import { ColorsMiniDisplay } from "@/components/ui/ColorsMiniDisplay"
 import { Checkbox } from "@/components/ui/checkbox"
 import { TableCell, TableRow } from "@/components/ui/table"
 import { cn, formatPrice } from "@/lib/utils"
@@ -84,28 +85,7 @@ export default function ProductsTableRow({ product }: ProductRowProps) {
 
       {/* Colors */}
       <TableCell className="hidden md:table-cell">
-        {product.colors && product.colors.length > 0 ? (
-          <div className="flex gap-2 items-center">
-            <div className="flex -space-x-1">
-              {product.colors.slice(0, 5).map((c) => (
-                <div
-                  key={c}
-                  role="img"
-                  aria-hidden={true}
-                  title={c}
-                  className="h-4 w-4 rounded-full border border-border"
-                  style={{ backgroundColor: c }}
-                />
-              ))}
-            </div>
-            {product.colors.length > 5 ? (
-              <span className="text-xs text-muted-foreground">+{product.colors.length - 5}</span>
-            ) : null}
-            <span className="sr-only">Colors: {product.colors.join(", ")}</span>
-          </div>
-        ) : (
-          <span className="text-muted-foreground">—</span>
-        )}
+        <ColorsMiniDisplay colorIds={product.colors} />
       </TableCell>
 
       {/* Description (truncated) */}

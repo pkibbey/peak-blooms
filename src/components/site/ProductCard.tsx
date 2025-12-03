@@ -4,6 +4,7 @@ import Image from "next/image"
 import Link from "next/link"
 import { ProductControls } from "@/components/site/ProductControls"
 import { Badge } from "@/components/ui/badge"
+import { ColorsMiniDisplay } from "@/components/ui/ColorsMiniDisplay"
 import { IconPackage } from "@/components/ui/icons"
 import type { ProductModel, ProductVariantModel } from "@/generated/models"
 
@@ -43,6 +44,12 @@ export function ProductCard({ product, user }: ProductCardProps) {
             <IconPackage className="h-3 w-3" />
             Boxlot
           </Badge>
+        )}
+        {/* Colors Display - Bottom Right */}
+        {product.colors && product.colors.length > 0 && (
+          <div className="absolute bottom-2 right-2 bg-white/90 rounded-md px-2 py-1">
+            <ColorsMiniDisplay colorIds={product.colors} />
+          </div>
         )}
       </div>
 

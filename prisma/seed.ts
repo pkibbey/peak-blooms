@@ -49,6 +49,7 @@ function readProductsFromCSV(): Array<{
   type: "FLOWER" | "FILLER"
   quantity: number
   description: string
+  colors: string[]
 }> {
   const csvPath = path.join(__dirname, "products.csv")
   const fileContent = fs.readFileSync(csvPath, "utf-8")
@@ -60,6 +61,7 @@ function readProductsFromCSV(): Array<{
     type: "FLOWER" | "FILLER"
     quantity: number
     description: string
+    colors: string[]
   }> = []
 
   // Skip header row (line 0)
@@ -75,13 +77,19 @@ function readProductsFromCSV(): Array<{
     const priceStr = (match[1] || "").replace(/"/g, "").trim()
     const typeStr = (match[2] || "").replace(/"/g, "").trim()
     const description = (match[3] || "").replace(/"/g, "").trim()
+    const colorsStr = (match[4] || "").replace(/"/g, "").trim()
 
     const price = parsePrice(priceStr)
     const quantity = getQuantity(priceStr)
     const type = typeStr === "FILLER" ? "FILLER" : "FLOWER"
+    // Parse pipe-separated color IDs from CSV (e.g., "pink|rose|greenery")
+    const colors = colorsStr
+      .split("|")
+      .map((c) => c.trim())
+      .filter(Boolean)
 
     if (name) {
-      products.push({ name, price, type, quantity, description })
+      products.push({ name, price, type, quantity, description, colors })
     }
   }
 
@@ -265,8 +273,8 @@ async function main() {
       description: "Lush and voluminous",
       image: "https://zvbfsgiej9tfgqre.public.blob.vercel-storage.com/products/green-fluffy.png",
       collectionId: exoticBlooms.id,
-      // Multiple shades to better exercise UI swatches
-      colors: ["#5BAE48", "#8FCC68", "#DFF6DF"],
+      // Color IDs from COLORS registry
+      colors: ["greenery", "lime", "moss"],
       featured: true,
       // create block helps when the product doesn't exist yet
       variants: {
@@ -279,7 +287,7 @@ async function main() {
       description: "Lush and voluminous",
       image: "https://zvbfsgiej9tfgqre.public.blob.vercel-storage.com/products/green-fluffy.png",
       collectionId: exoticBlooms.id,
-      colors: ["#5BAE48", "#8FCC68", "#DFF6DF"],
+      colors: ["greenery", "lime", "moss"],
       featured: true,
     },
   })
@@ -319,8 +327,8 @@ async function main() {
       description: "Warm and inviting",
       image: "https://zvbfsgiej9tfgqre.public.blob.vercel-storage.com/products/peach-flower.png",
       collectionId: exoticBlooms.id,
-      // Warm peach variations
-      colors: ["#F7A582", "#FFBFA0", "#FFDCCA"],
+      // Color IDs from COLORS registry
+      colors: ["peach", "blush", "cream"],
       featured: true,
       variants: {
         create: peachFlowerVariants,
@@ -332,7 +340,7 @@ async function main() {
       description: "Warm and inviting",
       image: "https://zvbfsgiej9tfgqre.public.blob.vercel-storage.com/products/peach-flower.png",
       collectionId: exoticBlooms.id,
-      colors: ["#F7A582", "#FFBFA0", "#FFDCCA"],
+      colors: ["peach", "blush", "cream"],
       featured: true,
     },
   })
@@ -375,8 +383,8 @@ async function main() {
       description: "Elegant and romantic",
       image: "https://zvbfsgiej9tfgqre.public.blob.vercel-storage.com/products/pink-rose.png",
       collectionId: classicRoses.id,
-      // Pink rose tints
-      colors: ["#FF9ECF", "#FF6BBA", "#FFD1E6"],
+      // Color IDs from COLORS registry
+      colors: ["pink", "magenta", "blush"],
       featured: false,
       variants: {
         create: pinkRoseVariants,
@@ -388,7 +396,7 @@ async function main() {
       description: "Elegant and romantic",
       image: "https://zvbfsgiej9tfgqre.public.blob.vercel-storage.com/products/pink-rose.png",
       collectionId: classicRoses.id,
-      colors: ["#FF9ECF", "#FF6BBA", "#FFD1E6"],
+      colors: ["pink", "magenta", "blush"],
       featured: false,
     },
   })
@@ -429,8 +437,8 @@ async function main() {
       description: "Pristine white beauty",
       image: "https://zvbfsgiej9tfgqre.public.blob.vercel-storage.com/products/playa-blanca.png",
       collectionId: seasonalWildflowers.id,
-      // Whites and near-whites for Playa Blanca
-      colors: ["#FFFFFF", "#F3F4F6", "#EDEFF1"],
+      // Color IDs from COLORS registry
+      colors: ["white", "ivory", "cream"],
       featured: false,
       variants: {
         create: playaBlancaVariants,
@@ -442,7 +450,7 @@ async function main() {
       description: "Pristine white beauty",
       image: "https://zvbfsgiej9tfgqre.public.blob.vercel-storage.com/products/playa-blanca.png",
       collectionId: seasonalWildflowers.id,
-      colors: ["#FFFFFF", "#F3F4F6", "#EDEFF1"],
+      colors: ["white", "ivory", "cream"],
       featured: false,
     },
   })
@@ -494,7 +502,7 @@ async function main() {
           description: csvProduct.description,
           collectionId: collection.id,
           productType: csvProduct.type,
-          colors: [], // No colors specified from CSV, can be added manually later
+          colors: csvProduct.colors, // Color IDs from CSV
           featured: false,
           variants: {
             create: [
@@ -511,6 +519,7 @@ async function main() {
           description: csvProduct.description,
           collectionId: collection.id,
           productType: csvProduct.type,
+          colors: csvProduct.colors, // Update colors from CSV
         },
       })
 
