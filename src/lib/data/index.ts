@@ -30,7 +30,7 @@ export {
   getAllProductSlugs,
   getFeaturedProducts,
   getProductById,
-  
   getProducts,
   getProductWithInspirations,
+  getShopFilterOptions,
 } from "./products"

@@ -44,7 +44,7 @@ function applyMultiplierToProducts<T extends ProductWithVariants>(
  * Get a single product by slug with variants
  * Returns null if not found
  */
-async function getProductBySlug(
+export async function getProductBySlug(
   slug: string,
   priceMultiplier = 1.0
 ): Promise<ProductWithVariantsAndCollection | null> {
@@ -263,4 +263,35 @@ export async function getProductWithInspirations(
     },
     { logNotFound: true }
   )
+}
+
+/**
+ * Get available filter options for the shop page
+ * Returns all unique colors and collections
+ */
+export async function getShopFilterOptions(): Promise<{
+  colors: string[]
+  collections: Array<{ id: string; name: string }>
+}> {
+  return withTiming("getShopFilterOptions", {}, async () => {
+    // Get all unique colors from products
+    const products = await db.product.findMany({
+      select: { colors: true },
+    })
+    const colorsSet = new Set<string>()
+    products.forEach((product) => {
+      product.colors.forEach((color) => {
+        colorsSet.add(color)
+      })
+    })
+    const colors = Array.from(colorsSet).sort()
+
+    // Get all collections
+    const collections = await db.collection.findMany({
+      select: { id: true, name: true },
+      orderBy: { name: "asc" },
+    })
+
+    return { colors, collections }
+  })
 }

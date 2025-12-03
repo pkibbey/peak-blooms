@@ -26,27 +26,29 @@ export default function Footer() {
 
             <div className="mt-4 flex items-center gap-4 text-sm text-muted-foreground">
               <IconMail aria-hidden="true" />
-              <a href="mailto:hello@peakblooms.com" className="hover:underline">
+              <a
+                href="mailto:hello@peakblooms.com"
+                className="text-sm text-muted-foreground hover:text-foreground hover:underline"
+              >
                 hello@peakblooms.com
               </a>
             </div>
 
             <div className="mt-3 flex items-center gap-4 text-sm text-muted-foreground">
               <IconPhone aria-hidden="true" />
-              <span>(619) 932-1139</span>
+              <a
+                href="tel:6199321139"
+                className="text-sm text-muted-foreground hover:text-foreground hover:underline"
+              >
+                (619) 932-1139
+              </a>
             </div>
 
             <div className="mt-4 flex items-center gap-3">
+              <IconInstagram aria-hidden="true" />
               <a
                 href="https://instagram.com/peakblooms"
-                aria-label="Instagram"
-                className="text-muted-foreground hover:text-foreground"
-              >
-                <IconInstagram />
-              </a>
-              <a
-                href="https://instagram.com/peakblooms"
-                className="text-sm text-muted-foreground hover:underline"
+                className="text-sm text-muted-foreground hover:text-foreground hover:underline"
               >
                 @peakblooms
               </a>

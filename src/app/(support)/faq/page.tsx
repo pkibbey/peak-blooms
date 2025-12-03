@@ -6,9 +6,11 @@ export const metadata: Metadata = {
     "Frequently asked questions about ordering, pricing, accounts, and our wholesale flower service.",
 }
 
+import type React from "react"
+
 interface FAQItem {
   question: string
-  answer: string
+  answer: React.ReactNode
 }
 
 const faqs: FAQItem[] = [
@@ -39,8 +41,20 @@ const faqs: FAQItem[] = [
   },
   {
     question: "Can I place a rush order?",
-    answer:
-      "Yes, we can often accommodate rush orders depending on availability and timing. Contact us directly at hello@peakblooms.com or (619) 932-1139 to discuss your urgent needs. Our team will do our best to help you.",
+    answer: (
+      <>
+        Yes, we can often accommodate rush orders depending on availability and timing. Contact us
+        directly at{" "}
+        <a href="mailto:hello@peakblooms.com" className="text-[#B45F68] hover:underline">
+          hello@peakblooms.com
+        </a>{" "}
+        or{" "}
+        <a href="tel:6199321139" className="text-[#B45F68] hover:underline">
+          (619) 932-1139
+        </a>{" "}
+        to discuss your urgent needs. Our team will do our best to help you.
+      </>
+    ),
   },
   {
     question: "How do I create an inspirational arrangement?",
@@ -76,7 +90,7 @@ export default function FAQPage() {
 
       <div className="space-y-6">
         {faqs.map((faq) => (
-          <div key={faq.answer} className="border-b border-border pb-6 last:border-b-0">
+          <div key={faq.question} className="border-b border-border pb-6 last:border-b-0">
             <h3 className="text-lg font-semibold mb-2 text-[#1F332E]">{faq.question}</h3>
             <p className="text-base text-foreground leading-relaxed">{faq.answer}</p>
           </div>

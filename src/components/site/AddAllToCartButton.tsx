@@ -1,5 +1,6 @@
 "use client"
 
+import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { useState } from "react"
 import { toast } from "sonner"
@@ -88,7 +89,7 @@ export default function AddAllToCartButton({
     return (
       <>
         <Button size="lg" className="w-full" asChild>
-          <a href="/auth/signin">Sign in to purchase all</a>
+          <Link href="/auth/signin">Sign in to purchase all</Link>
         </Button>
         {error ? <p className="mt-2 text-sm text-destructive">{error}</p> : null}
       </>
