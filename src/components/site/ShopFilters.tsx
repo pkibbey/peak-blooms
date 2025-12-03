@@ -92,7 +92,7 @@ export function ShopFilters({ availableColors = [], availableCollections = [] }:
         params.delete("priceMax")
       }
 
-      router.push(`/shop?${params.toString()}`)
+      router.push(`/shop?${params.toString()}`, { scroll: false })
     },
     [searchParams, router]
   )
@@ -187,7 +187,7 @@ export function ShopFilters({ availableColors = [], availableCollections = [] }:
     setStemLengthMax("")
     setPriceMin("")
     setPriceMax("")
-    router.push("/shop?page=1")
+    router.push("/shop?page=1", { scroll: false })
     setIsOpen(false)
   }, [router])
 

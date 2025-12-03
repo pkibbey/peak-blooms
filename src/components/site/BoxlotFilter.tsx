@@ -36,7 +36,7 @@ export function BoxlotFilter() {
       const res = await fetch(`/api/products?${q.toString()}`, { cache: "no-store" })
       if (!res.ok) {
         // If the count failed, fall back to the simple push (don't block UX)
-        router.push(`/shop?${params.toString()}`)
+        router.push(`/shop?${params.toString()}`, { scroll: false })
         return
       }
 
@@ -49,10 +49,10 @@ export function BoxlotFilter() {
         params.set("page", String(maxPage))
       }
 
-      router.push(`/shop?${params.toString()}`)
+      router.push(`/shop?${params.toString()}`, { scroll: false })
     } catch {
       // network or unexpected error — don't block toggle, fallback to pushing new params
-      router.push(`/shop?${params.toString()}`)
+      router.push(`/shop?${params.toString()}`, { scroll: false })
     } finally {
       setIsCounting(false)
     }
