@@ -14,6 +14,7 @@ export type SignUpFormData = z.infer<typeof signUpSchema>
 
 export const profileSchema = z.object({
   name: z.string(),
+  email: z.string().min(1, "Email is required").email("Please enter a valid email address"),
 })
 
 export type ProfileFormData = z.infer<typeof profileSchema>

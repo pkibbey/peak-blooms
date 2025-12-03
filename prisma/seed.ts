@@ -366,6 +366,26 @@ async function main() {
 
   console.log(`✅ Added ${collectionAssociations} products to collections`)
 
+  // Mark a handful of notable products as featured so the storefront has examples
+  // of featured products for UI/marketing sections.
+  const featuredSlugs = [
+    "peonies",
+    "sunflower",
+    "hydrangea",
+    "calla-lily",
+    "ranunculus-butterfly",
+    "gerbera",
+  ]
+
+  const featuredResult = await prisma.product.updateMany({
+    where: { slug: { in: featuredSlugs } },
+    data: { featured: true },
+  })
+
+  console.log(
+    `⭐ Marked ${featuredResult.count ?? 0} products as featured: ${featuredSlugs.join(", ")}`
+  )
+
   // First create the inspirations without products
   await prisma.inspiration.upsert({
     create: {

@@ -1,7 +1,8 @@
 "use client"
 
 import { zodResolver } from "@hookform/resolvers/zod"
-import { useRouter } from "next/navigation"
+import { useRouter, useSearchParams } from "next/navigation"
+import { useEffect } from "react"
 import { useForm } from "react-hook-form"
 import { toast } from "sonner"
 import { Button } from "@/components/ui/button"
@@ -26,13 +27,23 @@ interface ProfileFormProps {
 
 export default function ProfileForm({ user }: ProfileFormProps) {
   const router = useRouter()
+  const searchParams = useSearchParams()
 
   const form = useForm<ProfileFormData>({
     resolver: zodResolver(profileSchema),
     defaultValues: {
       name: user.name || "",
+      email: user.email,
     },
   })
+
+  // Show success message when email is verified via callback
+  useEffect(() => {
+    if (searchParams.get("emailVerified") === "true") {
+      toast.success("Your email address has been successfully verified and updated!")
+      router.refresh()
+    }
+  }, [searchParams, router])
 
   const onSubmit = async (data: ProfileFormData) => {
     try {
@@ -43,7 +54,15 @@ export default function ProfileForm({ user }: ProfileFormProps) {
       })
 
       if (response.ok) {
-        toast.success("Profile updated successfully")
+        const responseData = await response.json()
+
+        // If email was changed, show verification message
+        if (data.email !== user.email && responseData.requiresVerification) {
+          toast.success("Check your new email for a verification link to confirm the change")
+        } else {
+          toast.success("Profile updated successfully")
+        }
+
         router.refresh()
       } else {
         const responseData = await response.json()
@@ -79,19 +98,26 @@ export default function ProfileForm({ user }: ProfileFormProps) {
           )}
         />
 
-        {/* Email (read-only) */}
-        <div className="space-y-2">
-          <FormLabel>Email</FormLabel>
-          <Input
-            id="email"
-            name="email"
-            type="email"
-            value={user.email}
-            disabled
-            className="bg-muted"
-          />
-          <p className="text-sm text-muted-foreground">Email cannot be changed</p>
-        </div>
+        {/* Email */}
+        <FormField
+          control={form.control}
+          name="email"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Email</FormLabel>
+              <FormControl>
+                <Input {...field} type="email" placeholder="your@email.com" />
+              </FormControl>
+              <FormMessage />
+              {field.value !== user.email && (
+                <p className="text-sm text-muted-foreground">
+                  If you change your email, we'll send a verification link to your new address and a
+                  security notice to your current email.
+                </p>
+              )}
+            </FormItem>
+          )}
+        />
 
         {/* Actions */}
         <div className="flex gap-4">

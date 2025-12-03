@@ -3,8 +3,8 @@
 ### 🌟 Next Steps
 
 - [ ] Use real email server - need to get real domain before we can implement this
-- [ ] Allow users to change their email address
 - [ ] Turn the development of this into a website using git commits
+- [ ] Instead of having dead images, I should be able to either generate or have fallback images via an API to use as placeholder images
 
 ### 🪨 Code Stability
 - [ ] Add unit tests and e2e tests to ensure complete site functionality
