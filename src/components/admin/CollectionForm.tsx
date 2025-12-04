@@ -30,7 +30,7 @@ interface CollectionFormProps {
     slug: string
     image: string | null
     description: string | null
-    featured?: boolean
+    featured: boolean
     _count?: {
       productCollections: number
     }
@@ -180,7 +180,10 @@ export default function CollectionForm({ collection }: CollectionFormProps) {
           render={({ field }) => (
             <FormItem className="flex flex-row items-center space-x-3 space-y-0 rounded-md border p-4">
               <FormControl>
-                <Checkbox checked={field.value} onCheckedChange={field.onChange} />
+                <Checkbox
+                  checked={field.value}
+                  onChange={(e) => field.onChange((e.target as HTMLInputElement).checked)}
+                />
               </FormControl>
               <div className="space-y-1 leading-none">
                 <FormLabel>Featured collection (show on homepage)</FormLabel>

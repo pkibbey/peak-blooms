@@ -364,7 +364,7 @@ export default function CheckoutForm({ cart, savedAddresses, userEmail }: Checko
               </div>
               <div className="flex justify-between">
                 <span className="text-muted-foreground">Shipping</span>
-                <span className="text-muted-foreground">Calculated later</span>
+                <span className="text-green-600 font-medium">Free</span>
               </div>
             </div>
 

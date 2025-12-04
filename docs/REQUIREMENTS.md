@@ -83,7 +83,7 @@ toast.success(`Added "${productName}" to cart!`);
 ```
 
 ### Product Cards
-- Display price and variant specs (e.g., "50cm • 10 stems") visibly at all times for approved users
+- Display price visibly at all times for approved users only
 - Show "From $X.XX" when multiple price variants exist
 - Default to the first variant for quick-add functionality
 

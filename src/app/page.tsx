@@ -1,6 +1,6 @@
 import FeaturedCollections from "@/components/site/FeaturedCollections"
 import FeaturedProducts from "@/components/site/FeaturedProducts"
-import Hero from "@/components/site/Hero"
+import Hero, { isGradientPreset } from "@/components/site/Hero"
 import { db } from "@/lib/db"
 
 async function getHeroesBySlot(slot: number) {
@@ -42,7 +42,11 @@ export default async function Home() {
           ctaText={hero.ctaText}
           ctaLink={hero.ctaLink}
           backgroundImage={hero.backgroundType === "IMAGE" ? hero.backgroundImage : null}
-          gradientPreset={hero.backgroundType === "GRADIENT" ? hero.gradientPreset : null}
+          gradientPreset={
+            hero.backgroundType === "GRADIENT" && isGradientPreset(hero.gradientPreset)
+              ? hero.gradientPreset
+              : null
+          }
         />
       ))}
 
@@ -62,7 +66,11 @@ export default async function Home() {
           ctaText={hero.ctaText}
           ctaLink={hero.ctaLink}
           backgroundImage={hero.backgroundType === "IMAGE" ? hero.backgroundImage : null}
-          gradientPreset={hero.backgroundType === "GRADIENT" ? hero.gradientPreset : null}
+          gradientPreset={
+            hero.backgroundType === "GRADIENT" && isGradientPreset(hero.gradientPreset)
+              ? hero.gradientPreset
+              : null
+          }
         />
       ))}
 
@@ -82,7 +90,11 @@ export default async function Home() {
           ctaText={hero.ctaText}
           ctaLink={hero.ctaLink}
           backgroundImage={hero.backgroundType === "IMAGE" ? hero.backgroundImage : null}
-          gradientPreset={hero.backgroundType === "GRADIENT" ? hero.gradientPreset : null}
+          gradientPreset={
+            hero.backgroundType === "GRADIENT" && isGradientPreset(hero.gradientPreset)
+              ? hero.gradientPreset
+              : null
+          }
         />
       ))}
     </>

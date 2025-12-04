@@ -2,20 +2,22 @@
 
 ### 🌟 Next Steps
 
-- [ ] Use real email server - need to get real domain before we can implement this
 - [ ] Turn the development of this into a blog using git commits to show the progress of the app
 
-### 💰 Payment Processing
-
-- [ ] Add ability to accept payments
-- [ ] Add shipping information - shipping is free for the moment, so shipping should be described as such
+- [ ] Setup domain
+- [ ] Create subdomains
+- [ ] Create splash screen for www.
+- [ ] Upload test site to dev.
+- [ ] Confiure email server
+- [ ] Add payment processing
 
 ### 🎨 Design Changes
 
+- [ ] Perform a design review with either humans, or AI, or both
 - [ ] Update logos with proper graphics
 - [ ] Try out different colour schemes
-- [ ] Make the site feel more responsive by puting loading animations in using client side components
-- [ ] Perform a design review with either humans, or AI, or both
+- [ ] Add correct product images
+- [ ] Review text content
  
 ### 🪨 Code Stability
 - [ ] Add unit tests and e2e tests to ensure complete site functionality

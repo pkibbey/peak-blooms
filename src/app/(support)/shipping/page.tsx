@@ -17,15 +17,17 @@ export default function ShippingPage() {
       </div>
 
       <section className="space-y-4">
-        <h2 className="text-2xl font-semibold">Delivery Areas</h2>
+        <h2 className="text-2xl font-semibold">Delivery Areas & Free Shipping</h2>
         <p className="text-base text-foreground leading-relaxed">
-          Peak Blooms currently delivers to the greater San Diego area and surrounding regions.
-          We've built our logistics around local delivery to ensure freshness and reliability. If
-          you're unsure whether your location is covered, contact us to confirm.
+          Peak Blooms offers <span className="font-semibold text-green-600">free shipping</span> to
+          our regional delivery area. We've built our logistics around local delivery to ensure
+          freshness, reliability, and affordability. If you're unsure whether your location is
+          covered, contact us to confirm.
         </p>
         <p className="text-base text-foreground leading-relaxed">
-          We partner with local delivery services to get flowers to you as quickly as
-          possible—usually within 24-48 hours of your order, depending on timing and availability.
+          We deliver using our own team of delivery drivers, not third-party carriers. This means we
+          maintain full control over how your flowers are handled and delivered—usually within 24-48
+          hours of your order, depending on timing and availability.
         </p>
       </section>
 
@@ -53,15 +55,16 @@ export default function ShippingPage() {
       </section>
 
       <section className="space-y-4">
-        <h2 className="text-2xl font-semibold">Shipping & Delivery Rates</h2>
+        <h2 className="text-2xl font-semibold">Shipping & Delivery</h2>
         <p className="text-base text-foreground leading-relaxed">
-          Shipping rates vary based on order size, delivery location, and any special handling.
-          Rates are calculated at checkout and shown before you confirm your order. We aim to keep
-          delivery costs reasonable while ensuring professional, timely service.
+          All orders include{" "}
+          <span className="font-semibold text-green-600">free regional delivery</span>. No
+          additional shipping fees—ever. We deliver fresh flowers using our own team of delivery
+          drivers who are trained to handle your arrangement with care and deliver it perfectly.
         </p>
         <p className="text-base text-foreground leading-relaxed">
-          Large orders or regular recurring deliveries may qualify for discounted or flat-rate
-          shipping. Contact our team to discuss volume pricing.
+          Since we manage our own deliveries, we can offer reliable timing, professional handling,
+          and peace of mind knowing your flowers are in capable hands every step of the way.
         </p>
       </section>
 

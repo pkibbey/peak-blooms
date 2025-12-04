@@ -4,12 +4,21 @@ import type { ReactNode } from "react"
 import { Button } from "@/components/ui/button"
 
 // Gradient preset class mapping
-const GRADIENT_CLASS_MAP: Record<string, string> = {
+// keep as `const` so we can derive a literal union type from the keys
+const GRADIENT_CLASS_MAP = {
   "slate-green": "bg-hero-gradient-slate-green",
   forest: "bg-hero-gradient-forest",
   rose: "bg-hero-gradient-rose",
   ocean: "bg-hero-gradient-ocean",
   earth: "bg-hero-gradient-earth",
+} as const
+
+// derive a union type of the available gradient keys
+export type GradientPreset = keyof typeof GRADIENT_CLASS_MAP
+
+// runtime type guard for safety at call sites
+export function isGradientPreset(value: unknown): value is GradientPreset {
+  return typeof value === "string" && Object.hasOwn(GRADIENT_CLASS_MAP, value)
 }
 
 interface HeroProps {
@@ -19,7 +28,7 @@ interface HeroProps {
   ctaText?: string | null
   ctaLink?: string | null
   backgroundImage?: string | null
-  gradientPreset?: string | null
+  gradientPreset?: GradientPreset | null
   textPosition?: "left" | "center" | "right"
 }
 

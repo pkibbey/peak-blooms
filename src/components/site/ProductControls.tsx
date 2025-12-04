@@ -193,14 +193,6 @@ export function ProductControls({ product, user, mode = "card" }: ProductControl
   const currentPrice =
     selectedVariant?.price ?? srcVariants[0]?.price ?? productVariants[0]?.price ?? 0
 
-  // Build variant summary string
-  const variantSummary = [
-    selectedStemLength ? `${selectedStemLength} cm` : null,
-    selectedCount ? `${selectedCount} stems` : null,
-  ]
-    .filter(Boolean)
-    .join(" • ")
-
   const showSelectors = isApproved && hasVariants && (stemLengths.length >= 1 || counts.length >= 1)
 
   return (
@@ -298,16 +290,6 @@ export function ProductControls({ product, user, mode = "card" }: ProductControl
           >
             {formatPrice(currentPrice)}
           </div>
-          {variantSummary && (
-            <div
-              className={cn(
-                "text-muted-foreground mt-1",
-                mode === "detail" ? "text-xl" : "text-base"
-              )}
-            >
-              {variantSummary}
-            </div>
-          )}
         </div>
       )}
 

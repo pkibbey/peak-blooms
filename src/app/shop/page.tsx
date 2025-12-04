@@ -2,6 +2,7 @@ import { Suspense } from "react"
 import { BoxlotFilter } from "@/components/site/BoxlotFilter"
 import { PageHeader } from "@/components/site/PageHeader"
 import { ProductCard } from "@/components/site/ProductCard"
+import { ShippingBanner } from "@/components/site/ShippingBanner"
 import { ShopFilters } from "@/components/site/ShopFilters"
 import { ShopPagination } from "@/components/site/ShopPagination"
 import { ShopProductTableRow } from "@/components/site/ShopProductTableRow"
@@ -110,142 +111,151 @@ export default async function ShopPage({ searchParams }: ShopPageProps) {
   const headerUrl = new URLSearchParams(params as Record<string, string>).toString()
 
   return (
-    <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 py-10">
-      <PageHeader
-        title="Premium Wholesale Flowers"
-        description="Browse our carefully curated selection of the highest quality, freshest flowers. Every arrangement meets our standards for excellence, backed by reliable local delivery and competitive wholesale pricing."
-      />
+    <>
+      <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 pt-10">
+        <PageHeader
+          title="Premium Wholesale Flowers"
+          description="Browse our carefully curated selection of the highest quality, freshest flowers. Every arrangement meets our standards for excellence, backed by reliable local delivery and competitive wholesale pricing."
+        />
+      </div>
 
-      <div className="flex gap-6 lg:gap-8">
-        {/* Sidebar Filters */}
-        <aside className="hidden lg:block w-64 shrink-0">
-          <div className="sticky top-20">
-            <Suspense fallback={null}>
-              <ShopFilters
-                availableColorIds={filterOptions.colorIds}
-                availableCollections={filterOptions.collections}
-              />
-            </Suspense>
-          </div>
-        </aside>
+      <div className="mb-12">
+        <ShippingBanner />
+      </div>
 
-        <div className="flex-1">
-          {/* Mobile Filters + View Toggle */}
-          <div className="flex flex-col gap-4 mb-8">
-            <div className="flex flex-wrap gap-4 items-center justify-between">
-              <div className="flex flex-wrap gap-4 items-center flex-1 lg:hidden">
+      <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 pb-10">
+        <div className="flex gap-6 lg:gap-8">
+          {/* Sidebar Filters */}
+          <aside className="hidden lg:block w-64 shrink-0">
+            <div className="sticky top-20">
+              <Suspense fallback={null}>
+                <ShopFilters
+                  availableColorIds={filterOptions.colorIds}
+                  availableCollections={filterOptions.collections}
+                />
+              </Suspense>
+            </div>
+          </aside>
+
+          <div className="flex-1">
+            {/* Mobile Filters + View Toggle */}
+            <div className="flex flex-col gap-4 mb-8">
+              <div className="flex flex-wrap gap-4 items-center justify-between">
+                <div className="flex flex-wrap gap-4 items-center flex-1 lg:hidden">
+                  <Suspense fallback={null}>
+                    <ShopFilters
+                      availableColorIds={filterOptions.colorIds}
+                      availableCollections={filterOptions.collections}
+                    />
+                  </Suspense>
+                </div>
+              </div>
+
+              {/* Boxlot Filter + Message */}
+              <div className="flex flex-wrap gap-4 items-center justify-between">
                 <Suspense fallback={null}>
-                  <ShopFilters
-                    availableColorIds={filterOptions.colorIds}
-                    availableCollections={filterOptions.collections}
-                  />
+                  <BoxlotFilter />
+                </Suspense>
+                <Suspense fallback={null}>
+                  <ViewToggle />
                 </Suspense>
               </div>
             </div>
 
-            {/* Boxlot Filter + Message */}
-            <div className="flex flex-wrap gap-4 items-center justify-between">
-              <Suspense fallback={null}>
-                <BoxlotFilter />
-              </Suspense>
-              <Suspense fallback={null}>
-                <ViewToggle />
-              </Suspense>
-            </div>
-          </div>
-
-          {/* Products Info */}
-          <div className="flex gap-4 justify-between items-center mb-4">
-            {result.products.length > 0 && (
-              <p className="text-sm text-muted-foreground">
-                Showing {result.offset + 1} to{" "}
-                {Math.min(result.offset + ITEMS_PER_PAGE, result.total)} of {result.total} products
-              </p>
-            )}
-            {/* Pagination */}
-            {totalPages > 1 && (
-              <ShopPagination currentPage={page} totalPages={totalPages} searchParams={params} />
-            )}
-          </div>
-
-          {/* Products Grid or Table */}
-          {products.length === 0 ? (
-            <div className="flex justify-center items-center py-20">
-              <p className="text-muted-foreground">No products found matching your filters.</p>
-            </div>
-          ) : viewMode === "table" ? (
-            <>
-              <div className="rounded-md border mb-4">
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Image</TableHead>
-                      <SortableTableHead
-                        label="Name"
-                        sortKey="name"
-                        currentSort={sort}
-                        currentOrder={order}
-                        href={`/shop?${headerUrl}`}
-                      />
-                      <SortableTableHead
-                        label="Description"
-                        sortKey="description"
-                        currentSort={sort}
-                        currentOrder={order}
-                        href={`/shop?${headerUrl}`}
-                        className="hidden md:table-cell"
-                      />
-                      <TableHead>Colors</TableHead>
-                      <SortableTableHead
-                        label="Price"
-                        sortKey="price"
-                        currentSort={sort}
-                        currentOrder={order}
-                        href={`/shop?${headerUrl}`}
-                      />
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {products.map((product) => (
-                      <ShopProductTableRow key={product.slug} product={product} />
-                    ))}
-                  </TableBody>
-                </Table>
-              </div>
-
+            {/* Products Info */}
+            <div className="flex gap-4 justify-between items-center mb-4">
+              {result.products.length > 0 && (
+                <p className="text-sm text-muted-foreground">
+                  Showing {result.offset + 1} to{" "}
+                  {Math.min(result.offset + ITEMS_PER_PAGE, result.total)} of {result.total}{" "}
+                  products
+                </p>
+              )}
               {/* Pagination */}
               {totalPages > 1 && (
-                <div className="flex justify-end">
-                  <ShopPagination
-                    currentPage={page}
-                    totalPages={totalPages}
-                    searchParams={params}
-                  />
-                </div>
+                <ShopPagination currentPage={page} totalPages={totalPages} searchParams={params} />
               )}
-            </>
-          ) : (
-            <>
-              <div className="grid grid-cols-2 gap-4 sm:gap-6 md:grid-cols-3 mb-8">
-                {products.map((product) => (
-                  <ProductCard key={product.slug} product={product} user={user} />
-                ))}
-              </div>
+            </div>
 
-              {/* Pagination */}
-              {totalPages > 1 && (
-                <div className="flex justify-end">
-                  <ShopPagination
-                    currentPage={page}
-                    totalPages={totalPages}
-                    searchParams={params}
-                  />
+            {/* Products Grid or Table */}
+            {products.length === 0 ? (
+              <div className="flex justify-center items-center py-20">
+                <p className="text-muted-foreground">No products found matching your filters.</p>
+              </div>
+            ) : viewMode === "table" ? (
+              <>
+                <div className="rounded-md border mb-4">
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Image</TableHead>
+                        <SortableTableHead
+                          label="Name"
+                          sortKey="name"
+                          currentSort={sort}
+                          currentOrder={order}
+                          href={`/shop?${headerUrl}`}
+                        />
+                        <SortableTableHead
+                          label="Description"
+                          sortKey="description"
+                          currentSort={sort}
+                          currentOrder={order}
+                          href={`/shop?${headerUrl}`}
+                          className="hidden md:table-cell"
+                        />
+                        <TableHead>Colors</TableHead>
+                        <SortableTableHead
+                          label="Price"
+                          sortKey="price"
+                          currentSort={sort}
+                          currentOrder={order}
+                          href={`/shop?${headerUrl}`}
+                        />
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {products.map((product) => (
+                        <ShopProductTableRow key={product.slug} product={product} />
+                      ))}
+                    </TableBody>
+                  </Table>
                 </div>
-              )}
-            </>
-          )}
+
+                {/* Pagination */}
+                {totalPages > 1 && (
+                  <div className="flex justify-end">
+                    <ShopPagination
+                      currentPage={page}
+                      totalPages={totalPages}
+                      searchParams={params}
+                    />
+                  </div>
+                )}
+              </>
+            ) : (
+              <>
+                <div className="grid grid-cols-2 gap-4 sm:gap-6 md:grid-cols-3 mb-8">
+                  {products.map((product) => (
+                    <ProductCard key={product.slug} product={product} user={user} />
+                  ))}
+                </div>
+
+                {/* Pagination */}
+                {totalPages > 1 && (
+                  <div className="flex justify-end">
+                    <ShopPagination
+                      currentPage={page}
+                      totalPages={totalPages}
+                      searchParams={params}
+                    />
+                  </div>
+                )}
+              </>
+            )}
+          </div>
         </div>
       </div>
-    </div>
+    </>
   )
 }
