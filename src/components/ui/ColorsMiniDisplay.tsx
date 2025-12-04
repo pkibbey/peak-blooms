@@ -1,6 +1,7 @@
 "use client"
 
 import { COLORS } from "@/lib/colors"
+import { cn } from "@/lib/utils"
 
 interface ColorsMiniDisplayProps {
   colorIds?: string[] | null
@@ -10,6 +11,7 @@ interface ColorsMiniDisplayProps {
    * @default 5
    */
   maxDisplay?: number
+  size?: "sm" | "md"
 }
 
 /**
@@ -21,6 +23,7 @@ export function ColorsMiniDisplay({
   colorIds,
   className = "",
   maxDisplay = 5,
+  size = "sm",
 }: ColorsMiniDisplayProps) {
   if (!colorIds || colorIds.length === 0) {
     return <span className="text-muted-foreground text-xs">No colors</span>
@@ -40,7 +43,11 @@ export function ColorsMiniDisplay({
               role="img"
               aria-label={color?.label || colorId}
               title={color?.label || colorId}
-              className="h-4 w-4 rounded-full border border-border"
+              className={cn(
+                "rounded-full border border-border",
+                size === "sm" && "w-4 h-4",
+                size === "md" && "w-6 h-6"
+              )}
               style={{ backgroundColor: color?.hex || "#000000" }}
             />
           )

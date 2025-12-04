@@ -5,6 +5,8 @@ import BackLink from "@/components/site/BackLink"
 import { FeaturedInInspirations } from "@/components/site/FeaturedInInspirations"
 import { ProductControls } from "@/components/site/ProductControls"
 import { ShippingBanner } from "@/components/site/ShippingBanner"
+import { ColorsMiniDisplay } from "@/components/ui/ColorsMiniDisplay"
+import { Label } from "@/components/ui/label"
 import { getCurrentUser } from "@/lib/current-user"
 import { getAllProductSlugs, getProductWithInspirations } from "@/lib/data"
 import { db } from "@/lib/db"
@@ -94,16 +96,12 @@ export default async function ProductDetailPage({ params }: ProductDetailPagePro
               {/* Product Title */}
               <div>
                 <h1 className="text-4xl font-extrabold font-serif mb-2">{product.name}</h1>
-                {product.productCollections.length > 0 && (
-                  <p className="text-muted-foreground">
-                    {product.productCollections[0].collection.name}
-                  </p>
-                )}
-              </div>
-
-              {/* Description */}
-              <div>
+                {/* Description */}
                 <p className="text-lg text-muted-foreground">{product.description}</p>
+              </div>
+              <div className="grid gap-2">
+                <Label>Colors</Label>
+                <ColorsMiniDisplay colorIds={product.colors} size="md" />
               </div>
 
               {/* Product Controls */}

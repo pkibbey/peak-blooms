@@ -285,11 +285,27 @@ export function ProductControls({ product, user, mode = "card" }: ProductControl
         </div>
       ) : (
         <div>
+          <Label className="mb-1">Price</Label>
           <div
             className={cn("font-bold text-primary", mode === "detail" ? "text-4xl" : "text-3xl")}
           >
             {formatPrice(currentPrice)}
           </div>
+
+          {/* Variant / specs summary */}
+          {selectedVariant && (
+            <div className="mt-2 text-sm text-muted-foreground">
+              <div className="flex flex-wrap gap-3">
+                {selectedVariant.stemLength !== null && (
+                  <div>Stem: {selectedVariant.stemLength} cm</div>
+                )}
+                {selectedVariant.quantityPerBunch !== null && (
+                  <div>Quantity: {selectedVariant.quantityPerBunch} / bunch</div>
+                )}
+                <div>{selectedVariant.isBoxlot ? "Boxlot" : "Single bunch"}</div>
+              </div>
+            </div>
+          )}
         </div>
       )}
 
