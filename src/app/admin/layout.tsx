@@ -5,8 +5,19 @@ import { getSession } from "@/lib/auth"
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
   const session = await getSession()
 
-  if (!session?.user || session.user.role !== "ADMIN") {
-    redirect("/admin/unauthorized")
+  if (!session?.user) {
+    // If the visitor is not signed in, send them to the sign-in page.
+    // We redirect unauthenticated users to the sign-in flow rather than
+    // allowing the admin layout to attempt rendering the unauthorized page
+    // (which previously lived under the same layout and caused a redirect
+    // loop).
+    redirect("/auth/signin?callbackUrl=/admin")
+  }
+
+  if (session.user.role !== "ADMIN") {
+    // Signed-in users without admin privileges can be shown the standalone
+    // admin-unauthorized page (outside the admin layout).
+    redirect("/admin-unauthorized")
   }
 
   return (

@@ -60,8 +60,21 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
       },
     })
 
-    // Invalidate user's sessions so they must re-authenticate with new permissions
-    await invalidateUserSessions(id)
+    // Only invalidate sessions if we're updating someone else OR if the current
+    // session owner changed their `approved` status (that affects auth/permissions).
+    // This avoids logging an admin out when they edit their own non-auth fields
+    // like `priceMultiplier`.
+    const isCurrentUser = session.user.id === id
+
+    const changedApproved =
+      typeof updateData.approved === "boolean" &&
+      updateData.approved !== (session.user.approved as boolean | undefined)
+
+    if (!isCurrentUser || changedApproved) {
+      // Revoke sessions for the target user so their session reflects any
+      // significant changes to their permissions.
+      await invalidateUserSessions(id)
+    }
 
     return NextResponse.json(user)
   } catch (error) {

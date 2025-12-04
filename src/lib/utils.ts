@@ -9,7 +9,7 @@ export function cn(...inputs: ClassValue[]) {
  * Price multiplier bounds for per-account pricing adjustments
  */
 export const MIN_PRICE_MULTIPLIER = 0.5
-export const MAX_PRICE_MULTIPLIER = 2.0
+export const MAX_PRICE_MULTIPLIER = 20.0
 
 /**
  * Apply a price multiplier to a base price
