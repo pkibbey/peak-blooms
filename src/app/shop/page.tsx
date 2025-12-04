@@ -117,13 +117,7 @@ export default async function ShopPage({ searchParams }: ShopPageProps) {
           title="Premium Wholesale Flowers"
           description="Browse our carefully curated selection of the highest quality, freshest flowers. Every arrangement meets our standards for excellence, backed by reliable local delivery and competitive wholesale pricing."
         />
-      </div>
 
-      <div className="mb-12">
-        <ShippingBanner />
-      </div>
-
-      <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 pb-10">
         <div className="flex gap-6 lg:gap-8">
           {/* Sidebar Filters */}
           <aside className="hidden lg:block w-64 shrink-0">
@@ -255,6 +249,10 @@ export default async function ShopPage({ searchParams }: ShopPageProps) {
             )}
           </div>
         </div>
+      </div>
+
+      <div className="mt-12">
+        <ShippingBanner />
       </div>
     </>
   )

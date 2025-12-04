@@ -3,7 +3,14 @@ import Link from "next/link"
 import { notFound } from "next/navigation"
 import AddAllToCartButton from "@/components/site/AddAllToCartButton"
 import BackLink from "@/components/site/BackLink"
-import { Table, TableBody, TableCell, TableHeader, TableRow } from "@/components/ui/table"
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table"
 import { getCurrentUser } from "@/lib/current-user"
 import { getAllInspirationSlugs, getInspirationBySlug } from "@/lib/data"
 import { db } from "@/lib/db"
@@ -56,13 +63,21 @@ export default async function InspirationDetailPage({ params }: InspirationDetai
   }))
 
   return (
-    <div className="flex flex-col items-center justify-start bg-white py-12 md:py-20 font-sans">
+    <div className="flex flex-col items-center justify-start bg-white py-12 sm:py-16 font-sans">
       <div className="w-full max-w-5xl px-4 md:px-6">
         {/* Navigation Back Link */}
-        <BackLink href="/inspirations" label="inspirations" className="mb-8" />
+        <BackLink href="/inspirations" label="inspirations" />
+
+        {/* Header Section - Enhanced typography and spacing */}
+        <div className="mb-8 md:mb-12">
+          <h1 className="heading-1 text-4xl md:text-5xl mb-3 text-primary">{inspiration.name}</h1>
+          <p className="text-lg md:text-xl text-gray-600 leading-relaxed font-medium">
+            {inspiration.subtitle}
+          </p>
+        </div>
 
         {/* Featured Image - Enhanced with larger aspect ratio */}
-        <div className="relative aspect-video overflow-hidden rounded-lg shadow-lg mb-12 md:mb-16">
+        <div className="relative aspect-video overflow-hidden rounded-lg shadow-lg mb-6 md:mb-12">
           <Image
             src={inspiration.image}
             alt={inspiration.name}
@@ -72,16 +87,8 @@ export default async function InspirationDetailPage({ params }: InspirationDetai
           />
         </div>
 
-        {/* Header Section - Enhanced typography and spacing */}
-        <div className="mb-12 md:mb-16">
-          <h1 className="heading-1 text-4xl md:text-5xl mb-3 text-primary">{inspiration.name}</h1>
-          <p className="text-lg md:text-xl text-gray-600 leading-relaxed font-medium">
-            {inspiration.subtitle}
-          </p>
-        </div>
-
         {/* Inspiration Story Section - Enhanced styling */}
-        <div className="mb-12 md:mb-16 p-8 md:p-10 bg-linear-to-br from-secondary/20 to-secondary/5 rounded-lg border border-secondary/30">
+        <div className="mb-8 md:mb-12">
           <div className="max-w-3xl">
             <h2 className="heading-2 text-2xl md:text-3xl mb-6 text-primary flex items-center">
               <span className="w-1 h-8 bg-primary rounded-full mr-4"></span>
@@ -93,6 +100,31 @@ export default async function InspirationDetailPage({ params }: InspirationDetai
           </div>
         </div>
 
+        {/* Call to Action Section - Enhanced styling and positioning */}
+        <div className="mb-8 md:mb-12 w-full">
+          <div className="bg-linear-to-r from-primary/5 to-secondary/5 rounded-lg p-8 md:p-12 border border-primary/10">
+            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
+              <div>
+                <h3 className="heading-3 text-xl md:text-2xl text-primary mb-2">
+                  Add This Set to Your Cart
+                </h3>
+                <p className="text-gray-600 text-sm md:text-base">
+                  Get all flowers from this inspiration in one seamless order
+                </p>
+              </div>
+              <div className="md:shrink-0">
+                <AddAllToCartButton
+                  productIds={productsWithVariants.map((p) => p.id)}
+                  productVariantIds={productsWithVariants.map((p) => p.displayVariant?.id ?? null)}
+                  quantities={productsWithVariants.map((p) => p.quantity)}
+                  setName={inspiration.name}
+                  user={user}
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+
         {/* Products Section - Enhanced with better visual hierarchy */}
         <div className="w-full">
           <h2 className="heading-2 text-2xl md:text-3xl mb-2 text-primary">Flowers in This Set</h2>
@@ -101,14 +133,14 @@ export default async function InspirationDetailPage({ params }: InspirationDetai
           </p>
 
           {/* Product Table with Enhanced Styling */}
-          <div className="rounded-lg border border-border overflow-hidden shadow-sm">
+          <div className="rounded-md border">
             <Table>
               <TableHeader className="bg-muted/50">
                 <TableRow className="hover:bg-muted/50">
-                  <TableHeader className="font-semibold">Image</TableHeader>
-                  <TableHeader className="font-semibold">Product</TableHeader>
-                  <TableHeader className="font-semibold">Details</TableHeader>
-                  <TableHeader className="font-semibold text-right">Qty</TableHeader>
+                  <TableHead className="font-semibold">Image</TableHead>
+                  <TableHead className="font-semibold">Product</TableHead>
+                  <TableHead className="font-semibold">Details</TableHead>
+                  <TableHead className="font-semibold">Qty</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -163,7 +195,7 @@ export default async function InspirationDetailPage({ params }: InspirationDetai
                         <div className="text-sm text-muted-foreground">No variant</div>
                       )}
                     </TableCell>
-                    <TableCell className="py-4 text-right">
+                    <TableCell className="py-4">
                       <span className="inline-flex items-center justify-center min-w-10 px-3 py-1 text-sm font-semibold bg-primary/10 text-primary rounded-full">
                         {product.quantity}
                       </span>
@@ -172,31 +204,6 @@ export default async function InspirationDetailPage({ params }: InspirationDetai
                 ))}
               </TableBody>
             </Table>
-          </div>
-        </div>
-
-        {/* Call to Action Section - Enhanced styling and positioning */}
-        <div className="mt-16 md:mt-20 w-full">
-          <div className="bg-linear-to-r from-primary/5 to-secondary/5 rounded-lg p-8 md:p-12 border border-primary/10">
-            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
-              <div>
-                <h3 className="heading-3 text-xl md:text-2xl text-primary mb-2">
-                  Add This Set to Your Cart
-                </h3>
-                <p className="text-gray-600 text-sm md:text-base">
-                  Get all flowers from this inspiration in one seamless order
-                </p>
-              </div>
-              <div className="md:shrink-0">
-                <AddAllToCartButton
-                  productIds={productsWithVariants.map((p) => p.id)}
-                  productVariantIds={productsWithVariants.map((p) => p.displayVariant?.id ?? null)}
-                  quantities={productsWithVariants.map((p) => p.quantity)}
-                  setName={inspiration.name}
-                  user={user}
-                />
-              </div>
-            </div>
           </div>
         </div>
       </div>
