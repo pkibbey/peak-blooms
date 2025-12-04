@@ -59,7 +59,7 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
       )
     }
 
-    const { name, slug, image, description } = validationResult.data
+    const { name, slug, image, description, featured } = validationResult.data
 
     // Check if collection exists
     const existingCollection = await db.collection.findUnique({
@@ -77,6 +77,7 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
         ...(slug !== undefined && { slug }),
         ...(image !== undefined && { image }),
         ...(description !== undefined && { description }),
+        ...(featured !== undefined && { featured }),
       },
     })
 

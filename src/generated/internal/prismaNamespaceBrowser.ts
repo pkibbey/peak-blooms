@@ -171,6 +171,7 @@ export const CollectionScalarFieldEnum = {
   slug: 'slug',
   image: 'image',
   description: 'description',
+  featured: 'featured',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const

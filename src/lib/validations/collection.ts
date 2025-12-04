@@ -5,6 +5,7 @@ export const collectionSchema = z.object({
   slug: z.string().min(1, "Slug is required"),
   image: z.string(),
   description: z.string(),
+  featured: z.boolean().default(false),
 })
 
 export type CollectionFormData = z.infer<typeof collectionSchema>

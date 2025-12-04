@@ -1,20 +1,13 @@
-import Image from "next/image"
-import Link from "next/link"
 import { SortableTableHead } from "@/components/ui/SortableTableHead"
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table"
+import { Table, TableBody, TableHead, TableHeader, TableRow } from "@/components/ui/table"
+import CollectionsTableRow from "./CollectionsTableRow"
 
 interface Collection {
   id: string
   name: string
   slug: string
   image: string | null
+  featured: boolean
   _count?: {
     productCollections: number
   }
@@ -65,50 +58,12 @@ export default function CollectionsTable({ collections, sort, order }: Collectio
               currentOrder={order}
               href={headerUrl}
             />
+            <TableHead>Featured</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           {collections.map((collection) => (
-            <TableRow key={collection.id}>
-              {/* Image */}
-              <TableCell>
-                <div className="relative h-12 w-12 overflow-hidden rounded-sm bg-muted">
-                  {collection.image ? (
-                    <Image
-                      src={collection.image}
-                      alt={collection.name}
-                      fill
-                      className="object-cover"
-                      sizes="48px"
-                    />
-                  ) : (
-                    <div className="flex h-full w-full items-center justify-center text-xs text-muted-foreground">
-                      —
-                    </div>
-                  )}
-                </div>
-              </TableCell>
-
-              {/* Name */}
-              <TableCell>
-                <Link
-                  href={`/admin/collections/${collection.id}/edit`}
-                  className="text-primary font-medium hover:underline"
-                >
-                  {collection.name}
-                </Link>
-              </TableCell>
-
-              {/* Slug */}
-              <TableCell className="hidden md:table-cell text-muted-foreground">
-                /{collection.slug}
-              </TableCell>
-
-              {/* Products Count */}
-              <TableCell className="text-muted-foreground">
-                {collection._count?.productCollections || 0}
-              </TableCell>
-            </TableRow>
+            <CollectionsTableRow key={collection.id} collection={collection} />
           ))}
         </TableBody>
       </Table>

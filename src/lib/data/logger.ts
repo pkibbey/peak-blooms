@@ -32,11 +32,7 @@ function logNotFound(operation: string, identifier: string | Record<string, unkn
 /**
  * Log an error during data access
  */
-function logError(
-  operation: string,
-  identifier: string | Record<string, unknown>,
-  error: unknown
-) {
+function logError(operation: string, identifier: string | Record<string, unknown>, error: unknown) {
   if (!shouldLog("error")) return
 
   const timestamp = new Date().toISOString()

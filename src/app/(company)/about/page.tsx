@@ -2,7 +2,8 @@ import type { Metadata } from "next"
 
 export const metadata: Metadata = {
   title: "About Peak Blooms",
-  description: "Learn about Peak Blooms — our mission, values, and commitment to premium wholesale flowers.",
+  description:
+    "Learn about Peak Blooms — our mission, values, and commitment to premium wholesale flowers.",
 }
 
 export default function AboutPage() {
@@ -18,7 +19,10 @@ export default function AboutPage() {
       <section className="space-y-4">
         <h2 className="text-2xl font-semibold">Our Mission</h2>
         <p className="text-base text-foreground leading-relaxed">
-          Peak Blooms exists to empower independent florists with access to the highest-quality, freshest seasonal flowers at competitive wholesale prices. We believe that small, independent floral businesses deserve the same premium sourcing and service as larger enterprises—without the complexity or hidden fees.
+          Peak Blooms exists to empower independent florists with access to the highest-quality,
+          freshest seasonal flowers at competitive wholesale prices. We believe that small,
+          independent floral businesses deserve the same premium sourcing and service as larger
+          enterprises—without the complexity or hidden fees.
         </p>
       </section>
 
@@ -27,19 +31,64 @@ export default function AboutPage() {
         <ul className="space-y-3 text-base text-foreground">
           <li className="flex gap-3">
             <span className="font-semibold text-[#1F332E] min-w-fit">Transparency</span>
-            <span>We believe in clear pricing, honest product descriptions, and straightforward communication every step of the way.</span>
+            <span>
+              We believe in clear pricing, honest product descriptions, and straightforward
+              communication every step of the way.
+            </span>
           </li>
           <li className="flex gap-3">
             <span className="font-semibold text-[#1F332E] min-w-fit">Quality</span>
-            <span>Every bouquet, stem, and arrangement meets our high standards for freshness, beauty, and longevity.</span>
+            <span>
+              Every bouquet, stem, and arrangement meets our high standards for freshness, beauty,
+              and longevity.
+            </span>
           </li>
           <li className="flex gap-3">
             <span className="font-semibold text-[#1F332E] min-w-fit">Partnership</span>
-            <span>We're not just a supplier—we're a partner invested in your success and growth.</span>
+            <span>
+              We're not just a supplier—we're a partner invested in your success and growth.
+            </span>
           </li>
           <li className="flex gap-3">
             <span className="font-semibold text-[#1F332E] min-w-fit">Seasonality</span>
-            <span>We celebrate what's fresh and in-season, supporting local growers and sustainable practices.</span>
+            <span>
+              We celebrate what's fresh and in-season, supporting local growers and sustainable
+              practices.
+            </span>
+          </li>
+        </ul>
+      </section>
+
+      <section className="space-y-4">
+        <h2 className="text-2xl font-semibold">How We're Different</h2>
+        <p className="text-base text-foreground leading-relaxed">
+          Unlike larger wholesale suppliers, Peak Blooms treats every customer as a partner. We
+          don't just sell flowers—we invest in your success. Our approach centers on three
+          commitments that matter:
+        </p>
+        <ul className="space-y-3 text-base text-foreground">
+          <li className="flex gap-3">
+            <span className="font-semibold text-[#1F332E] min-w-fit">
+              Exceptional Customer Service
+            </span>
+            <span>
+              Real people who understand floristry, available to answer questions and solve problems
+              with your business in mind.
+            </span>
+          </li>
+          <li className="flex gap-3">
+            <span className="font-semibold text-[#1F332E] min-w-fit">Sustainable Sourcing</span>
+            <span>
+              Partnering with growers and suppliers who share our values, supporting seasonal
+              flowers and local agriculture whenever possible.
+            </span>
+          </li>
+          <li className="flex gap-3">
+            <span className="font-semibold text-[#1F332E] min-w-fit">Timely Deliveries</span>
+            <span>
+              Reliable, fast local delivery that keeps flowers at peak freshness, so you can focus
+              on design rather than logistics.
+            </span>
           </li>
         </ul>
       </section>
@@ -47,10 +96,14 @@ export default function AboutPage() {
       <section className="space-y-4">
         <h2 className="text-2xl font-semibold">Our Experience</h2>
         <p className="text-base text-foreground leading-relaxed">
-          With years of experience in wholesale floral sourcing, Peak Blooms understands the unique challenges facing independent florists. From managing seasonal availability to minimizing waste while maintaining selection, we've built systems that work.
+          With years of experience in wholesale floral sourcing, Peak Blooms understands the unique
+          challenges facing independent florists. From managing seasonal availability to minimizing
+          waste while maintaining selection, we've built systems that work.
         </p>
         <p className="text-base text-foreground leading-relaxed">
-          Our network of trusted growers, local suppliers, and specialty importers ensures that we can offer a diverse selection of premium flowers year-round, with a focus on seasonal arrangements that inspire creativity and drive sales.
+          Our network of trusted growers, local suppliers, and specialty importers ensures that we
+          can offer a diverse selection of premium flowers year-round, with a focus on seasonal
+          arrangements that inspire creativity and drive sales.
         </p>
       </section>
 

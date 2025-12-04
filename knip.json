@@ -41,7 +41,7 @@
     "src/lib/validations/**": ["types"],
     "public/**": ["files"]
   },
-  "ignoreDependencies": ["dotenv", "postcss"],
+  "ignoreDependencies": ["postcss"],
   "next": {
     "config": ["next.config.{js,mjs,cjs,ts}"],
     "entry": ["src/app/**/*.tsx", "src/pages/**/*.tsx"],

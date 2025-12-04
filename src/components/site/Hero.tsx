@@ -60,7 +60,7 @@ export default function Hero({
     left: {
       container: "md:justify-start md:items-start",
       text: "text-left",
-      width: "md:w-1/3",
+      width: "md:w-90",
     },
     center: {
       container: "md:justify-center md:items-center",
@@ -70,7 +70,7 @@ export default function Hero({
     right: {
       container: "md:justify-end md:items-end",
       text: "text-left",
-      width: "md:w-1/3",
+      width: "md:w-90",
     },
   }[alignment]
 

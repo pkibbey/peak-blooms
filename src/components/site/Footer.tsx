@@ -4,7 +4,7 @@ import { IconInstagram, IconMail, IconPhone } from "@/components/ui/icons"
 
 export default function Footer() {
   return (
-    <footer className="bg-white border-t border-t-border mt-12">
+    <footer className="bg-white border-t border-t-border">
       <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 py-10">
         <div className="flex flex-col md:flex-row md:justify-between md:items-start gap-8">
           {/* Brand & contact */}
@@ -20,8 +20,9 @@ export default function Footer() {
             </Link>
 
             <p className="mt-2 text-sm text-muted-foreground max-w-md">
-              Peak Blooms — fresh, seasonal bouquets delivered locally. Have questions or need help
-              with an order? Reach out below.
+              Peak Blooms partners with florists, retailers, and event planners to deliver the
+              highest quality, freshest flowers at competitive wholesale prices. We're committed to
+              exceptional service, sustainable sourcing, and timely delivery.
             </p>
 
             <div className="mt-4 flex items-center gap-4 text-sm text-muted-foreground">

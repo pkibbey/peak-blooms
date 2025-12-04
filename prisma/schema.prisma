@@ -108,6 +108,7 @@ model Collection {
   slug        String    @unique
   image       String?
   description String?
+  featured    Boolean   @default(false)
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
   productCollections ProductCollection[]

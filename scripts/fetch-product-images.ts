@@ -226,7 +226,6 @@ function normalizeProductName(name: string): {
 
   // Find matching flower type
   let baseFlower = ""
-  let matchedKey = ""
 
   // Try longest matches first (to handle multi-word entries like "bird of paradise")
   const sortedKeys = Object.keys(flowerNameMapping).sort((a, b) => b.length - a.length)
@@ -234,7 +233,6 @@ function normalizeProductName(name: string): {
   for (const key of sortedKeys) {
     if (lowerName.includes(key)) {
       baseFlower = flowerNameMapping[key]
-      matchedKey = key
       break
     }
   }

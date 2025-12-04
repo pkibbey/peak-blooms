@@ -15,7 +15,7 @@ export default async function InspirationPage() {
       {/* Page Header */}
       <PageHeader
         title="Inspirations"
-        description="Curated flower arrangements designed by our artisans to inspire and delight."
+        description="Expert arrangement ideas crafted to inspire and delight. Our artisan-designed collections serve as reference points for your own creations, showcasing design possibilities and professional-grade execution."
       />
 
       {/* Gallery Grid */}

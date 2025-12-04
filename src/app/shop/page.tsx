@@ -111,7 +111,10 @@ export default async function ShopPage({ searchParams }: ShopPageProps) {
 
   return (
     <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 py-10">
-      <PageHeader title="Shop" description="Browse our full catalog of premium flowers" />
+      <PageHeader
+        title="Premium Wholesale Flowers"
+        description="Browse our carefully curated selection of the highest quality, freshest flowers. Every arrangement meets our standards for excellence, backed by reliable local delivery and competitive wholesale pricing."
+      />
 
       <div className="flex gap-6 lg:gap-8">
         {/* Sidebar Filters */}
@@ -126,8 +129,7 @@ export default async function ShopPage({ searchParams }: ShopPageProps) {
           </div>
         </aside>
 
-        {/* Main Content */}
-        <main className="flex-1">
+        <div className="flex-1">
           {/* Mobile Filters + View Toggle */}
           <div className="flex flex-col gap-4 mb-8">
             <div className="flex flex-wrap gap-4 items-center justify-between">
@@ -242,7 +244,7 @@ export default async function ShopPage({ searchParams }: ShopPageProps) {
               )}
             </>
           )}
-        </main>
+        </div>
       </div>
     </div>
   )

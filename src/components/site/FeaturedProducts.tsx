@@ -11,17 +11,15 @@ export default async function FeaturedProducts() {
   return (
     <div className="flex flex-col items-center justify-start bg-white py-16 font-sans">
       <div className="w-full max-w-5xl px-6">
-        <div className="mb-12 flex items-end justify-between">
-          <div>
-            <h2 className="text-3xl font-extrabold font-serif">Featured Products</h2>
-            <p className="mt-2 text-muted-foreground">
-              Explore our handpicked selection of premium flowers
-            </p>
-          </div>
-          <Link href="/shop" className="text-sm font-medium text-primary hover:underline">
+        <div className="flex items-end justify-between">
+          <h2 className="text-3xl font-extrabold font-serif">Featured Products</h2>
+          <Link href="/shop" className="text-sm font-medium text-primary hover:underline shrink-0">
             View all products →
           </Link>
         </div>
+        <p className="mt-2 text-muted-foreground mb-6">
+          Explore our handpicked selection of premium flowers
+        </p>
 
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
           {products.map((product) => (

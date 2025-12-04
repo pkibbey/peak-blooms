@@ -43,6 +43,19 @@ export async function getAllCollections(): Promise<CollectionBasicWithCount[]> {
 }
 
 /**
+ * Get featured collections (basic info only, no products)
+ */
+export async function getFeaturedCollections(): Promise<CollectionBasicWithCount[]> {
+  return withTiming("getFeaturedCollections", {}, async () => {
+    return db.collection.findMany({
+      where: { featured: true },
+      orderBy: { name: "asc" },
+      include: { _count: { select: { productCollections: true } } },
+    })
+  })
+}
+
+/**
  * Get a collection by slug with its products
  * Returns null if not found
  */

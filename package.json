@@ -9,7 +9,6 @@
     "start": "next start",
     "lint": "biome lint --write .",
     "format": "biome format --write .",
-    "db:push": "prisma migrate dev",
     "db:seed": "prisma db seed",
     "postinstall": "prisma generate",
     "knip": "knip"

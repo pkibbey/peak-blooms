@@ -1,30 +1,25 @@
 import Link from "next/link"
 import { CollectionCard } from "@/components/site/CollectionCard"
-import { db } from "@/lib/db"
+import { getFeaturedCollections } from "@/lib/data/collections"
 
 export default async function FeaturedCollections() {
-  const collections = await db.collection.findMany({
-    include: {
-      _count: {
-        select: { productCollections: true },
-      },
-    },
-  })
+  const collections = await getFeaturedCollections()
 
   return (
     <div className="flex flex-col items-center justify-start bg-white py-16 font-sans">
       <div className="w-full max-w-5xl px-6">
-        <div className="mb-12 flex items-end justify-between">
-          <div>
-            <h2 className="text-3xl font-extrabold font-serif">Featured Collections</h2>
-            <p className="mt-2 text-muted-foreground">
-              Discover our curated selection of premium flower collections
-            </p>
-          </div>
-          <Link href="/collections" className="text-sm font-medium text-primary hover:underline">
+        <div className="flex items-end justify-between">
+          <h2 className="text-3xl font-extrabold font-serif">Featured Collections</h2>
+          <Link
+            href="/collections"
+            className="text-sm font-medium text-primary hover:underline shrink-0"
+          >
             View all collections →
           </Link>
         </div>
+        <p className="mt-2 text-muted-foreground mb-6">
+          Thoughtfully curated collections celebrating what's in season.
+        </p>
 
         <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
           {collections.map((collection) => (
