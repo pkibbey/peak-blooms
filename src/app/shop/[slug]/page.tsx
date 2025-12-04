@@ -47,7 +47,7 @@ export default async function ProductDetailPage({ params }: ProductDetailPagePro
 
   return (
     <>
-      <div className="flex flex-col items-center justify-start bg-white py-16 font-sans">
+      <div className="flex flex-col items-center justify-start bg-white py-12 font-sans">
         <div className="w-full max-w-5xl px-6">
           {/* Navigation Back Link */}
           <BackLink href="/shop" label="shop" />

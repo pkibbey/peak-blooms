@@ -19,25 +19,27 @@ export function CollectionCard({ collection }: CollectionCardProps) {
   return (
     <div className="group flex flex-col overflow-hidden rounded-xs shadow-md transition-shadow hover:shadow-lg">
       {/* Image Container */}
-      <div className="relative aspect-square overflow-hidden bg-zinc-200">
-        {collection.image && (
-          <Image
-            src={collection.image}
-            alt={collection.name}
-            fill
-            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
-            className="object-cover transition-transform duration-300 group-hover:scale-105"
-          />
-        )}
-        {productCount > 0 && (
-          <Badge
-            variant="secondary"
-            className="absolute bottom-3 left-3 bg-white/90 text-gray-700 backdrop-blur-sm"
-          >
-            {productCount} {productCount === 1 ? "Product" : "Products"}
-          </Badge>
-        )}
-      </div>
+      <Link href={`/collections/${collection.slug}`} className="group/link">
+        <div className="relative aspect-square overflow-hidden bg-zinc-200">
+          {collection.image && (
+            <Image
+              src={collection.image}
+              alt={collection.name}
+              fill
+              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
+              className="object-cover transition-transform duration-300 group-hover:scale-105"
+            />
+          )}
+          {productCount > 0 && (
+            <Badge
+              variant="secondary"
+              className="absolute bottom-3 left-3 bg-white/90 text-gray-700 backdrop-blur-sm"
+            >
+              {productCount} {productCount === 1 ? "Product" : "Products"}
+            </Badge>
+          )}
+        </div>
+      </Link>
 
       {/* Card Content */}
       <div className="flex flex-col justify-between bg-white p-6 grow">

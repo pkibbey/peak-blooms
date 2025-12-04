@@ -2,6 +2,7 @@ import { notFound } from "next/navigation"
 import BackLink from "@/components/site/BackLink"
 import { PageHeader } from "@/components/site/PageHeader"
 import { ProductCard } from "@/components/site/ProductCard"
+import { ShippingBanner } from "@/components/site/ShippingBanner"
 import { getCurrentUser } from "@/lib/current-user"
 import { getAllCollectionSlugs, getCollectionBySlug } from "@/lib/data"
 import { db } from "@/lib/db"
@@ -43,31 +44,41 @@ export default async function CollectionDetailPage({ params }: CollectionDetailP
   }
 
   return (
-    <div className="flex flex-col items-center justify-start bg-white py-16 font-sans">
-      <div className="w-full max-w-5xl px-6">
-        {/* Navigation Back Link */}
-        <BackLink href="/admin/collections" label="Collections" />
+    <>
+      <div className="flex flex-col items-center justify-start bg-white py-12 font-sans">
+        <div className="w-full max-w-5xl px-6">
+          {/* Navigation Back Link */}
+          <BackLink href="/collections" label="Collections" />
 
-        {/* Collection Header */}
-        <PageHeader title={collection.name} description={collection.description ?? undefined} />
+          {/* Collection Header */}
+          <PageHeader title={collection.name} description={collection.description ?? undefined} />
 
-        {/* Products Section */}
-        <div>
-          <h2 className="text-2xl font-bold mb-6 font-serif">Products in this collection</h2>
+          {/* Products Section */}
+          <div>
+            <h2 className="text-2xl font-bold mb-6 font-serif">Products in this collection</h2>
 
-          {collection.productCollections.length === 0 ? (
-            <div className="text-center py-12">
-              <p className="text-muted-foreground">No products available in this collection yet.</p>
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
-              {collection.productCollections.map((pc) => (
-                <ProductCard key={pc.product.slug} product={pc.product} user={user} />
-              ))}
-            </div>
-          )}
+            {collection.productCollections.length === 0 ? (
+              <div className="text-center py-12">
+                <p className="text-muted-foreground">
+                  No products available in this collection yet.
+                </p>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
+                {collection.productCollections.map((pc) => (
+                  <ProductCard key={pc.product.slug} product={pc.product} user={user} />
+                ))}
+              </div>
+            )}
+          </div>
         </div>
       </div>
-    </div>
+
+      {/* Shipping Banner */}
+      <ShippingBanner
+        subtitle="Order with confidence. Free regional delivery on all arrangements."
+        gradientPreset="rose"
+      />
+    </>
   )
 }

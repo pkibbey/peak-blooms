@@ -42,7 +42,7 @@ export default async function PendingApprovalPage({ searchParams }: PendingAppro
 
   return (
     <div className="flex flex-col bg-white">
-      <div className="flex flex-1 items-center justify-center px-4 py-16">
+      <div className="flex flex-1 items-center justify-center px-4 py-12">
         <div className="w-full max-w-5xl space-y-8">
           {/* Header Section */}
           <div className="space-y-4 text-center">

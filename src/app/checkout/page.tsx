@@ -39,7 +39,7 @@ export default async function CheckoutPage() {
   if (!cart) {
     return (
       <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 py-10">
-        <div className="flex flex-col items-center justify-center py-16 text-center">
+        <div className="flex flex-col items-center justify-center py-12 text-center">
           <IconShoppingBag className="h-16 w-16 text-muted-foreground/50 mb-4" />
           <h2 className="heading-2 mb-2">Your cart is empty</h2>
           <p className="text-muted-foreground mb-6">
