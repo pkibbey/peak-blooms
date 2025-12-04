@@ -55,7 +55,13 @@ function readProductsFromCSV(): Array<{
   // Get the CSV path using process.cwd() since __dirname may be unreliable with tsx
   const csvPath = path.join(process.cwd(), "prisma", "products.csv")
   console.log(`Reading CSV from: ${csvPath}`)
-  const fileContent = fs.readFileSync(csvPath, "utf-8")
+  let fileContent: string
+  try {
+    fileContent = fs.readFileSync(csvPath, "utf-8")
+  } catch (err) {
+    console.error(`❌ Failed to read CSV: ${(err as Error).message}`)
+    throw err
+  }
   const lines = fileContent.split("\n")
 
   const products: Array<{
@@ -104,6 +110,11 @@ function readProductsFromCSV(): Array<{
         image: imageStr || undefined,
       })
     }
+  }
+
+  console.log(`✅ Parsed ${products.length} products from CSV (${lines.length} lines)`)
+  if (products.length === 0) {
+    console.warn("⚠️  No products were parsed from the CSV — check the file format and header row.")
   }
 
   return products
@@ -225,13 +236,13 @@ async function main() {
     create: {
       name: "Flowers",
       slug: "flowers",
-      image: "https://zvbfsgiej9tfgqre.public.blob.vercel-storage.com/collections/flowers.png",
+      image: "/collection-images/flowers.png",
       description: "Beautiful fresh flowers for all occasions",
     },
     where: { slug: "flowers" },
     update: {
       name: "Flowers",
-      image: "https://zvbfsgiej9tfgqre.public.blob.vercel-storage.com/collections/flowers.png",
+      image: "/collection-images/flowers.png",
       description: "Beautiful fresh flowers for all occasions",
       slug: "flowers",
     },
@@ -241,13 +252,13 @@ async function main() {
     create: {
       name: "Fillers",
       slug: "fillers",
-      image: "https://zvbfsgiej9tfgqre.public.blob.vercel-storage.com/collections/fillers.png",
+      image: "/collection-images/fillers.png",
       description: "Greenery and filler materials for arrangements",
     },
     where: { slug: "fillers" },
     update: {
       name: "Fillers",
-      image: "https://zvbfsgiej9tfgqre.public.blob.vercel-storage.com/collections/fillers.png",
+      image: "/collection-images/fillers.png",
       description: "Greenery and filler materials for arrangements",
       slug: "fillers",
     },
@@ -256,10 +267,12 @@ async function main() {
   // Seed products from CSV file
   console.log("📦 Seeding products from CSV...")
   const csvProducts = readProductsFromCSV()
+  console.log(`📦 Found ${csvProducts.length} CSV products — starting upsert...`)
   let productsCreated = 0
   let productsSkipped = 0
 
-  for (const csvProduct of csvProducts) {
+  for (let i = 0; i < csvProducts.length; i++) {
+    const csvProduct = csvProducts[i]
     try {
       const slug = csvProduct.name
         .toLowerCase()
@@ -323,6 +336,13 @@ async function main() {
       console.warn(`⚠️  Skipped product: ${csvProduct.name} (${(error as Error).message})`)
       productsSkipped++
     }
+
+    // Log progress every 5 items so long-running seeds show activity
+    if ((i + 1) % 5 === 0 || i === csvProducts.length - 1) {
+      console.log(
+        `📊 Progress: ${i + 1}/${csvProducts.length} processed (${productsCreated} created, ${productsSkipped} skipped)`
+      )
+    }
   }
 
   console.log(
@@ -339,7 +359,8 @@ async function main() {
   })
 
   let collectionAssociations = 0
-  for (const csvProduct of csvProducts) {
+  for (let i = 0; i < csvProducts.length; i++) {
+    const csvProduct = csvProducts[i]
     try {
       const slug = csvProduct.name
         .toLowerCase()
@@ -377,6 +398,12 @@ async function main() {
     } catch (error) {
       console.warn(`⚠️  Failed to add ${csvProduct.name} to collection: ${(error as Error).message}`)
     }
+
+    if ((i + 1) % 20 === 0 || i === csvProducts.length - 1) {
+      console.log(
+        `📊 Collections progress: ${i + 1}/${csvProducts.length} checked, ${collectionAssociations} associations created`
+      )
+    }
   }
 
   console.log(`✅ Added ${collectionAssociations} products to collections`)
@@ -407,8 +434,7 @@ async function main() {
       name: "Sunset Romance",
       slug: "sunset-romance",
       subtitle: "Warm hues for evening celebrations",
-      image:
-        "https://zvbfsgiej9tfgqre.public.blob.vercel-storage.com/inspiration/sunset-romance.png",
+      image: "/inspiration-images/sunset-romance.png",
       excerpt:
         "A stunning combination of warm peach and amber tones that evoke the magical hour just before dusk. Perfect for evening receptions and intimate celebrations.",
       inspirationText:
@@ -418,8 +444,7 @@ async function main() {
     update: {
       name: "Sunset Romance",
       subtitle: "Warm hues for evening celebrations",
-      image:
-        "https://zvbfsgiej9tfgqre.public.blob.vercel-storage.com/inspiration/sunset-romance.png",
+      image: "/inspiration-images/sunset-romance.png",
       excerpt:
         "A stunning combination of warm peach and amber tones that evoke the magical hour just before dusk. Perfect for evening receptions and intimate celebrations.",
       inspirationText:
@@ -433,8 +458,7 @@ async function main() {
       name: "Romantic Elegance",
       slug: "romantic-elegance",
       subtitle: "Timeless pink and white arrangement",
-      image:
-        "https://zvbfsgiej9tfgqre.public.blob.vercel-storage.com/inspiration/romantic-elegance.png",
+      image: "/inspiration-images/romantic-elegance.png",
       excerpt:
         "A classic combination that exudes sophistication and grace. The soft pink roses paired with lush greenery create an arrangement that transcends trends.",
       inspirationText:
@@ -444,8 +468,7 @@ async function main() {
     update: {
       name: "Romantic Elegance",
       subtitle: "Timeless pink and white arrangement",
-      image:
-        "https://zvbfsgiej9tfgqre.public.blob.vercel-storage.com/inspiration/romantic-elegance.png",
+      image: "/inspiration-images/romantic-elegance.png",
       excerpt:
         "A classic combination that exudes sophistication and grace. The soft pink roses paired with lush greenery create an arrangement that transcends trends.",
       inspirationText:
@@ -459,8 +482,7 @@ async function main() {
       name: "Pure Serenity",
       slug: "pure-serenity",
       subtitle: "Pristine white and green sanctuary",
-      image:
-        "https://zvbfsgiej9tfgqre.public.blob.vercel-storage.com/inspiration/pure-serenity.png",
+      image: "/inspiration-images/pure-serenity.png",
       excerpt:
         "Simplicity meets sophistication in this minimalist arrangement. The pristine white blooms paired with lush greenery create a calming, elegant presence.",
       inspirationText:
@@ -470,8 +492,7 @@ async function main() {
     update: {
       name: "Pure Serenity",
       subtitle: "Pristine white and green sanctuary",
-      image:
-        "https://zvbfsgiej9tfgqre.public.blob.vercel-storage.com/inspiration/pure-serenity.png",
+      image: "/inspiration-images/pure-serenity.png",
       excerpt:
         "Simplicity meets sophistication in this minimalist arrangement. The pristine white blooms paired with lush greenery create a calming, elegant presence.",
       inspirationText:
@@ -485,7 +506,7 @@ async function main() {
       name: "Lush Garden",
       slug: "lush-garden",
       subtitle: "Abundant greenery with vibrant accents",
-      image: "https://zvbfsgiej9tfgqre.public.blob.vercel-storage.com/inspiration/lush-garden.png",
+      image: "/inspiration-images/lush-garden.png",
       excerpt:
         "Nature's bounty meets artful arrangement. This set celebrates the beauty of layered textures and verdant tones for creating immersive botanical spaces.",
       inspirationText:
@@ -495,7 +516,7 @@ async function main() {
     update: {
       name: "Lush Garden",
       subtitle: "Abundant greenery with vibrant accents",
-      image: "https://zvbfsgiej9tfgqre.public.blob.vercel-storage.com/inspiration/lush-garden.png",
+      image: "/inspiration-images/lush-garden.png",
       excerpt:
         "Nature's bounty meets artful arrangement. This set celebrates the beauty of layered textures and verdant tones for creating immersive botanical spaces.",
       inspirationText:
@@ -509,7 +530,7 @@ async function main() {
       name: "Blush Bride",
       slug: "blush-bride",
       subtitle: "Soft, romantic wedding palette",
-      image: "https://zvbfsgiej9tfgqre.public.blob.vercel-storage.com/inspiration/blush-bride.png",
+      image: "/inspiration-images/blush-bride.png",
       excerpt:
         "Gentle peachy-pink tones create a modern, romantic aesthetic perfect for weddings and celebrations that radiate warmth and tenderness.",
       inspirationText:
@@ -519,7 +540,7 @@ async function main() {
     update: {
       name: "Blush Bride",
       subtitle: "Soft, romantic wedding palette",
-      image: "https://zvbfsgiej9tfgqre.public.blob.vercel-storage.com/inspiration/blush-bride.png",
+      image: "/inspiration-images/blush-bride.png",
       excerpt:
         "Gentle peachy-pink tones create a modern, romantic aesthetic perfect for weddings and celebrations that radiate warmth and tenderness.",
       inspirationText:
@@ -533,8 +554,7 @@ async function main() {
       name: "Verdant Oasis",
       slug: "verdant-oasis",
       subtitle: "Tropical-inspired green sanctuary",
-      image:
-        "https://zvbfsgiej9tfgqre.public.blob.vercel-storage.com/inspiration/verdant-oasis.png",
+      image: "/inspiration-images/verdant-oasis.png",
       excerpt:
         "Rich, layered greenery creates a lush tropical feeling perfect for creating immersive botanical experiences and dramatic installations.",
       inspirationText:
@@ -544,8 +564,7 @@ async function main() {
     update: {
       name: "Verdant Oasis",
       subtitle: "Tropical-inspired green sanctuary",
-      image:
-        "https://zvbfsgiej9tfgqre.public.blob.vercel-storage.com/inspiration/verdant-oasis.png",
+      image: "/inspiration-images/verdant-oasis.png",
       excerpt:
         "Rich, layered greenery creates a lush tropical feeling perfect for creating immersive botanical experiences and dramatic installations.",
       inspirationText:
@@ -559,8 +578,7 @@ async function main() {
       name: "Classic Bouquet",
       slug: "classic-bouquet",
       subtitle: "Timeless pink roses and greenery",
-      image:
-        "https://zvbfsgiej9tfgqre.public.blob.vercel-storage.com/inspiration/classic-bouquet.png",
+      image: "/inspiration-images/classic-bouquet.png",
       excerpt:
         "The bouquet that never goes out of style. Pink roses have graced celebrations for generations—this set honors that tradition while staying utterly contemporary.",
       inspirationText:
@@ -570,8 +588,7 @@ async function main() {
     update: {
       name: "Classic Bouquet",
       subtitle: "Timeless pink roses and greenery",
-      image:
-        "https://zvbfsgiej9tfgqre.public.blob.vercel-storage.com/inspiration/classic-bouquet.png",
+      image: "/inspiration-images/classic-bouquet.png",
       excerpt:
         "The bouquet that never goes out of style. Pink roses have graced celebrations for generations—this set honors that tradition while staying utterly contemporary.",
       inspirationText:
@@ -585,8 +602,7 @@ async function main() {
       name: "Modern Minimal",
       slug: "modern-minimal",
       subtitle: "Contemporary white and green design",
-      image:
-        "https://zvbfsgiej9tfgqre.public.blob.vercel-storage.com/inspiration/modern-minimal.png",
+      image: "/inspiration-images/modern-minimal.png",
       excerpt:
         "Clean lines, intentional design. This palette is for spaces and moments that demand sophistication through restraint.",
       inspirationText:
@@ -596,8 +612,7 @@ async function main() {
     update: {
       name: "Modern Minimal",
       subtitle: "Contemporary white and green design",
-      image:
-        "https://zvbfsgiej9tfgqre.public.blob.vercel-storage.com/inspiration/modern-minimal.png",
+      image: "/inspiration-images/modern-minimal.png",
       excerpt:
         "Clean lines, intentional design. This palette is for spaces and moments that demand sophistication through restraint.",
       inspirationText:
@@ -611,8 +626,7 @@ async function main() {
       name: "Warm Celebratory",
       slug: "warm-celebratory",
       subtitle: "Joyful peach and green combination",
-      image:
-        "https://zvbfsgiej9tfgqre.public.blob.vercel-storage.com/inspiration/warm-celebratory.png",
+      image: "/inspiration-images/warm-celebratory.png",
       excerpt:
         "Celebration colors that feel welcoming and genuine. This palette radiates warmth and joy without demanding attention.",
       inspirationText:
@@ -622,8 +636,7 @@ async function main() {
     update: {
       name: "Warm Celebratory",
       subtitle: "Joyful peach and green combination",
-      image:
-        "https://zvbfsgiej9tfgqre.public.blob.vercel-storage.com/inspiration/warm-celebratory.png",
+      image: "/inspiration-images/warm-celebratory.png",
       excerpt:
         "Celebration colors that feel welcoming and genuine. This palette radiates warmth and joy without demanding attention.",
       inspirationText:
@@ -738,7 +751,7 @@ async function main() {
       ctaText: "Shop flowers",
       ctaLink: "/shop",
       backgroundType: "IMAGE",
-      backgroundImage: "https://zvbfsgiej9tfgqre.public.blob.vercel-storage.com/heroes/welcome.png",
+      backgroundImage: "/hero-images/welcome.png",
       slotPosition: 1,
       textPosition: "left",
     },
@@ -751,7 +764,7 @@ async function main() {
       ctaText: "Shop flowers",
       ctaLink: "/shop",
       backgroundType: "IMAGE",
-      backgroundImage: "https://zvbfsgiej9tfgqre.public.blob.vercel-storage.com/heroes/welcome.png",
+      backgroundImage: "/hero-images/welcome.png",
       slotPosition: 1,
       textPosition: "left",
     },
@@ -766,7 +779,7 @@ async function main() {
       ctaText: "Shop boxlots",
       ctaLink: "/shop?boxlotOnly=true",
       backgroundType: "IMAGE",
-      backgroundImage: "https://zvbfsgiej9tfgqre.public.blob.vercel-storage.com/heroes/boxlots.png",
+      backgroundImage: "/hero-images/boxlots.png",
       slotPosition: 2,
       textPosition: "right",
     },
@@ -779,7 +792,7 @@ async function main() {
       ctaText: "Shop boxlots",
       ctaLink: "/shop?boxlotOnly=true",
       backgroundType: "IMAGE",
-      backgroundImage: "https://zvbfsgiej9tfgqre.public.blob.vercel-storage.com/heroes/boxlots.png",
+      backgroundImage: "/hero-images/boxlots.png",
       slotPosition: 2,
       textPosition: "right",
     },
@@ -794,7 +807,7 @@ async function main() {
       ctaText: "Shop boxlots",
       ctaLink: "/shop?boxlotOnly=true",
       backgroundType: "IMAGE",
-      backgroundImage: "https://zvbfsgiej9tfgqre.public.blob.vercel-storage.com/heroes/boxlot2.png",
+      backgroundImage: "/hero-images/boxlot2.png",
       slotPosition: 3,
       textPosition: "center",
     },
@@ -807,7 +820,7 @@ async function main() {
       ctaText: "Shop boxlots",
       ctaLink: "/shop?boxlotOnly=true",
       backgroundType: "IMAGE",
-      backgroundImage: "https://zvbfsgiej9tfgqre.public.blob.vercel-storage.com/heroes/boxlot2.png",
+      backgroundImage: "/hero-images/boxlot2.png",
       slotPosition: 3,
       textPosition: "center",
     },
