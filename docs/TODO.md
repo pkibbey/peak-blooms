@@ -1,8 +1,9 @@
 ## 🛠️ Website To-Do List
 
-### 🌟 Next Steps
-
 - [ ] Turn the development of this into a blog using git commits to show the progress of the app
+- [ ] Track database usage, monitoring and actually find out where the weak spots are and then and implement strategies to prevent overuse of database queries
+
+### 🌟 Next Steps
 
 - [ ] Setup domain
 - [ ] Create subdomains
@@ -10,6 +11,9 @@
 - [ ] Upload test site to dev.
 - [ ] Confiure email server
 - [ ] Add payment processing
+- [ ] Add unit tests and e2e tests to ensure complete site functionality
+- [ ] Plan site launch
+- [ ] Maintenence and updates performed on feature branches, tested on dev, and then released
 
 ### 🎨 Design Changes
 
@@ -18,9 +22,6 @@
 - [ ] Try out different colour schemes
 - [ ] Add correct product images
 - [ ] Review text content
- 
-### 🪨 Code Stability
-- [ ] Add unit tests and e2e tests to ensure complete site functionality
 
 ### 🛍️ Tracking / Marketing
 

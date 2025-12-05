@@ -127,7 +127,6 @@ export default function OrdersTable({ orders, currentStatus, sort, order }: Orde
                   href={headerUrl}
                   className="hidden lg:table-cell"
                 />
-                <TableHead>Items</TableHead>
                 <SortableTableHead
                   label="Status"
                   sortKey="status"

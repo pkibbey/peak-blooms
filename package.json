@@ -9,9 +9,15 @@
     "start": "next start",
     "lint": "biome lint --write .",
     "format": "biome format --write .",
-    "db:seed": "prisma db seed",
     "postinstall": "prisma generate",
-    "knip": "knip"
+    "knip": "knip",
+    "db:docker:up": "docker-compose up -d postgres && sleep 3 && npm run db:docker:push && npm run db:docker:reset && npm run db:docker:seed",
+    "db:docker:down": "docker-compose down",
+    "db:docker:push": "dotenv -e .env.local -- prisma db push",
+    "db:docker:reset": "dotenv -e .env.local -- prisma migrate reset --force",
+    "db:docker:seed": "RUNNING_SEED=true dotenv -e .env.local -- prisma db seed",
+    "db:prod:reset": "dotenv -e .env.prod -- prisma migrate reset --force && RUNNING_SEED=true dotenv -e .env.prod -- prisma db seed",
+    "db:studio": "prisma studio"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",
@@ -47,6 +53,7 @@
     "@types/react": "^19.2.7",
     "@types/react-dom": "^19.2.3",
     "babel-plugin-react-compiler": "1.0.0",
+    "dotenv-cli": "^11.0.0",
     "knip": "^5.71.0",
     "tailwindcss": "^4.1.17",
     "ts-node": "^10.9.2",

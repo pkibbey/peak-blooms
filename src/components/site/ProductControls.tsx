@@ -291,21 +291,6 @@ export function ProductControls({ product, user, mode = "card" }: ProductControl
           >
             {formatPrice(currentPrice)}
           </div>
-
-          {/* Variant / specs summary */}
-          {selectedVariant && (
-            <div className="mt-2 text-sm text-muted-foreground">
-              <div className="flex flex-wrap gap-3">
-                {selectedVariant.stemLength !== null && (
-                  <div>Stem: {selectedVariant.stemLength} cm</div>
-                )}
-                {selectedVariant.quantityPerBunch !== null && (
-                  <div>Quantity: {selectedVariant.quantityPerBunch} / bunch</div>
-                )}
-                <div>{selectedVariant.isBoxlot ? "Boxlot" : "Single bunch"}</div>
-              </div>
-            </div>
-          )}
         </div>
       )}
 

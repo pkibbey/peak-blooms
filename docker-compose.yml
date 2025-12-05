@@ -1,0 +1,44 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: peak-blooms-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: peak_blooms
+      POSTGRES_PASSWORD: peak_blooms_local
+      POSTGRES_DB: peak_blooms
+    ports:
+      - "5432:5432"
+    volumes:
+      - peak_blooms_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U peak_blooms -d peak_blooms"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - peak_blooms_network
+
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: peak-blooms-pgadmin
+    restart: unless-stopped
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@peakblooms.local
+      PGADMIN_DEFAULT_PASSWORD: admin
+    ports:
+      - "5050:80"
+    depends_on:
+      - postgres
+    networks:
+      - peak_blooms_network
+    profiles:
+      - tools
+
+volumes:
+  peak_blooms_data:
+    driver: local
+
+networks:
+  peak_blooms_network:
+    driver: bridge
