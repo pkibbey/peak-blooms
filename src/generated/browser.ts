@@ -97,3 +97,8 @@ export type OrderItem = Prisma.OrderItemModel
  * 
  */
 export type HeroBanner = Prisma.HeroBannerModel
+/**
+ * Model Metric
+ * 
+ */
+export type Metric = Prisma.MetricModel

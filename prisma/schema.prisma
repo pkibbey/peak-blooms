@@ -86,7 +86,7 @@ model Address {
   userId         String?
   firstName      String
   lastName       String
-  company        String?
+  company        String
   street1        String
   street2        String?
   city           String

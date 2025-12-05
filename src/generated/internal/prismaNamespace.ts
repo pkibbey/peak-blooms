@@ -399,7 +399,8 @@ export const ModelName = {
   CartItem: 'CartItem',
   Order: 'Order',
   OrderItem: 'OrderItem',
-  HeroBanner: 'HeroBanner'
+  HeroBanner: 'HeroBanner',
+  Metric: 'Metric'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -415,7 +416,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "account" | "session" | "verification" | "address" | "collection" | "inspiration" | "product" | "productCollection" | "inspirationProduct" | "productVariant" | "shoppingCart" | "cartItem" | "order" | "orderItem" | "heroBanner"
+    modelProps: "user" | "account" | "session" | "verification" | "address" | "collection" | "inspiration" | "product" | "productCollection" | "inspirationProduct" | "productVariant" | "shoppingCart" | "cartItem" | "order" | "orderItem" | "heroBanner" | "metric"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -1603,6 +1604,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    Metric: {
+      payload: Prisma.$MetricPayload<ExtArgs>
+      fields: Prisma.MetricFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.MetricFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MetricPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.MetricFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MetricPayload>
+        }
+        findFirst: {
+          args: Prisma.MetricFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MetricPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.MetricFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MetricPayload>
+        }
+        findMany: {
+          args: Prisma.MetricFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MetricPayload>[]
+        }
+        create: {
+          args: Prisma.MetricCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MetricPayload>
+        }
+        createMany: {
+          args: Prisma.MetricCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.MetricCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MetricPayload>[]
+        }
+        delete: {
+          args: Prisma.MetricDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MetricPayload>
+        }
+        update: {
+          args: Prisma.MetricUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MetricPayload>
+        }
+        deleteMany: {
+          args: Prisma.MetricDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.MetricUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.MetricUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MetricPayload>[]
+        }
+        upsert: {
+          args: Prisma.MetricUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MetricPayload>
+        }
+        aggregate: {
+          args: Prisma.MetricAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateMetric>
+        }
+        groupBy: {
+          args: Prisma.MetricGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.MetricGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.MetricCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.MetricCountAggregateOutputType> | number
+        }
+      }
+    }
   }
 } & {
   other: {
@@ -1876,6 +1951,17 @@ export const HeroBannerScalarFieldEnum = {
 export type HeroBannerScalarFieldEnum = (typeof HeroBannerScalarFieldEnum)[keyof typeof HeroBannerScalarFieldEnum]
 
 
+export const MetricScalarFieldEnum = {
+  id: 'id',
+  type: 'type',
+  name: 'name',
+  duration: 'duration',
+  createdAt: 'createdAt'
+} as const
+
+export type MetricScalarFieldEnum = (typeof MetricScalarFieldEnum)[keyof typeof MetricScalarFieldEnum]
+
+
 export const SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -2024,6 +2110,20 @@ export type EnumHeroBackgroundTypeFieldRefInput<$PrismaModel> = FieldRefInputTyp
 export type ListEnumHeroBackgroundTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'HeroBackgroundType[]'>
     
 
+
+/**
+ * Reference to a field of type 'MetricType'
+ */
+export type EnumMetricTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'MetricType'>
+    
+
+
+/**
+ * Reference to a field of type 'MetricType[]'
+ */
+export type ListEnumMetricTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'MetricType[]'>
+    
+
 /**
  * Batch Payload for updateMany & deleteMany & createMany
  */
@@ -2135,6 +2235,7 @@ export type GlobalOmitConfig = {
   order?: Prisma.OrderOmit
   orderItem?: Prisma.OrderItemOmit
   heroBanner?: Prisma.HeroBannerOmit
+  metric?: Prisma.MetricOmit
 }
 
 /* Types for Logging */

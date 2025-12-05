@@ -297,6 +297,23 @@ export type EnumHeroBackgroundTypeWithAggregatesFilter<$PrismaModel = never> = {
   _max?: Prisma.NestedEnumHeroBackgroundTypeFilter<$PrismaModel>
 }
 
+export type EnumMetricTypeFilter<$PrismaModel = never> = {
+  equals?: $Enums.MetricType | Prisma.EnumMetricTypeFieldRefInput<$PrismaModel>
+  in?: $Enums.MetricType[] | Prisma.ListEnumMetricTypeFieldRefInput<$PrismaModel>
+  notIn?: $Enums.MetricType[] | Prisma.ListEnumMetricTypeFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumMetricTypeFilter<$PrismaModel> | $Enums.MetricType
+}
+
+export type EnumMetricTypeWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.MetricType | Prisma.EnumMetricTypeFieldRefInput<$PrismaModel>
+  in?: $Enums.MetricType[] | Prisma.ListEnumMetricTypeFieldRefInput<$PrismaModel>
+  notIn?: $Enums.MetricType[] | Prisma.ListEnumMetricTypeFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumMetricTypeWithAggregatesFilter<$PrismaModel> | $Enums.MetricType
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumMetricTypeFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumMetricTypeFilter<$PrismaModel>
+}
+
 export type NestedStringFilter<$PrismaModel = never> = {
   equals?: string | Prisma.StringFieldRefInput<$PrismaModel>
   in?: string[] | Prisma.ListStringFieldRefInput<$PrismaModel>
@@ -580,6 +597,23 @@ export type NestedEnumHeroBackgroundTypeWithAggregatesFilter<$PrismaModel = neve
   _count?: Prisma.NestedIntFilter<$PrismaModel>
   _min?: Prisma.NestedEnumHeroBackgroundTypeFilter<$PrismaModel>
   _max?: Prisma.NestedEnumHeroBackgroundTypeFilter<$PrismaModel>
+}
+
+export type NestedEnumMetricTypeFilter<$PrismaModel = never> = {
+  equals?: $Enums.MetricType | Prisma.EnumMetricTypeFieldRefInput<$PrismaModel>
+  in?: $Enums.MetricType[] | Prisma.ListEnumMetricTypeFieldRefInput<$PrismaModel>
+  notIn?: $Enums.MetricType[] | Prisma.ListEnumMetricTypeFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumMetricTypeFilter<$PrismaModel> | $Enums.MetricType
+}
+
+export type NestedEnumMetricTypeWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.MetricType | Prisma.EnumMetricTypeFieldRefInput<$PrismaModel>
+  in?: $Enums.MetricType[] | Prisma.ListEnumMetricTypeFieldRefInput<$PrismaModel>
+  notIn?: $Enums.MetricType[] | Prisma.ListEnumMetricTypeFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumMetricTypeWithAggregatesFilter<$PrismaModel> | $Enums.MetricType
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumMetricTypeFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumMetricTypeFilter<$PrismaModel>
 }
 
 

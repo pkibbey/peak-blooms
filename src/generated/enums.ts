@@ -18,6 +18,15 @@ export const Role = {
 export type Role = (typeof Role)[keyof typeof Role]
 
 
+export const MetricType = {
+  SEED: 'SEED',
+  QUERY: 'QUERY',
+  FETCH: 'FETCH'
+} as const
+
+export type MetricType = (typeof MetricType)[keyof typeof MetricType]
+
+
 export const OrderStatus = {
   PENDING: 'PENDING',
   CONFIRMED: 'CONFIRMED',

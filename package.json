@@ -13,6 +13,7 @@
     "knip": "knip",
     "db:docker:up": "docker-compose up -d postgres && sleep 3 && npm run db:docker:push && npm run db:docker:reset && npm run db:docker:seed",
     "db:docker:down": "docker-compose down",
+    "db:docker:generate": "dotenv -e .env.local -- prisma generate",
     "db:docker:push": "dotenv -e .env.local -- prisma db push",
     "db:docker:reset": "dotenv -e .env.local -- prisma migrate reset --force",
     "db:docker:seed": "RUNNING_SEED=true dotenv -e .env.local -- prisma db seed",

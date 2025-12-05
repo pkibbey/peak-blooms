@@ -38,20 +38,18 @@ export function CheckoutOrderItem({ item }: CheckoutOrderItemProps) {
 
   return (
     <div className="flex gap-3">
-      <div className="relative h-16 w-16 shrink-0">
-        <div className="h-full w-full overflow-hidden rounded-xs bg-neutral-100">
-          {item.product.image ? (
-            <Image
-              src={item.product.image}
-              alt={item.product.name}
-              fill
-              className="object-cover rounded-xs"
-              sizes="64px"
-            />
-          ) : (
-            <div className="h-full w-full bg-muted" />
-          )}
-        </div>
+      <div className="relative h-16 w-16 shrink-0 rounded-xs">
+        {item.product.image ? (
+          <Image
+            src={item.product.image}
+            alt={item.product.name}
+            fill
+            className="object-cover rounded-xs"
+            sizes="64px"
+          />
+        ) : (
+          <div className="h-full w-full bg-muted" />
+        )}
         <Badge className="absolute -top-2 -right-2 h-5 w-5 p-0 flex items-center justify-center text-xs">
           {item.quantity}
         </Badge>

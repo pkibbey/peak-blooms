@@ -65,7 +65,7 @@ interface SavedAddress {
   id: string
   firstName: string
   lastName: string
-  company: string | null
+  company: string
   street1: string
   street2: string | null
   city: string
@@ -93,7 +93,7 @@ export default function CheckoutForm({ cart, savedAddresses, userEmail }: Checko
       return {
         firstName: addr.firstName,
         lastName: addr.lastName,
-        company: addr.company || "",
+        company: addr.company,
         street1: addr.street1,
         street2: addr.street2 || "",
         city: addr.city,
@@ -115,7 +115,7 @@ export default function CheckoutForm({ cart, savedAddresses, userEmail }: Checko
       shippingAddress: getInitialShippingAddress(),
       saveShippingAddress: false,
       differentBilling: false,
-      billingAddress: emptyAddress,
+      billingAddress: null,
     },
   })
 
@@ -134,7 +134,7 @@ export default function CheckoutForm({ cart, savedAddresses, userEmail }: Checko
         form.setValue("shippingAddress", {
           firstName: addr.firstName,
           lastName: addr.lastName,
-          company: addr.company || "",
+          company: addr.company,
           street1: addr.street1,
           street2: addr.street2 || "",
           city: addr.city,
@@ -146,25 +146,69 @@ export default function CheckoutForm({ cart, savedAddresses, userEmail }: Checko
     }
   }
 
-  // When shipping address fields change, switch to "new" mode
+  // When shipping address fields change, check if it matches a saved address
   const handleShippingFieldChange = () => {
-    if (selectedAddressId !== "new") {
+    const currentAddress = form.getValues("shippingAddress")
+
+    // Check if the current address matches any saved address
+    const matchingSavedAddress = savedAddresses.find((saved) => {
+      return (
+        saved.firstName === currentAddress.firstName &&
+        saved.lastName === currentAddress.lastName &&
+        saved.company === currentAddress.company &&
+        saved.street1 === currentAddress.street1 &&
+        saved.street2 === (currentAddress.street2 || null) &&
+        saved.city === currentAddress.city &&
+        saved.state === currentAddress.state &&
+        saved.zip === currentAddress.zip &&
+        saved.country === currentAddress.country
+      )
+    })
+
+    if (matchingSavedAddress && selectedAddressId !== matchingSavedAddress.id) {
+      // If it matches a saved address, select that address
+      setSelectedAddressId(matchingSavedAddress.id)
+      form.setValue("selectedAddressId", matchingSavedAddress.id)
+    } else if (!matchingSavedAddress && selectedAddressId !== "new") {
+      // If it doesn't match any saved address, switch to "new" mode
       setSelectedAddressId("new")
       form.setValue("selectedAddressId", "new")
     }
   }
 
   const onSubmit = async (data: CheckoutFormData) => {
+    console.log("✅ [Form Validation] Form validation PASSED")
+    console.log("📋 [Checkout] Form data:", data)
     setIsSubmitting(true)
 
     try {
+      // Determine if we should save the address (prevent duplicates)
+      let shouldSaveAddress = false
+      if (selectedAddressId === "new" && data.saveShippingAddress) {
+        // Check if this exact address already exists
+        const isDuplicate = savedAddresses.some((saved) => {
+          return (
+            saved.firstName === data.shippingAddress.firstName &&
+            saved.lastName === data.shippingAddress.lastName &&
+            saved.company === data.shippingAddress.company &&
+            saved.street1 === data.shippingAddress.street1 &&
+            saved.street2 === (data.shippingAddress.street2 || null) &&
+            saved.city === data.shippingAddress.city &&
+            saved.state === data.shippingAddress.state &&
+            saved.zip === data.shippingAddress.zip &&
+            saved.country === data.shippingAddress.country
+          )
+        })
+        shouldSaveAddress = !isDuplicate
+      }
+
       const response = await fetch("/api/orders", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           shippingAddressId: selectedAddressId !== "new" ? selectedAddressId : null,
           shippingAddress: selectedAddressId === "new" ? data.shippingAddress : null,
-          saveShippingAddress: selectedAddressId === "new" && data.saveShippingAddress,
+          saveShippingAddress: shouldSaveAddress,
           billingAddress: data.differentBilling ? data.billingAddress : null,
           email: data.email,
           phone: data.phone?.trim() || null,
@@ -192,7 +236,7 @@ export default function CheckoutForm({ cart, savedAddresses, userEmail }: Checko
   }
 
   const formatAddressPreview = (addr: SavedAddress) => {
-    return `${addr.firstName} ${addr.lastName}, ${addr.street1}, ${addr.city}, ${addr.state} ${addr.zip}`
+    return `${addr.firstName} ${addr.lastName} / ${addr.company}, ${addr.street1}, ${addr.city}, ${addr.state} ${addr.zip}`
   }
 
   return (
@@ -251,22 +295,31 @@ export default function CheckoutForm({ cart, savedAddresses, userEmail }: Checko
             </h2>
 
             {savedAddresses.length > 0 && (
-              <div className="mb-4">
-                <FormLabel htmlFor="savedAddress">Select Address</FormLabel>
-                <Select value={selectedAddressId} onValueChange={handleAddressSelect}>
-                  <SelectTrigger className="w-full mt-1">
-                    <SelectValue placeholder="Select an address" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {savedAddresses.map((addr) => (
-                      <SelectItem key={addr.id} value={addr.id}>
-                        {formatAddressPreview(addr)}
-                      </SelectItem>
-                    ))}
-                    <SelectItem value="new">Enter a new address</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
+              <FormField
+                control={form.control}
+                name="selectedAddressId"
+                render={({ field }) => (
+                  <FormItem className="mb-4">
+                    <FormLabel>Select Address</FormLabel>
+                    <Select value={field.value} onValueChange={handleAddressSelect}>
+                      <FormControl>
+                        <SelectTrigger className="w-full">
+                          <SelectValue placeholder="Select an address" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {savedAddresses.map((addr) => (
+                          <SelectItem key={addr.id} value={addr.id}>
+                            {formatAddressPreview(addr)}
+                          </SelectItem>
+                        ))}
+                        <SelectItem value="new">Enter a new address</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
             )}
 
             <AddressFields fieldPrefix="shippingAddress." />

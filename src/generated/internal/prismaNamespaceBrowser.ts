@@ -66,7 +66,8 @@ export const ModelName = {
   CartItem: 'CartItem',
   Order: 'Order',
   OrderItem: 'OrderItem',
-  HeroBanner: 'HeroBanner'
+  HeroBanner: 'HeroBanner',
+  Metric: 'Metric'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -317,6 +318,17 @@ export const HeroBannerScalarFieldEnum = {
 } as const
 
 export type HeroBannerScalarFieldEnum = (typeof HeroBannerScalarFieldEnum)[keyof typeof HeroBannerScalarFieldEnum]
+
+
+export const MetricScalarFieldEnum = {
+  id: 'id',
+  type: 'type',
+  name: 'name',
+  duration: 'duration',
+  createdAt: 'createdAt'
+} as const
+
+export type MetricScalarFieldEnum = (typeof MetricScalarFieldEnum)[keyof typeof MetricScalarFieldEnum]
 
 
 export const SortOrder = {

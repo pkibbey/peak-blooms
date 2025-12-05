@@ -838,6 +838,7 @@ async function main() {
       data: {
         firstName: "Test",
         lastName: "Customer",
+        company: "Test Florist",
         street1: "123 Flower Lane",
         city: "Portland",
         state: "OR",
@@ -901,6 +902,7 @@ async function main() {
       data: {
         firstName: "Test",
         lastName: "Customer",
+        company: "Local Flowers",
         street1: "456 Rose Garden Ln",
         city: "Seattle",
         state: "WA",

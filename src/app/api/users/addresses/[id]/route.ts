@@ -127,6 +127,23 @@ export async function DELETE(_request: Request, { params }: RouteParams) {
       where: { id },
     })
 
+    // After deletion, check if the deleted address was the default
+    if (existingAddress.isDefault) {
+      // Get the count of remaining addresses for this user
+      const remainingAddresses = await db.address.findMany({
+        where: { userId: user.id },
+        orderBy: { createdAt: "asc" },
+      })
+
+      // If there's exactly one remaining address, make it the default
+      if (remainingAddresses.length === 1) {
+        await db.address.update({
+          where: { id: remainingAddresses[0].id },
+          data: { isDefault: true },
+        })
+      }
+    }
+
     return NextResponse.json({ message: "Address deleted" })
   } catch (error) {
     console.error("Error deleting address:", error)

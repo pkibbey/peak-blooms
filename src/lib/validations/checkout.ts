@@ -10,7 +10,7 @@ export const checkoutSchema = z
     shippingAddress: addressSchema,
     saveShippingAddress: z.boolean(),
     differentBilling: z.boolean(),
-    billingAddress: addressSchema.optional(),
+    billingAddress: addressSchema.nullable(),
   })
   .refine(
     (data) => {
