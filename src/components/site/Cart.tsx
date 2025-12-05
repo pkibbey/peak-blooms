@@ -25,6 +25,7 @@ export default function Cart({ initialCart }: CartProps) {
   const router = useRouter()
   const [cart, setCart] = useState<CartData>(initialCart)
   const [updatingItems, setUpdatingItems] = useState<Set<string>>(new Set())
+  const [isEmptying, setIsEmptying] = useState(false)
 
   // Debounced API call for quantity updates
   const debouncedQuantityUpdate = useDebouncedCallback(async (...args: readonly unknown[]) => {
@@ -132,6 +133,34 @@ export default function Cart({ initialCart }: CartProps) {
     }
   }
 
+  const emptyCart = async () => {
+    if (!window.confirm("Are you sure you want to empty your cart? This will remove all items.")) {
+      return
+    }
+
+    // Keep a copy in case we need to revert
+    const previousCart = cart
+    setIsEmptying(true)
+    // Optimistic UI: clear locally first
+    setCart((prev) => ({ ...prev, items: [], total: 0 }))
+
+    try {
+      const response = await fetch("/api/cart", { method: "DELETE" })
+      if (!response.ok) {
+        throw new Error("Failed to empty cart")
+      }
+
+      toast.success("Cart cleared")
+      router.refresh()
+    } catch (err) {
+      console.error("Error clearing cart:", err)
+      toast.error("Failed to clear cart")
+      // revert
+      setCart(previousCart)
+    }
+    setIsEmptying(false)
+  }
+
   if (cart.items.length === 0) {
     return (
       <EmptyState
@@ -165,7 +194,7 @@ export default function Cart({ initialCart }: CartProps) {
       {/* Order Summary */}
       <div className="lg:col-span-1">
         <div className="bg-white rounded-xs shadow-sm border p-6 sticky top-24">
-          <h2 className="heading-2 mb-4 font-serif">Order Summary</h2>
+          <h2 className="heading-3 mb-4 font-serif">Order Summary</h2>
 
           <div className="space-y-2 text-sm">
             <div className="flex justify-between">
@@ -195,6 +224,17 @@ export default function Cart({ initialCart }: CartProps) {
             <Button variant="outline" asChild className="w-full">
               <Link href="/shop">Continue Shopping</Link>
             </Button>
+            <div className="mt-3">
+              <Button
+                variant="ghost"
+                size="sm"
+                className="w-full text-destructive"
+                onClick={emptyCart}
+                disabled={isEmptying}
+              >
+                {isEmptying ? "Clearing..." : "Empty cart"}
+              </Button>
+            </div>
           </div>
         </div>
       </div>

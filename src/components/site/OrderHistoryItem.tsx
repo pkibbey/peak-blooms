@@ -8,6 +8,7 @@ interface OrderItem {
   id: string
   productId: string
   productVariantId: string | null
+  quantity: number
   product: {
     name: string
     image: string | null
@@ -74,6 +75,7 @@ export default function OrderHistoryItem({ order }: OrderHistoryItemProps) {
           items={order.items.map((item) => ({
             productId: item.productId,
             productVariantId: item.productVariantId,
+            quantity: item.quantity,
           }))}
         />
       </div>

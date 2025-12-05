@@ -9,6 +9,7 @@ import { IconRefresh } from "@/components/ui/icons"
 interface OrderItem {
   productId: string
   productVariantId: string | null
+  quantity: number
 }
 
 interface ReorderButtonProps {
@@ -30,11 +31,12 @@ export default function ReorderButton({ orderNumber, items }: ReorderButtonProps
     try {
       const productIds = items.map((item) => item.productId)
       const productVariantIds = items.map((item) => item.productVariantId)
+      const quantities = items.map((item) => Math.max(1, Number(item.quantity || 1)))
 
       const response = await fetch("/api/cart/batch", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ productIds, productVariantIds }),
+        body: JSON.stringify({ productIds, productVariantIds, quantities }),
       })
 
       if (!response.ok) {
@@ -42,7 +44,10 @@ export default function ReorderButton({ orderNumber, items }: ReorderButtonProps
         throw new Error(data.error || "Failed to add items to cart")
       }
 
-      toast.success(`Added ${items.length} items from order ${orderNumber} to your cart`)
+      const totalUnits = quantities.reduce((s, q) => s + q, 0)
+      toast.success(
+        `Added ${totalUnits} item${totalUnits !== 1 ? "s" : ""} from order ${orderNumber} to your cart`
+      )
       router.refresh()
       router.push("/cart")
     } catch (error) {

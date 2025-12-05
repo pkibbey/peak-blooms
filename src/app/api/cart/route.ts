@@ -113,3 +113,37 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Failed to add item to cart" }, { status: 500 })
   }
 }
+
+/**
+ * DELETE /api/cart
+ * Clear all items from the current user's cart
+ */
+export async function DELETE() {
+  try {
+    const user = await getCurrentUser()
+
+    if (!user) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+    }
+
+    if (!user.approved) {
+      return NextResponse.json(
+        { error: "Your account is not approved for purchases" },
+        { status: 403 }
+      )
+    }
+
+    const cart = await db.shoppingCart.findUnique({ where: { userId: user.id } })
+    if (!cart) {
+      // Nothing to clear
+      return NextResponse.json({ ok: true }, { status: 200 })
+    }
+
+    await db.cartItem.deleteMany({ where: { cartId: cart.id } })
+
+    return NextResponse.json({ ok: true }, { status: 200 })
+  } catch (error) {
+    console.error("DELETE /api/cart error:", error)
+    return NextResponse.json({ error: "Failed to clear cart" }, { status: 500 })
+  }
+}

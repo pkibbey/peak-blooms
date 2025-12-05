@@ -37,7 +37,7 @@ export default async function AccountPage() {
           <div className="rounded-lg border border-border p-6">
             <div className="flex items-start justify-between gap-4">
               <div>
-                <h2 className="heading-2">Profile</h2>
+                <h2 className="heading-3">Profile</h2>
                 <p className="mt-2 text-sm text-muted-foreground">View your account details</p>
               </div>
               <div className="shrink-0">
@@ -52,7 +52,7 @@ export default async function AccountPage() {
           <div className="rounded-lg border border-border p-6">
             <div className="flex items-start justify-between gap-4">
               <div>
-                <h2 className="heading-2">Addresses</h2>
+                <h2 className="heading-3">Addresses</h2>
                 <p className="mt-2 text-sm text-muted-foreground">
                   {addressCount > 0
                     ? `You have ${addressCount} saved address${addressCount === 1 ? "" : "es"}`
@@ -71,7 +71,7 @@ export default async function AccountPage() {
           <div className="rounded-lg border border-border p-6">
             <div className="flex items-start justify-between gap-4">
               <div>
-                <h2 className="heading-2">Order History</h2>
+                <h2 className="heading-3">Order History</h2>
                 <p className="mt-2 text-sm text-muted-foreground">
                   {orderCount > 0
                     ? `You have ${orderCount} order${orderCount === 1 ? "" : "s"}`
@@ -90,7 +90,7 @@ export default async function AccountPage() {
         {/* Account Info Sidebar */}
         <div className="lg:col-span-1">
           <div className="rounded-lg border border-border p-6 sticky top-24">
-            <h2 className="heading-2 mb-4">Account Information</h2>
+            <h2 className="heading-4 mb-3">Account Information</h2>
             <div className="space-y-4">
               <div>
                 <p className="text-sm text-muted-foreground">Account Status</p>
