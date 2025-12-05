@@ -2,6 +2,7 @@ import * as fs from "node:fs"
 import * as path from "node:path"
 import { PrismaPg } from "@prisma/adapter-pg"
 import { Pool } from "pg"
+import { MetricType } from "@/lib/types/metrics"
 import {
   type HeroBackgroundType,
   type Prisma,
@@ -19,6 +20,27 @@ console.log("Connecting to database...")
 const pool = new Pool({ connectionString })
 const adapter = new PrismaPg(pool)
 const prisma = new PrismaClient({ adapter })
+
+// Helper function to post metrics to the API
+async function captureMetric(type: MetricType, name: string, duration: number): Promise<void> {
+  try {
+    // Use localhost:3000 for local development
+    const response = await fetch("http://localhost:3000/api/admin/metrics", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ type, name, duration }),
+    })
+
+    if (!response.ok) {
+      console.warn(`⚠️  Failed to post metric "${name}": ${response.status} ${response.statusText}`)
+    }
+  } catch (error) {
+    // Silently fail - don't block seed script if metrics API is unavailable
+    console.warn(`⚠️  Could not post metric to API: ${(error as Error).message}`)
+  }
+}
 
 // Helper function to parse price strings from CSV
 function parsePrice(priceString: string): number {
@@ -175,11 +197,13 @@ async function main() {
   let approvedCustomer: PrismaNamespace.UserModel | null = null
 
   for (const user of testUsers) {
+    const start = performance.now()
     const createdUser = await prisma.user.upsert({
       create: user,
       where: { email: user.email },
       update: user,
     })
+    await captureMetric(MetricType.SEED, "create user", performance.now() - start)
 
     if (user.email === "customer@peakblooms.com") {
       approvedCustomer = createdUser
@@ -223,17 +247,25 @@ async function main() {
   ]
 
   for (const collection of collections) {
+    const start_createCollection = performance.now()
     await prisma.collection.upsert({
       create: collection,
       where: { slug: collection.slug },
       update: collection,
     })
+    await captureMetric(
+      MetricType.SEED,
+      "create collection",
+      performance.now() - start_createCollection
+    )
   }
   console.log(`✅ Created/updated ${collections.length} collections`)
 
   // Seed products from CSV file
   console.log("📦 Seeding products from CSV...")
+  const start_readCSV = performance.now()
   const csvProducts = readProductsFromCSV()
+  await captureMetric(MetricType.SEED, "read products CSV", performance.now() - start_readCSV)
   console.log(`📦 Found ${csvProducts.length} CSV products — starting upsert...`)
   let productsCreated = 0
   let productsSkipped = 0
@@ -247,6 +279,7 @@ async function main() {
         .replace(/^-|-$/g, "")
 
       // Create or update product with single variant
+      const start_createProduct = performance.now()
       const csvProductRecord = await prisma.product.upsert({
         create: {
           name: csvProduct.name,
@@ -274,19 +307,30 @@ async function main() {
           image: csvProduct.image || null, // Update image from CSV
         },
       })
+      await captureMetric(
+        MetricType.SEED,
+        "create product",
+        performance.now() - start_createProduct
+      )
 
       // Update variant for CSV product
+      const start_productVariant = performance.now()
+      const productVariant = await prisma.productVariant.findFirst({
+        where: {
+          productId: csvProductRecord.id,
+          price: csvProduct.price,
+        },
+      })
+      await captureMetric(
+        MetricType.SEED,
+        "get product variant",
+        performance.now() - start_productVariant
+      )
+
+      const start_createProductVariant = performance.now()
       await prisma.productVariant.upsert({
         where: {
-          id:
-            (
-              await prisma.productVariant.findFirst({
-                where: {
-                  productId: csvProductRecord.id,
-                  price: csvProduct.price,
-                },
-              })
-            )?.id || "new",
+          id: productVariant?.id || "new",
         },
         create: {
           productId: csvProductRecord.id,
@@ -297,6 +341,11 @@ async function main() {
           quantityPerBunch: csvProduct.quantity,
         },
       })
+      await captureMetric(
+        MetricType.SEED,
+        "create product variant",
+        performance.now() - start_createProductVariant
+      )
 
       productsCreated++
     } catch (error) {
@@ -318,9 +367,15 @@ async function main() {
 
   // Add CSV products to their appropriate collections (Flowers or Fillers)
   console.log("🏷️  Adding products to collections...")
+  const start_findCollection = performance.now()
   const flowersCollection = await prisma.collection.findUnique({
     where: { slug: "flowers" },
   })
+  await captureMetric(
+    MetricType.SEED,
+    "find flowers collection",
+    performance.now() - start_findCollection
+  )
   const fillersCollection = await prisma.collection.findUnique({
     where: { slug: "fillers" },
   })
@@ -347,6 +402,7 @@ async function main() {
       if (!collectionId) continue
 
       // Create association if it doesn't exist
+      const start_upsertProductCollection = performance.now()
       await prisma.productCollection.upsert({
         where: {
           productId_collectionId: {
@@ -360,6 +416,11 @@ async function main() {
         },
         update: {}, // No update needed, just ensure it exists
       })
+      await captureMetric(
+        MetricType.SEED,
+        "upsert product -> collection",
+        performance.now() - start_upsertProductCollection
+      )
 
       collectionAssociations++
     } catch (error) {
@@ -379,10 +440,16 @@ async function main() {
   // of featured products for UI/marketing sections.
   const featuredSlugs = ["peonies", "sunflower", "hydrangea", "ranunculus-butterfly"]
 
+  const start_updateFeaturedProducts = performance.now()
   const featuredResult = await prisma.product.updateMany({
     where: { slug: { in: featuredSlugs } },
     data: { featured: true },
   })
+  await captureMetric(
+    MetricType.SEED,
+    "update featured products",
+    performance.now() - start_updateFeaturedProducts
+  )
 
   console.log(
     `⭐ Marked ${featuredResult.count ?? 0} products as featured: ${featuredSlugs.join(", ")}`
@@ -390,11 +457,16 @@ async function main() {
 
   // Mark featured collections: Flowers, Fillers, and Exotic Blooms
   const featuredCollectionSlugs = ["flowers", "fillers", "exotic-blooms"]
-
+  const start_updateFeaturedCollections = performance.now()
   const featuredCollectionsResult = await prisma.collection.updateMany({
     where: { slug: { in: featuredCollectionSlugs } },
     data: { featured: true },
   })
+  await captureMetric(
+    MetricType.SEED,
+    "update featured collections",
+    performance.now() - start_updateFeaturedCollections
+  )
 
   console.log(
     `⭐ Marked ${featuredCollectionsResult.count ?? 0} collections as featured: ${featuredCollectionSlugs.join(", ")}`
@@ -416,6 +488,7 @@ async function main() {
       "protea",
     ]
 
+    const start_exoticUpserts = performance.now()
     for (const productSlug of exoticBlomsProductSlugs) {
       try {
         const product = await prisma.product.findUnique({
@@ -437,12 +510,18 @@ async function main() {
           },
           update: {},
         })
+        await captureMetric(MetricType.SEED, "upsert exotic-blooms association", 0)
       } catch (error) {
         console.warn(
           `⚠️  Failed to add ${productSlug} to Exotic Blooms: ${(error as Error).message}`
         )
       }
     }
+    await captureMetric(
+      MetricType.SEED,
+      "upsert exotic-blooms product associations",
+      performance.now() - start_exoticUpserts
+    )
 
     console.log(`✅ Added products to Exotic Blooms collection`)
   }
@@ -542,11 +621,17 @@ async function main() {
   ]
 
   for (const inspiration of inspirations) {
+    const start_upsertInspiration = performance.now()
     await prisma.inspiration.upsert({
       create: inspiration,
       where: { slug: inspiration.slug },
       update: inspiration,
     })
+    await captureMetric(
+      MetricType.SEED,
+      `upsert inspiration`,
+      performance.now() - start_upsertInspiration
+    )
   }
   console.log(`✅ Created/updated ${inspirations.length} inspirations`)
 
@@ -560,23 +645,36 @@ async function main() {
     quantity: number = 1
   ) {
     try {
+      const start_findInspAndProduct = performance.now()
       const inspiration = await prisma.inspiration.findUnique({
         where: { slug: inspirationSlug },
       })
       const product = await prisma.product.findUnique({
         where: { slug: productSlug },
       })
+      await captureMetric(
+        MetricType.SEED,
+        `find inspiration/product: ${inspirationSlug}/${productSlug}`,
+        performance.now() - start_findInspAndProduct
+      )
 
       if (!inspiration || !product) return
 
       // Get first variant of the product
+      const start_findVariant = performance.now()
       const variant = await prisma.productVariant.findFirst({
         where: { productId: product.id },
       })
+      await captureMetric(
+        MetricType.SEED,
+        `find variant for product: ${productSlug}`,
+        performance.now() - start_findVariant
+      )
 
       if (!variant) return
 
       // Upsert to avoid duplicates
+      const start_upsertInspirationProduct = performance.now()
       await prisma.inspirationProduct.upsert({
         where: {
           inspirationId_productId: {
@@ -594,6 +692,11 @@ async function main() {
           quantity: quantity,
         },
       })
+      await captureMetric(
+        MetricType.SEED,
+        "upsert inspiration product",
+        performance.now() - start_upsertInspirationProduct
+      )
     } catch (error) {
       console.warn(
         `⚠️  Failed to add ${productSlug} to ${inspirationSlug}: ${(error as Error).message}`
@@ -689,41 +792,48 @@ async function main() {
   ]
 
   for (const banner of heroBanners) {
+    const start_upsertBanner = performance.now()
     await prisma.heroBanner.upsert({
       where: { slug: banner.slug },
       update: banner,
       create: banner,
     })
+    await captureMetric(
+      MetricType.SEED,
+      `upsert hero banner`,
+      performance.now() - start_upsertBanner
+    )
   }
 
   console.log(`✅ Hero banners seeded/updated: ${heroBanners.map((b) => b.slug).join(", ")}`)
 
   // Create sample orders for the approved customer
+  // Reset existing orders first so seeding is idempotent and deterministic
   if (approvedCustomer) {
-    // Get some product variants for the orders
-    const peachFlowerVariant = await prisma.productVariant.findFirst({
-      where: {
-        product: { slug: "peach-flower" },
-      },
+    const start_resetOrders = performance.now()
+    // Delete all orders (order items will be cascaded)
+    await prisma.order.deleteMany({})
+    await captureMetric(MetricType.SEED, "reset orders", performance.now() - start_resetOrders)
+    // Get the first 3 available product variants to use in sample orders
+    // (previously used specific slugs that are no longer available)
+    const start_findVariants = performance.now()
+    const firstThreeVariants = await prisma.productVariant.findMany({
+      take: 3,
     })
+    await captureMetric(
+      MetricType.SEED,
+      "find first 3 product variants",
+      performance.now() - start_findVariants
+    )
 
-    const pinkRoseVariant = await prisma.productVariant.findFirst({
-      where: {
-        product: { slug: "pink-rose" },
-      },
-    })
-
-    const greenFluffyVariant = await prisma.productVariant.findFirst({
-      where: {
-        product: { slug: "green-fluffy" },
-      },
-    })
+    const [variantA, variantB, variantC] = firstThreeVariants
 
     // Create first order (completed order from 30 days ago)
     const order1Date = new Date()
     order1Date.setDate(order1Date.getDate() - 30)
 
     // Create shipping address for first order
+    const start_createAddress1 = performance.now()
     const shippingAddress1 = await prisma.address.create({
       data: {
         firstName: "Test",
@@ -736,6 +846,13 @@ async function main() {
         isDefault: true,
       },
     })
+    await captureMetric(
+      MetricType.SEED,
+      "create shipping address 1",
+      performance.now() - start_createAddress1
+    )
+
+    const order1Total = (variantA ? variantA.price * 2 : 0) + (variantB ? variantB.price * 1 : 0)
 
     const order1 = await prisma.order.create({
       data: {
@@ -743,25 +860,25 @@ async function main() {
         userId: approvedCustomer.id,
         email: approvedCustomer.email,
         status: "DELIVERED",
-        total: 242.0,
+        total: order1Total,
         createdAt: order1Date,
         shippingAddressId: shippingAddress1.id,
         items: {
           create: [
-            peachFlowerVariant
+            variantA
               ? {
-                  productId: peachFlowerVariant.productId,
-                  productVariantId: peachFlowerVariant.id,
+                  productId: variantA.productId,
+                  productVariantId: variantA.id,
                   quantity: 2,
-                  price: 55.0,
+                  price: variantA.price,
                 }
               : undefined,
-            greenFluffyVariant
+            variantB
               ? {
-                  productId: greenFluffyVariant.productId,
-                  productVariantId: greenFluffyVariant.id,
+                  productId: variantB.productId,
+                  productVariantId: variantB.id,
                   quantity: 1,
-                  price: 110.0,
+                  price: variantB.price,
                 }
               : undefined,
           ].filter(
@@ -770,6 +887,7 @@ async function main() {
         },
       },
     })
+    await captureMetric(MetricType.SEED, "create order 30-days-ago", 0)
 
     console.log(`✅ Created completed order from 30 days ago: ${order1.id}`)
 
@@ -778,6 +896,7 @@ async function main() {
     order2Date.setDate(order2Date.getDate() - 5)
 
     // Create shipping address for second order
+    const start_createAddress2 = performance.now()
     const shippingAddress2 = await prisma.address.create({
       data: {
         firstName: "Test",
@@ -790,6 +909,16 @@ async function main() {
         isDefault: false,
       },
     })
+    await captureMetric(
+      MetricType.SEED,
+      "create shipping address 2",
+      performance.now() - start_createAddress2
+    )
+
+    const order2Total =
+      (variantA ? variantA.price * 1 : 0) +
+      (variantB ? variantB.price * 2 : 0) +
+      (variantC ? variantC.price * 1 : 0)
 
     const order2 = await prisma.order.create({
       data: {
@@ -797,33 +926,33 @@ async function main() {
         userId: approvedCustomer.id,
         email: approvedCustomer.email,
         status: "CONFIRMED",
-        total: 374.0,
+        total: order2Total,
         createdAt: order2Date,
         shippingAddressId: shippingAddress2.id,
         items: {
           create: [
-            pinkRoseVariant
+            variantA
               ? {
-                  productId: pinkRoseVariant.productId,
-                  productVariantId: pinkRoseVariant.id,
+                  productId: variantA.productId,
+                  productVariantId: variantA.id,
                   quantity: 1,
-                  price: 75.0,
+                  price: variantA.price,
                 }
               : undefined,
-            greenFluffyVariant
+            variantB
               ? {
-                  productId: greenFluffyVariant.productId,
-                  productVariantId: greenFluffyVariant.id,
+                  productId: variantB.productId,
+                  productVariantId: variantB.id,
                   quantity: 2,
-                  price: 130.0,
+                  price: variantB.price,
                 }
               : undefined,
-            peachFlowerVariant
+            variantC
               ? {
-                  productId: peachFlowerVariant.productId,
-                  productVariantId: peachFlowerVariant.id,
+                  productId: variantC.productId,
+                  productVariantId: variantC.id,
                   quantity: 1,
-                  price: 55.0,
+                  price: variantC.price,
                 }
               : undefined,
           ].filter(
@@ -832,6 +961,7 @@ async function main() {
         },
       },
     })
+    await captureMetric(MetricType.SEED, "create order 5-days-ago", 0)
 
     console.log(`✅ Created confirmed order from 5 days ago: ${order2.id}`)
   }

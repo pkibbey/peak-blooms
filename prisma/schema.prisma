@@ -281,10 +281,27 @@ model HeroBanner {
   @@index([slotPosition])
 }
 
+model Metric {
+  id        String      @id @default(cuid())
+  type      MetricType
+  name      String
+  duration  Float
+  createdAt DateTime    @default(now())
+
+  @@index([type])
+  @@index([createdAt])
+}
+
 enum Role {
   CUSTOMER
   ADMIN
   NEWSLETTER_SUBSCRIBER
+}
+
+enum MetricType {
+  SEED
+  QUERY
+  FETCH
 }
 
 enum OrderStatus {

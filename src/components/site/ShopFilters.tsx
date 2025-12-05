@@ -214,7 +214,7 @@ export function ShopFilters({
       {/* Filter Panel */}
       <div
         className={cn(
-          "fixed left-0 top-0 bottom-0 w-72 bg-white shadow-lg transition-transform lg:static lg:shadow-none lg:w-auto lg:bg-transparent p-4 lg:p-0 z-50 lg:z-auto",
+          "fixed left-0 top-0 bottom-0 w-64 bg-white shadow-lg transition-transform lg:static lg:shadow-none lg:w-auto lg:bg-transparent p-4 lg:p-0 z-50 lg:z-auto",
           isOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
         )}
       >

@@ -4,6 +4,8 @@ import Link from "next/link"
 import { useCallback, useEffect, useMemo, useState } from "react"
 import AddToCartButton from "@/components/site/AddToCartButton"
 import { Button } from "@/components/ui/button"
+import { IconMinus, IconPlus } from "@/components/ui/icons"
+import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { cn, formatPrice } from "@/lib/utils"
 
@@ -195,6 +197,11 @@ export function ProductControls({ product, user, mode = "card" }: ProductControl
 
   const showSelectors = isApproved && hasVariants && (stemLengths.length >= 1 || counts.length >= 1)
 
+  // Local state for number of units to add to cart from the product card
+  const [addQuantity, setAddQuantity] = useState<number>(1)
+
+  const clampAddQuantity = (v: number) => Math.max(1, Math.min(999, Math.floor(Number(v) || 1)))
+
   return (
     <div className={cn("flex flex-col", mode === "detail" ? "gap-6" : "gap-3 mt-6")}>
       {/* Variant Selectors */}
@@ -304,12 +311,44 @@ export function ProductControls({ product, user, mode = "card" }: ProductControl
           Waiting on Account Approval
         </Button>
       ) : (
-        <AddToCartButton
-          productId={product.id}
-          productVariantId={selectedVariant?.id ?? null}
-          productName={product.name}
-          disabled={hasVariants && !selectedVariant}
-        />
+        <div className={cn("flex items-center gap-2 flex-wrap", mode === "detail" ? "" : "")}>
+          {/* compact quantity stepper for card / detail modes */}
+          <div className="flex items-center gap-1">
+            <Button
+              type="button"
+              variant="outline"
+              size="icon-sm"
+              onClick={() => setAddQuantity((q) => Math.max(1, q - 1))}
+              aria-label="Decrease quantity"
+            >
+              <IconMinus className="h-3 w-3" />
+            </Button>
+            <Input
+              type="number"
+              min={1}
+              value={addQuantity}
+              onChange={(e) => setAddQuantity(clampAddQuantity(parseInt(e.target.value, 10)))}
+              className="w-12 h-8 text-center text-xs px-1"
+            />
+            <Button
+              type="button"
+              variant="outline"
+              size="icon-sm"
+              onClick={() => setAddQuantity((q) => Math.min(999, q + 1))}
+              aria-label="Increase quantity"
+            >
+              <IconPlus className="h-3 w-3" />
+            </Button>
+          </div>
+
+          <AddToCartButton
+            productId={product.id}
+            productVariantId={selectedVariant?.id ?? null}
+            quantity={addQuantity}
+            productName={product.name}
+            disabled={hasVariants && !selectedVariant}
+          />
+        </div>
       )}
     </div>
   )

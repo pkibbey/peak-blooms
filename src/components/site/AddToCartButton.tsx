@@ -11,6 +11,7 @@ interface AddToCartButtonProps {
   productVariantId?: string | null
   productName?: string
   disabled?: boolean
+  quantity?: number
 }
 
 export default function AddToCartButton({
@@ -18,6 +19,7 @@ export default function AddToCartButton({
   productVariantId,
   productName,
   disabled,
+  quantity = 1,
 }: AddToCartButtonProps) {
   const router = useRouter()
   const { data: session } = useSession()
@@ -35,6 +37,9 @@ export default function AddToCartButton({
     setError(null)
 
     try {
+      const raw = Number(quantity)
+      const qty = Number.isNaN(raw) ? 1 : Math.max(1, Math.floor(raw))
+
       const response = await fetch("/api/cart", {
         method: "POST",
         headers: {
@@ -43,7 +48,7 @@ export default function AddToCartButton({
         body: JSON.stringify({
           productId,
           productVariantId: productVariantId || undefined,
-          quantity: 1,
+          quantity: qty,
         }),
       })
 
@@ -52,8 +57,14 @@ export default function AddToCartButton({
         throw new Error(data.error || "Failed to add to cart")
       }
 
-      // Show success message
-      toast.success(productName ? `Added "${productName}" to cart!` : "Added to cart!")
+      // Show success message — reflect the quantity when > 1
+      if (qty > 1) {
+        toast.success(
+          productName ? `Added ${qty} × "${productName}" to cart!` : `Added ${qty} items to cart!`
+        )
+      } else {
+        toast.success(productName ? `Added "${productName}" to cart!` : "Added to cart!")
+      }
 
       // Refresh the page to update cart count and other server components
       router.refresh()

@@ -1,5 +1,6 @@
 import {
   ArrowRight,
+  BarChart3,
   CheckCircle,
   Clock,
   Eye,
@@ -181,6 +182,12 @@ export function IconRefresh(props: React.ComponentProps<typeof RefreshCw>) {
 export function IconLogOut(props: React.ComponentProps<typeof LogOut>) {
   return (
     <LogOut {...props} className={[IconSizeClass, props.className].filter(Boolean).join(" ")} />
+  )
+}
+
+export function IconBarChart3(props: React.ComponentProps<typeof BarChart3>) {
+  return (
+    <BarChart3 {...props} className={[IconSizeClass, props.className].filter(Boolean).join(" ")} />
   )
 }
 

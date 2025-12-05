@@ -15,7 +15,8 @@
     },
     "Prisma-Local": {
       "command": "npx",
-      "args": ["-y", "prisma", "mcp"]
+      "args": ["-y", "prisma", "mcp"],
+      "envFile": "${workspaceFolder}/.env.local"
     },
     "Vercel": {
       "url": "https://mcp.vercel.com",

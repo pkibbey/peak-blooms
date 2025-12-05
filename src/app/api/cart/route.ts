@@ -89,9 +89,10 @@ export async function POST(request: NextRequest) {
 
     let cartItem: Awaited<ReturnType<typeof db.cartItem.create>>
     if (existingItem) {
+      // SET the quantity to the provided value (absolute) rather than incrementing
       cartItem = await db.cartItem.update({
         where: { id: existingItem.id },
-        data: { quantity: existingItem.quantity + quantity },
+        data: { quantity },
         include: { product: true, productVariant: true },
       })
     } else {
