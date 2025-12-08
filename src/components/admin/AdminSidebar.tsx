@@ -9,9 +9,11 @@ import {
   IconStar,
   IconUser,
 } from "@/components/ui/icons"
-import { db } from "@/lib/db"
+import { getTrackedDb } from "@/lib/db"
 
 export default async function AdminSidebar() {
+  const db = getTrackedDb(true)
+
   // lightweight counts for nav badges
   const pendingOrders = await db.order.count({ where: { status: "PENDING" } })
   const pendingApprovals = await db.user.count({ where: { approved: false } })
@@ -107,17 +109,6 @@ export default async function AdminSidebar() {
           >
             <span className="flex items-center gap-2">
               <IconBarChart3 className="h-4 w-4 text-muted-foreground" /> Database Metrics
-            </span>
-          </Link>
-        </li>
-
-        <li>
-          <Link
-            href="/admin/seed-metrics"
-            className="flex items-center justify-between w-full hover:underline"
-          >
-            <span className="flex items-center gap-2">
-              <IconBarChart3 className="h-4 w-4 text-muted-foreground" /> Seed Metrics
             </span>
           </Link>
         </li>

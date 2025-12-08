@@ -21,7 +21,9 @@ export type Role = (typeof Role)[keyof typeof Role]
 export const MetricType = {
   SEED: 'SEED',
   QUERY: 'QUERY',
-  FETCH: 'FETCH'
+  FETCH: 'FETCH',
+  ADMIN_QUERY: 'ADMIN_QUERY',
+  USER_QUERY: 'USER_QUERY'
 } as const
 
 export type MetricType = (typeof MetricType)[keyof typeof MetricType]

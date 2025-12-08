@@ -2,13 +2,15 @@ import Link from "next/link"
 import CollectionsTable from "@/components/admin/CollectionsTable"
 import BackLink from "@/components/site/BackLink"
 import { Button } from "@/components/ui/button"
-import { db } from "@/lib/db"
+import { getTrackedDb } from "@/lib/db"
 
 interface AdminCollectionsPageProps {
   searchParams: Promise<Record<string, string | string[] | undefined>>
 }
 
 export default async function AdminCollectionsPage({ searchParams }: AdminCollectionsPageProps) {
+  const db = getTrackedDb(true)
+
   const params = await searchParams
   // Parse sort params
   const sort = typeof params?.sort === "string" ? params.sort : undefined

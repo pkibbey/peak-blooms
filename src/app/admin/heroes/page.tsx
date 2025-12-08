@@ -2,13 +2,15 @@ import Link from "next/link"
 import HeroesTable from "@/components/admin/HeroesTable"
 import BackLink from "@/components/site/BackLink"
 import { Button } from "@/components/ui/button"
-import { db } from "@/lib/db"
+import { getTrackedDb } from "@/lib/db"
 
 interface AdminHeroesPageProps {
   searchParams: Promise<Record<string, string | string[] | undefined>>
 }
 
 export default async function AdminHeroesPage({ searchParams }: AdminHeroesPageProps) {
+  const db = getTrackedDb(true)
+
   const params = await searchParams
   // Parse sort params
   const sort = typeof params?.sort === "string" ? params.sort : undefined

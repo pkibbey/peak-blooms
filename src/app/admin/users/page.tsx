@@ -1,12 +1,14 @@
 import UsersTable from "@/components/admin/UsersTable"
 import BackLink from "@/components/site/BackLink"
-import { db } from "@/lib/db"
+import { getTrackedDb } from "@/lib/db"
 
 interface AdminUsersPageProps {
   searchParams: Promise<{ sort?: string; order?: string }>
 }
 
 export default async function UsersPage({ searchParams }: AdminUsersPageProps) {
+  const db = getTrackedDb(true)
+
   const { sort, order } = await searchParams
 
   // Fetch users from database (exclude newsletter subscribers)

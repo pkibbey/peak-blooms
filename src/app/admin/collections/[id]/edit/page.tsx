@@ -1,13 +1,15 @@
 import { notFound } from "next/navigation"
 import CollectionForm from "@/components/admin/CollectionForm"
 import BackLink from "@/components/site/BackLink"
-import { db } from "@/lib/db"
+import { getTrackedDb } from "@/lib/db"
 
 interface EditCollectionPageProps {
   params: Promise<{ id: string }>
 }
 
 export default async function EditCollectionPage({ params }: EditCollectionPageProps) {
+  const db = getTrackedDb(true)
+
   const { id } = await params
 
   const collection = await db.collection.findUnique({

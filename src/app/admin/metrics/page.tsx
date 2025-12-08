@@ -17,7 +17,22 @@ export default function MetricsPage() {
         </p>
       </div>
 
-      <MetricsClient types={[MetricType.QUERY]} />
+      <div className="space-y-12">
+        <div>
+          <h2 className="heading-2 mb-4">Admin Database Queries</h2>
+          <MetricsClient types={[MetricType.ADMIN_QUERY]} />
+        </div>
+
+        <div>
+          <h2 className="heading-2 mb-4">User Database Queries</h2>
+          <MetricsClient types={[MetricType.USER_QUERY]} />
+        </div>
+
+        <div>
+          <h2 className="heading-2 mb-4">Seed Operations</h2>
+          <MetricsClient types={[MetricType.SEED]} />
+        </div>
+      </div>
     </>
   )
 }

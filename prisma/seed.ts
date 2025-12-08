@@ -2,9 +2,9 @@ import * as fs from "node:fs"
 import * as path from "node:path"
 import { PrismaPg } from "@prisma/adapter-pg"
 import { Pool } from "pg"
-import { MetricType } from "@/lib/types/metrics"
 import {
   type HeroBackgroundType,
+  MetricType,
   type Prisma,
   PrismaClient,
   type Prisma as PrismaNamespace,

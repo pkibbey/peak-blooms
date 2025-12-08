@@ -45,7 +45,7 @@ export default function Footer() {
               </a>
             </div>
 
-            <div className="mt-4 flex items-center gap-3">
+            <div className="mt-3 flex items-center gap-4 text-sm text-muted-foreground">
               <IconInstagram aria-hidden="true" />
               <a
                 href="https://instagram.com/peakblooms"

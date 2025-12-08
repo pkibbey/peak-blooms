@@ -1,13 +1,15 @@
 import { notFound } from "next/navigation"
 import InspirationForm from "@/components/admin/InspirationForm"
 import BackLink from "@/components/site/BackLink"
-import { db } from "@/lib/db"
+import { getTrackedDb } from "@/lib/db"
 
 interface EditInspirationPageProps {
   params: Promise<{ id: string }>
 }
 
 export default async function EditInspirationPage({ params }: EditInspirationPageProps) {
+  const db = getTrackedDb(true)
+
   const { id } = await params
 
   const [inspiration, products] = await Promise.all([

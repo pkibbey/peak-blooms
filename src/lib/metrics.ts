@@ -1,12 +1,10 @@
 /**
  * Metrics Utility
- * In-memory metrics storage and capture functionality
+ * Database-backed metrics storage and capture functionality
  */
 
+import { db } from "@/lib/db"
 import type { Metric, MetricType } from "@/lib/types/metrics"
-
-// In-memory storage for metrics
-const metricsStore: Metric[] = []
 
 /**
  * Capture a metric by recording its type, name, and duration
@@ -14,32 +12,62 @@ const metricsStore: Metric[] = []
  * @param name - A descriptive name for this metric
  * @param duration - The duration in milliseconds
  */
-export function captureMetric(type: MetricType, name: string, duration: number): void {
+export async function captureMetric(
+  type: MetricType,
+  name: string,
+  duration: number
+): Promise<void> {
   console.log("captureMetric: ", name)
-  metricsStore.push({
-    type,
-    name,
-    duration,
-  })
+  try {
+    await db.metric.create({
+      data: {
+        type,
+        name,
+        duration,
+      },
+    })
+  } catch (error) {
+    // Silently fail if metrics can't be saved - don't break the app
+    console.error("Failed to capture metric:", error)
+  }
 }
 
 /**
  * Get all recorded metrics
  */
-export function getAllMetrics(): Metric[] {
-  return [...metricsStore]
+export async function getAllMetrics(): Promise<Metric[]> {
+  try {
+    return await db.metric.findMany({
+      orderBy: { createdAt: "desc" },
+    })
+  } catch (error) {
+    console.error("Failed to fetch metrics:", error)
+    return []
+  }
 }
 
 /**
  * Clear all recorded metrics
  */
-export function clearMetrics(): void {
-  metricsStore.length = 0
+export async function clearMetrics(): Promise<void> {
+  try {
+    await db.metric.deleteMany({})
+  } catch (error) {
+    console.error("Failed to clear metrics:", error)
+  }
 }
 
 /**
  * Get metrics filtered by types
  */
-export function getMetricsByTypes(types: MetricType[]): Metric[] {
-  return metricsStore.filter((metric) => types.includes(metric.type))
+export async function getMetricsByTypes(types: MetricType[]): Promise<Metric[]> {
+  try {
+    return await db.metric.findMany({
+      where: { type: { in: types } },
+      orderBy: { createdAt: "desc" },
+    })
+  } catch (error) {
+    console.error("Failed to fetch filtered metrics:", error)
+    return []
+  }
 }

@@ -302,6 +302,8 @@ enum MetricType {
   SEED
   QUERY
   FETCH
+  ADMIN_QUERY
+  USER_QUERY
 }
 
 enum OrderStatus {

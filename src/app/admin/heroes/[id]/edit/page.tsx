@@ -1,13 +1,15 @@
 import { notFound } from "next/navigation"
 import HeroForm from "@/components/admin/HeroForm"
 import BackLink from "@/components/site/BackLink"
-import { db } from "@/lib/db"
+import { getTrackedDb } from "@/lib/db"
 
 interface EditHeroPageProps {
   params: Promise<{ id: string }>
 }
 
 export default async function EditHeroPage({ params }: EditHeroPageProps) {
+  const db = getTrackedDb(true)
+
   const { id } = await params
 
   const hero = await db.heroBanner.findUnique({

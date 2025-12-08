@@ -1,13 +1,15 @@
 import { notFound } from "next/navigation"
 import ProductForm from "@/components/admin/ProductForm"
 import BackLink from "@/components/site/BackLink"
-import { db } from "@/lib/db"
+import { getTrackedDb } from "@/lib/db"
 
 interface EditProductPageProps {
   params: Promise<{ id: string }>
 }
 
 export default async function EditProductPage({ params }: EditProductPageProps) {
+  const db = getTrackedDb(true)
+
   const { id } = await params
 
   const [product, collections] = await Promise.all([

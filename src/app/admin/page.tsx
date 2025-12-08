@@ -1,9 +1,11 @@
 import ActivityFeed from "@/components/admin/ActivityFeed"
 import QuickActions from "@/components/admin/QuickActions"
-import { db } from "@/lib/db"
+import { getTrackedDb } from "@/lib/db"
 import { formatPrice } from "@/lib/utils"
 
 export default async function AdminDashboard() {
+  const db = getTrackedDb(true)
+
   // Recent items for activity feed
   const recentOrders = await db.order.findMany({
     orderBy: { createdAt: "desc" },

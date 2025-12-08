@@ -1,8 +1,10 @@
 import InspirationForm from "@/components/admin/InspirationForm"
 import BackLink from "@/components/site/BackLink"
-import { db } from "@/lib/db"
+import { getTrackedDb } from "@/lib/db"
 
 export default async function NewInspirationPage() {
+  const db = getTrackedDb(true)
+
   const products = await db.product.findMany({
     include: {
       productCollections: {

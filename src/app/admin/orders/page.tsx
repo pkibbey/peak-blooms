@@ -1,13 +1,15 @@
 import OrdersTable from "@/components/admin/OrdersTable"
 import BackLink from "@/components/site/BackLink"
 import { OrderStatus } from "@/generated/enums"
-import { db } from "@/lib/db"
+import { getTrackedDb } from "@/lib/db"
 
 interface AdminOrdersPageProps {
   searchParams: Promise<{ status?: string; sort?: string; order?: string }>
 }
 
 export default async function AdminOrdersPage({ searchParams }: AdminOrdersPageProps) {
+  const db = getTrackedDb(true)
+
   const { status, sort, order } = await searchParams
   const statusFilter = status as OrderStatus | undefined
 

@@ -2,13 +2,15 @@ import Link from "next/link"
 import InspirationsTable from "@/components/admin/InspirationsTable"
 import BackLink from "@/components/site/BackLink"
 import { Button } from "@/components/ui/button"
-import { db } from "@/lib/db"
+import { getTrackedDb } from "@/lib/db"
 
 interface AdminInspirationsPageProps {
   searchParams: Promise<Record<string, string | string[] | undefined>>
 }
 
 export default async function AdminInspirationsPage({ searchParams }: AdminInspirationsPageProps) {
+  const db = getTrackedDb(true)
+
   const params = await searchParams
   // Parse sort params
   const sort = typeof params?.sort === "string" ? params.sort : undefined

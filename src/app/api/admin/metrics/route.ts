@@ -15,7 +15,7 @@ export async function GET() {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }
 
-    const metrics = getAllMetrics()
+    const metrics = await getAllMetrics()
     return NextResponse.json(metrics)
   } catch (error) {
     console.error("GET /api/admin/metrics error:", error)
@@ -64,7 +64,7 @@ export async function DELETE() {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }
 
-    clearMetrics()
+    await clearMetrics()
 
     return NextResponse.json({ success: true })
   } catch (error) {

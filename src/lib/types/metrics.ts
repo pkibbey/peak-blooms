@@ -3,14 +3,10 @@
  * Centralized types for database metrics tracking
  */
 
-export enum MetricType {
-  SEED = "SEED",
-  QUERY = "QUERY",
-  FETCH = "FETCH",
-}
+export { MetricType } from "@/generated/enums"
 
 export interface Metric {
-  type: MetricType
+  type: import("@/generated/enums").MetricType
   name: string
   duration: number
 }

@@ -26,67 +26,18 @@ export default function CookiesPage() {
 
       <section className="space-y-3">
         <h2 className="text-2xl font-semibold">How Peak Blooms Uses Cookies</h2>
-        <p>Peak Blooms uses cookies for the following purposes:</p>
-        <h3 className="text-lg font-semibold text-[#1F332E]">Essential Cookies</h3>
         <p>
-          These cookies are necessary for the website to function properly. They enable you to
-          navigate the site, maintain your session, and access secure features.
+          Peak Blooms uses cookies exclusively for essential authentication and security purposes:
+        </p>
+        <h3 className="text-lg font-semibold text-[#1F332E]">Authentication Cookies</h3>
+        <p>
+          These cookies are strictly necessary for the website to function. They enable you to log
+          in, maintain your session, and access your account securely.
         </p>
         <ul className="list-disc list-inside space-y-1">
-          <li>Session cookies for authentication and account management</li>
-          <li>Security cookies to prevent fraud and protect your account</li>
-          <li>Cookies required for form submission and navigation</li>
-        </ul>
-
-        <h3 className="text-lg font-semibold text-[#1F332E] mt-4">Performance Cookies</h3>
-        <p>
-          These cookies help us understand how you use Peak Blooms so we can improve the website and
-          your experience.
-        </p>
-        <ul className="list-disc list-inside space-y-1">
-          <li>Analytics cookies to track page views and user interactions</li>
-          <li>Performance cookies to measure website load times and functionality</li>
-          <li>Cookies to understand which features are most popular</li>
-        </ul>
-
-        <h3 className="text-lg font-semibold text-[#1F332E] mt-4">Preference Cookies</h3>
-        <p>These cookies remember your choices to personalize your experience.</p>
-        <ul className="list-disc list-inside space-y-1">
-          <li>Language and region preferences</li>
-          <li>Display preferences and settings</li>
-          <li>Items saved to your cart or wishlist</li>
-        </ul>
-
-        <h3 className="text-lg font-semibold text-[#1F332E] mt-4">Marketing Cookies</h3>
-        <p>
-          These cookies are used to deliver targeted advertising and track the effectiveness of
-          marketing campaigns.
-        </p>
-        <ul className="list-disc list-inside space-y-1">
-          <li>Cookies for retargeting advertisements</li>
-          <li>Cookies to measure campaign effectiveness</li>
-          <li>Cookies shared with advertising partners</li>
-        </ul>
-      </section>
-
-      <section className="space-y-3">
-        <h2 className="text-2xl font-semibold">Third-Party Cookies</h2>
-        <p>
-          We may allow third-party service providers (such as analytics and advertising partners) to
-          place cookies on your device. These third parties have their own cookie policies and may
-          use the information collected for their own purposes.
-        </p>
-        <p>Common third parties include:</p>
-        <ul className="list-disc list-inside space-y-1">
-          <li>
-            <strong>Google Analytics:</strong> For website analytics and traffic measurement
-          </li>
-          <li>
-            <strong>Payment Processors:</strong> For secure payment processing
-          </li>
-          <li>
-            <strong>Advertising Networks:</strong> For targeted advertising
-          </li>
+          <li>Session cookies to keep you logged in</li>
+          <li>Security cookies to protect against unauthorized access</li>
+          <li>Cookies required for account management</li>
         </ul>
       </section>
 
@@ -106,13 +57,13 @@ export default function CookiesPage() {
       </section>
 
       <section className="space-y-3">
-        <h2 className="text-2xl font-semibold">Managing Your Cookie Preferences</h2>
+        <h2 className="text-2xl font-semibold">Managing Your Cookies</h2>
         <p>
-          You have control over how cookies are used on your device. Most browsers allow you to
-          refuse cookies or alert you when cookies are being sent.
+          Since Peak Blooms uses authentication cookies that are essential for the website to
+          function, they cannot be disabled without affecting your ability to log in and access your
+          account.
         </p>
-        <h3 className="text-lg font-semibold text-[#1F332E]">Browser Controls</h3>
-        <p>You can typically manage cookies through your browser settings:</p>
+        <p>If you wish to manage cookies on your device, you can adjust your browser settings:</p>
         <ul className="list-disc list-inside space-y-1">
           <li>Chrome: Visit chrome://settings/cookies</li>
           <li>Firefox: Go to Preferences &gt; Privacy &amp; Security &gt; Cookies</li>
@@ -120,34 +71,16 @@ export default function CookiesPage() {
           <li>Edge: Settings &gt; Privacy &gt; Cookies</li>
         </ul>
         <p className="mt-3">
-          For instructions on managing cookies in other browsers, consult your browser's help
-          documentation.
-        </p>
-
-        <h3 className="text-lg font-semibold text-[#1F332E] mt-4">Opt-Out of Marketing Cookies</h3>
-        <p>
-          You can opt out of certain marketing and tracking cookies. However, disabling cookies may
-          affect website functionality and your browsing experience.
+          Please note that disabling cookies will prevent you from logging in to your account.
         </p>
       </section>
 
       <section className="space-y-3">
-        <h2 className="text-2xl font-semibold">Impact of Disabling Cookies</h2>
-        <p>If you disable cookies, certain features of Peak Blooms may not function properly:</p>
-        <ul className="list-disc list-inside space-y-1">
-          <li>You may not be able to stay logged in</li>
-          <li>Your preferences and saved items may not be remembered</li>
-          <li>Some website features may be unavailable</li>
-          <li>Analytics will be less accurate, which we use to improve the site</li>
-        </ul>
-      </section>
-
-      <section className="space-y-3">
-        <h2 className="text-2xl font-semibold">Do Not Track (DNT)</h2>
+        <h2 className="text-2xl font-semibold">California Privacy</h2>
         <p>
-          Some browsers include a "Do Not Track" feature. Currently, there is no industry standard
-          for recognizing DNT signals. Peak Blooms does not currently respond to DNT browser
-          signals, but we respect your privacy choices through other means.
+          Peak Blooms operates in California and complies with applicable California privacy laws.
+          Since we only use authentication cookies that are strictly necessary for website
+          functionality, additional cookie consent is not required under California law.
         </p>
       </section>
 

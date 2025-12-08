@@ -5,7 +5,7 @@ import BackLink from "@/components/site/BackLink"
 import { OrderItemsCard } from "@/components/site/OrderItemsCard"
 import { type OrderStatus, OrderStatusBadge } from "@/components/site/OrderStatusBadge"
 import { IconMapPin } from "@/components/ui/icons"
-import { db } from "@/lib/db"
+import { getTrackedDb } from "@/lib/db"
 import { formatDate } from "@/lib/utils"
 
 interface AdminOrderDetailPageProps {
@@ -13,6 +13,8 @@ interface AdminOrderDetailPageProps {
 }
 
 export default async function AdminOrderDetailPage({ params }: AdminOrderDetailPageProps) {
+  const db = getTrackedDb(true)
+
   const { id } = await params
 
   // Fetch the order
