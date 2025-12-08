@@ -47,9 +47,10 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
 
     const { id } = await params
     const body = await request.json()
+    const { productIds, ...collectionData } = body
 
     // Partial validation - allow partial updates
-    const validationResult = collectionSchema.partial().safeParse(body)
+    const validationResult = collectionSchema.partial().safeParse(collectionData)
 
     if (!validationResult.success) {
       const firstError = validationResult.error.issues[0]
@@ -78,6 +79,15 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
         ...(image !== undefined && { image }),
         ...(description !== undefined && { description }),
         ...(featured !== undefined && { featured }),
+        // Handle product associations
+        ...(productIds !== undefined && {
+          productCollections: {
+            deleteMany: {},
+            create: productIds.map((productId: string) => ({
+              productId,
+            })),
+          },
+        }),
       },
     })
 

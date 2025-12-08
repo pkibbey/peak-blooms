@@ -31,7 +31,9 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json()
-    const validationResult = collectionSchema.safeParse(body)
+    const { productIds, ...collectionData } = body
+
+    const validationResult = collectionSchema.safeParse(collectionData)
 
     if (!validationResult.success) {
       const firstError = validationResult.error.issues[0]
@@ -41,7 +43,7 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    const { name, slug, image, description } = validationResult.data
+    const { name, slug, image, description, featured } = validationResult.data
 
     const collection = await db.collection.create({
       data: {
@@ -49,6 +51,12 @@ export async function POST(request: NextRequest) {
         slug,
         image: image || null,
         description: description || null,
+        featured: featured || false,
+        productCollections: {
+          create: (productIds || []).map((productId: string) => ({
+            productId,
+          })),
+        },
       },
     })
 

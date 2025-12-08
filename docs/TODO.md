@@ -1,7 +1,4 @@
 ## 🛠️ Website To-Do List
-- Admin Collection page needs to be able to manage the products in the collection
-- Add the ability to edit the quantity suggested by the inspiration page before adding to the cart
-- When shop filters are selected they should let the user know they have filters applied, in case the filter is collapsed
 
 ### 🌟 Next Steps
 

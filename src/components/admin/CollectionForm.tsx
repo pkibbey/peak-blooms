@@ -7,6 +7,7 @@ import { useState } from "react"
 import { useForm } from "react-hook-form"
 import { toast } from "sonner"
 import { ImageUpload } from "@/components/admin/ImageUpload"
+import ProductMultiSelectSimple from "@/components/admin/ProductMultiSelectSimple"
 import SlugInput from "@/components/admin/SlugInput"
 import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
@@ -23,6 +24,22 @@ import { Textarea } from "@/components/ui/textarea"
 import { type CollectionFormData, collectionSchema } from "@/lib/validations/collection"
 import { IconTrash } from "../ui/icons"
 
+interface ProductVariant {
+  id: string
+  price: number
+  stemLength: number | null
+  quantityPerBunch: number | null
+}
+
+interface Product {
+  id: string
+  name: string
+  collection?: {
+    name: string
+  }
+  variants?: ProductVariant[]
+}
+
 interface CollectionFormProps {
   collection?: {
     id: string
@@ -34,10 +51,14 @@ interface CollectionFormProps {
     _count?: {
       productCollections: number
     }
+    productCollections?: Array<{
+      productId: string
+    }>
   }
+  products?: Product[]
 }
 
-export default function CollectionForm({ collection }: CollectionFormProps) {
+export default function CollectionForm({ collection, products = [] }: CollectionFormProps) {
   const router = useRouter()
   const isEditing = !!collection
 
@@ -45,6 +66,11 @@ export default function CollectionForm({ collection }: CollectionFormProps) {
   const [originalImage] = useState(collection?.image || "")
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [isDeleting, setIsDeleting] = useState(false)
+
+  // Product selection state
+  const [selectedProductIds, setSelectedProductIds] = useState<string[]>(
+    collection?.productCollections?.map((pc) => pc.productId) || []
+  )
 
   const form = useForm<CollectionFormData>({
     resolver: zodResolver(collectionSchema),
@@ -67,7 +93,10 @@ export default function CollectionForm({ collection }: CollectionFormProps) {
       const response = await fetch(url, {
         method,
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
+        body: JSON.stringify({
+          ...data,
+          productIds: selectedProductIds,
+        }),
       })
 
       if (response.ok) {
@@ -202,6 +231,21 @@ export default function CollectionForm({ collection }: CollectionFormProps) {
           previousUrl={originalImage}
           label="Image"
         />
+
+        {/* Products */}
+        {products.length > 0 && (
+          <div className="space-y-2">
+            <FormLabel>Products in Collection</FormLabel>
+            <p className="text-xs text-muted-foreground mb-2">
+              Select products to add to this collection
+            </p>
+            <ProductMultiSelectSimple
+              products={products}
+              selectedIds={selectedProductIds}
+              onChange={setSelectedProductIds}
+            />
+          </div>
+        )}
 
         {/* Actions */}
         <div className="flex gap-4 justify-between">

@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from "next/navigation"
 import { useCallback, useState } from "react"
 import { ColorSelector } from "@/components/site/ColorSelector"
 import { SearchInput } from "@/components/site/SearchInput"
+import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
 import { cn } from "@/lib/utils"
@@ -47,6 +48,14 @@ export function ShopFilters({
     priceMin ? 1 : 0,
     priceMax ? 1 : 0,
   ].filter(Boolean).length
+
+  console.log("activeFilterCount: ", activeFilterCount)
+
+  // Track which sections have active filters
+  const hasActiveColors = selectedColors.length > 0
+  const hasActiveCollections = selectedCollectionIds.length > 0
+  const hasActiveStemLength = !!stemLengthMin || !!stemLengthMax
+  const hasActivePrice = !!priceMin || !!priceMax
 
   // Helper to build and navigate to filter URL
   const navigateWithFilters = useCallback(
@@ -190,15 +199,17 @@ export function ShopFilters({
     <>
       {/* Mobile Filter Button */}
       <div className="lg:hidden">
-        <Button variant="outline" size="sm" onClick={() => setIsOpen(!isOpen)} className="gap-2">
-          <Filter className="h-4 w-4" />
-          Filters
+        <div className="relative inline-block">
+          <Button variant="outline" size="sm" onClick={() => setIsOpen(!isOpen)} className="gap-2">
+            <Filter className="h-4 w-4" />
+            Filters
+          </Button>
           {activeFilterCount > 0 && (
-            <span className="ml-1 rounded-full bg-amber-100 text-amber-800 text-xs font-medium px-2 py-0.5">
+            <Badge variant="destructive" className="absolute -top-2 -right-2 text-xs">
               {activeFilterCount}
-            </span>
+            </Badge>
           )}
-        </Button>
+        </div>
       </div>
 
       {/* Mobile Overlay */}
@@ -220,7 +231,14 @@ export function ShopFilters({
       >
         {/* Header with close button (mobile only) */}
         <div className="flex items-center justify-between mb-6 lg:hidden">
-          <h2 className="font-semibold text-lg">Filters</h2>
+          <div className="flex items-center gap-2">
+            <h2 className="font-semibold text-lg">Filters</h2>
+            {activeFilterCount > 0 && (
+              <Badge variant="secondary" className="text-xs">
+                {activeFilterCount} active
+              </Badge>
+            )}
+          </div>
           <Button
             variant="ghost"
             size="sm"
@@ -231,13 +249,23 @@ export function ShopFilters({
           </Button>
         </div>
 
+        {/* Desktop filter header indicator */}
+        <div className="hidden lg:flex items-center gap-2 mb-6 pb-4 border-b">
+          <h2 className="font-semibold text-sm">Filters</h2>
+          {activeFilterCount > 0 && (
+            <Badge variant="secondary" className="text-xs bg-amber-400">
+              {activeFilterCount} active
+            </Badge>
+          )}
+        </div>
+
         <div className="space-y-6">
           {/* Search Filter */}
           <SearchInput />
 
           {/* Colors Filter */}
           {availableColorIds.length > 0 && (
-            <FilterSection title="Color">
+            <FilterSection title="Color" hasActive={hasActiveColors}>
               <ColorSelector
                 selectedColors={selectedColors}
                 onChange={handleColorsChange}
@@ -249,7 +277,7 @@ export function ShopFilters({
 
           {/* Collection Filter */}
           {availableCollections.length > 0 && (
-            <FilterSection title="Collection">
+            <FilterSection title="Collection" hasActive={hasActiveCollections}>
               <div className="space-y-3">
                 <div className="flex items-center gap-2">
                   <Checkbox
@@ -281,7 +309,7 @@ export function ShopFilters({
           )}
 
           {/* Stem Length Filter */}
-          <FilterSection title="Stem Length (inches)">
+          <FilterSection title="Stem Length (inches)" hasActive={hasActiveStemLength}>
             <div className="space-y-4">
               <div>
                 <label htmlFor="stem-length-min" className="text-sm font-medium block mb-1">
@@ -323,7 +351,7 @@ export function ShopFilters({
           </FilterSection>
 
           {/* Price Filter */}
-          <FilterSection title="Price">
+          <FilterSection title="Price" hasActive={hasActivePrice}>
             <div className="space-y-4">
               <div>
                 <label htmlFor="price-min" className="text-sm font-medium block mb-1">
@@ -383,9 +411,15 @@ interface FilterSectionProps {
   title: string
   children: React.ReactNode
   defaultOpen?: boolean
+  hasActive?: boolean
 }
 
-function FilterSection({ title, children, defaultOpen = false }: FilterSectionProps) {
+function FilterSection({
+  title,
+  children,
+  defaultOpen = false,
+  hasActive = false,
+}: FilterSectionProps) {
   const [open, setOpen] = useState(defaultOpen)
 
   return (
@@ -396,7 +430,12 @@ function FilterSection({ title, children, defaultOpen = false }: FilterSectionPr
         className="flex items-center justify-between w-full group py-2 hover:text-gray-700"
         aria-expanded={open}
       >
-        <h3 className="font-semibold text-sm">{title}</h3>
+        <div className="flex items-center gap-3">
+          <h3 className="font-semibold text-sm">{title}</h3>
+          {hasActive && (
+            <div className="inline-flex h-3 w-3 rounded-full bg-amber-400" title="Filter active" />
+          )}
+        </div>
         <ChevronDown className={cn("h-4 w-4 transition-transform", open && "rotate-180")} />
       </button>
       {open && <div className="pt-3">{children}</div>}

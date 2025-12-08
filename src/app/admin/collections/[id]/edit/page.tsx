@@ -12,14 +12,34 @@ export default async function EditCollectionPage({ params }: EditCollectionPageP
 
   const { id } = await params
 
-  const collection = await db.collection.findUnique({
-    where: { id },
-    include: {
-      _count: {
-        select: { productCollections: true },
+  const [collection, products] = await Promise.all([
+    db.collection.findUnique({
+      where: { id },
+      include: {
+        _count: {
+          select: { productCollections: true },
+        },
+        productCollections: {
+          select: {
+            productId: true,
+          },
+        },
       },
-    },
-  })
+    }),
+    db.product.findMany({
+      include: {
+        productCollections: {
+          include: {
+            collection: {
+              select: { name: true },
+            },
+          },
+        },
+        variants: true,
+      },
+      orderBy: { name: "asc" },
+    }),
+  ])
 
   if (!collection) {
     notFound()
@@ -34,7 +54,7 @@ export default async function EditCollectionPage({ params }: EditCollectionPageP
       </div>
 
       <div className="rounded-lg border border-border p-6">
-        <CollectionForm collection={collection} />
+        <CollectionForm collection={collection} products={products} />
       </div>
     </>
   )
