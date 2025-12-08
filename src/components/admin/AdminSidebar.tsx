@@ -3,7 +3,6 @@ import { Badge } from "@/components/ui/badge"
 import {
   IconBarChart3,
   IconClock,
-  IconMapPin,
   IconPackage,
   IconShoppingCart,
   IconStar,
@@ -75,17 +74,6 @@ export default async function AdminSidebar() {
           >
             <span className="flex items-center gap-2">
               <IconStar className="h-4 w-4 text-muted-foreground" /> Inspirations
-            </span>
-          </Link>
-        </li>
-
-        <li>
-          <Link
-            href="/admin/heroes"
-            className="flex items-center justify-between w-full hover:underline"
-          >
-            <span className="flex items-center gap-2">
-              <IconMapPin className="h-4 w-4 text-muted-foreground" /> Heroes
             </span>
           </Link>
         </li>

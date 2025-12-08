@@ -3,7 +3,6 @@ import * as path from "node:path"
 import { PrismaPg } from "@prisma/adapter-pg"
 import { Pool } from "pg"
 import {
-  type HeroBackgroundType,
   MetricType,
   type Prisma,
   PrismaClient,
@@ -25,6 +24,7 @@ const prisma = new PrismaClient({ adapter })
 async function captureMetric(type: MetricType, name: string, duration: number): Promise<void> {
   try {
     // Use localhost:3000 for local development
+    // Note: This will fail if the Next.js dev server isn't running, which is expected during seed
     const response = await fetch("http://localhost:3000/api/admin/metrics", {
       method: "POST",
       headers: {
@@ -38,7 +38,7 @@ async function captureMetric(type: MetricType, name: string, duration: number): 
     }
   } catch (error) {
     // Silently fail - don't block seed script if metrics API is unavailable
-    console.warn(`⚠️  Could not post metric to API: ${(error as Error).message}`)
+    // This is expected when running seed without the dev server running
   }
 }
 
@@ -746,66 +746,6 @@ async function main() {
   await addProductToInspiration("warm-celebratory", "carnation-mini", 2)
 
   console.log("✅ Added products to inspirations")
-
-  console.log("✨ Creating hero banners...")
-
-  const heroBanners = [
-    {
-      name: "Main Home Hero",
-      slug: "main-hero",
-      title: "Premium Wholesale Flowers for Creative Professionals",
-      subtitle:
-        "Partner with Peak Blooms for the highest quality, freshest flowers. Competitive wholesale pricing, sustainable sourcing, and reliable local delivery—built for florists, retailers, and event planners.",
-      ctaText: "Browse Catalog",
-      ctaLink: "/shop",
-      backgroundType: "IMAGE" as HeroBackgroundType,
-      backgroundImage: "/hero-images/welcome.png",
-      slotPosition: 1,
-      textPosition: "left",
-    },
-    {
-      name: "Boxlot CTA",
-      slug: "boxlot-hero",
-      title: "Bulk Solutions for Large-Scale Success",
-      subtitle:
-        "Access premium boxlots at wholesale pricing. Perfect for weddings, installations, and events—quality you trust, pricing that works, service that partners with your vision.",
-      ctaText: "Explore Boxlots",
-      ctaLink: "/shop?boxlotOnly=true",
-      backgroundType: "IMAGE" as HeroBackgroundType,
-      backgroundImage: "/hero-images/boxlots.png",
-      slotPosition: 2,
-      textPosition: "right",
-    },
-    {
-      name: "Boxlot hero center",
-      slug: "boxlot-hero-center",
-      title: "Reliable, Efficient Wholesale Solutions",
-      subtitle:
-        "We're committed to exceptional service, sustainable sourcing, and timely delivery. Your success is our mission—connect the world through the beauty of flowers with Peak Blooms.",
-      ctaText: "Start Shopping",
-      ctaLink: "/shop?boxlotOnly=true",
-      backgroundType: "IMAGE" as HeroBackgroundType,
-      backgroundImage: "/hero-images/boxlot2.png",
-      slotPosition: 3,
-      textPosition: "center",
-    },
-  ]
-
-  for (const banner of heroBanners) {
-    const start_upsertBanner = performance.now()
-    await prisma.heroBanner.upsert({
-      where: { slug: banner.slug },
-      update: banner,
-      create: banner,
-    })
-    await captureMetric(
-      MetricType.SEED,
-      `upsert hero banner`,
-      performance.now() - start_upsertBanner
-    )
-  }
-
-  console.log(`✅ Hero banners seeded/updated: ${heroBanners.map((b) => b.slug).join(", ")}`)
 
   // Create sample orders for the approved customer
   // Reset existing orders first so seeding is idempotent and deterministic

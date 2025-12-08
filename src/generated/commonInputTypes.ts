@@ -280,23 +280,6 @@ export type EnumOrderStatusWithAggregatesFilter<$PrismaModel = never> = {
   _max?: Prisma.NestedEnumOrderStatusFilter<$PrismaModel>
 }
 
-export type EnumHeroBackgroundTypeFilter<$PrismaModel = never> = {
-  equals?: $Enums.HeroBackgroundType | Prisma.EnumHeroBackgroundTypeFieldRefInput<$PrismaModel>
-  in?: $Enums.HeroBackgroundType[] | Prisma.ListEnumHeroBackgroundTypeFieldRefInput<$PrismaModel>
-  notIn?: $Enums.HeroBackgroundType[] | Prisma.ListEnumHeroBackgroundTypeFieldRefInput<$PrismaModel>
-  not?: Prisma.NestedEnumHeroBackgroundTypeFilter<$PrismaModel> | $Enums.HeroBackgroundType
-}
-
-export type EnumHeroBackgroundTypeWithAggregatesFilter<$PrismaModel = never> = {
-  equals?: $Enums.HeroBackgroundType | Prisma.EnumHeroBackgroundTypeFieldRefInput<$PrismaModel>
-  in?: $Enums.HeroBackgroundType[] | Prisma.ListEnumHeroBackgroundTypeFieldRefInput<$PrismaModel>
-  notIn?: $Enums.HeroBackgroundType[] | Prisma.ListEnumHeroBackgroundTypeFieldRefInput<$PrismaModel>
-  not?: Prisma.NestedEnumHeroBackgroundTypeWithAggregatesFilter<$PrismaModel> | $Enums.HeroBackgroundType
-  _count?: Prisma.NestedIntFilter<$PrismaModel>
-  _min?: Prisma.NestedEnumHeroBackgroundTypeFilter<$PrismaModel>
-  _max?: Prisma.NestedEnumHeroBackgroundTypeFilter<$PrismaModel>
-}
-
 export type EnumMetricTypeFilter<$PrismaModel = never> = {
   equals?: $Enums.MetricType | Prisma.EnumMetricTypeFieldRefInput<$PrismaModel>
   in?: $Enums.MetricType[] | Prisma.ListEnumMetricTypeFieldRefInput<$PrismaModel>
@@ -580,23 +563,6 @@ export type NestedEnumOrderStatusWithAggregatesFilter<$PrismaModel = never> = {
   _count?: Prisma.NestedIntFilter<$PrismaModel>
   _min?: Prisma.NestedEnumOrderStatusFilter<$PrismaModel>
   _max?: Prisma.NestedEnumOrderStatusFilter<$PrismaModel>
-}
-
-export type NestedEnumHeroBackgroundTypeFilter<$PrismaModel = never> = {
-  equals?: $Enums.HeroBackgroundType | Prisma.EnumHeroBackgroundTypeFieldRefInput<$PrismaModel>
-  in?: $Enums.HeroBackgroundType[] | Prisma.ListEnumHeroBackgroundTypeFieldRefInput<$PrismaModel>
-  notIn?: $Enums.HeroBackgroundType[] | Prisma.ListEnumHeroBackgroundTypeFieldRefInput<$PrismaModel>
-  not?: Prisma.NestedEnumHeroBackgroundTypeFilter<$PrismaModel> | $Enums.HeroBackgroundType
-}
-
-export type NestedEnumHeroBackgroundTypeWithAggregatesFilter<$PrismaModel = never> = {
-  equals?: $Enums.HeroBackgroundType | Prisma.EnumHeroBackgroundTypeFieldRefInput<$PrismaModel>
-  in?: $Enums.HeroBackgroundType[] | Prisma.ListEnumHeroBackgroundTypeFieldRefInput<$PrismaModel>
-  notIn?: $Enums.HeroBackgroundType[] | Prisma.ListEnumHeroBackgroundTypeFieldRefInput<$PrismaModel>
-  not?: Prisma.NestedEnumHeroBackgroundTypeWithAggregatesFilter<$PrismaModel> | $Enums.HeroBackgroundType
-  _count?: Prisma.NestedIntFilter<$PrismaModel>
-  _min?: Prisma.NestedEnumHeroBackgroundTypeFilter<$PrismaModel>
-  _max?: Prisma.NestedEnumHeroBackgroundTypeFilter<$PrismaModel>
 }
 
 export type NestedEnumMetricTypeFilter<$PrismaModel = never> = {

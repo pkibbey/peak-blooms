@@ -399,7 +399,6 @@ export const ModelName = {
   CartItem: 'CartItem',
   Order: 'Order',
   OrderItem: 'OrderItem',
-  HeroBanner: 'HeroBanner',
   Metric: 'Metric'
 } as const
 
@@ -416,7 +415,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "account" | "session" | "verification" | "address" | "collection" | "inspiration" | "product" | "productCollection" | "inspirationProduct" | "productVariant" | "shoppingCart" | "cartItem" | "order" | "orderItem" | "heroBanner" | "metric"
+    modelProps: "user" | "account" | "session" | "verification" | "address" | "collection" | "inspiration" | "product" | "productCollection" | "inspirationProduct" | "productVariant" | "shoppingCart" | "cartItem" | "order" | "orderItem" | "metric"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -1530,80 +1529,6 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
-    HeroBanner: {
-      payload: Prisma.$HeroBannerPayload<ExtArgs>
-      fields: Prisma.HeroBannerFieldRefs
-      operations: {
-        findUnique: {
-          args: Prisma.HeroBannerFindUniqueArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$HeroBannerPayload> | null
-        }
-        findUniqueOrThrow: {
-          args: Prisma.HeroBannerFindUniqueOrThrowArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$HeroBannerPayload>
-        }
-        findFirst: {
-          args: Prisma.HeroBannerFindFirstArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$HeroBannerPayload> | null
-        }
-        findFirstOrThrow: {
-          args: Prisma.HeroBannerFindFirstOrThrowArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$HeroBannerPayload>
-        }
-        findMany: {
-          args: Prisma.HeroBannerFindManyArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$HeroBannerPayload>[]
-        }
-        create: {
-          args: Prisma.HeroBannerCreateArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$HeroBannerPayload>
-        }
-        createMany: {
-          args: Prisma.HeroBannerCreateManyArgs<ExtArgs>
-          result: BatchPayload
-        }
-        createManyAndReturn: {
-          args: Prisma.HeroBannerCreateManyAndReturnArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$HeroBannerPayload>[]
-        }
-        delete: {
-          args: Prisma.HeroBannerDeleteArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$HeroBannerPayload>
-        }
-        update: {
-          args: Prisma.HeroBannerUpdateArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$HeroBannerPayload>
-        }
-        deleteMany: {
-          args: Prisma.HeroBannerDeleteManyArgs<ExtArgs>
-          result: BatchPayload
-        }
-        updateMany: {
-          args: Prisma.HeroBannerUpdateManyArgs<ExtArgs>
-          result: BatchPayload
-        }
-        updateManyAndReturn: {
-          args: Prisma.HeroBannerUpdateManyAndReturnArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$HeroBannerPayload>[]
-        }
-        upsert: {
-          args: Prisma.HeroBannerUpsertArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$HeroBannerPayload>
-        }
-        aggregate: {
-          args: Prisma.HeroBannerAggregateArgs<ExtArgs>
-          result: runtime.Types.Utils.Optional<Prisma.AggregateHeroBanner>
-        }
-        groupBy: {
-          args: Prisma.HeroBannerGroupByArgs<ExtArgs>
-          result: runtime.Types.Utils.Optional<Prisma.HeroBannerGroupByOutputType>[]
-        }
-        count: {
-          args: Prisma.HeroBannerCountArgs<ExtArgs>
-          result: runtime.Types.Utils.Optional<Prisma.HeroBannerCountAggregateOutputType> | number
-        }
-      }
-    }
     Metric: {
       payload: Prisma.$MetricPayload<ExtArgs>
       fields: Prisma.MetricFieldRefs
@@ -1931,26 +1856,6 @@ export const OrderItemScalarFieldEnum = {
 export type OrderItemScalarFieldEnum = (typeof OrderItemScalarFieldEnum)[keyof typeof OrderItemScalarFieldEnum]
 
 
-export const HeroBannerScalarFieldEnum = {
-  id: 'id',
-  name: 'name',
-  slug: 'slug',
-  title: 'title',
-  subtitle: 'subtitle',
-  ctaText: 'ctaText',
-  ctaLink: 'ctaLink',
-  backgroundType: 'backgroundType',
-  backgroundImage: 'backgroundImage',
-  gradientPreset: 'gradientPreset',
-  slotPosition: 'slotPosition',
-  textPosition: 'textPosition',
-  createdAt: 'createdAt',
-  updatedAt: 'updatedAt'
-} as const
-
-export type HeroBannerScalarFieldEnum = (typeof HeroBannerScalarFieldEnum)[keyof typeof HeroBannerScalarFieldEnum]
-
-
 export const MetricScalarFieldEnum = {
   id: 'id',
   type: 'type',
@@ -2098,20 +2003,6 @@ export type ListEnumOrderStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$
 
 
 /**
- * Reference to a field of type 'HeroBackgroundType'
- */
-export type EnumHeroBackgroundTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'HeroBackgroundType'>
-    
-
-
-/**
- * Reference to a field of type 'HeroBackgroundType[]'
- */
-export type ListEnumHeroBackgroundTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'HeroBackgroundType[]'>
-    
-
-
-/**
  * Reference to a field of type 'MetricType'
  */
 export type EnumMetricTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'MetricType'>
@@ -2234,7 +2125,6 @@ export type GlobalOmitConfig = {
   cartItem?: Prisma.CartItemOmit
   order?: Prisma.OrderOmit
   orderItem?: Prisma.OrderItemOmit
-  heroBanner?: Prisma.HeroBannerOmit
   metric?: Prisma.MetricOmit
 }
 

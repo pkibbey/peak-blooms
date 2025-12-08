@@ -93,11 +93,6 @@ export type Order = Prisma.OrderModel
  */
 export type OrderItem = Prisma.OrderItemModel
 /**
- * Model HeroBanner
- * 
- */
-export type HeroBanner = Prisma.HeroBannerModel
-/**
  * Model Metric
  * 
  */

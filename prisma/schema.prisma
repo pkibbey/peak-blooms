@@ -262,25 +262,6 @@ model OrderItem {
   @@index([orderId])
 }
 
-model HeroBanner {
-  id              String             @id @default(cuid())
-  name            String
-  slug            String             @unique
-  title           String
-  subtitle        String
-  ctaText         String?
-  ctaLink         String?
-  backgroundType  HeroBackgroundType @default(GRADIENT)
-  backgroundImage String?
-  gradientPreset  String?
-  slotPosition    Int?
-  textPosition    String?
-  createdAt       DateTime           @default(now())
-  updatedAt       DateTime           @updatedAt
-
-  @@index([slotPosition])
-}
-
 model Metric {
   id        String      @id @default(cuid())
   type      MetricType
@@ -312,11 +293,6 @@ enum OrderStatus {
   SHIPPED
   DELIVERED
   CANCELLED
-}
-
-enum HeroBackgroundType {
-  IMAGE
-  GRADIENT
 }
 
 enum ProductType {
