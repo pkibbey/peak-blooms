@@ -75,7 +75,7 @@ export function CartItem({ item, isUpdating, onUpdateQuantity, onRemove }: CartI
           <div>
             <Link
               href={`/shop/${item.product.slug}`}
-              className="font-medium hover:text-primary transition-colors"
+              className="font-semibold hover:text-primary transition-colors"
             >
               {item.product.name}
             </Link>
@@ -89,10 +89,7 @@ export function CartItem({ item, isUpdating, onUpdateQuantity, onRemove }: CartI
 
         {/* View Options Link */}
         <div className="mt-2">
-          <Link
-            href={`/shop/${item.product.slug}`}
-            className="text-xs text-primary hover:underline"
-          >
+          <Link href={`/shop/${item.product.slug}`} className="text-sm text-primary underline">
             View similar options →
           </Link>
         </div>

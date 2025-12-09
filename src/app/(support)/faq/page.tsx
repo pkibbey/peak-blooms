@@ -69,7 +69,7 @@ const faqs: FAQItem[] = [
   {
     question: "What payment methods do you accept?",
     answer:
-      "We accept major credit cards and are working on additional payment options for flexibility. Invoicing and payment terms for high-volume accounts can be arranged—contact our sales team for details.",
+      "Payment is collected upon delivery. This allows us to handle market price items flexibly, as prices may fluctuate based on seasonal availability. You'll be informed of any market price items when your delivery is scheduled.",
   },
   {
     question: "How can I update my account information?",

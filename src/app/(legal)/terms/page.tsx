@@ -72,8 +72,9 @@ export default function TermsPage() {
           applicable taxes.
         </p>
         <p>
-          Payment must be received before orders are processed. We accept major credit cards and
-          other payment methods as indicated during checkout.
+          Payment is collected upon delivery. Orders include items with fixed prices as well as
+          items at market prices, which are determined at the time of delivery. You will be informed
+          of the final total for market price items when your delivery is scheduled.
         </p>
       </section>
 

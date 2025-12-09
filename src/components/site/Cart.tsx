@@ -161,6 +161,9 @@ export default function Cart({ initialCart }: CartProps) {
     setIsEmptying(false)
   }
 
+  const marketPriceItems = cart.items.filter((item) => !item.productVariant?.price)
+  const marketPriceQuantity = marketPriceItems.reduce((sum, item) => sum + item.quantity, 0)
+
   if (cart.items.length === 0) {
     return (
       <EmptyState
@@ -205,9 +208,30 @@ export default function Cart({ initialCart }: CartProps) {
             </div>
             <div className="flex justify-between">
               <span className="text-muted-foreground">Shipping</span>
-              <span className="text-muted-foreground">Calculated at checkout</span>
+              <span className="text-muted-foreground">Free</span>
             </div>
           </div>
+
+          {/* Market Price Items Note */}
+          {(() => {
+            const marketPriceItems = cart.items.filter((item) => !item.productVariant?.price)
+            const marketPriceQuantity = marketPriceItems.reduce(
+              (sum, item) => sum + item.quantity,
+              0
+            )
+            if (marketPriceQuantity > 0) {
+              return (
+                <div className="bg-amber-50/50 border border-amber-200 rounded p-3 mt-4">
+                  <p className="text-xs text-center text-amber-800">
+                    {marketPriceItems.length > 0 &&
+                      `${marketPriceItems.length} ${marketPriceItems.length === 1 ? "product" : "products"} `}
+                    awaiting market price
+                  </p>
+                </div>
+              )
+            }
+            return null
+          })()}
 
           <div className="border-t my-4" />
 

@@ -1793,6 +1793,7 @@ export const ProductVariantScalarFieldEnum = {
   id: 'id',
   productId: 'productId',
   price: 'price',
+  isMarketPrice: 'isMarketPrice',
   stemLength: 'stemLength',
   quantityPerBunch: 'quantityPerBunch',
   isBoxlot: 'isBoxlot',
