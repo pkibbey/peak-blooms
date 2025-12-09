@@ -73,7 +73,7 @@ function getQuantity(priceString: string): number {
 function readProductsFromCSV(): Array<{
   name: string
   price: number
-  type: "FLOWER" | "FILLER"
+  type: "FLOWER" | "FILLER" | "ROSE"
   quantity: number
   description: string
   colors: string[]
@@ -94,7 +94,7 @@ function readProductsFromCSV(): Array<{
   const products: Array<{
     name: string
     price: number
-    type: "FLOWER" | "FILLER"
+    type: "FLOWER" | "FILLER" | "ROSE"
     quantity: number
     description: string
     colors: string[]
@@ -119,7 +119,7 @@ function readProductsFromCSV(): Array<{
 
     const price = parsePrice(priceStr)
     const quantity = getQuantity(priceStr)
-    const type = typeStr === "FILLER" ? "FILLER" : "FLOWER"
+    const type = typeStr === "FILLER" ? "FILLER" : typeStr === "ROSE" ? "ROSE" : "FLOWER"
     // Parse pipe-separated color IDs from CSV (e.g., "pink|rose|greenery")
     const colors = colorsStr
       .split("|")
@@ -280,6 +280,18 @@ async function main() {
 
       // Create or update product with single variant
       const start_createProduct = performance.now()
+
+      // For roses, create multiple variants with different stem lengths
+      const isRose = csvProduct.type === "ROSE"
+      const roseVariantData = isRose
+        ? [
+            { stemLength: 40, stemLengthCm: "40cm" },
+            { stemLength: 50, stemLengthCm: "50cm" },
+            { stemLength: 60, stemLengthCm: "60cm" },
+            { stemLength: 70, stemLengthCm: "70cm" },
+          ]
+        : []
+
       const csvProductRecord = await prisma.product.upsert({
         create: {
           name: csvProduct.name,
@@ -290,12 +302,18 @@ async function main() {
           image: csvProduct.image || null, // Image from CSV (or null if not set)
           featured: false,
           variants: {
-            create: [
-              {
-                price: csvProduct.price,
-                quantityPerBunch: csvProduct.quantity,
-              },
-            ],
+            create: isRose
+              ? roseVariantData.map((variantData) => ({
+                  price: csvProduct.price,
+                  quantityPerBunch: csvProduct.quantity,
+                  stemLength: variantData.stemLength,
+                }))
+              : [
+                  {
+                    price: csvProduct.price,
+                    quantityPerBunch: csvProduct.quantity,
+                  },
+                ],
           },
         },
         where: { slug: slug },
@@ -327,25 +345,28 @@ async function main() {
         performance.now() - start_productVariant
       )
 
-      const start_createProductVariant = performance.now()
-      await prisma.productVariant.upsert({
-        where: {
-          id: productVariant?.id || "new",
-        },
-        create: {
-          productId: csvProductRecord.id,
-          price: csvProduct.price,
-          quantityPerBunch: csvProduct.quantity,
-        },
-        update: {
-          quantityPerBunch: csvProduct.quantity,
-        },
-      })
-      await captureMetric(
-        MetricType.SEED,
-        "create product variant",
-        performance.now() - start_createProductVariant
-      )
+      // Only upsert a single base variant if not a rose (roses already have multiple variants created)
+      if (!isRose) {
+        const start_createProductVariant = performance.now()
+        await prisma.productVariant.upsert({
+          where: {
+            id: productVariant?.id || "new",
+          },
+          create: {
+            productId: csvProductRecord.id,
+            price: csvProduct.price,
+            quantityPerBunch: csvProduct.quantity,
+          },
+          update: {
+            quantityPerBunch: csvProduct.quantity,
+          },
+        })
+        await captureMetric(
+          MetricType.SEED,
+          "create product variant",
+          performance.now() - start_createProductVariant
+        )
+      }
 
       productsCreated++
     } catch (error) {

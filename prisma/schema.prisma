@@ -298,4 +298,5 @@ enum OrderStatus {
 enum ProductType {
   FLOWER
   FILLER
+  ROSE
 }

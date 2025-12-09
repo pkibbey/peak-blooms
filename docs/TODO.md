@@ -11,7 +11,6 @@
 - Add unit tests and e2e tests to ensure complete site functionality
 - Plan site launch
 - Maintenence and updates performed on feature branches, tested on dev, and then released
-- Add a new product type of roses - these will also have a stem length property
 
 ### 🎨 Design Changes
 

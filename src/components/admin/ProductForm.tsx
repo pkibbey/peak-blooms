@@ -46,7 +46,7 @@ interface ProductFormProps {
     image: string | null
     colors?: string[] | null
     collectionIds: string[]
-    productType?: "FLOWER" | "FILLER"
+    productType?: "FLOWER" | "FILLER" | "ROSE"
     featured: boolean
     variants?: {
       id: string
@@ -314,7 +314,8 @@ export default function ProductForm({ collections, product }: ProductFormProps) 
                 </FormControl>
                 <SelectContent>
                   <SelectItem value="FLOWER">Flower</SelectItem>
-                  <SelectItem value="FILLER">Filler / Green</SelectItem>
+                  <SelectItem value="ROSE">Rose</SelectItem>
+                  <SelectItem value="FILLER">Filler</SelectItem>
                 </SelectContent>
               </Select>
               <FormMessage />

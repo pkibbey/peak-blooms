@@ -42,7 +42,8 @@ export type OrderStatus = (typeof OrderStatus)[keyof typeof OrderStatus]
 
 export const ProductType = {
   FLOWER: 'FLOWER',
-  FILLER: 'FILLER'
+  FILLER: 'FILLER',
+  ROSE: 'ROSE'
 } as const
 
 export type ProductType = (typeof ProductType)[keyof typeof ProductType]
