@@ -48,8 +48,8 @@ export default function ReorderButton({ orderNumber, items }: ReorderButtonProps
       toast.success(
         `Added ${totalUnits} item${totalUnits !== 1 ? "s" : ""} from order ${orderNumber} to your cart`
       )
-      router.refresh()
-      router.push("/cart")
+      // Use full page navigation to ensure cart state is updated on client and server
+      window.location.href = "/cart"
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Failed to reorder")
     } finally {

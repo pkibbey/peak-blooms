@@ -22,6 +22,7 @@ export default function AddressManager({ addresses }: AddressManagerProps) {
   const [formData, setFormData] = useState<AddressFormData>(emptyAddress)
   const [setAsDefault, setSetAsDefault] = useState(false)
   const [isSaving, setIsSaving] = useState(false)
+  const [showAllAddresses, setShowAllAddresses] = useState(false)
 
   const handleAddNew = () => {
     setIsEditing(null)
@@ -96,19 +97,67 @@ export default function AddressManager({ addresses }: AddressManagerProps) {
 
   return (
     <div className="space-y-4">
-      {/* Address List */}
-      {addresses.length > 0 ? (
-        <div className="grid gap-4 md:grid-cols-2">
-          {addresses.map((address) => (
-            <AddressCard key={address.id} address={address} onEdit={handleEdit} />
-          ))}
+      {/* Default Address Display (Minimal) */}
+      {addresses.length > 0 && !isAdding && (
+        <div className="space-y-3">
+          {(() => {
+            const defaultAddress = addresses.find((a) => a.isDefault) || addresses[0]
+            return (
+              <div>
+                <div className="bg-white rounded-xs shadow-sm border p-4">
+                  <div className="flex items-start justify-between">
+                    <div className="flex-1">
+                      <p className="text-sm text-muted-foreground mb-2">Default Address</p>
+                      <p className="font-medium">
+                        {defaultAddress.firstName} {defaultAddress.lastName}
+                      </p>
+                      <p className="text-sm">{defaultAddress.company}</p>
+                      <p className="text-sm">
+                        {defaultAddress.street1}
+                        {defaultAddress.street2 && `, ${defaultAddress.street2}`}
+                      </p>
+                      <p className="text-sm">
+                        {defaultAddress.city}, {defaultAddress.state} {defaultAddress.zip}
+                      </p>
+                    </div>
+                    <Button variant="ghost" size="sm" onClick={() => handleEdit(defaultAddress)}>
+                      Edit
+                    </Button>
+                  </div>
+                </div>
+                {addresses.length > 1 && (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setShowAllAddresses(!showAllAddresses)}
+                    className="w-full mt-2"
+                  >
+                    {showAllAddresses ? "Hide" : "Show"} Other Addresses ({addresses.length - 1})
+                  </Button>
+                )}
+              </div>
+            )
+          })()}
         </div>
-      ) : (
-        !isAdding && (
-          <p className="text-muted-foreground text-sm">
-            No saved addresses yet. Add an address to make checkout faster.
-          </p>
-        )
+      )}
+
+      {/* Other Addresses (Hidden by default) */}
+      {addresses.length > 1 && showAllAddresses && !isAdding && (
+        <div className="grid gap-4 md:grid-cols-2">
+          {addresses
+            .filter((a) => !a.isDefault || addresses.every((addr) => !addr.isDefault))
+            .slice(1)
+            .map((address) => (
+              <AddressCard key={address.id} address={address} onEdit={handleEdit} />
+            ))}
+        </div>
+      )}
+
+      {/* No Addresses */}
+      {addresses.length === 0 && !isAdding && (
+        <p className="text-muted-foreground text-sm">
+          No saved addresses yet. Add an address to make checkout faster.
+        </p>
       )}
 
       {/* Add/Edit Form */}

@@ -114,12 +114,8 @@ export default function CheckoutForm({ cart, savedAddresses, userEmail }: Checko
       selectedAddressId: selectedAddressId,
       shippingAddress: getInitialShippingAddress(),
       saveShippingAddress: false,
-      differentBilling: false,
-      billingAddress: null,
     },
   })
-
-  const differentBilling = form.watch("differentBilling")
 
   const handleAddressSelect = (addressId: string) => {
     setSelectedAddressId(addressId)
@@ -209,7 +205,6 @@ export default function CheckoutForm({ cart, savedAddresses, userEmail }: Checko
           shippingAddressId: selectedAddressId !== "new" ? selectedAddressId : null,
           shippingAddress: selectedAddressId === "new" ? data.shippingAddress : null,
           saveShippingAddress: shouldSaveAddress,
-          billingAddress: data.differentBilling ? data.billingAddress : null,
           email: data.email,
           phone: data.phone?.trim() || null,
           notes: data.notes?.trim() || null,
@@ -223,8 +218,10 @@ export default function CheckoutForm({ cart, savedAddresses, userEmail }: Checko
 
       const order = await response.json()
       toast.success("Order placed successfully!")
-      router.refresh()
-      router.push(`/account/order-history/${order.id}`)
+
+      // Refresh the entire page to update cart and all server components
+      // This ensures the cart badge is cleared and order history is updated
+      window.location.href = `/account/order-history/${order.id}`
     } catch (err) {
       console.error("Checkout error:", err)
       form.setError("root", {
@@ -322,7 +319,7 @@ export default function CheckoutForm({ cart, savedAddresses, userEmail }: Checko
               />
             )}
 
-            <AddressFields fieldPrefix="shippingAddress." />
+            {selectedAddressId === "new" && <AddressFields fieldPrefix="shippingAddress." />}
 
             {selectedAddressId === "new" && (
               <FormField
@@ -347,33 +344,6 @@ export default function CheckoutForm({ cart, savedAddresses, userEmail }: Checko
           </div>
 
           {/* Billing Address */}
-          <div className="bg-white rounded-xs shadow-sm border p-6">
-            <FormField
-              control={form.control}
-              name="differentBilling"
-              render={({ field }) => (
-                <FormItem className="flex items-center gap-2 mb-4 space-y-0">
-                  <FormControl>
-                    <Checkbox
-                      id="differentBilling"
-                      checked={field.value}
-                      onChange={(e) => field.onChange(e.target.checked)}
-                    />
-                  </FormControl>
-                  <FormLabel htmlFor="differentBilling" className="cursor-pointer font-semibold">
-                    Billing address is different from shipping
-                  </FormLabel>
-                </FormItem>
-              )}
-            />
-
-            {differentBilling && (
-              <div className="pt-2">
-                <AddressFields fieldPrefix="billingAddress." />
-              </div>
-            )}
-          </div>
-
           {/* Order Notes */}
           <div className="bg-white rounded-xs shadow-sm border p-6">
             <h2 className="heading-3 mb-4">Order Notes (optional)</h2>

@@ -97,15 +97,8 @@ export async function POST(request: Request) {
       )
     }
 
-    const {
-      shippingAddressId,
-      shippingAddress,
-      saveShippingAddress,
-      billingAddress,
-      email,
-      phone,
-      notes,
-    } = validationResult.data
+    const { shippingAddressId, shippingAddress, saveShippingAddress, email, phone, notes } =
+      validationResult.data
 
     // Get user's cart
     const cart = await db.shoppingCart.findUnique({
@@ -155,7 +148,7 @@ export async function POST(request: Request) {
           userId: saveShippingAddress ? user.id : null,
           firstName: shippingAddress.firstName,
           lastName: shippingAddress.lastName,
-          company: shippingAddress.company || null,
+          company: shippingAddress.company,
           street1: shippingAddress.street1,
           street2: shippingAddress.street2 || null,
           city: shippingAddress.city,
@@ -168,28 +161,6 @@ export async function POST(request: Request) {
       finalShippingAddressId = newAddress.id
     } else {
       return NextResponse.json({ error: "Shipping address is required" }, { status: 400 })
-    }
-
-    // Handle billing address (optional)
-    let finalBillingAddressId: string | null = null
-
-    if (billingAddress) {
-      const newBillingAddress = await db.address.create({
-        data: {
-          userId: null, // Billing addresses are not saved to user profile
-          firstName: billingAddress.firstName,
-          lastName: billingAddress.lastName,
-          company: billingAddress.company || null,
-          street1: billingAddress.street1,
-          street2: billingAddress.street2 || null,
-          city: billingAddress.city,
-          state: billingAddress.state,
-          zip: billingAddress.zip,
-          country: billingAddress.country || "US",
-        },
-      })
-
-      finalBillingAddressId = newBillingAddress.id
     }
 
     // Generate order number
@@ -206,7 +177,6 @@ export async function POST(request: Request) {
         phone: phone || null,
         notes: notes || null,
         shippingAddressId: finalShippingAddressId,
-        billingAddressId: finalBillingAddressId,
         items: {
           create: cart.items.map((item) => ({
             productId: item.productId,
@@ -224,7 +194,6 @@ export async function POST(request: Request) {
           },
         },
         shippingAddress: true,
-        billingAddress: true,
       },
     })
 

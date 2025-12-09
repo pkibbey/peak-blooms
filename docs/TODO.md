@@ -7,7 +7,6 @@
 - Create splash screen for www.
 - Upload test site to dev.
 - Configure email server
-- Add payment processing - defer for the moment (ability to do market price and price ranging)
 - Add unit tests and e2e tests to ensure complete site functionality
 - Plan site launch
 - Maintenence and updates performed on feature branches, tested on dev, and then released
