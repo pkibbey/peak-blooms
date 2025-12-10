@@ -16,11 +16,6 @@ const GRADIENT_CLASS_MAP = {
 // derive a union type of the available gradient keys
 export type GradientPreset = keyof typeof GRADIENT_CLASS_MAP
 
-// runtime type guard for safety at call sites
-export function isGradientPreset(value: unknown): value is GradientPreset {
-  return typeof value === "string" && Object.hasOwn(GRADIENT_CLASS_MAP, value)
-}
-
 interface HeroProps {
   title: string
   subtitle: string

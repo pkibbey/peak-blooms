@@ -56,18 +56,3 @@ export async function clearMetrics(): Promise<void> {
     console.error("Failed to clear metrics:", error)
   }
 }
-
-/**
- * Get metrics filtered by types
- */
-export async function getMetricsByTypes(types: MetricType[]): Promise<Metric[]> {
-  try {
-    return await db.metric.findMany({
-      where: { type: { in: types } },
-      orderBy: { createdAt: "desc" },
-    })
-  } catch (error) {
-    console.error("Failed to fetch filtered metrics:", error)
-    return []
-  }
-}

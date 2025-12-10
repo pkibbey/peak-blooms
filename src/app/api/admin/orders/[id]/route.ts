@@ -38,7 +38,6 @@ export async function GET(_request: Request, { params }: RouteParams) {
           },
         },
         shippingAddress: true,
-        billingAddress: true,
       },
     })
 
@@ -102,7 +101,6 @@ export async function PATCH(request: Request, { params }: RouteParams) {
           },
         },
         shippingAddress: true,
-        billingAddress: true,
       },
     })
 

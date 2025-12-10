@@ -1,5 +1,8 @@
 ## 🛠️ Website To-Do List
 
+- Refactor seed script to use less database operations
+- Add a Google icon
+
 ### 🌟 Next Steps
 
 - Setup domain
@@ -25,7 +28,6 @@
 - Coupon code / discount offers / discount code for newsletter sign up
 
 # Meeting Notes
-Stem length will only apply for roses
 https://www.floom.com/us/thank-you-flowers
 https://www.bloomnation.com/?srsltid=AfmBOoraeFFwn9Ox8o-MIB9V5N9is_4ZyCd7RP20AmVi-TTrlMTYSX6g
 https://help.bloomnation.com/s/article/Order-Statuses?language=en_US

@@ -1,8 +1,7 @@
 "use client"
 
 import { zodResolver } from "@hookform/resolvers/zod"
-import { useRouter, useSearchParams } from "next/navigation"
-import { useEffect } from "react"
+import { useRouter } from "next/navigation"
 import { useForm } from "react-hook-form"
 import { toast } from "sonner"
 import { Button } from "@/components/ui/button"
@@ -27,23 +26,13 @@ interface ProfileFormProps {
 
 export default function ProfileForm({ user }: ProfileFormProps) {
   const router = useRouter()
-  const searchParams = useSearchParams()
 
   const form = useForm<ProfileFormData>({
     resolver: zodResolver(profileSchema),
     defaultValues: {
       name: user.name || "",
-      email: user.email,
     },
   })
-
-  // Show success message when email is verified via callback
-  useEffect(() => {
-    if (searchParams.get("emailVerified") === "true") {
-      toast.success("Your email address has been successfully verified and updated!")
-      router.refresh()
-    }
-  }, [searchParams, router])
 
   const onSubmit = async (data: ProfileFormData) => {
     try {
@@ -54,15 +43,7 @@ export default function ProfileForm({ user }: ProfileFormProps) {
       })
 
       if (response.ok) {
-        const responseData = await response.json()
-
-        // If email was changed, show verification message
-        if (data.email !== user.email && responseData.requiresVerification) {
-          toast.success("Check your new email for a verification link to confirm the change")
-        } else {
-          toast.success("Profile updated successfully")
-        }
-
+        toast.success("Profile updated successfully")
         router.refresh()
       } else {
         const responseData = await response.json()
@@ -83,6 +64,17 @@ export default function ProfileForm({ user }: ProfileFormProps) {
           </div>
         )}
 
+        {/* Email (read-only, verified by Google) */}
+        <FormItem>
+          <FormLabel>Email</FormLabel>
+          <div className="rounded-md border border-border bg-muted px-3 py-2 text-sm">
+            {user.email}
+          </div>
+          <p className="text-xs text-muted-foreground">
+            Your email is verified by Google and cannot be changed.
+          </p>
+        </FormItem>
+
         {/* Name */}
         <FormField
           control={form.control}
@@ -94,27 +86,6 @@ export default function ProfileForm({ user }: ProfileFormProps) {
                 <Input {...field} placeholder="Your name" />
               </FormControl>
               <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        {/* Email */}
-        <FormField
-          control={form.control}
-          name="email"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Email</FormLabel>
-              <FormControl>
-                <Input {...field} type="email" placeholder="your@email.com" />
-              </FormControl>
-              <FormMessage />
-              {field.value !== user.email && (
-                <p className="text-sm text-muted-foreground">
-                  If you change your email, we'll send a verification link to your new address and a
-                  security notice to your current email.
-                </p>
-              )}
             </FormItem>
           )}
         />

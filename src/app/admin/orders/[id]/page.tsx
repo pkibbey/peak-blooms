@@ -35,7 +35,6 @@ export default async function AdminOrderDetailPage({ params }: AdminOrderDetailP
         },
       },
       shippingAddress: true,
-      billingAddress: true,
     },
   })
 
@@ -118,14 +117,6 @@ export default async function AdminOrderDetailPage({ params }: AdminOrderDetailP
             </h2>
             <AddressDisplay address={order.shippingAddress} />
           </div>
-
-          {/* Billing Address (if different) */}
-          {order.billingAddress && (
-            <div className="bg-white rounded-xs shadow-sm border p-6">
-              <h2 className="heading-3 mb-4">Billing Address</h2>
-              <AddressDisplay address={order.billingAddress} />
-            </div>
-          )}
         </div>
       </div>
     </>

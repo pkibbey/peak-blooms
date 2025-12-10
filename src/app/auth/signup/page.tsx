@@ -1,33 +1,14 @@
 "use client"
 
-import { zodResolver } from "@hookform/resolvers/zod"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { useEffect } from "react"
-import { useForm } from "react-hook-form"
 import { Button } from "@/components/ui/button"
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form"
-import { Input } from "@/components/ui/input"
-import { authClient, useSession } from "@/lib/auth-client"
-import { type SignUpFormData, signUpSchema } from "@/lib/validations/auth"
+import { useSession } from "@/lib/auth-client"
 
 export default function SignUpPage() {
   const router = useRouter()
   const { data: session, isPending } = useSession()
-
-  const form = useForm<SignUpFormData>({
-    resolver: zodResolver(signUpSchema),
-    defaultValues: {
-      email: "",
-    },
-  })
 
   // Redirect if already authenticated
   useEffect(() => {
@@ -36,17 +17,14 @@ export default function SignUpPage() {
     }
   }, [isPending, session, router])
 
-  const onSubmit = async (data: SignUpFormData) => {
+  const handleGoogleSignUp = async () => {
     try {
-      await authClient.signIn.magicLink({
-        email: data.email,
-        callbackURL: "/auth/pending-approval",
-      })
-      // Redirect to pending approval page
-      router.push(`/auth/pending-approval?email=${encodeURIComponent(data.email)}`)
+      console.log("[SignUp] Starting Google OAuth sign-up")
+      const baseURL = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"
+      const redirectUrl = `${baseURL}/api/auth/signin/google`
+      window.location.href = redirectUrl
     } catch (error) {
-      form.setError("root", { message: "Failed to send sign-up email. Please try again." })
-      console.error("Error signing up:", error)
+      console.error("[SignUp] Error during Google sign-up:", error)
     }
   }
 
@@ -56,40 +34,13 @@ export default function SignUpPage() {
         <div className="space-y-2 text-center">
           <h1 className="text-2xl font-bold">Create Your Account</h1>
           <p className="text-sm text-muted-foreground">
-            Sign up to explore Peak Blooms and get exclusive first-time customer discounts
+            Sign up with your Google account to get started with Peak Blooms
           </p>
         </div>
 
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-            {form.formState.errors.root && (
-              <div className="rounded-lg bg-destructive/10 p-3 text-sm text-destructive">
-                {form.formState.errors.root.message}
-              </div>
-            )}
-            <FormField
-              control={form.control}
-              name="email"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Email</FormLabel>
-                  <FormControl>
-                    <Input
-                      {...field}
-                      type="email"
-                      placeholder="you@example.com"
-                      className="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <Button type="submit" disabled={form.formState.isSubmitting} className="w-full">
-              {form.formState.isSubmitting ? "Signing up..." : "Sign Up with Email"}
-            </Button>
-          </form>
-        </Form>
+        <Button onClick={handleGoogleSignUp} className="w-full">
+          Sign up with Google
+        </Button>
 
         <div className="space-y-3 text-center text-sm">
           <p className="text-muted-foreground">

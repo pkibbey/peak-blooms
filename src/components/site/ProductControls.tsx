@@ -203,9 +203,9 @@ export function ProductControls({ product, user, mode = "card" }: ProductControl
   const clampAddQuantity = (v: number) => Math.max(1, Math.min(999, Math.floor(Number(v) || 1)))
 
   return (
-    <div className={cn("flex flex-col", mode === "detail" ? "gap-6" : "gap-3 mt-6")}>
+    <div className={cn("flex flex-col", mode === "detail" ? "gap-6" : "gap-3")}>
       {/* Variant Selectors */}
-      {showSelectors && (
+      {showSelectors && (stemLengths.length >= 1 || counts.length > 1) && (
         <div className={cn("flex flex-col", mode === "detail" ? "gap-4" : "gap-2")}>
           {stemLengths.length >= 1 && (
             <div className={mode === "detail" ? "space-y-2" : ""}>
@@ -245,7 +245,7 @@ export function ProductControls({ product, user, mode = "card" }: ProductControl
             </div>
           )}
 
-          {counts.length >= 1 && (
+          {counts.length > 1 ? (
             <div className={mode === "detail" ? "space-y-2" : ""}>
               <Label
                 className={
@@ -281,7 +281,7 @@ export function ProductControls({ product, user, mode = "card" }: ProductControl
                 })}
               </div>
             </div>
-          )}
+          ) : null}
         </div>
       )}
 
@@ -291,13 +291,11 @@ export function ProductControls({ product, user, mode = "card" }: ProductControl
           Your account is pending approval. Pricing will be available once approved.
         </div>
       ) : (
-        <div>
-          <Label className="mb-1">Price</Label>
-          <div
-            className={cn("font-bold text-primary", mode === "detail" ? "text-4xl" : "text-3xl")}
-          >
-            {formatPrice(currentPrice)}
-          </div>
+        <div
+          className={cn("font-semibold text-primary", mode === "detail" ? "text-4xl" : "text-2xl")}
+        >
+          {formatPrice(currentPrice)}
+          <span className="text-xs pl-2">(10 count)</span>
         </div>
       )}
 

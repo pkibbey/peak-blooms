@@ -14,7 +14,7 @@ interface AddressFieldsProps {
  * AddressFields is a fieldset component that integrates with a parent form's
  * React Hook Form context. It renders address input fields with validation.
  *
- * @param fieldPrefix - Optional prefix for field names (e.g., "shippingAddress." or "billingAddress.")
+ * @param fieldPrefix - Optional prefix for field names (e.g., "shippingAddress.")
  * @param disabled - Whether the fields should be disabled
  *
  * Usage:
