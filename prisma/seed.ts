@@ -59,6 +59,14 @@ async function main() {
           priceMultiplier: 1.0,
         },
         {
+          email: "peakbloomssd@gmail.com",
+          name: "Peak Blooms Admin",
+          emailVerified: true,
+          approved: true,
+          role: "ADMIN" as const,
+          priceMultiplier: 1.0,
+        },
+        {
           email: "pending@peakblooms.com",
           name: "Pending User",
           emailVerified: true,

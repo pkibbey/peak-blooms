@@ -19,7 +19,9 @@
     "db:docker:reset": "dotenv -e .env.local -- prisma migrate reset --force",
     "db:docker:seed": "dotenv -e .env.local -- prisma db seed",
     "db:prod:reset": "dotenv -e .env.prod -- prisma migrate reset --force && dotenv -e .env.prod -- prisma db seed",
-    "db:studio": "prisma studio"
+    "db:prod:seed": "dotenv -e .env.prod -- prisma db seed",
+    "db:docker:studio": "dotenv -e .env.local -- prisma studio",
+    "db:prod:studio": "dotenv -e .env.prod -- prisma studio"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",

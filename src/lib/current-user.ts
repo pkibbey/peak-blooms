@@ -10,10 +10,7 @@ import { adjustPrice } from "./utils"
  * Better Auth provides user data directly in the session with custom fields
  */
 export const getCurrentUser = cache(async () => {
-  const start = performance.now()
-
   const session = await getSession()
-  console.log(`[getCurrentUser] getSession() done: ${(performance.now() - start).toFixed(0)}ms`)
 
   if (!session?.user?.email) {
     return null

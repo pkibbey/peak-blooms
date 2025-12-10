@@ -17,7 +17,6 @@ export async function captureMetric(
   name: string,
   duration: number
 ): Promise<void> {
-  console.log("captureMetric: ", name)
   try {
     await db.metric.create({
       data: {

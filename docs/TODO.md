@@ -1,8 +1,5 @@
 ## 🛠️ Website To-Do List
 
-- Refactor seed script to use less database operations
-- Add a Google icon
-
 ### 🌟 Next Steps
 
 - Setup domain

@@ -173,8 +173,6 @@ export default function CheckoutForm({ cart, savedAddresses, userEmail }: Checko
   }
 
   const onSubmit = async (data: CheckoutFormData) => {
-    console.log("✅ [Form Validation] Form validation PASSED")
-    console.log("📋 [Checkout] Form data:", data)
     setIsSubmitting(true)
 
     try {

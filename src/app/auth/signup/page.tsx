@@ -19,7 +19,6 @@ export default function SignUpPage() {
 
   const handleGoogleSignUp = async () => {
     try {
-      console.log("[SignUp] Starting Google OAuth sign-up")
       const baseURL = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"
       const redirectUrl = `${baseURL}/api/auth/signin/google`
       window.location.href = redirectUrl

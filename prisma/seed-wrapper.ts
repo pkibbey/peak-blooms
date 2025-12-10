@@ -5,8 +5,8 @@
  * 2. seed.ts - Seeds users, inspirations, and orders (fast operations)
  */
 
-import { spawn } from "child_process"
-import path from "path"
+import { spawn } from "node:child_process"
+import path from "node:path"
 
 async function runSeedScript(scriptName: string): Promise<void> {
   return new Promise((resolve, reject) => {
@@ -37,7 +37,7 @@ async function runSeedScript(scriptName: string): Promise<void> {
 async function main() {
   try {
     console.log("🌸 Peak Blooms Database Seeding (Split Mode)")
-    console.log("=" + "=".repeat(60))
+    console.log(`=${"=".repeat(60)}`)
 
     // Run seed-products first (creates collections, products, variants)
     await runSeedScript("seed-products.ts")
@@ -45,10 +45,10 @@ async function main() {
     // Run seed second (creates users, inspirations, orders)
     await runSeedScript("seed.ts")
 
-    console.log("\n" + "=".repeat(61))
+    console.log(`\n${"=".repeat(61)}`)
     console.log("✅ All seeds completed successfully!")
   } catch (error) {
-    console.error("\n" + "=".repeat(61))
+    console.error(`\n${"=".repeat(61)}`)
     console.error("❌ Seeding failed:", error)
     process.exit(1)
   }

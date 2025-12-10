@@ -1,5 +1,6 @@
 "use client"
 
+import { Mail } from "lucide-react"
 import Link from "next/link"
 import { useSearchParams } from "next/navigation"
 import { Button } from "@/components/ui/button"
@@ -11,7 +12,6 @@ export default function SignInPage() {
 
   const handleGoogleSignIn = async () => {
     try {
-      console.log("[SignIn] Starting Google OAuth sign-in")
       await authClient.signIn.social({
         provider: "google",
       })
@@ -38,6 +38,7 @@ export default function SignInPage() {
         )}
 
         <Button onClick={handleGoogleSignIn} className="w-full">
+          <Mail className="mr-2 h-4 w-4" />
           Sign in with Google
         </Button>
 

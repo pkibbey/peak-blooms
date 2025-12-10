@@ -49,8 +49,6 @@ export function ShopFilters({
     priceMax ? 1 : 0,
   ].filter(Boolean).length
 
-  console.log("activeFilterCount: ", activeFilterCount)
-
   // Track which sections have active filters
   const hasActiveColors = selectedColors.length > 0
   const hasActiveCollections = selectedCollectionIds.length > 0
