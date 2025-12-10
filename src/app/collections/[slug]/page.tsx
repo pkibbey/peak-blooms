@@ -4,20 +4,13 @@ import { PageHeader } from "@/components/site/PageHeader"
 import { ProductCard } from "@/components/site/ProductCard"
 import { ShippingBanner } from "@/components/site/ShippingBanner"
 import { getCurrentUser } from "@/lib/current-user"
-import { getAllCollectionSlugs, getCollectionBySlug } from "@/lib/data"
+import { getCollectionBySlug } from "@/lib/data"
 import { db } from "@/lib/db"
 
 interface CollectionDetailPageProps {
   params: Promise<{
     slug: string
   }>
-}
-
-export async function generateStaticParams() {
-  const collections = await getAllCollectionSlugs()
-  return collections.map((collection) => ({
-    slug: collection.slug,
-  }))
 }
 
 export async function generateMetadata({ params }: CollectionDetailPageProps) {

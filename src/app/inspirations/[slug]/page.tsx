@@ -3,20 +3,13 @@ import { notFound } from "next/navigation"
 import BackLink from "@/components/site/BackLink"
 import { InspirationProductTable } from "@/components/site/InspirationProductTable"
 import { getCurrentUser } from "@/lib/current-user"
-import { getAllInspirationSlugs, getInspirationBySlug } from "@/lib/data"
+import { getInspirationBySlug } from "@/lib/data"
 import { db } from "@/lib/db"
 
 interface InspirationDetailPageProps {
   params: Promise<{
     slug: string
   }>
-}
-
-export async function generateStaticParams() {
-  const inspirations = await getAllInspirationSlugs()
-  return inspirations.map((inspiration) => ({
-    slug: inspiration.slug,
-  }))
 }
 
 export async function generateMetadata({ params }: InspirationDetailPageProps) {

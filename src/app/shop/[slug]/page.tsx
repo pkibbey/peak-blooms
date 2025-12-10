@@ -8,20 +8,13 @@ import { ShippingBanner } from "@/components/site/ShippingBanner"
 import { ColorsMiniDisplay } from "@/components/ui/ColorsMiniDisplay"
 import { Label } from "@/components/ui/label"
 import { getCurrentUser } from "@/lib/current-user"
-import { getAllProductSlugs, getProductWithInspirations } from "@/lib/data"
+import { getProductWithInspirations } from "@/lib/data"
 import { db } from "@/lib/db"
 
 interface ProductDetailPageProps {
   params: Promise<{
     slug: string
   }>
-}
-
-export async function generateStaticParams() {
-  const products = await getAllProductSlugs()
-  return products.map((product) => ({
-    slug: product.slug,
-  }))
 }
 
 export async function generateMetadata({ params }: ProductDetailPageProps) {
