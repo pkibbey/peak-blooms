@@ -1,6 +1,8 @@
 "use client"
 
 import Link from "next/link"
+import { useRouter } from "next/navigation"
+import { toast } from "sonner"
 import { Button } from "@/components/ui/button"
 import {
   DropdownMenu,
@@ -22,6 +24,8 @@ interface UserMenuProps {
 }
 
 export default function UserMenu({ user }: UserMenuProps) {
+  const router = useRouter()
+
   // Dropdown behavior is handled by the Radix-based DropdownMenu component.
 
   // Show Sign In when not authenticated
@@ -81,7 +85,14 @@ export default function UserMenu({ user }: UserMenuProps) {
         <DropdownMenuItem
           asChild
           onSelect={async () => {
-            await signOut()
+            await signOut({
+              fetchOptions: {
+                onSuccess: () => {
+                  toast.success("Signed out successfully")
+                  router.refresh()
+                },
+              },
+            })
           }}
           className="focus:bg-secondary/50 focus:text-secondary-foreground text-destructive"
         >

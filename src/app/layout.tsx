@@ -63,7 +63,7 @@ export default async function RootLayout({
 
         <NewsletterBanner />
         <Footer />
-        <Toaster position="bottom-center" />
+        <Toaster position="bottom-center" richColors />
       </body>
     </html>
   )

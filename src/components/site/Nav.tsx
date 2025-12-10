@@ -2,7 +2,9 @@
 
 import Image from "next/image"
 import Link from "next/link"
+import { useRouter } from "next/navigation"
 import { useState } from "react"
+import { toast } from "sonner"
 import NavLink from "@/components/site/NavLink"
 import UserMenu from "@/components/site/UserMenu"
 import { IconMenu, IconSettings, IconShoppingCart, IconUser, IconX } from "@/components/ui/icons"
@@ -28,6 +30,7 @@ interface NavProps {
 
 export default function Nav({ user, cartCount = 0 }: NavProps) {
   const [open, setOpen] = useState(false)
+  const router = useRouter()
   const isApproved = user?.approved === true
 
   return (
@@ -119,7 +122,14 @@ export default function Nav({ user, cartCount = 0 }: NavProps) {
                   <Button
                     variant="ghost"
                     onClick={async () => {
-                      await signOut()
+                      await signOut({
+                        fetchOptions: {
+                          onSuccess: () => {
+                            toast.success("Signed out successfully")
+                            router.refresh()
+                          },
+                        },
+                      })
                     }}
                     className="text-destructive"
                   >

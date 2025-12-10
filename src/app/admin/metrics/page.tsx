@@ -1,4 +1,4 @@
-import router from "next/router"
+import { redirect } from "next/navigation"
 import MetricsClient from "@/components/admin/MetricsClient"
 import { MetricType } from "@/lib/types/metrics"
 
@@ -9,7 +9,7 @@ export const metadata = {
 
 export default function MetricsPage() {
   if (process.env.NODE_ENV !== "development") {
-    router.push("/admin")
+    redirect("/admin")
   }
 
   return (
