@@ -25,7 +25,7 @@ export default async function OrderDetailPage({ params }: OrderDetailPageProps) 
 
   // Redirect to pending approval if not approved
   if (!user.approved) {
-    redirect("/auth/pending-approval")
+    redirect("/pending-approval")
   }
 
   // Fetch the order
@@ -62,7 +62,9 @@ export default async function OrderDetailPage({ params }: OrderDetailPageProps) 
           <p className="text-muted-foreground">Placed on {formatDate(order.createdAt)}</p>
         </div>
         <Button variant="outline" asChild>
-          <Link href="/account/order-history">View All Orders</Link>
+          <Link prefetch={false} href="/account/order-history">
+            View All Orders
+          </Link>
         </Button>
       </div>
 
@@ -129,7 +131,9 @@ export default async function OrderDetailPage({ params }: OrderDetailPageProps) 
       {/* Actions */}
       <div className="mt-8 flex gap-4">
         <Button asChild>
-          <Link href="/shop">Continue Shopping</Link>
+          <Link prefetch={false} href="/shop">
+            Continue Shopping
+          </Link>
         </Button>
       </div>
     </>

@@ -34,7 +34,11 @@ export function SortableTableHead({
 
   return (
     <TableHead className={`cursor-pointer select-none hover:bg-muted/50 ${className}`}>
-      <Link href={sortUrl} className="inline-flex items-center gap-2 font-semibold">
+      <Link
+        prefetch={false}
+        href={sortUrl}
+        className="inline-flex items-center gap-2 font-semibold"
+      >
         <span>{label}</span>
         <div className="inline-flex h-4 w-4 items-center justify-center">
           {isActive && currentOrder === "asc" && <ChevronUp className="h-4 w-4" />}

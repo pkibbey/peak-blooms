@@ -89,7 +89,7 @@ export function InspirationProductTable({
                 className={index % 2 === 0 ? "bg-white" : "bg-muted/20 hover:bg-muted/30"}
               >
                 <TableCell className="py-4">
-                  <Link href={`/shop/${product.slug}`} className="block">
+                  <Link prefetch={false} href={`/shop/${product.slug}`} className="block">
                     {product.image ? (
                       <div className="relative h-20 w-20 overflow-hidden rounded-md bg-muted shadow-sm hover:shadow-md transition-shadow">
                         <Image
@@ -109,6 +109,7 @@ export function InspirationProductTable({
                 </TableCell>
                 <TableCell className="py-4">
                   <Link
+                    prefetch={false}
                     href={`/shop/${product.slug}`}
                     className="text-primary font-semibold hover:underline text-base"
                   >

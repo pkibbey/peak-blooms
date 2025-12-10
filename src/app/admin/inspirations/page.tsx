@@ -57,7 +57,9 @@ export default async function AdminInspirationsPage({ searchParams }: AdminInspi
           </p>
         </div>
         <Button asChild>
-          <Link href="/admin/inspirations/new">Add New Inspiration</Link>
+          <Link prefetch={false} href="/admin/inspirations/new">
+            Add New Inspiration
+          </Link>
         </Button>
       </div>
 

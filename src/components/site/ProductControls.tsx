@@ -302,7 +302,9 @@ export function ProductControls({ product, user, mode = "card" }: ProductControl
       {/* Add to Cart Button */}
       {isSignedOut ? (
         <Button className="w-full" asChild>
-          <Link href="/auth/signin">Sign in to view pricing</Link>
+          <Link prefetch={false} href="/auth/signin">
+            Sign in to view pricing
+          </Link>
         </Button>
       ) : isUnapproved ? (
         <Button size="lg" className="w-full" disabled>

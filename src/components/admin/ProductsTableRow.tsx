@@ -73,6 +73,7 @@ export default function ProductsTableRow({ product }: ProductRowProps) {
       {/* Name */}
       <TableCell>
         <Link
+          prefetch={false}
           href={`/admin/products/${product.id}/edit`}
           className="text-primary font-medium hover:underline"
         >

@@ -48,6 +48,7 @@ export default function CollectionsTableRow({ collection }: { collection: Collec
       {/* Name */}
       <TableCell>
         <Link
+          prefetch={false}
           href={`/admin/collections/${collection.id}/edit`}
           className="text-primary font-medium hover:underline"
         >

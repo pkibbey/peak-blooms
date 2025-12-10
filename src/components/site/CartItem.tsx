@@ -53,6 +53,7 @@ export function CartItem({ item, isUpdating, onUpdateQuantity, onRemove }: CartI
     >
       {/* Product Image */}
       <Link
+        prefetch={false}
         href={`/shop/${item.product.slug}`}
         className="relative h-24 w-24 shrink-0 overflow-hidden rounded-xs bg-neutral-100"
       >
@@ -74,6 +75,7 @@ export function CartItem({ item, isUpdating, onUpdateQuantity, onRemove }: CartI
         <div className="flex justify-between">
           <div>
             <Link
+              prefetch={false}
               href={`/shop/${item.product.slug}`}
               className="font-semibold hover:text-primary transition-colors"
             >
@@ -89,7 +91,11 @@ export function CartItem({ item, isUpdating, onUpdateQuantity, onRemove }: CartI
 
         {/* View Options Link */}
         <div className="mt-2">
-          <Link href={`/shop/${item.product.slug}`} className="text-sm text-primary underline">
+          <Link
+            prefetch={false}
+            href={`/shop/${item.product.slug}`}
+            className="text-sm text-primary underline"
+          >
             View similar options →
           </Link>
         </div>

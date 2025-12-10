@@ -27,7 +27,9 @@ export default function VerifyRequestPage() {
         </div>
 
         <Button asChild variant="outline" className="w-full">
-          <Link href="/">Return to home</Link>
+          <Link prefetch={false} href="/">
+            Return to home
+          </Link>
         </Button>
       </div>
     </div>

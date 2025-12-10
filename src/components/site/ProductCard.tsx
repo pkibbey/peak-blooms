@@ -23,7 +23,7 @@ export function ProductCard({ product, user }: ProductCardProps) {
   return (
     <div className="group flex flex-col overflow-hidden rounded-xs shadow-md transition-shadow hover:shadow-lg">
       {/* Image Container */}
-      <Link href={`/shop/${product.slug}`}>
+      <Link prefetch={false} href={`/shop/${product.slug}`}>
         <div className="relative aspect-square overflow-hidden bg-zinc-200">
           {product.image && (
             <Image
@@ -56,7 +56,7 @@ export function ProductCard({ product, user }: ProductCardProps) {
       {/* Card Content */}
       <div className="flex flex-col justify-between bg-white p-4 gap-2 grow">
         <div>
-          <Link href={`/shop/${product.slug}`}>
+          <Link prefetch={false} href={`/shop/${product.slug}`}>
             <h3 className="font-bold font-serif">{product.name}</h3>
           </Link>
         </div>

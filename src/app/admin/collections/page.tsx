@@ -57,7 +57,9 @@ export default async function AdminCollectionsPage({ searchParams }: AdminCollec
           </p>
         </div>
         <Button asChild>
-          <Link href="/admin/collections/new">Add New Collection</Link>
+          <Link prefetch={false} href="/admin/collections/new">
+            Add New Collection
+          </Link>
         </Button>
       </div>
 

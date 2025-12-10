@@ -74,6 +74,7 @@ export default function OrdersTable({ orders, currentStatus, sort, order }: Orde
                 asChild
               >
                 <Link
+                  prefetch={false}
                   href={
                     filter.value === "ALL"
                       ? "/admin/orders"
@@ -151,6 +152,7 @@ export default function OrdersTable({ orders, currentStatus, sort, order }: Orde
                   <TableRow key={order.id}>
                     <TableCell>
                       <Link
+                        prefetch={false}
                         href={`/admin/orders/${order.id}`}
                         className="font-medium text-primary hover:underline"
                       >
@@ -177,7 +179,7 @@ export default function OrdersTable({ orders, currentStatus, sort, order }: Orde
                     </TableCell>
                     <TableCell className="text-right">
                       <Button variant="outline" size="sm" asChild>
-                        <Link href={`/admin/orders/${order.id}`}>
+                        <Link prefetch={false} href={`/admin/orders/${order.id}`}>
                           <IconEye className="h-4 w-4 mr-1" />
                           View
                         </Link>

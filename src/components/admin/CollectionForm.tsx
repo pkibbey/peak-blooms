@@ -254,7 +254,9 @@ export default function CollectionForm({ collection, products = [] }: Collection
               {isSubmitting ? "Saving..." : "Save Collection"}
             </Button>
             <Button type="button" variant="outline" asChild>
-              <Link href="/admin/collections">Cancel</Link>
+              <Link prefetch={false} href="/admin/collections">
+                Cancel
+              </Link>
             </Button>
           </div>
           {isEditing && (

@@ -461,7 +461,9 @@ export default function ProductForm({ collections, product }: ProductFormProps) 
               {isSubmitting ? "Saving..." : "Save Product"}
             </Button>
             <Button type="button" variant="outline" asChild>
-              <Link href="/admin/products">Cancel</Link>
+              <Link prefetch={false} href="/admin/products">
+                Cancel
+              </Link>
             </Button>
           </div>
           {isEditing && (

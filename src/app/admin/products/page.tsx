@@ -66,7 +66,9 @@ export default async function AdminProductsPage({ searchParams }: AdminProductsP
           </p>
         </div>
         <Button asChild>
-          <Link href="/admin/products/new">Add New Product</Link>
+          <Link prefetch={false} href="/admin/products/new">
+            Add New Product
+          </Link>
         </Button>
       </div>
 

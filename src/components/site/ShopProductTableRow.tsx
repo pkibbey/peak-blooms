@@ -50,7 +50,11 @@ export function ShopProductTableRow({ product }: ShopProductTableRowProps) {
 
       {/* Name */}
       <TableCell>
-        <Link href={`/shop/${product.slug}`} className="text-primary font-medium hover:underline">
+        <Link
+          prefetch={false}
+          href={`/shop/${product.slug}`}
+          className="text-primary font-medium hover:underline"
+        >
           {product.name}
         </Link>
       </TableCell>

@@ -16,7 +16,7 @@ export default async function CheckoutPage() {
 
   // Redirect to pending approval if not approved
   if (!user.approved) {
-    redirect("/auth/pending-approval")
+    redirect("/pending-approval")
   }
 
   // Fetch cart data
@@ -46,7 +46,9 @@ export default async function CheckoutPage() {
             Add some items to your cart before checking out.
           </p>
           <Button asChild>
-            <Link href="/shop">Browse Products</Link>
+            <Link prefetch={false} href="/shop">
+              Browse Products
+            </Link>
           </Button>
         </div>
       </div>

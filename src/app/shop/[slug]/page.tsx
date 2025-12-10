@@ -68,13 +68,14 @@ export default async function ProductDetailPage({ params }: ProductDetailPagePro
             <div className="flex flex-col justify-start gap-6">
               {/* Breadcrumb */}
               <div className="text-sm text-muted-foreground">
-                <Link href="/shop" className="hover:underline">
+                <Link prefetch={false} href="/shop" className="hover:underline">
                   Shop
                 </Link>
                 {product.productCollections.length > 0 && (
                   <>
                     <span className="mx-2">/</span>
                     <Link
+                      prefetch={false}
                       href={`/collections/${product.productCollections[0].collection.slug}`}
                       className="hover:underline"
                     >

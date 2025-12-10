@@ -48,7 +48,7 @@ export default function SignInPage() {
         <div className="border-t border-border pt-4">
           <p className="text-center text-sm text-muted-foreground">
             Don&apos;t have an account?{" "}
-            <Link href="/auth/signup" className="font-medium hover:underline">
+            <Link prefetch={false} href="/auth/signup" className="font-medium hover:underline">
               Create one
             </Link>
           </p>

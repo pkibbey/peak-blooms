@@ -40,7 +40,7 @@ export function InspirationCard({ inspiration }: InspirationCardProps) {
       {/* Content Container */}
       <div className="flex flex-col justify-between p-6 grow">
         <div>
-          <Link href={`/inspirations/${inspiration.slug}`} className="group/link">
+          <Link prefetch={false} href={`/inspirations/${inspiration.slug}`} className="group/link">
             <h3 className="text-xl font-bold group-hover/link:text-primary transition-colors font-serif">
               {inspiration.name}
             </h3>
@@ -53,6 +53,7 @@ export function InspirationCard({ inspiration }: InspirationCardProps) {
 
         <Button asChild className="mt-4 w-full">
           <Link
+            prefetch={false}
             href={`/inspirations/${inspiration.slug}`}
             className="inline-flex items-center justify-center gap-2"
           >

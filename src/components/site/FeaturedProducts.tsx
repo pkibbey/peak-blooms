@@ -13,7 +13,11 @@ export default async function FeaturedProducts() {
       <div className="w-full max-w-5xl px-6">
         <div className="flex items-end justify-between">
           <h2 className="text-3xl font-extrabold font-serif">Featured Products</h2>
-          <Link href="/shop" className="text-sm font-medium text-primary hover:underline shrink-0">
+          <Link
+            prefetch={false}
+            href="/shop"
+            className="text-sm font-medium text-primary hover:underline shrink-0"
+          >
             View all products →
           </Link>
         </div>

@@ -33,7 +33,9 @@ export default function EmptyState({
 
       {primaryAction ?? (
         <Button asChild>
-          <Link href="/shop">Browse Products</Link>
+          <Link prefetch={false} href="/shop">
+            Browse Products
+          </Link>
         </Button>
       )}
     </div>

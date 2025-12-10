@@ -21,7 +21,7 @@ export default async function InspirationPage() {
         />
 
         {/* Gallery Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-4">
           {inspirations.map((inspiration) => (
             <InspirationCard key={inspiration.slug} inspiration={inspiration} />
           ))}

@@ -31,10 +31,14 @@ export default async function ErrorPage({
 
         <div className="space-y-2">
           <Button asChild className="w-full">
-            <Link href="/auth/signin">Try signing in again</Link>
+            <Link prefetch={false} href="/auth/signin">
+              Try signing in again
+            </Link>
           </Button>
           <Button asChild variant="outline" className="w-full">
-            <Link href="/">Return to home</Link>
+            <Link prefetch={false} href="/">
+              Return to home
+            </Link>
           </Button>
         </div>
       </div>

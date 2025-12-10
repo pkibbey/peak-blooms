@@ -7,22 +7,13 @@ import { calculateCartTotal, getCurrentUser, getOrCreateCart } from "@/lib/curre
 export default async function CartPage() {
   const user = await getCurrentUser()
 
-  // If not authenticated, render a viewable (empty) cart so guests can
-  // inspect the UI. Cart interactions still require signing in to modify.
   if (!user) {
-    const total = 0
-
-    return (
-      <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 py-10">
-        <h1 className="heading-1 mb-8">Shopping Cart</h1>
-        <Cart initialCart={{ id: "", items: [], total }} />
-      </div>
-    )
+    redirect("/auth/signin?callbackUrl=/cart")
   }
 
   // Redirect to pending approval if not approved
   if (!user.approved) {
-    redirect("/auth/pending-approval")
+    redirect("/pending-approval")
   }
 
   // Fetch cart data server-side

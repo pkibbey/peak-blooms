@@ -48,7 +48,7 @@ export default function Hero({
     if (ctaText && ctaLink) {
       return (
         <Button asChild>
-          <Link href={ctaLink} className="inline-flex items-center gap-1">
+          <Link prefetch={false} href={ctaLink} className="inline-flex items-center gap-1">
             {ctaText}
           </Link>
         </Button>

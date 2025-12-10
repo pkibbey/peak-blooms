@@ -40,7 +40,9 @@ export default async function UnauthorizedPage() {
               </Button>
 
               <Button asChild className="w-full">
-                <Link href="/">Return to home</Link>
+                <Link prefetch={false} href="/">
+                  Return to home
+                </Link>
               </Button>
             </div>
           </>
@@ -52,11 +54,15 @@ export default async function UnauthorizedPage() {
 
             <div className="grid gap-3">
               <Button asChild variant="outline" className="w-full">
-                <Link href="/auth/signin?callbackUrl=/admin">Sign in to Admin</Link>
+                <Link prefetch={false} href="/auth/signin?callbackUrl=/admin">
+                  Sign in to Admin
+                </Link>
               </Button>
 
               <Button asChild className="w-full">
-                <Link href="/">Return to home</Link>
+                <Link prefetch={false} href="/">
+                  Return to home
+                </Link>
               </Button>
             </div>
           </>

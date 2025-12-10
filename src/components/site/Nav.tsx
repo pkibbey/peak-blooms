@@ -42,7 +42,11 @@ export default function Nav({ user, cartCount = 0 }: NavProps) {
       <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
         <div className="flex h-16 items-center justify-between">
           <div className="flex items-center gap-6">
-            <Link href="/" className="inline-flex items-center gap-3 text-lg font-semibold">
+            <Link
+              prefetch={false}
+              href="/"
+              className="inline-flex items-center gap-3 text-lg font-semibold"
+            >
               <Image
                 src="/logos/peakblooms.png"
                 alt="Peak Blooms logo"
@@ -67,7 +71,7 @@ export default function Nav({ user, cartCount = 0 }: NavProps) {
           <div className="flex items-center gap-4">
             {isApproved && (
               <div className="hidden md:block">
-                <Link href="/cart" className="inline-flex items-center gap-2">
+                <Link prefetch={false} href="/cart" className="inline-flex items-center gap-2">
                   <IconShoppingCart aria-hidden="true" />
                   <span>Cart</span>
                   {cartCount > 0 && <Badge variant="default">{cartCount}</Badge>}
@@ -102,7 +106,11 @@ export default function Nav({ user, cartCount = 0 }: NavProps) {
               ))}
               {isApproved && (
                 <Button asChild variant="ghost">
-                  <Link href="/cart" className="inline-flex items-center gap-2 px-4 py-2">
+                  <Link
+                    prefetch={false}
+                    href="/cart"
+                    className="inline-flex items-center gap-2 px-4 py-2"
+                  >
                     <IconShoppingCart aria-hidden="true" />
                     <span>Cart</span>
                     {cartCount > 0 && <Badge variant="default">{cartCount}</Badge>}
@@ -139,12 +147,12 @@ export default function Nav({ user, cartCount = 0 }: NavProps) {
               ) : (
                 <>
                   <Button asChild variant="ghost">
-                    <Link href="/auth/signin" className="px-4 py-2">
+                    <Link prefetch={false} href="/auth/signin" className="px-4 py-2">
                       Sign In
                     </Link>
                   </Button>
                   <Button asChild>
-                    <Link href="/auth/signup" className="px-4 py-2">
+                    <Link prefetch={false} href="/auth/signup" className="px-4 py-2">
                       Sign Up
                     </Link>
                   </Button>

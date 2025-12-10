@@ -9,19 +9,27 @@ export default function QuickActions() {
 
       <div className="flex flex-wrap gap-3">
         <Button asChild>
-          <Link href="/admin/products/new">Add product</Link>
+          <Link prefetch={false} href="/admin/products/new">
+            Add product
+          </Link>
         </Button>
 
         <Button asChild variant="outline">
-          <Link href="/admin/orders?status=PENDING">View pending orders</Link>
+          <Link prefetch={false} href="/admin/orders?status=PENDING">
+            View pending orders
+          </Link>
         </Button>
 
         <Button asChild variant="outline">
-          <Link href="/admin/users">Review users</Link>
+          <Link prefetch={false} href="/admin/users">
+            Review users
+          </Link>
         </Button>
 
         <Button asChild variant="ghost">
-          <Link href="/admin/collections/new">New collection</Link>
+          <Link prefetch={false} href="/admin/collections/new">
+            New collection
+          </Link>
         </Button>
       </div>
     </div>

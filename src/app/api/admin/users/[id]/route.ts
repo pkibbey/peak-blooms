@@ -60,19 +60,14 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
       },
     })
 
-    // Only invalidate sessions if we're updating someone else OR if the current
-    // session owner changed their `approved` status (that affects auth/permissions).
-    // This avoids logging an admin out when they edit their own non-auth fields
-    // like `priceMultiplier`.
+    // Only invalidate sessions if we're updating someone else.
+    // When updating yourself (even if changing approval status), keep the session active
+    // so you can see the changes reflected immediately without being logged out.
     const isCurrentUser = session.user.id === id
 
-    const changedApproved =
-      typeof updateData.approved === "boolean" &&
-      updateData.approved !== (session.user.approved as boolean | undefined)
-
-    if (!isCurrentUser || changedApproved) {
+    if (!isCurrentUser) {
       // Revoke sessions for the target user so their session reflects any
-      // significant changes to their permissions.
+      // changes to their permissions.
       await invalidateUserSessions(id)
     }
 

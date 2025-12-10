@@ -89,7 +89,9 @@ export default function AddAllToCartButton({
     return (
       <>
         <Button size="lg" className="w-full" asChild>
-          <Link href="/auth/signin">Sign in to purchase all</Link>
+          <Link prefetch={false} href="/auth/signin">
+            Sign in to purchase all
+          </Link>
         </Button>
         {error ? <p className="mt-2 text-sm text-destructive">{error}</p> : null}
       </>

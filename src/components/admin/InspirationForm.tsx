@@ -286,7 +286,9 @@ export default function InspirationForm({ products, inspiration }: InspirationFo
               {isSubmitting ? "Saving..." : "Save Inspiration"}
             </Button>
             <Button type="button" variant="outline" asChild>
-              <Link href="/admin/inspirations">Cancel</Link>
+              <Link prefetch={false} href="/admin/inspirations">
+                Cancel
+              </Link>
             </Button>
           </div>
           {isEditing && (

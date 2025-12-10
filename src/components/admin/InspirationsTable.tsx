@@ -94,6 +94,7 @@ export default function InspirationsTable({ inspirations, sort, order }: Inspira
                 {/* Name */}
                 <TableCell>
                   <Link
+                    prefetch={false}
                     href={`/admin/inspirations/${inspiration.id}/edit`}
                     className="text-primary font-medium hover:underline"
                   >

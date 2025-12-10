@@ -9,7 +9,11 @@ export default function Footer() {
         <div className="flex flex-col md:flex-row md:justify-between md:items-start gap-8">
           {/* Brand & contact */}
           <div className="flex-1 min-w-[220px]">
-            <Link href="/" className="inline-flex items-center gap-3 text-lg font-semibold mb-3">
+            <Link
+              prefetch={false}
+              href="/"
+              className="inline-flex items-center gap-3 text-lg font-semibold mb-3"
+            >
               <Image
                 src="/logos/peakblooms.png"
                 alt="Peak Blooms logo"
@@ -62,17 +66,21 @@ export default function Footer() {
               <h4 className="heading-4">Shop</h4>
               <ul className="mt-3 text-sm text-muted-foreground space-y-2">
                 <li>
-                  <Link href="/shop" className="hover:underline inline-flex items-center gap-2">
+                  <Link
+                    prefetch={false}
+                    href="/shop"
+                    className="hover:underline inline-flex items-center gap-2"
+                  >
                     Flowers
                   </Link>
                 </li>
                 <li>
-                  <Link href="/collections" className="hover:underline">
+                  <Link prefetch={false} href="/collections" className="hover:underline">
                     Collections
                   </Link>
                 </li>
                 <li>
-                  <Link href="/inspirations" className="hover:underline">
+                  <Link prefetch={false} href="/inspirations" className="hover:underline">
                     Inspirations
                   </Link>
                 </li>
@@ -83,12 +91,16 @@ export default function Footer() {
               <h4 className="heading-4">Company</h4>
               <ul className="mt-3 text-sm text-muted-foreground space-y-2">
                 <li>
-                  <Link href="/about" className="hover:underline inline-flex items-center gap-2">
+                  <Link
+                    prefetch={false}
+                    href="/about"
+                    className="hover:underline inline-flex items-center gap-2"
+                  >
                     About
                   </Link>
                 </li>
                 <li>
-                  <Link href="/contact" className="hover:underline">
+                  <Link prefetch={false} href="/contact" className="hover:underline">
                     Contact
                   </Link>
                 </li>
@@ -99,17 +111,17 @@ export default function Footer() {
               <h4 className="heading-4">Support</h4>
               <ul className="mt-3 text-sm text-muted-foreground space-y-2">
                 <li>
-                  <Link href="/faq" className="hover:underline">
+                  <Link prefetch={false} href="/faq" className="hover:underline">
                     FAQ
                   </Link>
                 </li>
                 <li>
-                  <Link href="/shipping" className="hover:underline">
+                  <Link prefetch={false} href="/shipping" className="hover:underline">
                     Shipping
                   </Link>
                 </li>
                 <li>
-                  <Link href="/returns" className="hover:underline">
+                  <Link prefetch={false} href="/returns" className="hover:underline">
                     Returns
                   </Link>
                 </li>
@@ -120,17 +132,17 @@ export default function Footer() {
               <h4 className="heading-4">Legal</h4>
               <ul className="mt-3 text-sm text-muted-foreground space-y-2">
                 <li>
-                  <Link href="/privacy" className="hover:underline">
+                  <Link prefetch={false} href="/privacy" className="hover:underline">
                     Privacy
                   </Link>
                 </li>
                 <li>
-                  <Link href="/terms" className="hover:underline">
+                  <Link prefetch={false} href="/terms" className="hover:underline">
                     Terms
                   </Link>
                 </li>
                 <li>
-                  <Link href="/cookies" className="hover:underline">
+                  <Link prefetch={false} href="/cookies" className="hover:underline">
                     Cookie Policy
                   </Link>
                 </li>
@@ -142,7 +154,7 @@ export default function Footer() {
         <div className="mt-8 border-t border-t-border pt-4 text-sm text-muted-foreground flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
           <div>© {new Date().getFullYear()} Peak Blooms. All rights reserved.</div>
           <div className="flex items-center gap-4">
-            <Link href="/site-map" className="hover:underline">
+            <Link prefetch={false} href="/site-map" className="hover:underline">
               Sitemap
             </Link>
           </div>

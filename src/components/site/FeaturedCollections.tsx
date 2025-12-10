@@ -11,6 +11,7 @@ export default async function FeaturedCollections() {
         <div className="flex items-end justify-between">
           <h2 className="text-3xl font-extrabold font-serif">Featured Collections</h2>
           <Link
+            prefetch={false}
             href="/collections"
             className="text-sm font-medium text-primary hover:underline shrink-0"
           >

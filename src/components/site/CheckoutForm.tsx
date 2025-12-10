@@ -402,7 +402,9 @@ export default function CheckoutForm({ cart, savedAddresses, userEmail }: Checko
 
             <div className="mt-4">
               <Button variant="outline" asChild className="w-full">
-                <Link href="/cart">Return to Cart</Link>
+                <Link prefetch={false} href="/cart">
+                  Return to Cart
+                </Link>
               </Button>
             </div>
 

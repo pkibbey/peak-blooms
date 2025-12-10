@@ -26,7 +26,11 @@ export default async function AdminSidebar() {
 
       <ul className="space-y-2 text-sm">
         <li>
-          <Link href="/admin" className="flex items-center justify-between w-full hover:underline">
+          <Link
+            prefetch={false}
+            href="/admin"
+            className="flex items-center justify-between w-full hover:underline"
+          >
             <span className="flex items-center gap-2">
               <span className="text-muted-foreground">Overview</span>
             </span>
@@ -35,6 +39,7 @@ export default async function AdminSidebar() {
 
         <li>
           <Link
+            prefetch={false}
             href="/admin/orders"
             className="flex items-center justify-between w-full hover:underline"
           >
@@ -47,6 +52,7 @@ export default async function AdminSidebar() {
 
         <li>
           <Link
+            prefetch={false}
             href="/admin/products"
             className="flex items-center justify-between w-full hover:underline"
           >
@@ -58,6 +64,7 @@ export default async function AdminSidebar() {
 
         <li>
           <Link
+            prefetch={false}
             href="/admin/collections"
             className="flex items-center justify-between w-full hover:underline"
           >
@@ -69,6 +76,7 @@ export default async function AdminSidebar() {
 
         <li>
           <Link
+            prefetch={false}
             href="/admin/inspirations"
             className="flex items-center justify-between w-full hover:underline"
           >
@@ -80,6 +88,7 @@ export default async function AdminSidebar() {
 
         <li>
           <Link
+            prefetch={false}
             href="/admin/users"
             className="flex items-center justify-between w-full hover:underline"
           >
@@ -93,6 +102,7 @@ export default async function AdminSidebar() {
         {process.env.NODE_ENV === "development" && (
           <li>
             <Link
+              prefetch={false}
               href="/admin/metrics"
               className="flex items-center justify-between w-full hover:underline"
             >

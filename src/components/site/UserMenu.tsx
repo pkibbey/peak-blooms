@@ -33,7 +33,9 @@ export default function UserMenu({ user }: UserMenuProps) {
     return (
       <div>
         <Button asChild size="sm" variant="outline" className="hidden md:inline-flex">
-          <Link href="/auth/signin">Sign In</Link>
+          <Link prefetch={false} href="/auth/signin">
+            Sign In
+          </Link>
         </Button>
       </div>
     )
@@ -62,7 +64,7 @@ export default function UserMenu({ user }: UserMenuProps) {
               asChild
               className="focus:bg-secondary/50 focus:text-secondary-foreground"
             >
-              <Link href="/admin" className="flex items-center gap-2">
+              <Link prefetch={false} href="/admin" className="flex items-center gap-2">
                 <IconSettings aria-hidden="true" />
                 <span>Admin Dashboard</span>
               </Link>
@@ -73,7 +75,7 @@ export default function UserMenu({ user }: UserMenuProps) {
             asChild
             className="focus:bg-secondary/50 focus:text-secondary-foreground"
           >
-            <Link href="/account" className="flex items-center gap-2">
+            <Link prefetch={false} href="/account" className="flex items-center gap-2">
               <IconUser aria-hidden="true" />
               <span>Account settings</span>
             </Link>

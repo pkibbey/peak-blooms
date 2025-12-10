@@ -48,7 +48,9 @@ export default async function OrderHistoryPage() {
           <IconPackage className="h-12 w-12 mx-auto text-muted-foreground mb-3" />
           <p className="text-muted-foreground mb-4">No orders yet</p>
           <Button asChild>
-            <Link href="/shop">Browse Products</Link>
+            <Link prefetch={false} href="/shop">
+              Browse Products
+            </Link>
           </Button>
         </div>
       )}

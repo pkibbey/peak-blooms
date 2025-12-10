@@ -42,7 +42,9 @@ export default async function AccountPage() {
               </div>
               <div className="shrink-0">
                 <Button asChild className="mt-2">
-                  <Link href="/account/profile">View Profile</Link>
+                  <Link prefetch={false} href="/account/profile">
+                    View Profile
+                  </Link>
                 </Button>
               </div>
             </div>
@@ -61,7 +63,9 @@ export default async function AccountPage() {
               </div>
               <div className="shrink-0">
                 <Button asChild className="mt-2">
-                  <Link href="/account/addresses">Manage Addresses</Link>
+                  <Link prefetch={false} href="/account/addresses">
+                    Manage Addresses
+                  </Link>
                 </Button>
               </div>
             </div>
@@ -80,7 +84,9 @@ export default async function AccountPage() {
               </div>
               <div className="shrink-0">
                 <Button asChild className="mt-2">
-                  <Link href="/account/order-history">View Order History</Link>
+                  <Link prefetch={false} href="/account/order-history">
+                    View Order History
+                  </Link>
                 </Button>
               </div>
             </div>

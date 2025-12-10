@@ -52,7 +52,11 @@ export function OrderItem({ item, linkHref }: OrderItemProps) {
         <div className="flex justify-between">
           <div>
             {linkHref ? (
-              <Link href={linkHref} className="font-medium hover:text-primary hover:underline">
+              <Link
+                prefetch={false}
+                href={linkHref}
+                className="font-medium hover:text-primary hover:underline"
+              >
                 {item.product.name}
               </Link>
             ) : (

@@ -26,7 +26,7 @@ export default function NavLink({ href, children, className, icon, ...props }: N
         className
       )}
     >
-      <Link href={href} aria-current={active ? "page" : undefined} {...props}>
+      <Link prefetch={false} href={href} aria-current={active ? "page" : undefined} {...props}>
         {icon ? (
           <span className="inline-flex items-center" aria-hidden="true">
             {icon}
