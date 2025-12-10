@@ -10,12 +10,55 @@ import type { Prisma } from "@/generated/client"
 
 // Re-export base model types for convenience
 export type {
+  AddressModel,
+  CartItemModel,
   CollectionModel,
   InspirationModel,
   InspirationProductModel,
+  OrderItemModel,
+  OrderModel,
   ProductModel,
   ProductVariantModel,
+  ShoppingCartModel,
+  UserModel,
 } from "@/generated/models"
+
+// =============================================================================
+// User Types
+// =============================================================================
+
+/** Minimal user data for cart operations (from getCurrentUser) */
+export interface CartUser {
+  id: string
+  priceMultiplier: number
+  email?: string
+  name?: string
+  role?: string
+  approved?: boolean
+}
+
+/** User with minimal fields */
+export type UserBasic = Prisma.UserGetPayload<Record<string, never>>
+
+/** User with complete address information */
+export type UserWithAddresses = Prisma.UserGetPayload<{
+  include: { addresses: true }
+}>
+
+/** User with cart and cart items */
+export type UserWithCart = Prisma.UserGetPayload<{
+  include: {
+    cart: {
+      include: {
+        items: {
+          include: {
+            productVariant: true
+          }
+        }
+      }
+    }
+  }
+}>
 
 // =============================================================================
 // Product Types

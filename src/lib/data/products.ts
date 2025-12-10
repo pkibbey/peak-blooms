@@ -4,6 +4,7 @@
  */
 
 import { db } from "@/lib/db"
+import type { GetProductsOptions, GetProductsResult } from "@/lib/types/data"
 import type {
   ProductVariantWhereInput,
   ProductWhereInput,
@@ -65,29 +66,6 @@ export async function getProductById(
     },
     { logNotFound: true }
   )
-}
-
-interface GetProductsOptions {
-  collectionIds?: string[]
-  featured?: boolean
-  colors?: string[]
-  stemLengthMin?: number
-  stemLengthMax?: number
-  priceMin?: number
-  priceMax?: number
-  boxlotOnly?: boolean
-  search?: string
-  limit?: number
-  offset?: number
-  sort?: string
-  order?: "asc" | "desc"
-}
-
-interface GetProductsResult {
-  products: ProductWithVariantsAndCollection[]
-  total: number
-  limit: number
-  offset: number
 }
 
 /**

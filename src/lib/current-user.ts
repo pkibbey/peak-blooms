@@ -1,6 +1,7 @@
 import { cache } from "react"
 import { getSession } from "./auth"
 import { db } from "./db"
+import type { CartUser } from "./types/prisma"
 import { adjustPrice } from "./utils"
 
 /**
@@ -42,12 +43,6 @@ function applyPriceMultiplierToCartItems<
         }
       : null,
   }))
-}
-
-/** User type for cart operations */
-type CartUser = {
-  id: string
-  priceMultiplier: number
 }
 
 /**

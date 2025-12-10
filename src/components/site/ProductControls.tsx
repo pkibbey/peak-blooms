@@ -202,6 +202,10 @@ export function ProductControls({ product, user, mode = "card" }: ProductControl
 
   const clampAddQuantity = (v: number) => Math.max(1, Math.min(999, Math.floor(Number(v) || 1)))
 
+  if (isSignedOut && isUnapproved) {
+    return null
+  }
+
   return (
     <div className={cn("flex flex-col", mode === "detail" ? "gap-6" : "gap-3")}>
       {/* Variant Selectors */}
@@ -286,11 +290,7 @@ export function ProductControls({ product, user, mode = "card" }: ProductControl
       )}
 
       {/* Price Display & Variant Summary */}
-      {isSignedOut ? null : isUnapproved ? (
-        <div className="text-sm text-muted-foreground italic">
-          Your account is pending approval. Pricing will be available once approved.
-        </div>
-      ) : (
+      {isSignedOut && !isUnapproved && (
         <div
           className={cn("font-semibold text-primary", mode === "detail" ? "text-4xl" : "text-2xl")}
         >
@@ -306,49 +306,47 @@ export function ProductControls({ product, user, mode = "card" }: ProductControl
             Sign in to view pricing
           </Link>
         </Button>
-      ) : isUnapproved ? (
-        <Button size="lg" className="w-full" disabled>
-          Waiting on Account Approval
-        </Button>
       ) : (
-        <div className={cn("flex items-center gap-2 flex-wrap", mode === "detail" ? "" : "")}>
-          {/* compact quantity stepper for card / detail modes */}
-          <div className="flex items-center gap-1">
-            <Button
-              type="button"
-              variant="outline"
-              size="icon-sm"
-              onClick={() => setAddQuantity((q) => Math.max(1, q - 1))}
-              aria-label="Decrease quantity"
-            >
-              <IconMinus className="h-3 w-3" />
-            </Button>
-            <Input
-              type="number"
-              min={1}
-              value={addQuantity}
-              onChange={(e) => setAddQuantity(clampAddQuantity(parseInt(e.target.value, 10)))}
-              className="w-12 h-8 text-center text-xs px-1"
-            />
-            <Button
-              type="button"
-              variant="outline"
-              size="icon-sm"
-              onClick={() => setAddQuantity((q) => Math.min(999, q + 1))}
-              aria-label="Increase quantity"
-            >
-              <IconPlus className="h-3 w-3" />
-            </Button>
-          </div>
+        !isUnapproved && (
+          <div className={cn("flex items-center gap-2 flex-wrap", mode === "detail" ? "" : "")}>
+            {/* compact quantity stepper for card / detail modes */}
+            <div className="flex items-center gap-1">
+              <Button
+                type="button"
+                variant="outline"
+                size="icon-sm"
+                onClick={() => setAddQuantity((q) => Math.max(1, q - 1))}
+                aria-label="Decrease quantity"
+              >
+                <IconMinus className="h-3 w-3" />
+              </Button>
+              <Input
+                type="number"
+                min={1}
+                value={addQuantity}
+                onChange={(e) => setAddQuantity(clampAddQuantity(parseInt(e.target.value, 10)))}
+                className="w-12 h-8 text-center text-xs px-1"
+              />
+              <Button
+                type="button"
+                variant="outline"
+                size="icon-sm"
+                onClick={() => setAddQuantity((q) => Math.min(999, q + 1))}
+                aria-label="Increase quantity"
+              >
+                <IconPlus className="h-3 w-3" />
+              </Button>
+            </div>
 
-          <AddToCartButton
-            productId={product.id}
-            productVariantId={selectedVariant?.id ?? null}
-            quantity={addQuantity}
-            productName={product.name}
-            disabled={hasVariants && !selectedVariant}
-          />
-        </div>
+            <AddToCartButton
+              productId={product.id}
+              productVariantId={selectedVariant?.id ?? null}
+              quantity={addQuantity}
+              productName={product.name}
+              disabled={hasVariants && !selectedVariant}
+            />
+          </div>
+        )
       )}
     </div>
   )
