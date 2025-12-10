@@ -90,16 +90,18 @@ export default async function AdminSidebar() {
           </Link>
         </li>
 
-        <li>
-          <Link
-            href="/admin/metrics"
-            className="flex items-center justify-between w-full hover:underline"
-          >
-            <span className="flex items-center gap-2">
-              <IconBarChart3 className="h-4 w-4 text-muted-foreground" /> Database Metrics
-            </span>
-          </Link>
-        </li>
+        {process.env.NODE_ENV === "development" && (
+          <li>
+            <Link
+              href="/admin/metrics"
+              className="flex items-center justify-between w-full hover:underline"
+            >
+              <span className="flex items-center gap-2">
+                <IconBarChart3 className="h-4 w-4 text-muted-foreground" /> Database Metrics
+              </span>
+            </Link>
+          </li>
+        )}
       </ul>
     </nav>
   )
