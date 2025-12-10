@@ -21,7 +21,12 @@ export const auth = betterAuth({
     },
   },
   appName: "Peak Blooms",
-  baseURL: process.env.BETTER_AUTH_URL || "http://localhost:3000",
+  baseURL: process.env.BETTER_AUTH_URL || (() => {
+    if (process.env.NODE_ENV === "production") {
+      throw new Error("BETTER_AUTH_URL environment variable is required in production")
+    }
+    return "http://localhost:3000"
+  })(),
   basePath: "/api/auth",
   secret: process.env.BETTER_AUTH_SECRET,
   session: {

@@ -1,3 +1,5 @@
+export const dynamic = "force-static"
+
 export default function CompanyLayout({ children }: { children: React.ReactNode }) {
   return (
     <div className="min-h-screen bg-white">
