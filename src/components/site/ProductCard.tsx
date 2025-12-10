@@ -54,7 +54,7 @@ export function ProductCard({ product, user }: ProductCardProps) {
       </Link>
 
       {/* Card Content */}
-      <div className="flex flex-col justify-between bg-white p-6 gap-2 grow">
+      <div className="flex flex-col justify-between bg-white p-4 gap-2 grow">
         <div>
           <Link href={`/shop/${product.slug}`}>
             <h3 className="font-bold font-serif">{product.name}</h3>

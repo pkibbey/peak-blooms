@@ -4,6 +4,24 @@ import { nextCookies } from "better-auth/next-js"
 import { headers } from "next/headers"
 import { db } from "./db"
 
+function getBaseURL(): string {
+  console.log("process.env.NODE_ENV: ", process.env.NODE_ENV)
+  console.log("process.env.BETTER_AUTH_URL: ", process.env.BETTER_AUTH_URL)
+
+  // Check for explicit environment variable first
+  if (process.env.BETTER_AUTH_URL) {
+    return process.env.BETTER_AUTH_URL
+  }
+
+  // In production without the env var, throw an error
+  if (process.env.NODE_ENV === "production") {
+    throw new Error("BETTER_AUTH_URL environment variable is required in production")
+  }
+
+  // Default to localhost in development
+  return "http://localhost:3000"
+}
+
 export const auth = betterAuth({
   database: prismaAdapter(db, {
     provider: "postgresql",
@@ -21,12 +39,7 @@ export const auth = betterAuth({
     },
   },
   appName: "Peak Blooms",
-  baseURL: process.env.BETTER_AUTH_URL || (() => {
-    if (process.env.NODE_ENV === "production") {
-      throw new Error("BETTER_AUTH_URL environment variable is required in production")
-    }
-    return "http://localhost:3000"
-  })(),
+  baseURL: getBaseURL(),
   basePath: "/api/auth",
   secret: process.env.BETTER_AUTH_SECRET,
   session: {
