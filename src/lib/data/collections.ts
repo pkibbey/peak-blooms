@@ -91,14 +91,3 @@ export async function getCollectionBySlug(
     { logNotFound: true }
   )
 }
-
-/**
- * Get all collection slugs (for static generation)
- */
-export async function getAllCollectionSlugs(): Promise<Array<{ slug: string }>> {
-  return withTiming("getAllCollectionSlugs", {}, async () => {
-    return db.collection.findMany({
-      select: { slug: true },
-    })
-  })
-}

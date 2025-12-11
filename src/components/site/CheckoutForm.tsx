@@ -2,7 +2,6 @@
 
 import { zodResolver } from "@hookform/resolvers/zod"
 import Link from "next/link"
-import { useRouter } from "next/navigation"
 import { useState } from "react"
 import { useForm } from "react-hook-form"
 import { toast } from "sonner"
@@ -81,7 +80,6 @@ interface CheckoutFormProps {
 }
 
 export default function CheckoutForm({ cart, savedAddresses, userEmail }: CheckoutFormProps) {
-  const router = useRouter()
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [selectedAddressId, setSelectedAddressId] = useState<string>(
     savedAddresses.length > 0 ? savedAddresses[0].id : "new"

@@ -161,9 +161,6 @@ export default function Cart({ initialCart }: CartProps) {
     setIsEmptying(false)
   }
 
-  const marketPriceItems = cart.items.filter((item) => !item.productVariant?.price)
-  const marketPriceQuantity = marketPriceItems.reduce((sum, item) => sum + item.quantity, 0)
-
   if (cart.items.length === 0) {
     return (
       <EmptyState

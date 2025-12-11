@@ -1,6 +1,5 @@
 "use client"
 
-import { useRouter } from "next/navigation"
 import { useState } from "react"
 import { toast } from "sonner"
 import { Button } from "@/components/ui/button"
@@ -18,7 +17,6 @@ interface ReorderButtonProps {
 }
 
 export default function ReorderButton({ orderNumber, items }: ReorderButtonProps) {
-  const router = useRouter()
   const [isLoading, setIsLoading] = useState(false)
 
   const handleReorder = async () => {

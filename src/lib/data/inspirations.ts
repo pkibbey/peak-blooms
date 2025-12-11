@@ -86,14 +86,3 @@ export async function getInspirationBySlug(
     { logNotFound: true }
   )
 }
-
-/**
- * Get all inspiration slugs (for static generation)
- */
-export async function getAllInspirationSlugs(): Promise<Array<{ slug: string }>> {
-  return withTiming("getAllInspirationSlugs", {}, async () => {
-    return db.inspiration.findMany({
-      select: { slug: true },
-    })
-  })
-}

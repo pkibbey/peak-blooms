@@ -7,7 +7,6 @@ import { Input } from "@/components/ui/input"
 interface AddressFieldsProps {
   fieldPrefix?: string
   disabled?: boolean
-  hidden?: boolean
 }
 
 /**
@@ -24,11 +23,7 @@ interface AddressFieldsProps {
  * </FormProvider>
  * ```
  */
-export default function AddressFields({
-  fieldPrefix = "",
-  disabled = false,
-  hidden = false,
-}: AddressFieldsProps) {
+export default function AddressFields({ fieldPrefix = "", disabled = false }: AddressFieldsProps) {
   const { control } = useFormContext()
 
   const fieldName = (name: string) => `${fieldPrefix}${name}` as const

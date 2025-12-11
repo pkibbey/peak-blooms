@@ -201,18 +201,6 @@ export async function getFeaturedProducts(
 }
 
 /**
- * Get all products (for static generation)
- * Note: No price multiplier applied - use for generateStaticParams
- */
-export async function getAllProductSlugs(): Promise<Array<{ slug: string }>> {
-  return withTiming("getAllProductSlugs", {}, async () => {
-    return db.product.findMany({
-      select: { slug: true },
-    })
-  })
-}
-
-/**
  * Get a product by slug with variants, collection, and inspirations
  * Used for product detail pages
  * Returns null if not found

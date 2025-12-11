@@ -13,13 +13,11 @@
 
 // Collections
 export {
-  getAllCollectionSlugs,
   getAllCollections,
   getCollectionBySlug,
 } from "./collections"
 // Inspirations
 export {
-  getAllInspirationSlugs,
   getInspirationBySlug,
   getInspirationsWithCounts,
 } from "./inspirations"
@@ -27,7 +25,6 @@ export {
 
 // Products
 export {
-  getAllProductSlugs,
   getFeaturedProducts,
   getProductById,
   getProducts,
