@@ -19,7 +19,7 @@ import {
   IconSettings,
   IconUser,
 } from "@/components/ui/icons"
-import { signOut } from "@/lib/auth-client"
+import { authClient, signOut } from "@/lib/auth-client"
 
 interface UserMenuProps {
   user: {
@@ -34,15 +34,28 @@ export default function UserMenu({ user }: UserMenuProps) {
   const router = useRouter()
 
   // Dropdown behavior is handled by the Radix-based DropdownMenu component.
+  const handleGoogleSignIn = async () => {
+    try {
+      await authClient.signIn.social({
+        provider: "google",
+      })
+    } catch (error) {
+      toast.error("Failed to sign in")
+      console.error("[SignIn] Error during Google sign-in:", error)
+    }
+  }
 
   // Show Sign In when not authenticated
   if (!user) {
     return (
       <div>
-        <Button asChild size="sm" variant="outline" className="hidden md:inline-flex">
-          <Link prefetch={false} href="/auth/signin">
-            Sign In
-          </Link>
+        <Button
+          onClick={handleGoogleSignIn}
+          size="sm"
+          variant="outline"
+          className="hidden md:inline-flex"
+        >
+          Sign In
         </Button>
       </div>
     )

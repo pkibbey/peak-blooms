@@ -38,7 +38,7 @@ export default async function CollectionDetailPage({ params }: CollectionDetailP
 
   return (
     <>
-      <div className="flex flex-col items-center justify-start bg-white py-12 font-sans">
+      <div className="flex flex-col items-center justify-start py-12 font-sans">
         <div className="w-full max-w-5xl px-6">
           {/* Navigation Back Link */}
           <BackLink href="/collections" label="Collections" />
@@ -73,10 +73,7 @@ export default async function CollectionDetailPage({ params }: CollectionDetailP
       </div>
 
       {/* Shipping Banner */}
-      <ShippingBanner
-        subtitle="Order with confidence. Free regional delivery on all arrangements."
-        gradientPreset="rose"
-      />
+      <ShippingBanner subtitle="Order with confidence. Free regional delivery on all arrangements." />
     </>
   )
 }

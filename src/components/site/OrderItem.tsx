@@ -1,18 +1,12 @@
 import { ProductItem } from "@/components/site/ProductItem"
+import type { OrderItemModel, ProductModel } from "@/generated/models"
 
-interface Product {
-  id: string
-  name: string
-  slug: string
-  image: string | null
-  price: number
-}
-
-interface OrderItemData {
-  id: string
-  price: number
-  quantity: number
-  product: Product
+/**
+ * OrderItemData - Omits fields not used in UI (FK references)
+ * Keeps only: id, quantity, price, product
+ */
+type OrderItemData = Omit<OrderItemModel, "orderId" | "productId"> & {
+  product: ProductModel
 }
 
 interface OrderItemProps {
@@ -23,10 +17,7 @@ export function OrderItem({ item }: OrderItemProps) {
   return (
     <ProductItem
       product={{
-        id: item.product.id,
-        name: item.product.name,
-        slug: item.product.slug,
-        image: item.product.image,
+        ...item.product,
         price: item.price,
       }}
       quantity={item.quantity}

@@ -1,5 +1,7 @@
+import Link from "next/link"
 import UsersTable from "@/components/admin/UsersTable"
 import BackLink from "@/components/site/BackLink"
+import { Button } from "@/components/ui/button"
 import { getTrackedDb } from "@/lib/db"
 
 interface AdminUsersPageProps {
@@ -79,12 +81,17 @@ export default async function UsersPage({ searchParams }: AdminUsersPageProps) {
   return (
     <>
       <BackLink href="/admin" label="Dashboard" />
-      <div className="mb-8">
-        <h1 className="heading-1">User Management</h1>
-        <p className="mt-2 text-muted-foreground">
-          Manage user accounts and permissions ({users.length} total • {pendingCount} pending •{" "}
-          {approvedCount} approved)
-        </p>
+      <div className="mb-8 flex items-start justify-between">
+        <div>
+          <h1 className="heading-1">User Management</h1>
+          <p className="mt-2 text-muted-foreground">
+            Manage user accounts and permissions ({users.length} total • {pendingCount} pending •{" "}
+            {approvedCount} approved)
+          </p>
+        </div>
+        <Link href="/admin/users/new">
+          <Button>New User</Button>
+        </Link>
       </div>
 
       <UsersTable users={users} sort={sort} order={sortOrder} />

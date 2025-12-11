@@ -8,7 +8,7 @@ import { toast } from "sonner"
 import NavLink from "@/components/site/NavLink"
 import UserMenu from "@/components/site/UserMenu"
 import { IconMenu, IconSettings, IconShoppingCart, IconUser, IconX } from "@/components/ui/icons"
-import { signOut } from "@/lib/auth-client"
+import { authClient, signOut } from "@/lib/auth-client"
 import { Badge } from "../ui/badge"
 import { Button } from "../ui/button"
 
@@ -33,8 +33,19 @@ export default function Nav({ user, cartCount = 0 }: NavProps) {
   const router = useRouter()
   const isApproved = user?.approved === true
 
+  const handleGoogleSignIn = async () => {
+    try {
+      await authClient.signIn.social({
+        provider: "google",
+      })
+    } catch (error) {
+      toast.error("Failed to sign in")
+      console.error("[SignIn] Error during Google sign-in:", error)
+    }
+  }
+
   return (
-    <header className="sticky top-0 z-50 w-full bg-white/70 backdrop-blur-sm border-b border-b-border">
+    <header className="sticky top-0 z-50 w-full bg-background/70 backdrop-blur-sm border-b border-b-border">
       <a href="#content" className="sr-only focus:not-sr-only focus:sr-only:block px-4 py-2">
         Skip to content
       </a>
@@ -146,10 +157,8 @@ export default function Nav({ user, cartCount = 0 }: NavProps) {
                 </>
               ) : (
                 <>
-                  <Button asChild variant="ghost">
-                    <Link prefetch={false} href="/auth/signin" className="px-4 py-2">
-                      Sign In
-                    </Link>
+                  <Button onClick={handleGoogleSignIn} variant="ghost">
+                    Sign In
                   </Button>
                   <Button asChild>
                     <Link prefetch={false} href="/auth/signup" className="px-4 py-2">

@@ -17,7 +17,7 @@ export function CollectionCard({ collection }: CollectionCardProps) {
   const productCount = collection._count?.productCollections ?? 0
 
   return (
-    <div className="group flex flex-col overflow-hidden rounded-xs shadow-md transition-shadow hover:shadow-lg">
+    <div className="group flex flex-col overflow-hidden rounded-xs shadow-md transition-shadow hover:shadow-lg border border-border">
       {/* Image Container */}
       <Link prefetch={false} href={`/collections/${collection.slug}`} className="group/link">
         <div className="relative aspect-square overflow-hidden bg-zinc-200">
@@ -33,7 +33,7 @@ export function CollectionCard({ collection }: CollectionCardProps) {
           {productCount > 0 && (
             <Badge
               variant="secondary"
-              className="absolute bottom-3 left-3 bg-white/90 text-gray-700 backdrop-blur-sm"
+              className="absolute bottom-3 left-3 bg-background/90 text-gray-700 backdrop-blur-sm"
             >
               {productCount} {productCount === 1 ? "Product" : "Products"}
             </Badge>
@@ -42,7 +42,7 @@ export function CollectionCard({ collection }: CollectionCardProps) {
       </Link>
 
       {/* Card Content */}
-      <div className="flex flex-col justify-between bg-white p-6 grow">
+      <div className="flex flex-col justify-between bg-background p-6 grow">
         <div>
           <Link prefetch={false} href={`/collections/${collection.slug}`} className="group/link">
             <h3 className="text-xl font-bold group-hover/link:text-primary transition-colors font-serif">

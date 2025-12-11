@@ -5,6 +5,7 @@ import "./globals.css"
 import Footer from "@/components/site/Footer"
 import Nav from "@/components/site/Nav"
 import { NewsletterBanner } from "@/components/site/NewsletterBanner"
+import { ThemeProvider } from "@/components/ThemeProvider"
 import { getCurrentUser, getOrCreateCart } from "@/lib/current-user"
 
 const geistSans = Geist({
@@ -57,13 +58,15 @@ export default async function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} ${playfairDisplay.variable} antialiased`}
       >
-        <Nav user={user} cartCount={cartCount} />
+        <ThemeProvider>
+          <Nav user={user} cartCount={cartCount} />
 
-        <main id="content">{children}</main>
+          <main id="content">{children}</main>
 
-        <NewsletterBanner />
-        <Footer />
-        <Toaster position="bottom-center" richColors />
+          <NewsletterBanner />
+          <Footer />
+          <Toaster position="bottom-center" richColors />
+        </ThemeProvider>
       </body>
     </html>
   )

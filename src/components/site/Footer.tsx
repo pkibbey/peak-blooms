@@ -1,10 +1,11 @@
 import Image from "next/image"
 import Link from "next/link"
 import { IconInstagram, IconMail, IconPhone } from "@/components/ui/icons"
+import { ThemeToggle } from "../ui/ThemeToggle"
 
 export default function Footer() {
   return (
-    <footer className="bg-white border-t border-t-border">
+    <footer className="bg-background border-t border-t-border">
       <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 py-10">
         <div className="flex flex-col md:flex-row md:justify-between md:items-start gap-8">
           {/* Brand & contact */}
@@ -154,6 +155,7 @@ export default function Footer() {
         <div className="mt-8 border-t border-t-border pt-4 text-sm text-muted-foreground flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
           <div>© {new Date().getFullYear()} Peak Blooms. All rights reserved.</div>
           <div className="flex items-center gap-4">
+            <ThemeToggle />
             <Link prefetch={false} href="/site-map" className="hover:underline">
               Sitemap
             </Link>

@@ -8,11 +8,15 @@ import { CartItem, type CartItemData } from "@/components/site/CartItem"
 import EmptyState from "@/components/site/EmptyState"
 import { Button } from "@/components/ui/button"
 import { IconShoppingBag } from "@/components/ui/icons"
+import type { ShoppingCartModel } from "@/generated/models"
 import { useDebouncedCallback } from "@/lib/useDebouncedCallback"
 import { formatPrice } from "@/lib/utils"
 
-interface CartData {
-  id: string
+/**
+ * CartData - Omits FK and timestamp fields not needed in UI
+ * Extends ShoppingCartModel with items (CartItemData[]) and total
+ */
+interface CartData extends Omit<ShoppingCartModel, "userId" | "createdAt" | "updatedAt"> {
   items: CartItemData[]
   total: number
 }
@@ -193,7 +197,7 @@ export default function Cart({ initialCart }: CartProps) {
 
       {/* Order Summary */}
       <div className="lg:col-span-1">
-        <div className="bg-white rounded-xs shadow-sm border p-6 sticky top-24">
+        <div className="bg-background rounded-xs shadow-sm border p-6 sticky top-24">
           <h2 className="heading-3 mb-4 font-serif">Order Summary</h2>
 
           <div className="space-y-2 text-sm">

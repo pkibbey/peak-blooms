@@ -2,29 +2,17 @@ import Image from "next/image"
 import Link from "next/link"
 import { type OrderStatus, OrderStatusBadge } from "@/components/site/OrderStatusBadge"
 import ReorderButton from "@/components/site/ReorderButton"
+import type { OrderItemModel, OrderModel, ProductModel } from "@/generated/models"
 import { formatDate, formatPrice } from "@/lib/utils"
 
-interface OrderItem {
-  id: string
-  quantity: number
-  product: {
-    id: string
-    name: string
-    image: string | null
-  }
-}
-
-interface Order {
-  id: string
-  orderNumber: string
-  status: string
-  total: number
-  createdAt: Date
-  items: OrderItem[]
-}
-
+/**
+ * OrderHistoryItemProps - Uses generated types with items and products
+ * Omits FK and fields not needed in UI
+ */
 interface OrderHistoryItemProps {
-  order: Order
+  order: Omit<OrderModel, "userId" | "shippingAddressId"> & {
+    items: (Omit<OrderItemModel, "orderId" | "productId"> & { product: ProductModel })[]
+  }
 }
 
 export default function OrderHistoryItem({ order }: OrderHistoryItemProps) {
@@ -47,10 +35,7 @@ export default function OrderHistoryItem({ order }: OrderHistoryItemProps) {
       {/* Order Items Preview */}
       <div className="flex gap-1 mb-2">
         {order.items.slice(0, 5).map((item) => (
-          <div
-            key={item.id}
-            className="relative h-12 w-12 shrink-0 overflow-hidden rounded-xs bg-neutral-100"
-          >
+          <div key={item.id} className="relative h-12 w-12 shrink-0 overflow-hidden rounded-xs">
             {item.product.image ? (
               <Image
                 src={item.product.image}

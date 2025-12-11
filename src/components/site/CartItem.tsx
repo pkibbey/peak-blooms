@@ -1,20 +1,17 @@
 "use client"
 
 import { ProductItem } from "@/components/site/ProductItem"
+import type { CartItemModel, ProductModel } from "@/generated/models"
 
-interface CartProduct {
-  id: string
-  name: string
-  slug: string
-  image: string | null
-  price: number
-}
-
-export interface CartItemData {
-  id: string
-  productId: string
-  quantity: number
-  product: CartProduct
+/**
+ * CartItemData - Omits fields not used in UI (FK references, timestamps)
+ * Keeps only: id, quantity, product
+ */
+export type CartItemData = Omit<
+  CartItemModel,
+  "productId" | "cartId" | "createdAt" | "updatedAt"
+> & {
+  product: ProductModel
 }
 
 interface CartItemProps {

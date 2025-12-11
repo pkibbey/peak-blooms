@@ -104,7 +104,7 @@ export default function AddressManager({ addresses }: AddressManagerProps) {
             const defaultAddress = addresses.find((a) => a.isDefault) || addresses[0]
             return (
               <div>
-                <div className="bg-white rounded-xs shadow-sm border p-4">
+                <div className="bg-background rounded-xs shadow-sm border p-4">
                   <div className="flex items-start justify-between">
                     <div className="flex-1">
                       <p className="text-sm text-muted-foreground mb-2">Default Address</p>
@@ -162,7 +162,7 @@ export default function AddressManager({ addresses }: AddressManagerProps) {
 
       {/* Add/Edit Form */}
       {isAdding ? (
-        <div className="bg-white rounded-xs shadow-sm border p-6">
+        <div className="bg-background rounded-xs shadow-sm border p-6">
           <div className="flex items-center justify-between mb-4">
             <h3 className="heading-3">{isEditing ? "Edit Address" : "Add New Address"}</h3>
             <Button variant="ghost" size="sm" onClick={handleCancel}>

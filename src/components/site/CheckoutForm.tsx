@@ -245,7 +245,7 @@ export default function CheckoutForm({
           )}
 
           {/* Contact Information */}
-          <div className="bg-white rounded-xs shadow-sm border p-6">
+          <div className="bg-background rounded-xs shadow-sm border p-6">
             <h2 className="heading-3 mb-4">Contact Information</h2>
             <div className="grid gap-4 md:grid-cols-2">
               <FormField
@@ -289,7 +289,7 @@ export default function CheckoutForm({
           </div>
 
           {/* Shipping Address */}
-          <div className="bg-white rounded-xs shadow-sm border p-6">
+          <div className="bg-background rounded-xs shadow-sm border p-6">
             <h2 className="heading-3 mb-4 flex items-center gap-2">Shipping Address</h2>
 
             {savedAddresses.length > 0 && (
@@ -346,7 +346,7 @@ export default function CheckoutForm({
 
           {/* Billing Address */}
           {/* Order Notes */}
-          <div className="bg-white rounded-xs shadow-sm border p-6">
+          <div className="bg-background rounded-xs shadow-sm border p-6">
             <h2 className="heading-3 mb-4">Order Notes (optional)</h2>
             <FormField
               control={form.control}
@@ -369,7 +369,7 @@ export default function CheckoutForm({
 
         {/* Right Column - Order Summary */}
         <div className="lg:col-span-1">
-          <div className="bg-white rounded-xs shadow-sm border p-6 sticky top-24">
+          <div className="bg-background rounded-xs shadow-sm border p-6 sticky top-24">
             <h2 className="heading-3 mb-4">Order Summary</h2>
 
             {/* Cart Items */}

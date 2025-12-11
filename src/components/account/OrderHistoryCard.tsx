@@ -5,28 +5,16 @@ import Link from "next/link"
 import OrderHistoryItem from "@/components/site/OrderHistoryItem"
 import { Button } from "@/components/ui/button"
 import { IconPackage } from "@/components/ui/icons"
+import type { OrderItemModel, OrderModel, ProductModel } from "@/generated/models"
 
-interface OrderItem {
-  id: string
-  quantity: number
-  product: {
-    id: string
-    name: string
-    image: string | null
-  }
-}
-
-interface Order {
-  id: string
-  orderNumber: string
-  status: string
-  total: number
-  createdAt: Date
-  items: OrderItem[]
-}
-
+/**
+ * OrderHistoryCardProps - Uses generated types with items and products
+ * Omits FK and fields not needed in UI
+ */
 interface OrderHistoryCardProps {
-  orders: Order[]
+  orders: (Omit<OrderModel, "userId" | "shippingAddressId"> & {
+    items: (Omit<OrderItemModel, "orderId" | "productId"> & { product: ProductModel })[]
+  })[]
   currentPage: number
   totalPages: number
   searchParams: Record<string, string | string[] | undefined>

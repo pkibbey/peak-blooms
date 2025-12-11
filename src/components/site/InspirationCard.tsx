@@ -17,7 +17,7 @@ export function InspirationCard({ inspiration }: InspirationCardProps) {
   const productCount = inspiration._count?.products ?? 0
 
   return (
-    <div className="group flex flex-row overflow-hidden rounded-xs shadow-md transition-shadow hover:shadow-lg bg-white">
+    <div className="group flex flex-row overflow-hidden rounded-xs shadow-md transition-shadow hover:shadow-lg bg-background border border-border">
       {/* Image Container */}
       <div className="relative w-2/5 shrink-0 overflow-hidden bg-zinc-200">
         <Image
@@ -30,7 +30,7 @@ export function InspirationCard({ inspiration }: InspirationCardProps) {
         {productCount > 0 && (
           <Badge
             variant="secondary"
-            className="absolute bottom-3 left-3 bg-white/90 text-gray-700 backdrop-blur-sm"
+            className="absolute bottom-3 left-3 bg-background/90 text-gray-700 backdrop-blur-sm"
           >
             {productCount} {productCount === 1 ? "Product" : "Products"}
           </Badge>

@@ -43,7 +43,7 @@ export default async function InspirationDetailPage({ params }: InspirationDetai
   }))
 
   return (
-    <div className="flex flex-col items-center justify-start bg-white py-12 sm:py-16 font-sans">
+    <div className="flex flex-col items-center justify-start py-12 sm:py-16 font-sans">
       <div className="w-full max-w-5xl px-4 md:px-6">
         {/* Navigation Back Link */}
         <BackLink href="/inspirations" label="inspirations" />
@@ -71,7 +71,6 @@ export default async function InspirationDetailPage({ params }: InspirationDetai
         <div className="mb-8 md:mb-12">
           <div className="max-w-3xl">
             <h2 className="heading-2 text-2xl md:text-3xl mb-6 text-primary flex items-center">
-              <span className="w-1 h-8 bg-primary rounded-full mr-4"></span>
               The Story
             </h2>
             <p className="text-base md:text-lg leading-relaxed text-gray-700 whitespace-pre-line">
@@ -83,7 +82,6 @@ export default async function InspirationDetailPage({ params }: InspirationDetai
         {/* Products Section - Combined with interactive quantities and CTA */}
         <div className="w-full mb-8 md:mb-12">
           <h2 className="heading-2 text-2xl md:text-3xl mb-2 text-primary flex items-center">
-            <span className="w-1 h-8 bg-primary rounded-full mr-4"></span>
             Flowers in This Set
           </h2>
           <p className="text-gray-500 mb-4 text-sm md:text-base">

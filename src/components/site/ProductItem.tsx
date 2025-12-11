@@ -45,7 +45,7 @@ export function ProductItem({
   // Grid Layout - renders as a product card
   if (layout === "grid") {
     return (
-      <div className="group flex flex-col overflow-hidden rounded-xs shadow-md transition-shadow hover:shadow-lg">
+      <div className="group flex flex-col overflow-hidden rounded-xs shadow-md transition-shadow hover:shadow-lg border border-border">
         {/* Image Container */}
         <Link prefetch={false} href={`/shop/${product.slug}`}>
           <div className="relative aspect-square overflow-hidden bg-zinc-200">
@@ -60,7 +60,7 @@ export function ProductItem({
             )}
             {/* Colors Display - Bottom Left */}
             {product.colors && product.colors.length > 0 && (
-              <div className="absolute bottom-2 left-2 bg-white/90 rounded-md px-2 py-1">
+              <div className="absolute bottom-2 left-2 bg-background/90 rounded-md px-2 py-1">
                 <ColorsMiniDisplay colorIds={product.colors} />
               </div>
             )}
@@ -68,7 +68,7 @@ export function ProductItem({
         </Link>
 
         {/* Card Content */}
-        <div className="flex flex-col justify-between bg-white p-4 gap-2 grow">
+        <div className="flex flex-col justify-between bg-background p-4 gap-2 grow">
           <div>
             <Link prefetch={false} href={`/shop/${product.slug}`}>
               <h3 className="font-bold font-serif">{product.name}</h3>
@@ -89,7 +89,7 @@ export function ProductItem({
 
   return (
     <div
-      className={`flex md:flex-row flex-col bg-white rounded-xs shadow-sm border transition-opacity ${
+      className={`flex md:flex-row flex-col bg-background rounded-xs shadow-sm border transition-opacity ${
         isUpdating ? "opacity-60" : ""
       }`}
     >
@@ -97,7 +97,7 @@ export function ProductItem({
       <Link
         prefetch={false}
         href={`/shop/${product.slug}`}
-        className={`relative ${sizeConfig.container} shrink-0 overflow-hidden bg-neutral-100`}
+        className={`relative ${sizeConfig.container} shrink-0 overflow-hidden`}
       >
         {product.image ? (
           <Image

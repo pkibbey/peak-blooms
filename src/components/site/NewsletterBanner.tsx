@@ -78,7 +78,7 @@ export function NewsletterBanner() {
   }
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 z-40 border-t border-border bg-white px-4 py-6 sm:px-6">
+    <div className="fixed bottom-0 left-0 right-0 z-40 border-t border-border bg-background px-4 py-6 sm:px-6">
       <div className="mx-auto max-w-5xl">
         <div className="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
           <div className="flex-1">

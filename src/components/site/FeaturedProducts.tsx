@@ -9,7 +9,7 @@ export default async function FeaturedProducts() {
   const products = await getFeaturedProducts(multiplier, 4)
 
   return (
-    <div className="flex flex-col items-center justify-start bg-white py-16 font-sans">
+    <div className="flex flex-col items-center justify-start bg-background py-16 font-sans">
       <div className="w-full max-w-5xl px-6">
         <div className="flex items-end justify-between">
           <h2 className="text-3xl font-extrabold font-serif">Featured Products</h2>

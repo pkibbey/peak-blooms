@@ -1,30 +1,19 @@
 import { OrderItem } from "@/components/site/OrderItem"
+import type { OrderItemModel, ProductModel } from "@/generated/models"
 import { formatPrice } from "@/lib/utils"
 
-interface Product {
-  id: string
-  name: string
-  slug: string
-  image: string | null
-  price: number
-}
-
-interface OrderItemData {
-  id: string
-  productId: string
-  price: number
-  quantity: number
-  product: Product
-}
-
+/**
+ * OrderItemsCardProps - Uses generated types with product relation
+ * Omits FK and timestamp fields not needed in UI
+ */
 interface OrderItemsCardProps {
-  items: OrderItemData[]
+  items: (Omit<OrderItemModel, "orderId" | "productId"> & { product: ProductModel })[]
   total: number
 }
 
 export function OrderItemsCard({ items, total }: OrderItemsCardProps) {
   return (
-    <div className="bg-white rounded-xs shadow-sm border p-6">
+    <div className="bg-background rounded-xs shadow-sm border p-6">
       <h2 className="heading-3 mb-4">Order Items</h2>
       <div className="space-y-4">
         {items.map((item) => (

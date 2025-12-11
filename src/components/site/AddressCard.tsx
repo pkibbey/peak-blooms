@@ -80,7 +80,7 @@ export default function AddressCard({ address, onEdit }: AddressCardProps) {
   }
 
   return (
-    <div className="bg-white rounded-xs shadow-sm border p-4">
+    <div className="bg-background rounded-xs shadow-sm border p-4">
       <div className="flex items-start justify-between gap-4">
         <div className="flex-1">
           <div className="flex items-center gap-2 mb-1">
