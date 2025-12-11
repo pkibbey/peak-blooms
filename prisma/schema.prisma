@@ -274,7 +274,7 @@ model Metric {
 enum Role {
   CUSTOMER
   ADMIN
-  NEWSLETTER_SUBSCRIBER
+  SUBSCRIBER
 }
 
 enum MetricType {

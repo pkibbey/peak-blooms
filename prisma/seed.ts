@@ -87,7 +87,7 @@ async function main() {
           name: "Newsletter Subscriber",
           emailVerified: true,
           approved: true,
-          role: "NEWSLETTER_SUBSCRIBER" as const,
+          role: "SUBSCRIBER" as const,
           priceMultiplier: 1.0,
         },
         {
@@ -95,7 +95,7 @@ async function main() {
           name: "Pending Newsletter Subscriber",
           emailVerified: true,
           approved: false,
-          role: "NEWSLETTER_SUBSCRIBER" as const,
+          role: "SUBSCRIBER" as const,
           priceMultiplier: 1.0,
         },
       ]

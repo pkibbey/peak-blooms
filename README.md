@@ -64,7 +64,7 @@ For local development the seed script creates a few test users you can use in th
 - Admin: `phineas.kibbey@gmail.com` (role: ADMIN)
 - Pending user: `pending@peakblooms.com` (role: CUSTOMER, not approved)
 - Customer: `customer@peakblooms.com` (role: CUSTOMER, approved)
-- Newsletter subscriber: `newsletter@peakblooms.com` (role: NEWSLETTER_SUBSCRIBER)
+- Newsletter subscriber: `newsletter@peakblooms.com` (role: SUBSCRIBER)
 
 ## Tech Stack
 

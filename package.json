@@ -16,9 +16,9 @@
     "db:docker:generate": "dotenv -e .env.local -- prisma generate",
     "db:docker:push": "dotenv -e .env.local -- prisma db push",
     "db:docker:dev": "dotenv -e .env.local -- prisma migrate dev",
-    "db:docker:reset": "dotenv -e .env.local -- prisma migrate reset --force",
+    "db:docker:reset": "dotenv -e .env.local -- prisma migrate reset --force && npm run db:docker:seed",
     "db:docker:seed": "dotenv -e .env.local -- prisma db seed",
-    "db:prod:reset": "dotenv -e .env.prod -- prisma migrate reset --force && dotenv -e .env.prod -- prisma db seed",
+    "db:prod:reset": "dotenv -e .env.prod -- prisma migrate reset --force && db:prod:seed",
     "db:prod:seed": "dotenv -e .env.prod -- prisma db seed",
     "db:docker:studio": "dotenv -e .env.local -- prisma studio",
     "db:prod:studio": "dotenv -e .env.prod -- prisma studio"

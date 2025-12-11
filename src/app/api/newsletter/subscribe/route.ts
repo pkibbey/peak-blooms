@@ -33,7 +33,7 @@ export async function POST(request: NextRequest) {
     const user = await db.user.create({
       data: {
         email,
-        role: "NEWSLETTER_SUBSCRIBER",
+        role: "SUBSCRIBER",
         approved: false,
         emailVerified: false,
       },
