@@ -1,25 +1,52 @@
-import Link from "next/link"
-import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
-import { IconCheckCircle, IconClock } from "@/components/ui/icons"
+import AddressesCard from "@/components/account/AddressesCard"
+import OrderHistoryCard from "@/components/account/OrderHistoryCard"
+import ProfileCard from "@/components/account/ProfileCard"
 import { getCurrentUser } from "@/lib/current-user"
 import { db } from "@/lib/db"
 
-export default async function AccountPage() {
+const ITEMS_PER_PAGE = 10
+
+export default async function AccountPage({
+  searchParams,
+}: {
+  searchParams: Promise<Record<string, string | string[] | undefined>>
+}) {
   const user = await getCurrentUser()
 
   // User is guaranteed to exist due to layout auth check
   if (!user) return null
 
-  // Count total orders for display
-  const orderCount = await db.order.count({
+  const params = await searchParams
+  const currentPage = Math.max(1, parseInt(String(params.page || "1")))
+
+  // Fetch all user data in parallel
+  const [addresses, totalOrders] = await Promise.all([
+    db.address.findMany({
+      where: { userId: user.id },
+      orderBy: [{ isDefault: "desc" }, { createdAt: "desc" }],
+    }),
+    db.order.count({
+      where: { userId: user.id },
+    }),
+  ])
+
+  // Fetch paginated orders
+  const orders = await db.order.findMany({
     where: { userId: user.id },
+    orderBy: { createdAt: "desc" },
+    include: {
+      items: {
+        include: {
+          product: true,
+          productVariant: true,
+        },
+      },
+    },
+    take: ITEMS_PER_PAGE,
+    skip: (currentPage - 1) * ITEMS_PER_PAGE,
   })
 
-  // Count addresses
-  const addressCount = await db.address.count({
-    where: { userId: user.id },
-  })
+  const totalPages = Math.ceil(totalOrders / ITEMS_PER_PAGE)
 
   return (
     <>
@@ -30,93 +57,20 @@ export default async function AccountPage() {
         </p>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        {/* Main Content */}
-        <div className="lg:col-span-2 space-y-6">
-          {/* Profile Section */}
-          <div className="rounded-lg border border-border p-6">
-            <div className="flex items-start justify-between gap-4">
-              <div>
-                <h2 className="heading-3">Profile</h2>
-                <p className="mt-2 text-sm text-muted-foreground">View your account details</p>
-              </div>
-              <div className="shrink-0">
-                <Button asChild className="mt-2">
-                  <Link prefetch={false} href="/account/profile">
-                    View Profile
-                  </Link>
-                </Button>
-              </div>
-            </div>
-          </div>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <ProfileCard
+          user={{ id: user.id, name: user.name, email: user.email ?? "", phone: user.phone }}
+        />
+        <AddressesCard addresses={addresses} />
+      </div>
 
-          {/* Addresses Section */}
-          <div className="rounded-lg border border-border p-6">
-            <div className="flex items-start justify-between gap-4">
-              <div>
-                <h2 className="heading-3">Addresses</h2>
-                <p className="mt-2 text-sm text-muted-foreground">
-                  {addressCount > 0
-                    ? `You have ${addressCount} saved address${addressCount === 1 ? "" : "es"}`
-                    : "Manage your delivery addresses"}
-                </p>
-              </div>
-              <div className="shrink-0">
-                <Button asChild className="mt-2">
-                  <Link prefetch={false} href="/account/addresses">
-                    Manage Addresses
-                  </Link>
-                </Button>
-              </div>
-            </div>
-          </div>
-
-          {/* Order History Section */}
-          <div className="rounded-lg border border-border p-6">
-            <div className="flex items-start justify-between gap-4">
-              <div>
-                <h2 className="heading-3">Order History</h2>
-                <p className="mt-2 text-sm text-muted-foreground">
-                  {orderCount > 0
-                    ? `You have ${orderCount} order${orderCount === 1 ? "" : "s"}`
-                    : "View your order history"}
-                </p>
-              </div>
-              <div className="shrink-0">
-                <Button asChild className="mt-2">
-                  <Link prefetch={false} href="/account/order-history">
-                    View Order History
-                  </Link>
-                </Button>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Account Info Sidebar */}
-        <div className="lg:col-span-1">
-          <div className="rounded-lg border border-border p-6 sticky top-24">
-            <h2 className="heading-4 mb-3">Account Information</h2>
-            <div className="space-y-4">
-              <div>
-                <p className="text-sm text-muted-foreground">Account Status</p>
-                <div className="flex items-center gap-2 mt-1">
-                  {user.approved ? (
-                    <Badge variant="default">
-                      <IconCheckCircle className="h-3 w-3 mr-1" />
-                      Approved
-                    </Badge>
-                  ) : (
-                    <Badge variant="secondary">
-                      <IconClock className="h-3 w-3 mr-1" />
-                      Pending Approval
-                    </Badge>
-                  )}
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
+      <div className="mt-8">
+        <OrderHistoryCard
+          orders={orders}
+          currentPage={currentPage}
+          totalPages={totalPages}
+          searchParams={params}
+        />
       </div>
     </>
   )

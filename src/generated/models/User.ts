@@ -45,6 +45,7 @@ export type UserMinAggregateOutputType = {
   approved: boolean | null
   role: $Enums.Role | null
   priceMultiplier: number | null
+  phone: string | null
 }
 
 export type UserMaxAggregateOutputType = {
@@ -58,6 +59,7 @@ export type UserMaxAggregateOutputType = {
   approved: boolean | null
   role: $Enums.Role | null
   priceMultiplier: number | null
+  phone: string | null
 }
 
 export type UserCountAggregateOutputType = {
@@ -71,6 +73,7 @@ export type UserCountAggregateOutputType = {
   approved: number
   role: number
   priceMultiplier: number
+  phone: number
   _all: number
 }
 
@@ -94,6 +97,7 @@ export type UserMinAggregateInputType = {
   approved?: true
   role?: true
   priceMultiplier?: true
+  phone?: true
 }
 
 export type UserMaxAggregateInputType = {
@@ -107,6 +111,7 @@ export type UserMaxAggregateInputType = {
   approved?: true
   role?: true
   priceMultiplier?: true
+  phone?: true
 }
 
 export type UserCountAggregateInputType = {
@@ -120,6 +125,7 @@ export type UserCountAggregateInputType = {
   approved?: true
   role?: true
   priceMultiplier?: true
+  phone?: true
   _all?: true
 }
 
@@ -220,6 +226,7 @@ export type UserGroupByOutputType = {
   approved: boolean
   role: $Enums.Role
   priceMultiplier: number
+  phone: string | null
   _count: UserCountAggregateOutputType | null
   _avg: UserAvgAggregateOutputType | null
   _sum: UserSumAggregateOutputType | null
@@ -256,6 +263,7 @@ export type UserWhereInput = {
   approved?: Prisma.BoolFilter<"User"> | boolean
   role?: Prisma.EnumRoleFilter<"User"> | $Enums.Role
   priceMultiplier?: Prisma.FloatFilter<"User"> | number
+  phone?: Prisma.StringNullableFilter<"User"> | string | null
   accounts?: Prisma.AccountListRelationFilter
   sessions?: Prisma.SessionListRelationFilter
   verifications?: Prisma.VerificationListRelationFilter
@@ -275,6 +283,7 @@ export type UserOrderByWithRelationInput = {
   approved?: Prisma.SortOrder
   role?: Prisma.SortOrder
   priceMultiplier?: Prisma.SortOrder
+  phone?: Prisma.SortOrderInput | Prisma.SortOrder
   accounts?: Prisma.AccountOrderByRelationAggregateInput
   sessions?: Prisma.SessionOrderByRelationAggregateInput
   verifications?: Prisma.VerificationOrderByRelationAggregateInput
@@ -297,6 +306,7 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   approved?: Prisma.BoolFilter<"User"> | boolean
   role?: Prisma.EnumRoleFilter<"User"> | $Enums.Role
   priceMultiplier?: Prisma.FloatFilter<"User"> | number
+  phone?: Prisma.StringNullableFilter<"User"> | string | null
   accounts?: Prisma.AccountListRelationFilter
   sessions?: Prisma.SessionListRelationFilter
   verifications?: Prisma.VerificationListRelationFilter
@@ -316,6 +326,7 @@ export type UserOrderByWithAggregationInput = {
   approved?: Prisma.SortOrder
   role?: Prisma.SortOrder
   priceMultiplier?: Prisma.SortOrder
+  phone?: Prisma.SortOrderInput | Prisma.SortOrder
   _count?: Prisma.UserCountOrderByAggregateInput
   _avg?: Prisma.UserAvgOrderByAggregateInput
   _max?: Prisma.UserMaxOrderByAggregateInput
@@ -337,6 +348,7 @@ export type UserScalarWhereWithAggregatesInput = {
   approved?: Prisma.BoolWithAggregatesFilter<"User"> | boolean
   role?: Prisma.EnumRoleWithAggregatesFilter<"User"> | $Enums.Role
   priceMultiplier?: Prisma.FloatWithAggregatesFilter<"User"> | number
+  phone?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
 }
 
 export type UserCreateInput = {
@@ -350,6 +362,7 @@ export type UserCreateInput = {
   approved?: boolean
   role?: $Enums.Role
   priceMultiplier?: number
+  phone?: string | null
   accounts?: Prisma.AccountCreateNestedManyWithoutUserInput
   sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
   verifications?: Prisma.VerificationCreateNestedManyWithoutUserInput
@@ -369,6 +382,7 @@ export type UserUncheckedCreateInput = {
   approved?: boolean
   role?: $Enums.Role
   priceMultiplier?: number
+  phone?: string | null
   accounts?: Prisma.AccountUncheckedCreateNestedManyWithoutUserInput
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
   verifications?: Prisma.VerificationUncheckedCreateNestedManyWithoutUserInput
@@ -388,6 +402,7 @@ export type UserUpdateInput = {
   approved?: Prisma.BoolFieldUpdateOperationsInput | boolean
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   priceMultiplier?: Prisma.FloatFieldUpdateOperationsInput | number
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   accounts?: Prisma.AccountUpdateManyWithoutUserNestedInput
   sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
   verifications?: Prisma.VerificationUpdateManyWithoutUserNestedInput
@@ -407,6 +422,7 @@ export type UserUncheckedUpdateInput = {
   approved?: Prisma.BoolFieldUpdateOperationsInput | boolean
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   priceMultiplier?: Prisma.FloatFieldUpdateOperationsInput | number
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   accounts?: Prisma.AccountUncheckedUpdateManyWithoutUserNestedInput
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
   verifications?: Prisma.VerificationUncheckedUpdateManyWithoutUserNestedInput
@@ -426,6 +442,7 @@ export type UserCreateManyInput = {
   approved?: boolean
   role?: $Enums.Role
   priceMultiplier?: number
+  phone?: string | null
 }
 
 export type UserUpdateManyMutationInput = {
@@ -439,6 +456,7 @@ export type UserUpdateManyMutationInput = {
   approved?: Prisma.BoolFieldUpdateOperationsInput | boolean
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   priceMultiplier?: Prisma.FloatFieldUpdateOperationsInput | number
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type UserUncheckedUpdateManyInput = {
@@ -452,6 +470,7 @@ export type UserUncheckedUpdateManyInput = {
   approved?: Prisma.BoolFieldUpdateOperationsInput | boolean
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   priceMultiplier?: Prisma.FloatFieldUpdateOperationsInput | number
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type UserCountOrderByAggregateInput = {
@@ -465,6 +484,7 @@ export type UserCountOrderByAggregateInput = {
   approved?: Prisma.SortOrder
   role?: Prisma.SortOrder
   priceMultiplier?: Prisma.SortOrder
+  phone?: Prisma.SortOrder
 }
 
 export type UserAvgOrderByAggregateInput = {
@@ -482,6 +502,7 @@ export type UserMaxOrderByAggregateInput = {
   approved?: Prisma.SortOrder
   role?: Prisma.SortOrder
   priceMultiplier?: Prisma.SortOrder
+  phone?: Prisma.SortOrder
 }
 
 export type UserMinOrderByAggregateInput = {
@@ -495,6 +516,7 @@ export type UserMinOrderByAggregateInput = {
   approved?: Prisma.SortOrder
   role?: Prisma.SortOrder
   priceMultiplier?: Prisma.SortOrder
+  phone?: Prisma.SortOrder
 }
 
 export type UserSumOrderByAggregateInput = {
@@ -638,6 +660,7 @@ export type UserCreateWithoutAccountsInput = {
   approved?: boolean
   role?: $Enums.Role
   priceMultiplier?: number
+  phone?: string | null
   sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
   verifications?: Prisma.VerificationCreateNestedManyWithoutUserInput
   addresses?: Prisma.AddressCreateNestedManyWithoutUserInput
@@ -656,6 +679,7 @@ export type UserUncheckedCreateWithoutAccountsInput = {
   approved?: boolean
   role?: $Enums.Role
   priceMultiplier?: number
+  phone?: string | null
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
   verifications?: Prisma.VerificationUncheckedCreateNestedManyWithoutUserInput
   addresses?: Prisma.AddressUncheckedCreateNestedManyWithoutUserInput
@@ -690,6 +714,7 @@ export type UserUpdateWithoutAccountsInput = {
   approved?: Prisma.BoolFieldUpdateOperationsInput | boolean
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   priceMultiplier?: Prisma.FloatFieldUpdateOperationsInput | number
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
   verifications?: Prisma.VerificationUpdateManyWithoutUserNestedInput
   addresses?: Prisma.AddressUpdateManyWithoutUserNestedInput
@@ -708,6 +733,7 @@ export type UserUncheckedUpdateWithoutAccountsInput = {
   approved?: Prisma.BoolFieldUpdateOperationsInput | boolean
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   priceMultiplier?: Prisma.FloatFieldUpdateOperationsInput | number
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
   verifications?: Prisma.VerificationUncheckedUpdateManyWithoutUserNestedInput
   addresses?: Prisma.AddressUncheckedUpdateManyWithoutUserNestedInput
@@ -726,6 +752,7 @@ export type UserCreateWithoutSessionsInput = {
   approved?: boolean
   role?: $Enums.Role
   priceMultiplier?: number
+  phone?: string | null
   accounts?: Prisma.AccountCreateNestedManyWithoutUserInput
   verifications?: Prisma.VerificationCreateNestedManyWithoutUserInput
   addresses?: Prisma.AddressCreateNestedManyWithoutUserInput
@@ -744,6 +771,7 @@ export type UserUncheckedCreateWithoutSessionsInput = {
   approved?: boolean
   role?: $Enums.Role
   priceMultiplier?: number
+  phone?: string | null
   accounts?: Prisma.AccountUncheckedCreateNestedManyWithoutUserInput
   verifications?: Prisma.VerificationUncheckedCreateNestedManyWithoutUserInput
   addresses?: Prisma.AddressUncheckedCreateNestedManyWithoutUserInput
@@ -778,6 +806,7 @@ export type UserUpdateWithoutSessionsInput = {
   approved?: Prisma.BoolFieldUpdateOperationsInput | boolean
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   priceMultiplier?: Prisma.FloatFieldUpdateOperationsInput | number
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   accounts?: Prisma.AccountUpdateManyWithoutUserNestedInput
   verifications?: Prisma.VerificationUpdateManyWithoutUserNestedInput
   addresses?: Prisma.AddressUpdateManyWithoutUserNestedInput
@@ -796,6 +825,7 @@ export type UserUncheckedUpdateWithoutSessionsInput = {
   approved?: Prisma.BoolFieldUpdateOperationsInput | boolean
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   priceMultiplier?: Prisma.FloatFieldUpdateOperationsInput | number
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   accounts?: Prisma.AccountUncheckedUpdateManyWithoutUserNestedInput
   verifications?: Prisma.VerificationUncheckedUpdateManyWithoutUserNestedInput
   addresses?: Prisma.AddressUncheckedUpdateManyWithoutUserNestedInput
@@ -814,6 +844,7 @@ export type UserCreateWithoutVerificationsInput = {
   approved?: boolean
   role?: $Enums.Role
   priceMultiplier?: number
+  phone?: string | null
   accounts?: Prisma.AccountCreateNestedManyWithoutUserInput
   sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
   addresses?: Prisma.AddressCreateNestedManyWithoutUserInput
@@ -832,6 +863,7 @@ export type UserUncheckedCreateWithoutVerificationsInput = {
   approved?: boolean
   role?: $Enums.Role
   priceMultiplier?: number
+  phone?: string | null
   accounts?: Prisma.AccountUncheckedCreateNestedManyWithoutUserInput
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
   addresses?: Prisma.AddressUncheckedCreateNestedManyWithoutUserInput
@@ -866,6 +898,7 @@ export type UserUpdateWithoutVerificationsInput = {
   approved?: Prisma.BoolFieldUpdateOperationsInput | boolean
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   priceMultiplier?: Prisma.FloatFieldUpdateOperationsInput | number
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   accounts?: Prisma.AccountUpdateManyWithoutUserNestedInput
   sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
   addresses?: Prisma.AddressUpdateManyWithoutUserNestedInput
@@ -884,6 +917,7 @@ export type UserUncheckedUpdateWithoutVerificationsInput = {
   approved?: Prisma.BoolFieldUpdateOperationsInput | boolean
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   priceMultiplier?: Prisma.FloatFieldUpdateOperationsInput | number
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   accounts?: Prisma.AccountUncheckedUpdateManyWithoutUserNestedInput
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
   addresses?: Prisma.AddressUncheckedUpdateManyWithoutUserNestedInput
@@ -902,6 +936,7 @@ export type UserCreateWithoutAddressesInput = {
   approved?: boolean
   role?: $Enums.Role
   priceMultiplier?: number
+  phone?: string | null
   accounts?: Prisma.AccountCreateNestedManyWithoutUserInput
   sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
   verifications?: Prisma.VerificationCreateNestedManyWithoutUserInput
@@ -920,6 +955,7 @@ export type UserUncheckedCreateWithoutAddressesInput = {
   approved?: boolean
   role?: $Enums.Role
   priceMultiplier?: number
+  phone?: string | null
   accounts?: Prisma.AccountUncheckedCreateNestedManyWithoutUserInput
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
   verifications?: Prisma.VerificationUncheckedCreateNestedManyWithoutUserInput
@@ -954,6 +990,7 @@ export type UserUpdateWithoutAddressesInput = {
   approved?: Prisma.BoolFieldUpdateOperationsInput | boolean
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   priceMultiplier?: Prisma.FloatFieldUpdateOperationsInput | number
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   accounts?: Prisma.AccountUpdateManyWithoutUserNestedInput
   sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
   verifications?: Prisma.VerificationUpdateManyWithoutUserNestedInput
@@ -972,6 +1009,7 @@ export type UserUncheckedUpdateWithoutAddressesInput = {
   approved?: Prisma.BoolFieldUpdateOperationsInput | boolean
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   priceMultiplier?: Prisma.FloatFieldUpdateOperationsInput | number
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   accounts?: Prisma.AccountUncheckedUpdateManyWithoutUserNestedInput
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
   verifications?: Prisma.VerificationUncheckedUpdateManyWithoutUserNestedInput
@@ -990,6 +1028,7 @@ export type UserCreateWithoutCartInput = {
   approved?: boolean
   role?: $Enums.Role
   priceMultiplier?: number
+  phone?: string | null
   accounts?: Prisma.AccountCreateNestedManyWithoutUserInput
   sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
   verifications?: Prisma.VerificationCreateNestedManyWithoutUserInput
@@ -1008,6 +1047,7 @@ export type UserUncheckedCreateWithoutCartInput = {
   approved?: boolean
   role?: $Enums.Role
   priceMultiplier?: number
+  phone?: string | null
   accounts?: Prisma.AccountUncheckedCreateNestedManyWithoutUserInput
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
   verifications?: Prisma.VerificationUncheckedCreateNestedManyWithoutUserInput
@@ -1042,6 +1082,7 @@ export type UserUpdateWithoutCartInput = {
   approved?: Prisma.BoolFieldUpdateOperationsInput | boolean
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   priceMultiplier?: Prisma.FloatFieldUpdateOperationsInput | number
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   accounts?: Prisma.AccountUpdateManyWithoutUserNestedInput
   sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
   verifications?: Prisma.VerificationUpdateManyWithoutUserNestedInput
@@ -1060,6 +1101,7 @@ export type UserUncheckedUpdateWithoutCartInput = {
   approved?: Prisma.BoolFieldUpdateOperationsInput | boolean
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   priceMultiplier?: Prisma.FloatFieldUpdateOperationsInput | number
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   accounts?: Prisma.AccountUncheckedUpdateManyWithoutUserNestedInput
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
   verifications?: Prisma.VerificationUncheckedUpdateManyWithoutUserNestedInput
@@ -1078,6 +1120,7 @@ export type UserCreateWithoutOrdersInput = {
   approved?: boolean
   role?: $Enums.Role
   priceMultiplier?: number
+  phone?: string | null
   accounts?: Prisma.AccountCreateNestedManyWithoutUserInput
   sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
   verifications?: Prisma.VerificationCreateNestedManyWithoutUserInput
@@ -1096,6 +1139,7 @@ export type UserUncheckedCreateWithoutOrdersInput = {
   approved?: boolean
   role?: $Enums.Role
   priceMultiplier?: number
+  phone?: string | null
   accounts?: Prisma.AccountUncheckedCreateNestedManyWithoutUserInput
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
   verifications?: Prisma.VerificationUncheckedCreateNestedManyWithoutUserInput
@@ -1130,6 +1174,7 @@ export type UserUpdateWithoutOrdersInput = {
   approved?: Prisma.BoolFieldUpdateOperationsInput | boolean
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   priceMultiplier?: Prisma.FloatFieldUpdateOperationsInput | number
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   accounts?: Prisma.AccountUpdateManyWithoutUserNestedInput
   sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
   verifications?: Prisma.VerificationUpdateManyWithoutUserNestedInput
@@ -1148,6 +1193,7 @@ export type UserUncheckedUpdateWithoutOrdersInput = {
   approved?: Prisma.BoolFieldUpdateOperationsInput | boolean
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   priceMultiplier?: Prisma.FloatFieldUpdateOperationsInput | number
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   accounts?: Prisma.AccountUncheckedUpdateManyWithoutUserNestedInput
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
   verifications?: Prisma.VerificationUncheckedUpdateManyWithoutUserNestedInput
@@ -1233,6 +1279,7 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   approved?: boolean
   role?: boolean
   priceMultiplier?: boolean
+  phone?: boolean
   accounts?: boolean | Prisma.User$accountsArgs<ExtArgs>
   sessions?: boolean | Prisma.User$sessionsArgs<ExtArgs>
   verifications?: boolean | Prisma.User$verificationsArgs<ExtArgs>
@@ -1253,6 +1300,7 @@ export type UserSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   approved?: boolean
   role?: boolean
   priceMultiplier?: boolean
+  phone?: boolean
 }, ExtArgs["result"]["user"]>
 
 export type UserSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -1266,6 +1314,7 @@ export type UserSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   approved?: boolean
   role?: boolean
   priceMultiplier?: boolean
+  phone?: boolean
 }, ExtArgs["result"]["user"]>
 
 export type UserSelectScalar = {
@@ -1279,9 +1328,10 @@ export type UserSelectScalar = {
   approved?: boolean
   role?: boolean
   priceMultiplier?: boolean
+  phone?: boolean
 }
 
-export type UserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "email" | "emailVerified" | "name" | "image" | "createdAt" | "updatedAt" | "approved" | "role" | "priceMultiplier", ExtArgs["result"]["user"]>
+export type UserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "email" | "emailVerified" | "name" | "image" | "createdAt" | "updatedAt" | "approved" | "role" | "priceMultiplier" | "phone", ExtArgs["result"]["user"]>
 export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   accounts?: boolean | Prisma.User$accountsArgs<ExtArgs>
   sessions?: boolean | Prisma.User$sessionsArgs<ExtArgs>
@@ -1315,6 +1365,7 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     approved: boolean
     role: $Enums.Role
     priceMultiplier: number
+    phone: string | null
   }, ExtArgs["result"]["user"]>
   composites: {}
 }
@@ -1754,6 +1805,7 @@ export interface UserFieldRefs {
   readonly approved: Prisma.FieldRef<"User", 'Boolean'>
   readonly role: Prisma.FieldRef<"User", 'Role'>
   readonly priceMultiplier: Prisma.FieldRef<"User", 'Float'>
+  readonly phone: Prisma.FieldRef<"User", 'String'>
 }
     
 

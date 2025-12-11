@@ -5,7 +5,7 @@ import BackLink from "@/components/site/BackLink"
 import { OrderItemsCard } from "@/components/site/OrderItemsCard"
 import { type OrderStatus, OrderStatusBadge } from "@/components/site/OrderStatusBadge"
 import { Button } from "@/components/ui/button"
-import { IconCheckCircle, IconMapPin } from "@/components/ui/icons"
+import { IconCheckCircle } from "@/components/ui/icons"
 import { getCurrentUser } from "@/lib/current-user"
 import { db } from "@/lib/db"
 import { formatDate } from "@/lib/utils"
@@ -102,10 +102,7 @@ export default async function OrderDetailPage({ params }: OrderDetailPageProps) 
         <div className="lg:col-span-1 space-y-4">
           {/* Shipping Address */}
           <div className="bg-white rounded-xs shadow-sm border p-6">
-            <h2 className="heading-3 mb-4 flex items-center gap-2">
-              <IconMapPin className="h-5 w-5" />
-              Shipping Address
-            </h2>
+            <h2 className="heading-3 mb-4 flex items-center gap-2">Shipping Address</h2>
             <AddressDisplay address={order.shippingAddress} />
           </div>
 

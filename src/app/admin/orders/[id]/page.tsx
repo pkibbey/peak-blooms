@@ -4,7 +4,6 @@ import { AddressDisplay } from "@/components/site/AddressDisplay"
 import BackLink from "@/components/site/BackLink"
 import { OrderItemsCard } from "@/components/site/OrderItemsCard"
 import { type OrderStatus, OrderStatusBadge } from "@/components/site/OrderStatusBadge"
-import { IconMapPin } from "@/components/ui/icons"
 import { getTrackedDb } from "@/lib/db"
 import { formatDate } from "@/lib/utils"
 
@@ -60,11 +59,7 @@ export default async function AdminOrderDetailPage({ params }: AdminOrderDetailP
         {/* Main Content */}
         <div className="lg:col-span-2 space-y-6">
           {/* Order Items */}
-          <OrderItemsCard
-            items={order.items}
-            total={order.total}
-            getItemLinkHref={(item) => `/admin/products/${item.productId}/edit`}
-          />
+          <OrderItemsCard items={order.items} total={order.total} />
 
           {/* Order Notes */}
           {order.notes && (
@@ -111,10 +106,7 @@ export default async function AdminOrderDetailPage({ params }: AdminOrderDetailP
 
           {/* Shipping Address */}
           <div className="bg-white rounded-xs shadow-sm border p-6">
-            <h2 className="heading-3 mb-4 flex items-center gap-2">
-              <IconMapPin className="h-5 w-5" />
-              Shipping Address
-            </h2>
+            <h2 className="heading-3 mb-4 flex items-center gap-2">Shipping Address</h2>
             <AddressDisplay address={order.shippingAddress} />
           </div>
         </div>

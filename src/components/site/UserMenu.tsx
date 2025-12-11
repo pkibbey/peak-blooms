@@ -3,6 +3,7 @@
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { toast } from "sonner"
+import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import {
   DropdownMenu,
@@ -11,7 +12,13 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { IconLogOut, IconSettings, IconUser } from "@/components/ui/icons"
+import {
+  IconCheckCircle,
+  IconClock,
+  IconLogOut,
+  IconSettings,
+  IconUser,
+} from "@/components/ui/icons"
 import { signOut } from "@/lib/auth-client"
 
 interface UserMenuProps {
@@ -56,6 +63,19 @@ export default function UserMenu({ user }: UserMenuProps) {
         <div className="py-2 px-3 text-sm text-muted-foreground border-b">
           <div className="font-medium truncate">{user.name ?? user.email}</div>
           {user.email && <div className="text-xs opacity-80 truncate">{user.email}</div>}
+          <div className="flex items-center gap-2 mt-2">
+            {user.approved ? (
+              <Badge variant="default">
+                <IconCheckCircle className="h-3 w-3 mr-1" />
+                Approved
+              </Badge>
+            ) : (
+              <Badge variant="secondary">
+                <IconClock className="h-3 w-3 mr-1" />
+                Pending Approval
+              </Badge>
+            )}
+          </div>
         </div>
 
         <div className="flex flex-col gap-1 py-1">

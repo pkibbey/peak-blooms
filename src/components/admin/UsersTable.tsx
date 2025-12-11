@@ -192,7 +192,7 @@ export default function UsersTable({ users, sort, order }: UsersTableProps) {
 
               {/* Email */}
               <TableCell className="hidden md:table-cell text-muted-foreground">
-                <p className="text-sm">{user.email}</p>
+                <p className="text-sm max-w-24 truncated">{user.email}</p>
               </TableCell>
 
               {/* Role */}

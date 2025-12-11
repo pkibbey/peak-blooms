@@ -1,3 +1,4 @@
+import { revalidateTag } from "next/cache"
 import { type NextRequest, NextResponse } from "next/server"
 import { getSession } from "@/lib/auth"
 import { db } from "@/lib/db"
@@ -41,7 +42,7 @@ export async function GET() {
 
 /**
  * PATCH /api/users/profile
- * Update current user's profile (name only)
+ * Update current user's profile (name and phone)
  * Email cannot be changed - it's verified by Google OAuth
  */
 export async function PATCH(request: NextRequest) {
@@ -63,24 +64,32 @@ export async function PATCH(request: NextRequest) {
       )
     }
 
-    const { name } = validationResult.data
+    const { name, phone } = validationResult.data
     const currentUser = await db.user.findUnique({
       where: { id: session.user.id },
-      select: { email: true, name: true },
+      select: { email: true, name: true, phone: true },
     })
 
     if (!currentUser) {
       return NextResponse.json({ error: "User not found" }, { status: 404 })
     }
 
-    // Update user's name if provided
+    // Update user's name and/or phone if provided
+    const updateData: { name?: string | null; phone?: string | null } = {}
     if (name !== undefined && name !== currentUser.name) {
+      updateData.name = name || null
+    }
+    if (phone !== undefined && phone !== currentUser.phone) {
+      updateData.phone = phone || null
+    }
+
+    if (Object.keys(updateData).length > 0) {
       await db.user.update({
         where: { id: session.user.id },
-        data: {
-          name: name || null,
-        },
+        data: updateData,
       })
+      // Revalidate the user profile cache after successful update
+      revalidateTag("user-profile")
     }
 
     const updatedUser = await db.user.findUnique({
@@ -89,6 +98,7 @@ export async function PATCH(request: NextRequest) {
         id: true,
         email: true,
         name: true,
+        phone: true,
         image: true,
         role: true,
         approved: true,

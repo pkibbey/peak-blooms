@@ -22,6 +22,7 @@ export const getCurrentUser = cache(async () => {
     id: session.user.id,
     email: session.user.email,
     name: session.user.name ?? null,
+    phone: (session.user.phone as string | null | undefined) ?? null,
     role: (session.user.role as "CUSTOMER" | "ADMIN") ?? "CUSTOMER",
     approved: (session.user.approved as boolean) ?? false,
     priceMultiplier: (session.user.priceMultiplier as number) ?? 1.0,

@@ -4,9 +4,8 @@ import Link from "next/link"
 import { useCallback, useEffect, useMemo, useState } from "react"
 import AddToCartButton from "@/components/site/AddToCartButton"
 import { Button } from "@/components/ui/button"
-import { IconMinus, IconPlus } from "@/components/ui/icons"
-import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { QuantityStepper } from "@/components/ui/QuantityStepper"
 import { cn, formatPrice } from "@/lib/utils"
 
 interface ProductVariant {
@@ -200,8 +199,6 @@ export function ProductControls({ product, user, mode = "card" }: ProductControl
   // Local state for number of units to add to cart from the product card
   const [addQuantity, setAddQuantity] = useState<number>(1)
 
-  const clampAddQuantity = (v: number) => Math.max(1, Math.min(999, Math.floor(Number(v) || 1)))
-
   if (isSignedOut && isUnapproved) {
     return null
   }
@@ -310,33 +307,13 @@ export function ProductControls({ product, user, mode = "card" }: ProductControl
         !isUnapproved && (
           <div className={cn("flex items-center gap-2 flex-wrap", mode === "detail" ? "" : "")}>
             {/* compact quantity stepper for card / detail modes */}
-            <div className="flex items-center gap-1">
-              <Button
-                type="button"
-                variant="outline"
-                size="icon-sm"
-                onClick={() => setAddQuantity((q) => Math.max(1, q - 1))}
-                aria-label="Decrease quantity"
-              >
-                <IconMinus className="h-3 w-3" />
-              </Button>
-              <Input
-                type="number"
-                min={1}
-                value={addQuantity}
-                onChange={(e) => setAddQuantity(clampAddQuantity(parseInt(e.target.value, 10)))}
-                className="w-12 h-8 text-center text-xs px-1"
-              />
-              <Button
-                type="button"
-                variant="outline"
-                size="icon-sm"
-                onClick={() => setAddQuantity((q) => Math.min(999, q + 1))}
-                aria-label="Increase quantity"
-              >
-                <IconPlus className="h-3 w-3" />
-              </Button>
-            </div>
+            <QuantityStepper
+              size="xs"
+              value={addQuantity}
+              onChange={setAddQuantity}
+              min={1}
+              max={999}
+            />
 
             <AddToCartButton
               productId={product.id}

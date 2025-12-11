@@ -89,7 +89,7 @@ export default async function InspirationDetailPage({ params }: InspirationDetai
             <span className="w-1 h-8 bg-primary rounded-full mr-4"></span>
             Flowers in This Set
           </h2>
-          <p className="text-gray-600 mb-8 text-sm md:text-base">
+          <p className="text-gray-500 mb-4 text-sm md:text-base">
             Adjust quantities as needed—these are suggested amounts based on the inspiration
           </p>
 

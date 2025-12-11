@@ -1,9 +1,12 @@
 import { z } from "zod"
+import { isValidPhoneNumber } from "@/lib/phone"
 import { addressSchema } from "./address"
 
 export const checkoutSchema = z.object({
   email: z.string().min(1, "Email is required").email("Please enter a valid email address"),
-  phone: z.string(),
+  phone: z
+    .string()
+    .refine((value) => isValidPhoneNumber(value), "Please enter a valid phone number"),
   notes: z.string(),
   selectedAddressId: z.string(),
   shippingAddress: addressSchema,

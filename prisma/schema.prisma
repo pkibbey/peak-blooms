@@ -21,6 +21,7 @@ model User {
   approved        Boolean       @default(false)
   role            Role          @default(CUSTOMER)
   priceMultiplier Float         @default(1.0)
+  phone           String?
   
   accounts       Account[]
   sessions       Session[]

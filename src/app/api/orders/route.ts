@@ -166,6 +166,14 @@ export async function POST(request: Request) {
     // Generate order number
     const orderNumber = await generateOrderNumber()
 
+    // Update user's phone if provided
+    if (phone && phone !== user.phone) {
+      await db.user.update({
+        where: { id: user.id },
+        data: { phone },
+      })
+    }
+
     // Create order with items (storing adjusted prices)
     const order = await db.order.create({
       data: {

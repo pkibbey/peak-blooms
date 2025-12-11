@@ -4,6 +4,7 @@ import { formatPrice } from "@/lib/utils"
 interface Product {
   id: string
   name: string
+  slug: string
   image: string | null
 }
 
@@ -25,16 +26,15 @@ interface OrderItemData {
 interface OrderItemsCardProps {
   items: OrderItemData[]
   total: number
-  getItemLinkHref?: (item: OrderItemData) => string
 }
 
-export function OrderItemsCard({ items, total, getItemLinkHref }: OrderItemsCardProps) {
+export function OrderItemsCard({ items, total }: OrderItemsCardProps) {
   return (
     <div className="bg-white rounded-xs shadow-sm border p-6">
       <h2 className="heading-3 mb-4">Order Items</h2>
       <div className="space-y-4">
         {items.map((item) => (
-          <OrderItem key={item.id} item={item} linkHref={getItemLinkHref?.(item)} />
+          <OrderItem key={item.id} item={item} />
         ))}
       </div>
 

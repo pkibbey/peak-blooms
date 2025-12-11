@@ -1,8 +1,6 @@
-import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
-import { IconMinus, IconPlus } from "@/components/ui/icons"
-import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { QuantityStepper } from "@/components/ui/QuantityStepper"
 import {
   Select,
   SelectContent,
@@ -109,39 +107,13 @@ export function ProductMultiSelectItem({
           {onQuantityChange && (
             <div className="flex items-center gap-1">
               <span className="text-xs text-muted-foreground mr-1">Qty:</span>
-              <Button
-                type="button"
-                variant="outline"
-                size="icon-sm"
-                onClick={() => onQuantityChange(product.id, selectedQuantity - 1)}
-                disabled={disabled || selectedQuantity <= 1}
-                aria-label="Decrease quantity"
-              >
-                <IconMinus className="h-3 w-3" />
-              </Button>
-              <Input
-                type="number"
-                min="1"
+              <QuantityStepper
+                size="xs"
                 value={selectedQuantity}
-                onChange={(e) => {
-                  const newQty = parseInt(e.target.value, 10)
-                  if (!Number.isNaN(newQty) && newQty >= 1) {
-                    onQuantityChange(product.id, newQty)
-                  }
-                }}
+                onChange={(newQuantity) => onQuantityChange(product.id, newQuantity)}
                 disabled={disabled}
-                className="w-14 h-8 text-center text-xs px-1"
+                min={1}
               />
-              <Button
-                type="button"
-                variant="outline"
-                size="icon-sm"
-                onClick={() => onQuantityChange(product.id, selectedQuantity + 1)}
-                disabled={disabled}
-                aria-label="Increase quantity"
-              >
-                <IconPlus className="h-3 w-3" />
-              </Button>
             </div>
           )}
         </div>

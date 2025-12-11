@@ -17,7 +17,6 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form"
-import { IconMapPin } from "@/components/ui/icons"
 import { Input } from "@/components/ui/input"
 import {
   Select,
@@ -27,6 +26,7 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
+import { formatPhoneNumber } from "@/lib/phone"
 import { formatPrice } from "@/lib/utils"
 import { emptyAddress } from "@/lib/validations/address"
 import { type CheckoutFormData, checkoutSchema } from "@/lib/validations/checkout"
@@ -77,9 +77,15 @@ interface CheckoutFormProps {
   cart: CartData
   savedAddresses: SavedAddress[]
   userEmail: string
+  userPhone?: string | null
 }
 
-export default function CheckoutForm({ cart, savedAddresses, userEmail }: CheckoutFormProps) {
+export default function CheckoutForm({
+  cart,
+  savedAddresses,
+  userEmail,
+  userPhone,
+}: CheckoutFormProps) {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [selectedAddressId, setSelectedAddressId] = useState<string>(
     savedAddresses.length > 0 ? savedAddresses[0].id : "new"
@@ -107,11 +113,11 @@ export default function CheckoutForm({ cart, savedAddresses, userEmail }: Checko
     resolver: zodResolver(checkoutSchema),
     defaultValues: {
       email: userEmail,
-      phone: "",
+      phone: userPhone || "",
       notes: "",
       selectedAddressId: selectedAddressId,
       shippingAddress: getInitialShippingAddress(),
-      saveShippingAddress: false,
+      saveShippingAddress: true,
     },
   })
 
@@ -271,7 +277,18 @@ export default function CheckoutForm({ cart, savedAddresses, userEmail }: Checko
                   <FormItem>
                     <FormLabel>Phone</FormLabel>
                     <FormControl>
-                      <Input {...field} type="tel" placeholder="(555) 123-4567" />
+                      <Input
+                        {...field}
+                        type="tel"
+                        placeholder="(555) 123-4567"
+                        onBlur={(e) => {
+                          if (e.target.value) {
+                            const formatted = formatPhoneNumber(e.target.value)
+                            field.onChange(formatted)
+                          }
+                          field.onBlur()
+                        }}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -282,10 +299,7 @@ export default function CheckoutForm({ cart, savedAddresses, userEmail }: Checko
 
           {/* Shipping Address */}
           <div className="bg-white rounded-xs shadow-sm border p-6">
-            <h2 className="heading-3 mb-4 flex items-center gap-2">
-              <IconMapPin className="h-5 w-5" />
-              Shipping Address
-            </h2>
+            <h2 className="heading-3 mb-4 flex items-center gap-2">Shipping Address</h2>
 
             {savedAddresses.length > 0 && (
               <FormField

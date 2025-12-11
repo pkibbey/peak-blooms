@@ -14,6 +14,7 @@ import {
   FormMessage,
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
+import { formatPhoneNumber } from "@/lib/phone"
 import { type ProfileFormData, profileSchema } from "@/lib/validations/auth"
 
 interface ProfileFormProps {
@@ -21,6 +22,7 @@ interface ProfileFormProps {
     id: string
     name: string | null
     email: string
+    phone?: string | null
   }
 }
 
@@ -31,6 +33,7 @@ export default function ProfileForm({ user }: ProfileFormProps) {
     resolver: zodResolver(profileSchema),
     defaultValues: {
       name: user.name || "",
+      phone: user.phone || "",
     },
   })
 
@@ -84,6 +87,32 @@ export default function ProfileForm({ user }: ProfileFormProps) {
               <FormLabel>Name</FormLabel>
               <FormControl>
                 <Input {...field} placeholder="Your name" />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        {/* Phone */}
+        <FormField
+          control={form.control}
+          name="phone"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Phone</FormLabel>
+              <FormControl>
+                <Input
+                  {...field}
+                  type="tel"
+                  placeholder="(555) 123-4567"
+                  onBlur={(e) => {
+                    if (e.target.value) {
+                      const formatted = formatPhoneNumber(e.target.value)
+                      field.onChange(formatted)
+                    }
+                    field.onBlur()
+                  }}
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
