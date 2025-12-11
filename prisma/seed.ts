@@ -296,14 +296,6 @@ async function main() {
         select: { id: true, slug: true },
       })
 
-      // Also fetch the first variant for each product (grouped by productId)
-      const productVariants = await tx.productVariant.findMany({
-        where: { productId: { in: allProductsForInspiration.map((p) => p.id) } },
-        select: { id: true, productId: true },
-        distinct: ["productId"],
-        take: allProductsForInspiration.length,
-      })
-
       await captureMetric(
         MetricType.SEED,
         "batch fetch inspiration and product data",
@@ -313,7 +305,6 @@ async function main() {
       // Create maps for O(1) lookups
       const inspirationMap = new Map(allInspirations.map((i) => [i.slug, i.id]))
       const productMap = new Map(allProductsForInspiration.map((p) => [p.slug, p.id]))
-      const variantByProductId = new Map(productVariants.map((v) => [v.productId, v.id]))
 
       // Batch upsert all inspiration-product associations
       const start_upsertInspirationProducts = performance.now()
@@ -321,9 +312,8 @@ async function main() {
         try {
           const inspirationId = inspirationMap.get(assoc.inspirationSlug)
           const productId = productMap.get(assoc.productSlug)
-          const variantId = productId ? variantByProductId.get(productId) : undefined
 
-          if (!inspirationId || !productId || !variantId) continue
+          if (!inspirationId || !productId) continue
 
           await tx.inspirationProduct.upsert({
             where: {
@@ -335,7 +325,6 @@ async function main() {
             create: {
               inspirationId: inspirationId,
               productId: productId,
-              productVariantId: variantId,
               quantity: assoc.quantity,
             },
             update: {
@@ -364,18 +353,20 @@ async function main() {
         await tx.order.deleteMany({})
         await captureMetric(MetricType.SEED, "reset orders", performance.now() - start_resetOrders)
 
-        // Get the first 3 available product variants to use in sample orders
-        const start_findVariants = performance.now()
-        const firstThreeVariants = await tx.productVariant.findMany({
+        // Get the first 3 available products to use in sample orders
+        const start_findProducts = performance.now()
+        const firstThreeProducts = await tx.product.findMany({
           take: 3,
         })
         await captureMetric(
           MetricType.SEED,
-          "find first 3 product variants",
-          performance.now() - start_findVariants
+          "find first 3 products",
+          performance.now() - start_findProducts
         )
 
-        const [variantA, variantB, variantC] = firstThreeVariants
+        const productA = firstThreeProducts[0]
+        const productB = firstThreeProducts[1]
+        const productC = firstThreeProducts[2]
 
         // Create both shipping addresses in parallel
         const start_createAddresses = performance.now()
@@ -418,7 +409,7 @@ async function main() {
         order1Date.setDate(order1Date.getDate() - 30)
 
         const order1Total =
-          (variantA ? variantA.price * 2 : 0) + (variantB ? variantB.price * 1 : 0)
+          (productA ? productA.price * 2 : 0) + (productB ? productB.price * 1 : 0)
 
         const order1 = await tx.order.create({
           data: {
@@ -431,20 +422,18 @@ async function main() {
             shippingAddressId: shippingAddress1.id,
             items: {
               create: [
-                variantA
+                productA
                   ? {
-                      productId: variantA.productId,
-                      productVariantId: variantA.id,
+                      productId: productA.id,
                       quantity: 2,
-                      price: variantA.price,
+                      price: productA.price,
                     }
                   : undefined,
-                variantB
+                productB
                   ? {
-                      productId: variantB.productId,
-                      productVariantId: variantB.id,
+                      productId: productB.id,
                       quantity: 1,
-                      price: variantB.price,
+                      price: productB.price,
                     }
                   : undefined,
               ].filter(
@@ -461,9 +450,9 @@ async function main() {
         order2Date.setDate(order2Date.getDate() - 5)
 
         const order2Total =
-          (variantA ? variantA.price * 1 : 0) +
-          (variantB ? variantB.price * 2 : 0) +
-          (variantC ? variantC.price * 1 : 0)
+          (productA ? productA.price * 1 : 0) +
+          (productB ? productB.price * 2 : 0) +
+          (productC ? productC.price * 1 : 0)
 
         const order2 = await tx.order.create({
           data: {
@@ -476,28 +465,25 @@ async function main() {
             shippingAddressId: shippingAddress2.id,
             items: {
               create: [
-                variantA
+                productA
                   ? {
-                      productId: variantA.productId,
-                      productVariantId: variantA.id,
+                      productId: productA.id,
                       quantity: 1,
-                      price: variantA.price,
+                      price: productA.price,
                     }
                   : undefined,
-                variantB
+                productB
                   ? {
-                      productId: variantB.productId,
-                      productVariantId: variantB.id,
+                      productId: productB.id,
                       quantity: 2,
-                      price: variantB.price,
+                      price: productB.price,
                     }
                   : undefined,
-                variantC
+                productC
                   ? {
-                      productId: variantC.productId,
-                      productVariantId: variantC.id,
+                      productId: productC.id,
                       quantity: 1,
-                      price: variantC.price,
+                      price: productC.price,
                     }
                   : undefined,
               ].filter(

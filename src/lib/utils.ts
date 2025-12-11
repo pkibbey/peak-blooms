@@ -57,18 +57,3 @@ export function formatDate(date: Date | string): string {
     dateStyle: "medium",
   }).format(new Date(date))
 }
-
-/**
- * Formats product variant specifications for display
- * @example formatVariantSpecs(50, 10) => "50cm • 10"
- * @example formatVariantSpecs(50, null) => "50cm"
- * @example formatVariantSpecs(null, 10) => "10"
- */
-export function formatVariantSpecs(
-  stemLength: number | null | undefined,
-  quantityPerBunch: number | null | undefined
-): string {
-  return [stemLength ? `${stemLength}cm` : null, quantityPerBunch ? `${quantityPerBunch}` : null]
-    .filter(Boolean)
-    .join(" • ")
-}

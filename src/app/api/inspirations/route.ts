@@ -29,10 +29,8 @@ export async function GET() {
                     collection: true,
                   },
                 },
-                variants: true,
               },
             },
-            productVariant: true,
           },
         },
       },
@@ -41,17 +39,15 @@ export async function GET() {
       },
     })
 
-    // Apply price multiplier to product variant prices
+    // Apply price multiplier to product prices
     const adjustedInspirations = inspirations.map((inspiration) => ({
       ...inspiration,
       products: inspiration.products.map((p) => ({
         ...p,
-        productVariant: p.productVariant
-          ? {
-              ...p.productVariant,
-              price: adjustPrice(p.productVariant.price, priceMultiplier),
-            }
-          : null,
+        product: {
+          ...p.product,
+          price: adjustPrice(p.product.price, priceMultiplier),
+        },
       })),
     }))
 
@@ -93,17 +89,13 @@ export async function POST(request: NextRequest) {
       image,
       excerpt,
       inspirationText,
-      productSelections, // Array of { productId, productVariantId, quantity }
+      productSelections, // Array of { productId, quantity }
     } = validationResult.data
 
-    // Validate product selections - each must have a variant
+    // Use product selections as-is
     const selections: ProductSelection[] = productSelections || []
-    const invalidSelections = selections.filter((sel) => !sel.productId || !sel.productVariantId)
-    if (invalidSelections.length > 0) {
-      return NextResponse.json(
-        { error: "Each product must have a specific variant selected" },
-        { status: 400 }
-      )
+    if (selections.length === 0) {
+      return NextResponse.json({ error: "At least one product must be selected" }, { status: 400 })
     }
 
     const inspiration = await db.inspiration.create({
@@ -118,7 +110,6 @@ export async function POST(request: NextRequest) {
           products: {
             create: selections.map((sel: ProductSelection) => ({
               productId: sel.productId,
-              productVariantId: sel.productVariantId,
               quantity: Math.max(1, sel.quantity || 1),
             })),
           },
@@ -128,7 +119,6 @@ export async function POST(request: NextRequest) {
         products: {
           include: {
             product: true,
-            productVariant: true,
           },
         },
       },

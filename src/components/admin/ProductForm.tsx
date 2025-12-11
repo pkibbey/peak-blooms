@@ -4,7 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { useState } from "react"
-import { useFieldArray, useForm } from "react-hook-form"
+import { useForm } from "react-hook-form"
 import { toast } from "sonner"
 import { ImageUpload } from "@/components/admin/ImageUpload"
 import SlugInput from "@/components/admin/SlugInput"
@@ -29,7 +29,7 @@ import {
 } from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
 import { type ProductFormData, productSchema } from "@/lib/validations/product"
-import { IconPlus, IconTrash } from "../ui/icons"
+import { IconTrash } from "../ui/icons"
 
 interface Collection {
   id: string
@@ -44,17 +44,11 @@ interface ProductFormProps {
     slug: string
     description: string | null
     image: string | null
+    price: number
     colors?: string[] | null
     collectionIds: string[]
     productType?: "FLOWER" | "FILLER" | "ROSE"
     featured: boolean
-    variants?: {
-      id: string
-      price: number
-      stemLength: number | null
-      quantityPerBunch: number | null
-      isBoxlot: boolean
-    }[]
   }
 }
 
@@ -67,9 +61,6 @@ export default function ProductForm({ collections, product }: ProductFormProps) 
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [isDeleting, setIsDeleting] = useState(false)
 
-  // Color IDs are stored directly in the database
-  const initialColors = product?.colors || []
-
   const form = useForm<ProductFormData>({
     resolver: zodResolver(productSchema),
     defaultValues: {
@@ -77,26 +68,12 @@ export default function ProductForm({ collections, product }: ProductFormProps) 
       slug: product?.slug || "",
       description: product?.description || "",
       image: product?.image || "",
-      colors: initialColors,
+      price: product?.price?.toString() || "",
+      colors: product?.colors || [],
       collectionIds: product?.collectionIds || [],
       productType: product?.productType || "FLOWER",
       featured: product?.featured || false,
-      variants:
-        product?.variants && product.variants.length > 0
-          ? product.variants.map((v) => ({
-              id: v.id,
-              price: v.price.toString(),
-              stemLength: v.stemLength?.toString() || "",
-              quantityPerBunch: v.quantityPerBunch?.toString() || "",
-              isBoxlot: v.isBoxlot || false,
-            }))
-          : [{ price: "", stemLength: "", quantityPerBunch: "", isBoxlot: false }],
     },
-  })
-
-  const { fields, append, remove } = useFieldArray({
-    control: form.control,
-    name: "variants",
   })
 
   const onSubmit = async (data: ProductFormData) => {
@@ -106,22 +83,12 @@ export default function ProductForm({ collections, product }: ProductFormProps) 
       const url = isEditing ? `/api/products/${product.id}` : "/api/products"
       const method = isEditing ? "PUT" : "POST"
 
-      // Filter out empty variants and transform to API format
-      const validVariants = data.variants
-        .filter((v) => v.price.trim() !== "")
-        .map((v) => ({
-          price: Number.parseFloat(v.price),
-          stemLength: v.stemLength ? Number.parseInt(v.stemLength) : null,
-          quantityPerBunch: v.quantityPerBunch ? Number.parseInt(v.quantityPerBunch) : null,
-          isBoxlot: v.isBoxlot,
-        }))
-
       const response = await fetch(url, {
         method,
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           ...data,
-          variants: validVariants,
+          price: Number.parseFloat(data.price),
         }),
       })
 
@@ -169,10 +136,6 @@ export default function ProductForm({ collections, product }: ProductFormProps) 
     } finally {
       setIsDeleting(false)
     }
-  }
-
-  const addVariant = () => {
-    append({ price: "", stemLength: "", quantityPerBunch: "", isBoxlot: false })
   }
 
   // Watch the slug for ImageUpload
@@ -323,117 +286,20 @@ export default function ProductForm({ collections, product }: ProductFormProps) 
           )}
         />
 
-        {/* Variants Section */}
-        <div className="space-y-4">
-          <div className="flex items-center justify-between">
-            <FormLabel>Variants *</FormLabel>
-            <Button type="button" variant="outline" size="sm" onClick={addVariant}>
-              <IconPlus className="h-4 w-4 mr-1" />
-              Add Variant
-            </Button>
-          </div>
-          <p className="text-sm text-muted-foreground">
-            At least one variant is required. Each variant defines pricing and specifications.
-          </p>
-
-          {/* Show array-level errors */}
-          {form.formState.errors.variants?.root && (
-            <p className="text-sm text-destructive">
-              {form.formState.errors.variants.root.message}
-            </p>
+        {/* Price */}
+        <FormField
+          control={form.control}
+          name="price"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Price (per unit) *</FormLabel>
+              <FormControl>
+                <Input {...field} type="number" step="0.01" min="0" placeholder="0.00" />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
           )}
-          {form.formState.errors.variants?.message && (
-            <p className="text-sm text-destructive">{form.formState.errors.variants.message}</p>
-          )}
-
-          <div className="space-y-3">
-            {fields.map((field, index) => (
-              <div
-                key={field.id}
-                className="grid gap-4 md:grid-cols-5 items-end p-4 border border-border rounded-md bg-muted/30"
-              >
-                {/* Price */}
-                <FormField
-                  control={form.control}
-                  name={`variants.${index}.price`}
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Price *</FormLabel>
-                      <FormControl>
-                        <Input {...field} type="number" step="0.01" min="0" placeholder="0.00" />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                {/* Stem Length */}
-                <FormField
-                  control={form.control}
-                  name={`variants.${index}.stemLength`}
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Stem Length (cm)</FormLabel>
-                      <FormControl>
-                        <Input {...field} type="number" min="0" placeholder="e.g., 50" />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                {/* Quantity Per Bunch */}
-                <FormField
-                  control={form.control}
-                  name={`variants.${index}.quantityPerBunch`}
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Stems Per Bunch</FormLabel>
-                      <FormControl>
-                        <Input {...field} type="number" min="0" placeholder="e.g., 10" />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                {/* Boxlot Checkbox */}
-                <FormField
-                  control={form.control}
-                  name={`variants.${index}.isBoxlot`}
-                  render={({ field }) => (
-                    <FormItem className="flex items-center gap-2 h-10 space-y-0">
-                      <FormControl>
-                        <Checkbox
-                          checked={field.value}
-                          onChange={(e) => field.onChange(e.target.checked)}
-                        />
-                      </FormControl>
-                      <FormLabel className="cursor-pointer text-sm font-normal">
-                        Boxlot (Bulk)
-                      </FormLabel>
-                    </FormItem>
-                  )}
-                />
-
-                {/* Remove Button */}
-                <div>
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="sm"
-                    onClick={() => remove(index)}
-                    disabled={fields.length <= 1}
-                    className="w-full border-destructive text-destructive hover:bg-destructive hover:text-white disabled:opacity-50"
-                  >
-                    <IconTrash className="h-4 w-4 mr-1" />
-                    Remove
-                  </Button>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
+        />
 
         {/* Featured */}
         <FormField

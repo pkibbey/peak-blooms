@@ -5,25 +5,17 @@ import { ProductMultiSelectItem } from "@/components/admin/ProductMultiSelectIte
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 
-interface ProductVariant {
-  id: string
-  price: number
-  stemLength: number | null
-  quantityPerBunch: number | null
-}
-
 interface Product {
   id: string
   name: string
+  price: number
   collection?: {
     name: string
   }
-  variants?: ProductVariant[]
 }
 
 interface ProductSelection {
   productId: string
-  productVariantId: string
   quantity: number
 }
 
@@ -64,27 +56,11 @@ export default function ProductMultiSelect({
       }
     } else {
       onChange([...selectedIds, productId])
-      // Add to selections with first variant (required)
+      // Add to selections
       if (onSelectionsChange) {
-        const product = products.find((p) => p.id === productId)
-        const firstVariantId = product?.variants?.[0]?.id
-        if (firstVariantId) {
-          onSelectionsChange([
-            ...productSelections,
-            { productId, productVariantId: firstVariantId, quantity: 1 },
-          ])
-        }
+        onSelectionsChange([...productSelections, { productId, quantity: 1 }])
       }
     }
-  }
-
-  const handleVariantChange = (productId: string, variantId: string) => {
-    if (disabled || !onSelectionsChange) return
-
-    const updatedSelections = productSelections.map((s) =>
-      s.productId === productId ? { ...s, productVariantId: variantId } : s
-    )
-    onSelectionsChange(updatedSelections)
   }
 
   const handleSelectAll = () => {
@@ -93,14 +69,13 @@ export default function ProductMultiSelect({
     const newSelected = [...new Set([...selectedIds, ...filteredIds])]
     onChange(newSelected)
 
-    // Add selections for newly added products (only those with variants)
+    // Add selections for newly added products
     if (onSelectionsChange) {
       const existingProductIds = new Set(productSelections.map((s) => s.productId))
       const newSelections: ProductSelection[] = []
       for (const p of filteredProducts) {
-        const firstVariantId = p.variants?.[0]?.id
-        if (!existingProductIds.has(p.id) && firstVariantId) {
-          newSelections.push({ productId: p.id, productVariantId: firstVariantId, quantity: 1 })
+        if (!existingProductIds.has(p.id)) {
+          newSelections.push({ productId: p.id, quantity: 1 })
         }
       }
       onSelectionsChange([...productSelections, ...newSelections])
@@ -116,11 +91,6 @@ export default function ProductMultiSelect({
     if (onSelectionsChange) {
       onSelectionsChange(productSelections.filter((s) => !filteredIds.has(s.productId)))
     }
-  }
-
-  const getSelectedVariantId = (productId: string): string | null => {
-    const selection = productSelections.find((s) => s.productId === productId)
-    return selection?.productVariantId ?? null
   }
 
   const getSelectedQuantity = (productId: string): number => {
@@ -188,11 +158,9 @@ export default function ProductMultiSelect({
                 key={product.id}
                 product={product}
                 isSelected={selectedIds.includes(product.id)}
-                selectedVariantId={getSelectedVariantId(product.id)}
                 selectedQuantity={getSelectedQuantity(product.id)}
                 disabled={disabled}
                 onToggle={handleToggle}
-                onVariantChange={onSelectionsChange ? handleVariantChange : undefined}
                 onQuantityChange={onSelectionsChange ? handleQuantityChange : undefined}
               />
             ))}

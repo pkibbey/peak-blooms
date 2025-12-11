@@ -7,7 +7,6 @@ import { IconRefresh } from "@/components/ui/icons"
 
 interface OrderItem {
   productId: string
-  productVariantId: string | null
   quantity: number
 }
 
@@ -28,13 +27,12 @@ export default function ReorderButton({ orderNumber, items }: ReorderButtonProps
     setIsLoading(true)
     try {
       const productIds = items.map((item) => item.productId)
-      const productVariantIds = items.map((item) => item.productVariantId)
       const quantities = items.map((item) => Math.max(1, Number(item.quantity || 1)))
 
       const response = await fetch("/api/cart/batch", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ productIds, productVariantIds, quantities }),
+        body: JSON.stringify({ productIds, quantities }),
       })
 
       if (!response.ok) {

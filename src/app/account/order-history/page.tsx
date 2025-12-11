@@ -19,7 +19,6 @@ export default async function OrderHistoryPage() {
       items: {
         include: {
           product: true,
-          productVariant: true,
         },
       },
     },

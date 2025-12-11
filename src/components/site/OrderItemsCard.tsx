@@ -6,12 +6,7 @@ interface Product {
   name: string
   slug: string
   image: string | null
-}
-
-interface ProductVariant {
-  id: string
-  stemLength: number | null
-  quantityPerBunch: number | null
+  price: number
 }
 
 interface OrderItemData {
@@ -20,7 +15,6 @@ interface OrderItemData {
   price: number
   quantity: number
   product: Product
-  productVariant: ProductVariant | null
 }
 
 interface OrderItemsCardProps {

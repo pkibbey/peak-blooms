@@ -90,11 +90,6 @@ export type ProductCollection = Prisma.ProductCollectionModel
  */
 export type InspirationProduct = Prisma.InspirationProductModel
 /**
- * Model ProductVariant
- * 
- */
-export type ProductVariant = Prisma.ProductVariantModel
-/**
  * Model ShoppingCart
  * 
  */

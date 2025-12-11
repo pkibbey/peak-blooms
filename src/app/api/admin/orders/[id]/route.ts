@@ -34,7 +34,6 @@ export async function GET(_request: Request, { params }: RouteParams) {
         items: {
           include: {
             product: true,
-            productVariant: true,
           },
         },
         shippingAddress: true,
@@ -97,7 +96,6 @@ export async function PATCH(request: Request, { params }: RouteParams) {
         items: {
           include: {
             product: true,
-            productVariant: true,
           },
         },
         shippingAddress: true,

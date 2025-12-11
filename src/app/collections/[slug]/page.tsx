@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation"
 import BackLink from "@/components/site/BackLink"
 import { PageHeader } from "@/components/site/PageHeader"
-import { ProductCard } from "@/components/site/ProductCard"
+import { ProductItem } from "@/components/site/ProductItem"
 import { ShippingBanner } from "@/components/site/ShippingBanner"
 import { getCurrentUser } from "@/lib/current-user"
 import { getCollectionBySlug } from "@/lib/data"
@@ -59,7 +59,12 @@ export default async function CollectionDetailPage({ params }: CollectionDetailP
             ) : (
               <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
                 {collection.productCollections.map((pc) => (
-                  <ProductCard key={pc.product.slug} product={pc.product} user={user} />
+                  <ProductItem
+                    key={pc.product.slug}
+                    product={pc.product}
+                    user={user}
+                    layout="grid"
+                  />
                 ))}
               </div>
             )}

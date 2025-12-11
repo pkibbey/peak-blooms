@@ -9,7 +9,6 @@ import { useSession } from "@/lib/auth-client"
 
 interface AddAllToCartButtonProps {
   productIds: string[]
-  productVariantIds?: (string | null)[]
   quantities?: number[]
   setName?: string
   user?: { approved: boolean } | null
@@ -17,7 +16,6 @@ interface AddAllToCartButtonProps {
 
 export default function AddAllToCartButton({
   productIds,
-  productVariantIds,
   quantities,
   setName,
   user,
@@ -46,11 +44,9 @@ export default function AddAllToCartButton({
     try {
       type Payload = {
         productIds: string[]
-        productVariantIds?: (string | null)[]
         quantities?: number[]
       }
       const payload: Payload = { productIds }
-      if (Array.isArray(productVariantIds)) payload.productVariantIds = productVariantIds
       if (Array.isArray(quantities)) payload.quantities = quantities
 
       const response = await fetch("/api/cart/batch", {

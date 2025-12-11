@@ -21,17 +21,8 @@ function applyMultiplierToInspiration(
       ...sp,
       product: {
         ...sp.product,
-        variants: sp.product.variants.map((variant) => ({
-          ...variant,
-          price: adjustPrice(variant.price, multiplier),
-        })),
+        price: adjustPrice(sp.product.price, multiplier),
       },
-      ...(sp.productVariant && {
-        productVariant: {
-          ...sp.productVariant,
-          price: adjustPrice(sp.productVariant.price, multiplier),
-        },
-      }),
     })),
   }
 }
@@ -71,10 +62,7 @@ export async function getInspirationBySlug(
         include: {
           products: {
             include: {
-              product: {
-                include: { variants: true },
-              },
-              productVariant: true,
+              product: true,
             },
           },
         },

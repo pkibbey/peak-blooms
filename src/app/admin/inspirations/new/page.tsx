@@ -14,7 +14,6 @@ export default async function NewInspirationPage() {
           },
         },
       },
-      variants: true,
     },
     orderBy: { name: "asc" },
   })

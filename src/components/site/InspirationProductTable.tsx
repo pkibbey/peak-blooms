@@ -9,28 +9,17 @@ interface Product {
   name: string
   slug: string
   image: string | null
+  price: number
   quantity: number
-  displayVariant: {
-    id: string | null
-    price: number
-    stemLength: number | null
-    quantityPerBunch: number | null
-  } | null
 }
 
 interface InspirationProductTableProps {
   products: Product[]
-  productVariantIds: (string | null)[]
   setName: string
   user?: { approved: boolean } | null
 }
 
-export function InspirationProductTable({
-  products,
-  productVariantIds,
-  setName,
-  user,
-}: InspirationProductTableProps) {
+export function InspirationProductTable({ products, setName, user }: InspirationProductTableProps) {
   const [quantities, setQuantities] = useState<number[]>(products.map((p) => p.quantity))
 
   const handleQuantityChange = (index: number, value: number) => {
@@ -47,7 +36,6 @@ export function InspirationProductTable({
           <ProductItem
             key={product.slug}
             product={product}
-            productVariant={product.displayVariant}
             quantity={quantities[index]}
             imageSize="md"
             showQuantityControl={true}
@@ -61,7 +49,6 @@ export function InspirationProductTable({
       <div className="flex justify-end">
         <AddAllToCartButton
           productIds={products.map((p) => p.id)}
-          productVariantIds={productVariantIds}
           quantities={quantities}
           setName={setName}
           user={user}

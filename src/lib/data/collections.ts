@@ -21,10 +21,7 @@ function applyMultiplierToCollection(
       ...pc,
       product: {
         ...pc.product,
-        variants: pc.product.variants.map((variant) => ({
-          ...variant,
-          price: adjustPrice(variant.price, multiplier),
-        })),
+        price: adjustPrice(pc.product.price, multiplier),
       },
     })),
   }
@@ -75,11 +72,7 @@ export async function getCollectionBySlug(
               createdAt: "desc",
             },
             include: {
-              product: {
-                include: {
-                  variants: true,
-                },
-              },
+              product: true,
             },
           },
         },

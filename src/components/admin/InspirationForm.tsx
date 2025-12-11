@@ -26,20 +26,13 @@ import {
   type ProductSelection,
 } from "@/lib/validations/inspiration"
 
-interface ProductVariant {
-  id: string
-  price: number
-  stemLength: number | null
-  quantityPerBunch: number | null
-}
-
 interface Product {
   id: string
   name: string
+  price: number
   collection?: {
     name: string
   }
-  variants?: ProductVariant[]
 }
 
 interface InspirationFormProps {
@@ -54,7 +47,6 @@ interface InspirationFormProps {
     inspirationText: string
     products: Array<{
       productId: string
-      productVariantId: string
       quantity: number
     }>
   }
@@ -76,7 +68,6 @@ export default function InspirationForm({ products, inspiration }: InspirationFo
   const [productSelections, setProductSelections] = useState<ProductSelection[]>(
     inspiration?.products?.map((p) => ({
       productId: p.productId,
-      productVariantId: p.productVariantId,
       quantity: p.quantity ?? 1,
     })) || []
   )

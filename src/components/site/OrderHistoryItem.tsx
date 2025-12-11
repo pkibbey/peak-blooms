@@ -6,10 +6,9 @@ import { formatDate, formatPrice } from "@/lib/utils"
 
 interface OrderItem {
   id: string
-  productId: string
-  productVariantId: string | null
   quantity: number
   product: {
+    id: string
     name: string
     image: string | null
   }
@@ -77,8 +76,7 @@ export default function OrderHistoryItem({ order }: OrderHistoryItemProps) {
         <ReorderButton
           orderNumber={order.orderNumber}
           items={order.items.map((item) => ({
-            productId: item.productId,
-            productVariantId: item.productVariantId,
+            productId: item.product.id,
             quantity: item.quantity,
           }))}
         />

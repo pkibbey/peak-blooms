@@ -134,6 +134,7 @@ model Product {
   slug         String               @unique
   description  String?
   image        String?
+  price        Float
   colors       String[]             // Array of color IDs (references COLORS object in lib/colors.ts)
   featured     Boolean              @default(false)
   productType  ProductType          @default(FLOWER)
@@ -143,7 +144,6 @@ model Product {
   inspirations InspirationProduct[]
   orderItems   OrderItem[]
   productCollections ProductCollection[]
-  variants     ProductVariant[]
 
   @@index([slug])
   @@index([createdAt])
@@ -166,38 +166,17 @@ model ProductCollection {
 }
 
 model InspirationProduct {
-  id               String         @id @default(cuid())
-  inspirationId    String
-  productId        String
-  productVariantId String
-  quantity         Int            @default(1)
-  createdAt        DateTime       @default(now())
-  inspiration      Inspiration    @relation(fields: [inspirationId], references: [id], onDelete: Cascade)
-  product          Product        @relation(fields: [productId], references: [id], onDelete: Cascade)
-  productVariant   ProductVariant @relation(fields: [productVariantId], references: [id], onDelete: Cascade)
+  id            String      @id @default(cuid())
+  inspirationId String
+  productId     String
+  quantity      Int         @default(1)
+  createdAt     DateTime    @default(now())
+  inspiration   Inspiration @relation(fields: [inspirationId], references: [id], onDelete: Cascade)
+  product       Product     @relation(fields: [productId], references: [id], onDelete: Cascade)
 
   @@unique([inspirationId, productId])
   @@index([inspirationId])
   @@index([productId])
-}
-
-model ProductVariant {
-  id                  String               @id @default(cuid())
-  productId           String
-  price               Float
-  stemLength          Int?                 @map("stem_length")
-  quantityPerBunch    Int?                 @map("quantity_per_bunch")
-  isBoxlot            Boolean              @default(false) @map("is_boxlot")
-  createdAt           DateTime             @default(now())
-  updatedAt           DateTime             @updatedAt
-  cartItems           CartItem[]
-  inspirationProducts InspirationProduct[]
-  orderItems          OrderItem[]
-  product             Product              @relation(fields: [productId], references: [id], onDelete: Cascade)
-
-  @@index([productId])
-  @@index([productId, price], map: "idx_variant_product_price")
-  @@index([productId, stemLength], map: "idx_variant_product_stem_length")
 }
 
 model ShoppingCart {
@@ -210,18 +189,16 @@ model ShoppingCart {
 }
 
 model CartItem {
-  id               String          @id @default(cuid())
-  cartId           String
-  productId        String
-  quantity         Int             @default(1)
-  createdAt        DateTime        @default(now())
-  updatedAt        DateTime        @updatedAt
-  productVariantId String?
-  cart             ShoppingCart    @relation(fields: [cartId], references: [id], onDelete: Cascade)
-  product          Product         @relation(fields: [productId], references: [id], onDelete: Cascade)
-  productVariant   ProductVariant? @relation(fields: [productVariantId], references: [id])
+  id        String       @id @default(cuid())
+  cartId    String
+  productId String
+  quantity  Int          @default(1)
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @updatedAt
+  cart      ShoppingCart @relation(fields: [cartId], references: [id], onDelete: Cascade)
+  product   Product      @relation(fields: [productId], references: [id], onDelete: Cascade)
 
-  @@unique([cartId, productId, productVariantId])
+  @@unique([cartId, productId])
   @@index([cartId])
   @@index([productId])
 }
@@ -248,15 +225,13 @@ model Order {
 }
 
 model OrderItem {
-  id               String          @id @default(cuid())
-  orderId          String
-  productId        String
-  quantity         Int
-  price            Float
-  productVariantId String?
-  order            Order           @relation(fields: [orderId], references: [id], onDelete: Cascade)
-  product          Product         @relation(fields: [productId], references: [id], onDelete: SetNull)
-  productVariant   ProductVariant? @relation(fields: [productVariantId], references: [id])
+  id        String @id @default(cuid())
+  orderId   String
+  productId String
+  quantity  Int
+  price     Float
+  order     Order  @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  product   Product @relation(fields: [productId], references: [id], onDelete: SetNull)
 
   @@index([orderId])
 }

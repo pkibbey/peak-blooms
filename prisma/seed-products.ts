@@ -2,12 +2,7 @@ import * as fs from "node:fs"
 import * as path from "node:path"
 import { PrismaPg } from "@prisma/adapter-pg"
 import { Pool } from "pg"
-import {
-  MetricType,
-  type Prisma,
-  PrismaClient,
-  type Prisma as PrismaNamespace,
-} from "../src/generated/client"
+import { MetricType, PrismaClient, type Prisma as PrismaNamespace } from "../src/generated/client"
 
 const connectionString = process.env.DATABASE_URL
 
@@ -241,6 +236,7 @@ async function seedProducts() {
               productType: csvProduct.type,
               colors: csvProduct.colors,
               image: csvProduct.image || null,
+              price: csvProduct.price,
               featured: false,
             },
             where: { slug: slug },
@@ -250,6 +246,7 @@ async function seedProducts() {
               productType: csvProduct.type,
               colors: csvProduct.colors,
               image: csvProduct.image || null,
+              price: csvProduct.price,
             },
           })
           nonRoseUpsertResults.push({ product, csvProduct })
@@ -264,33 +261,6 @@ async function seedProducts() {
         "upsert non-rose products",
         performance.now() - start_upsertNonRoseProducts
       )
-
-      // Batch create variants for non-rose products
-      if (nonRoseUpsertResults.length > 0) {
-        const start_createNonRoseVariants = performance.now()
-        const variantCreateData = nonRoseUpsertResults.map(({ product, csvProduct }) => ({
-          productId: product.id,
-          price: csvProduct.price,
-          quantityPerBunch: csvProduct.quantity,
-        }))
-
-        // Delete existing variants for these products first
-        const productIds = nonRoseUpsertResults.map(({ product }) => product.id)
-        await tx.productVariant.deleteMany({
-          where: { productId: { in: productIds } },
-        })
-
-        // Batch create new variants
-        await tx.productVariant.createMany({
-          data: variantCreateData,
-          skipDuplicates: true,
-        })
-        await captureMetric(
-          MetricType.SEED,
-          "batch create non-rose variants",
-          performance.now() - start_createNonRoseVariants
-        )
-      }
 
       // Upsert rose products
       const start_upsertRoseProducts = performance.now()
@@ -314,6 +284,7 @@ async function seedProducts() {
               productType: csvProduct.type,
               colors: csvProduct.colors,
               image: csvProduct.image || null,
+              price: csvProduct.price,
               featured: false,
             },
             where: { slug: slug },
@@ -323,6 +294,7 @@ async function seedProducts() {
               productType: csvProduct.type,
               colors: csvProduct.colors,
               image: csvProduct.image || null,
+              price: csvProduct.price,
             },
           })
           roseUpsertResults.push({ product, csvProduct })
@@ -337,41 +309,6 @@ async function seedProducts() {
         "upsert rose products",
         performance.now() - start_upsertRoseProducts
       )
-
-      // Batch create rose variants (4 variants per rose product)
-      if (roseUpsertResults.length > 0) {
-        const start_createRoseVariants = performance.now()
-        const roseVariantCreateData: Prisma.ProductVariantCreateManyInput[] = []
-
-        for (const { product, csvProduct } of roseUpsertResults) {
-          const stemLengths = [40, 50, 60, 70]
-          for (const stemLength of stemLengths) {
-            roseVariantCreateData.push({
-              productId: product.id,
-              price: csvProduct.price,
-              quantityPerBunch: csvProduct.quantity,
-              stemLength: stemLength,
-            })
-          }
-        }
-
-        // Delete existing variants for rose products first
-        const roseProductIds = roseUpsertResults.map(({ product }) => product.id)
-        await tx.productVariant.deleteMany({
-          where: { productId: { in: roseProductIds } },
-        })
-
-        // Batch create all rose variants at once
-        await tx.productVariant.createMany({
-          data: roseVariantCreateData,
-          skipDuplicates: true,
-        })
-        await captureMetric(
-          MetricType.SEED,
-          "batch create rose variants",
-          performance.now() - start_createRoseVariants
-        )
-      }
 
       console.log(
         `✅ CSV seeding complete: ${productsCreated} products created/updated, ${productsSkipped} skipped`

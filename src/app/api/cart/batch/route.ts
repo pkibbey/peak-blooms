@@ -5,7 +5,7 @@ import { db } from "@/lib/db"
 /**
  * POST /api/cart/batch
  * Add multiple items to the user's cart in one request.
- * Body: { productIds: string[], quantities?: number[] | number, productVariantIds?: (string|null)[] }
+ * Body: { productIds: string[], quantities?: number[] | number }
  */
 export async function POST(request: NextRequest) {
   try {
@@ -23,7 +23,7 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json()
-    const { productIds, quantities, productVariantIds } = body
+    const { productIds, quantities } = body
 
     if (!Array.isArray(productIds) || productIds.length === 0) {
       return NextResponse.json({ error: "productIds must be a non-empty array" }, { status: 400 })
@@ -45,25 +45,6 @@ export async function POST(request: NextRequest) {
       resolvedQuantities = productIds.map(() => 1)
     }
 
-    // Resolve optional productVariantIds
-    let resolvedVariantIds: (string | null)[] = []
-    if (productVariantIds === undefined) {
-      resolvedVariantIds = productIds.map(() => null)
-    } else if (Array.isArray(productVariantIds)) {
-      if (productVariantIds.length !== productIds.length) {
-        return NextResponse.json(
-          { error: "productVariantIds array length must match productIds" },
-          { status: 400 }
-        )
-      }
-      resolvedVariantIds = productVariantIds.map((v) => (v === null ? null : String(v)))
-    } else {
-      return NextResponse.json(
-        { error: "productVariantIds must be an array if provided" },
-        { status: 400 }
-      )
-    }
-
     // Get or create cart (user already fetched above)
     let cart = await db.shoppingCart.findUnique({ where: { userId: user.id } })
     if (!cart) {
@@ -76,13 +57,11 @@ export async function POST(request: NextRequest) {
       for (let i = 0; i < productIds.length; i++) {
         const productId = String(productIds[i])
         const quantity = Math.max(1, Number(resolvedQuantities[i] ?? 1))
-        const productVariantId = resolvedVariantIds[i] ?? null
 
         const existingItem = await tx.cartItem.findFirst({
           where: {
             cartId: cart.id,
             productId,
-            productVariantId: productVariantId || null,
           },
         })
 
@@ -92,17 +71,16 @@ export async function POST(request: NextRequest) {
           item = await tx.cartItem.update({
             where: { id: existingItem.id },
             data: { quantity },
-            include: { product: true, productVariant: true },
+            include: { product: true },
           })
         } else {
           item = await tx.cartItem.create({
             data: {
               cartId: cart.id,
               productId,
-              productVariantId: productVariantId || null,
               quantity,
             },
-            include: { product: true, productVariant: true },
+            include: { product: true },
           })
         }
         items.push(item)

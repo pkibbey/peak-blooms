@@ -34,15 +34,9 @@ export default async function AdminProductsPage({ searchParams }: AdminProductsP
     1.0
   )
 
-  // Apply client-side sorting for price and description
+  // Apply client-side sorting for description only (price is now server-side)
   const products = [...result.products]
-  if (sort === "price") {
-    products.sort((a, b) => {
-      const aPrice = a.variants[0]?.price ?? 0
-      const bPrice = b.variants[0]?.price ?? 0
-      return order === "desc" ? bPrice - aPrice : aPrice - bPrice
-    })
-  } else if (sort === "description") {
+  if (sort === "description") {
     products.sort((a, b) => {
       const aDesc = a.description ?? ""
       const bDesc = b.description ?? ""

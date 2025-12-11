@@ -31,7 +31,7 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
     const cartItem = await db.cartItem.update({
       where: { id },
       data: { quantity },
-      include: { product: true, productVariant: true },
+      include: { product: true },
     })
 
     return NextResponse.json(cartItem)

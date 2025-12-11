@@ -82,8 +82,7 @@ export default function Cart({ initialCart }: CartProps) {
         item.id === itemId ? { ...item, quantity: newQuantity } : item
       )
       const newTotal = updatedItems.reduce((total, item) => {
-        // Variant is required for pricing
-        const price = item.productVariant?.price ?? 0
+        const price = item.product?.price ?? 0
         return total + price * item.quantity
       }, 0)
       return { ...prev, items: updatedItems, total: newTotal }
@@ -101,8 +100,7 @@ export default function Cart({ initialCart }: CartProps) {
       if (!prev) return prev
       const updatedItems = prev.items.filter((item) => item.id !== itemId)
       const newTotal = updatedItems.reduce((total, item) => {
-        // Variant is required for pricing
-        const price = item.productVariant?.price ?? 0
+        const price = item.product?.price ?? 0
         return total + price * item.quantity
       }, 0)
       return { ...prev, items: updatedItems, total: newTotal }
@@ -211,26 +209,13 @@ export default function Cart({ initialCart }: CartProps) {
             </div>
           </div>
 
-          {/* Market Price Items Note */}
-          {(() => {
-            const marketPriceItems = cart.items.filter((item) => !item.productVariant?.price)
-            const marketPriceQuantity = marketPriceItems.reduce(
-              (sum, item) => sum + item.quantity,
-              0
-            )
-            if (marketPriceQuantity > 0) {
-              return (
-                <div className="bg-amber-50/50 border border-amber-200 rounded p-3 mt-4">
-                  <p className="text-xs text-center text-amber-800">
-                    {marketPriceItems.length > 0 &&
-                      `${marketPriceItems.length} ${marketPriceItems.length === 1 ? "product" : "products"} `}
-                    awaiting market price
-                  </p>
-                </div>
-              )
-            }
-            return null
-          })()}
+          {/* Cart Total */}
+          <div className="bg-neutral-50 rounded-xs p-4 mt-4">
+            <div className="flex justify-between items-center">
+              <span className="font-semibold">Total:</span>
+              <span className="text-lg font-bold text-primary">{formatPrice(cart.total)}</span>
+            </div>
+          </div>
 
           <div className="border-t my-4" />
 

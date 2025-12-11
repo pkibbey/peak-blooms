@@ -1,28 +1,19 @@
 import Image from "next/image"
 import { Badge } from "@/components/ui/badge"
-import { formatPrice, formatVariantSpecs } from "@/lib/utils"
+import { formatPrice } from "@/lib/utils"
 
 interface CartProduct {
   id: string
   name: string
   slug: string
   image: string | null
-}
-
-interface CartVariant {
-  id: string
   price: number
-  stemLength: number | null
-  quantityPerBunch: number | null
 }
 
 interface CartItemData {
   id: string
-  productId: string
-  productVariantId: string | null
   quantity: number
   product: CartProduct
-  productVariant: CartVariant | null
 }
 
 interface CheckoutOrderItemProps {
@@ -30,11 +21,8 @@ interface CheckoutOrderItemProps {
 }
 
 export function CheckoutOrderItem({ item }: CheckoutOrderItemProps) {
-  const price = item.productVariant?.price ?? 0
+  const price = item.product.price
   const lineTotal = price * item.quantity
-  const variantSpecs = item.productVariant
-    ? formatVariantSpecs(item.productVariant.stemLength, item.productVariant.quantityPerBunch)
-    : null
 
   return (
     <div className="flex gap-3">
@@ -56,7 +44,6 @@ export function CheckoutOrderItem({ item }: CheckoutOrderItemProps) {
       </div>
       <div className="flex-1 min-w-0">
         <p className="text-sm font-medium truncate">{item.product.name}</p>
-        {variantSpecs && <p className="text-xs text-muted-foreground">{variantSpecs}</p>}
       </div>
       <p className="text-sm font-medium">{formatPrice(lineTotal)}</p>
     </div>

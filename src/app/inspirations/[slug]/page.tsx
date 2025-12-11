@@ -35,13 +35,10 @@ export default async function InspirationDetailPage({ params }: InspirationDetai
     notFound()
   }
 
-  // Extract products with their selected variants from the join table
+  // Extract products from the join table
   // Prices are already adjusted by the DAL
   const productsWithVariants = inspiration.products.map((sp) => ({
     ...sp.product,
-    selectedVariant: sp.productVariant,
-    // Use the selected variant or fall back to first variant
-    displayVariant: sp.productVariant ?? sp.product.variants[0] ?? null,
     quantity: sp.quantity ?? 1,
   }))
 
@@ -95,7 +92,6 @@ export default async function InspirationDetailPage({ params }: InspirationDetai
 
           <InspirationProductTable
             products={productsWithVariants}
-            productVariantIds={productsWithVariants.map((p) => p.displayVariant?.id ?? null)}
             setName={inspiration.name}
             user={user}
           />

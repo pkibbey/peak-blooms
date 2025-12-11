@@ -38,7 +38,6 @@ export async function GET(request: NextRequest) {
     const priceMin = searchParams.get("priceMin")
     const priceMax = searchParams.get("priceMax")
     const search = searchParams.get("search")
-    const boxlotOnly = searchParams.get("boxlotOnly")
     const limitParam = searchParams.get("limit")
     const offsetParam = searchParams.get("offset")
     const limit = limitParam ? parseInt(limitParam, 10) : ITEMS_PER_PAGE
@@ -62,7 +61,6 @@ export async function GET(request: NextRequest) {
         priceMin: priceMin ? parseFloat(priceMin) : undefined,
         priceMax: priceMax ? parseFloat(priceMax) : undefined,
         search: search || undefined,
-        boxlotOnly: boxlotOnly === "true",
         limit,
         offset,
       },
@@ -78,7 +76,7 @@ export async function GET(request: NextRequest) {
 
 /**
  * POST /api/products
- * Create a new product with variants (admin only)
+ * Create a new product (admin only)
  */
 export async function POST(request: NextRequest) {
   try {
@@ -100,17 +98,8 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    const {
-      name,
-      slug,
-      description,
-      image,
-      colors,
-      collectionIds,
-      productType,
-      featured,
-      variants,
-    } = validationResult.data
+    const { name, slug, description, image, price, colors, collectionIds, productType, featured } =
+      validationResult.data
 
     const product = await db.product.create({
       data: {
@@ -118,18 +107,11 @@ export async function POST(request: NextRequest) {
         slug,
         description,
         image,
+        price,
         // Save provided colors array (no legacy single color field)
         ...(colors !== undefined && { colors: colors ?? [] }),
         productType: productType ?? "FLOWER",
         featured: featured === true,
-        variants: {
-          create: variants.map((v) => ({
-            price: v.price,
-            stemLength: v.stemLength ?? null,
-            quantityPerBunch: v.quantityPerBunch ?? null,
-            isBoxlot: v.isBoxlot ?? false,
-          })),
-        },
         // Create junction table entries for each collection
         productCollections: {
           create: collectionIds.map((collectionId) => ({
@@ -143,7 +125,6 @@ export async function POST(request: NextRequest) {
             collection: true,
           },
         },
-        variants: true,
       },
     })
 

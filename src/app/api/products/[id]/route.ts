@@ -60,17 +60,8 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
       )
     }
 
-    const {
-      name,
-      slug,
-      description,
-      image,
-      colors,
-      collectionIds,
-      productType,
-      featured,
-      variants,
-    } = validationResult.data
+    const { name, slug, description, image, price, colors, collectionIds, productType, featured } =
+      validationResult.data
 
     // Check if product exists
     const existingProduct = await db.product.findUnique({
@@ -81,22 +72,8 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
       return NextResponse.json({ error: "Product not found" }, { status: 404 })
     }
 
-    // If variants are provided, validate at least one exists
-    if (variants !== undefined) {
-      if (!Array.isArray(variants) || variants.length === 0) {
-        return NextResponse.json({ error: "At least one variant is required" }, { status: 400 })
-      }
-    }
-
-    // Use transaction to update product and replace variants/collections
+    // Use transaction to update product and replace collections
     const product = await db.$transaction(async (tx) => {
-      // If variants provided, delete existing and recreate
-      if (variants !== undefined) {
-        await tx.productVariant.deleteMany({
-          where: { productId: id },
-        })
-      }
-
       // If collectionIds provided, delete existing junction entries and recreate
       if (collectionIds !== undefined) {
         await tx.productCollection.deleteMany({
@@ -111,6 +88,7 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
           ...(slug !== undefined && { slug }),
           ...(description !== undefined && { description }),
           ...(image !== undefined && { image }),
+          ...(price !== undefined && { price }),
           ...(colors !== undefined && { colors: colors ?? [] }),
           ...(collectionIds !== undefined && {
             productCollections: {
@@ -121,16 +99,6 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
           }),
           ...(productType !== undefined && { productType }),
           ...(featured !== undefined && { featured }),
-          ...(variants !== undefined && {
-            variants: {
-              create: variants.map((v) => ({
-                price: v.price,
-                stemLength: v.stemLength ?? null,
-                quantityPerBunch: v.quantityPerBunch ?? null,
-                isBoxlot: v.isBoxlot ?? false,
-              })),
-            },
-          }),
         },
         include: {
           productCollections: {
@@ -138,7 +106,6 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
               collection: true,
             },
           },
-          variants: true,
         },
       })
     })

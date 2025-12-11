@@ -61,7 +61,7 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json()
-    const { productId, productVariantId, quantity = 1 } = body
+    const { productId, quantity = 1 } = body
 
     if (!productId || quantity < 1) {
       return NextResponse.json({ error: "Invalid product or quantity" }, { status: 400 })
@@ -83,7 +83,6 @@ export async function POST(request: NextRequest) {
       where: {
         cartId: cart.id,
         productId,
-        productVariantId: productVariantId || null,
       },
     })
 
@@ -93,17 +92,16 @@ export async function POST(request: NextRequest) {
       cartItem = await db.cartItem.update({
         where: { id: existingItem.id },
         data: { quantity },
-        include: { product: true, productVariant: true },
+        include: { product: true },
       })
     } else {
       cartItem = await db.cartItem.create({
         data: {
           cartId: cart.id,
           productId,
-          productVariantId: productVariantId || null,
           quantity,
         },
-        include: { product: true, productVariant: true },
+        include: { product: true },
       })
     }
 

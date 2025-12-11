@@ -38,7 +38,6 @@ export default async function AccountPage({
       items: {
         include: {
           product: true,
-          productVariant: true,
         },
       },
     },

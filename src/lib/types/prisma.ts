@@ -18,7 +18,6 @@ export type {
   OrderItemModel,
   OrderModel,
   ProductModel,
-  ProductVariantModel,
   ShoppingCartModel,
   UserModel,
 } from "@/generated/models"
@@ -52,7 +51,7 @@ export type UserWithCart = Prisma.UserGetPayload<{
       include: {
         items: {
           include: {
-            productVariant: true
+            product: true
           }
         }
       }
@@ -64,15 +63,9 @@ export type UserWithCart = Prisma.UserGetPayload<{
 // Product Types
 // =============================================================================
 
-/** Product with its variants included */
-export type ProductWithVariants = Prisma.ProductGetPayload<{
-  include: { variants: true }
-}>
-
-/** Product with variants and collections included */
+/** Product with collections included */
 export type ProductWithVariantsAndCollection = Prisma.ProductGetPayload<{
   include: {
-    variants: true
     productCollections: {
       include: {
         collection: true
@@ -81,10 +74,9 @@ export type ProductWithVariantsAndCollection = Prisma.ProductGetPayload<{
   }
 }>
 
-/** Product with variants, collections, and inspirations with counts */
+/** Product with collections and inspirations with counts */
 export type ProductWithInspirations = Prisma.ProductGetPayload<{
   include: {
-    variants: true
     productCollections: {
       include: {
         collection: true
@@ -116,16 +108,12 @@ export type CollectionBasicWithCount = Prisma.CollectionGetPayload<{
   include: { _count: { select: { productCollections: true } } }
 }>
 
-/** Collection with all products and their variants */
+/** Collection with all products */
 export type CollectionWithProducts = Prisma.CollectionGetPayload<{
   include: {
     productCollections: {
       include: {
-        product: {
-          include: {
-            variants: true
-          }
-        }
+        product: true
       }
     }
   }
@@ -144,15 +132,12 @@ export type InspirationWithCount = Prisma.InspirationGetPayload<{
   }
 }>
 
-/** Inspiration with full product details including variants */
+/** Inspiration with full product details */
 export type InspirationWithProducts = Prisma.InspirationGetPayload<{
   include: {
     products: {
       include: {
-        product: {
-          include: { variants: true }
-        }
-        productVariant: true
+        product: true
       }
     }
   }
@@ -165,4 +150,3 @@ export type InspirationWithProducts = Prisma.InspirationGetPayload<{
 export type { CollectionWhereInput } from "@/generated/models/Collection"
 export type { InspirationWhereInput } from "@/generated/models/Inspiration"
 export type { ProductWhereInput } from "@/generated/models/Product"
-export type { ProductVariantWhereInput } from "@/generated/models/ProductVariant"

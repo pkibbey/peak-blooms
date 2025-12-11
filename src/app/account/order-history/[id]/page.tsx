@@ -38,7 +38,6 @@ export default async function OrderDetailPage({ params }: OrderDetailPageProps) 
       items: {
         include: {
           product: true,
-          productVariant: true,
         },
       },
       shippingAddress: true,

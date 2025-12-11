@@ -36,22 +36,13 @@ interface CartProduct {
   name: string
   slug: string
   image: string | null
-}
-
-interface CartVariant {
-  id: string
   price: number
-  stemLength: number | null
-  quantityPerBunch: number | null
 }
 
 interface CartItem {
   id: string
-  productId: string
-  productVariantId: string | null
   quantity: number
   product: CartProduct
-  productVariant: CartVariant | null
 }
 
 interface CartData {

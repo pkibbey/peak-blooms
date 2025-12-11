@@ -32,10 +32,8 @@ export async function GET(_request: NextRequest, { params }: { params: Promise<{
                     collection: true,
                   },
                 },
-                variants: true,
               },
             },
-            productVariant: true,
           },
         },
       },
@@ -45,24 +43,15 @@ export async function GET(_request: NextRequest, { params }: { params: Promise<{
       return NextResponse.json({ error: "Inspiration not found" }, { status: 404 })
     }
 
-    // Apply price multiplier to product variant prices
+    // Apply price multiplier to product prices
     const adjustedInspiration = {
       ...inspiration,
       products: inspiration.products.map((p) => ({
         ...p,
         product: {
           ...p.product,
-          variants: p.product.variants.map((variant) => ({
-            ...variant,
-            price: adjustPrice(variant.price, priceMultiplier),
-          })),
+          price: adjustPrice(p.product.price, priceMultiplier),
         },
-        productVariant: p.productVariant
-          ? {
-              ...p.productVariant,
-              price: adjustPrice(p.productVariant.price, priceMultiplier),
-            }
-          : null,
       })),
     }
 
@@ -129,29 +118,20 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
     if (excerpt !== undefined) updateData.excerpt = excerpt
     if (inspirationText !== undefined) updateData.inspirationText = inspirationText
 
-    // Handle product associations with variants
+    // Handle product associations
     if (productSelections !== undefined) {
       // Delete existing products first
       await db.inspirationProduct.deleteMany({
         where: { inspirationId: id },
       })
 
-      // Validate product selections - each must have a variant
       const selections: ProductSelection[] = productSelections || []
-      const invalidSelections = selections.filter((sel) => !sel.productId || !sel.productVariantId)
-      if (invalidSelections.length > 0) {
-        return NextResponse.json(
-          { error: "Each product must have a specific variant selected" },
-          { status: 400 }
-        )
-      }
 
       // Create new product associations
       if (selections.length > 0) {
         updateData.products = {
           create: selections.map((sel: ProductSelection) => ({
             productId: sel.productId,
-            productVariantId: sel.productVariantId,
             quantity: Math.max(1, sel.quantity || 1),
           })),
         }
@@ -173,7 +153,6 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
                 },
               },
             },
-            productVariant: true,
           },
         },
       },

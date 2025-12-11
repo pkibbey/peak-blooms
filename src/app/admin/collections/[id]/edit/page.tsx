@@ -35,7 +35,6 @@ export default async function EditCollectionPage({ params }: EditCollectionPageP
             },
           },
         },
-        variants: true,
       },
       orderBy: { name: "asc" },
     }),

@@ -39,20 +39,3 @@ export function isValidPhoneNumber(
     return false
   }
 }
-
-/**
- * Get the country code from a phone number
- */
-export function getPhoneCountryCode(
-  phoneInput: string | undefined | null,
-  defaultCountry: string = "US"
-): string | null {
-  if (!phoneInput) return null
-
-  try {
-    const parsed = parsePhoneNumberWithError(phoneInput, defaultCountry as CountryCode)
-    return parsed?.country ?? null
-  } catch {
-    return null
-  }
-}

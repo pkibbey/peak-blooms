@@ -107,7 +107,6 @@ export async function POST(request: Request) {
         items: {
           include: {
             product: true,
-            productVariant: true,
           },
         },
       },
@@ -117,9 +116,9 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Cart is empty" }, { status: 400 })
     }
 
-    // Calculate total using variant pricing with price multiplier applied
+    // Calculate total using product pricing with price multiplier applied
     const total = cart.items.reduce((sum: number, item) => {
-      const basePrice = item.productVariant?.price ?? 0
+      const basePrice = item.product?.price ?? 0
       const adjustedPrice = adjustPrice(basePrice, priceMultiplier)
       return sum + adjustedPrice * item.quantity
     }, 0)
@@ -188,9 +187,8 @@ export async function POST(request: Request) {
         items: {
           create: cart.items.map((item) => ({
             productId: item.productId,
-            productVariantId: item.productVariantId,
             quantity: item.quantity,
-            price: adjustPrice(item.productVariant?.price ?? 0, priceMultiplier),
+            price: adjustPrice(item.product?.price ?? 0, priceMultiplier),
           })),
         },
       },
@@ -198,7 +196,6 @@ export async function POST(request: Request) {
         items: {
           include: {
             product: true,
-            productVariant: true,
           },
         },
         shippingAddress: true,

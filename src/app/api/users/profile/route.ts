@@ -89,7 +89,7 @@ export async function PATCH(request: NextRequest) {
         data: updateData,
       })
       // Revalidate the user profile cache after successful update
-      revalidateTag("user-profile")
+      revalidateTag("user-profile", "max")
     }
 
     const updatedUser = await db.user.findUnique({

@@ -8,10 +8,9 @@ import { IconPackage } from "@/components/ui/icons"
 
 interface OrderItem {
   id: string
-  productId: string
-  productVariantId: string | null
   quantity: number
   product: {
+    id: string
     name: string
     image: string | null
   }

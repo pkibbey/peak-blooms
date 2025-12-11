@@ -33,14 +33,14 @@ export const getCurrentUser = cache(async () => {
  * Apply price multiplier to cart items
  */
 function applyPriceMultiplierToCartItems<
-  T extends { productVariant?: { price: number; [key: string]: unknown } | null },
+  T extends { product?: { price: number; [key: string]: unknown } | null },
 >(items: T[], multiplier: number): T[] {
   return items.map((item) => ({
     ...item,
-    productVariant: item.productVariant
+    product: item.product
       ? {
-          ...item.productVariant,
-          price: adjustPrice(item.productVariant.price, multiplier),
+          ...item.product,
+          price: adjustPrice(item.product.price, multiplier),
         }
       : null,
   }))
@@ -64,7 +64,6 @@ export async function getOrCreateCart(existingUser?: CartUser | null) {
       items: {
         include: {
           product: true,
-          productVariant: true,
         },
       },
     },
@@ -87,7 +86,6 @@ export async function getOrCreateCart(existingUser?: CartUser | null) {
         items: {
           include: {
             product: true,
-            productVariant: true,
           },
         },
       },
@@ -105,17 +103,17 @@ export async function getOrCreateCart(existingUser?: CartUser | null) {
 }
 
 /**
- * Calculate cart total (variant pricing required)
+ * Calculate cart total (product pricing)
  * Note: Assumes prices have already been adjusted by multiplier
  */
 export function calculateCartTotal(
   cartItems: Array<{
-    productVariant?: { price: number } | null
+    product?: { price: number } | null
     quantity: number
   }>
 ) {
   const total = cartItems.reduce((sum, item) => {
-    const price = item.productVariant?.price ?? 0
+    const price = item.product?.price ?? 0
     return sum + price * item.quantity
   }, 0)
   // Round to 2 decimal places

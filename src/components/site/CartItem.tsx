@@ -7,22 +7,14 @@ interface CartProduct {
   name: string
   slug: string
   image: string | null
-}
-
-interface CartVariant {
-  id: string
   price: number
-  stemLength: number | null
-  quantityPerBunch: number | null
 }
 
 export interface CartItemData {
   id: string
   productId: string
-  productVariantId: string | null
   quantity: number
   product: CartProduct
-  productVariant: CartVariant | null
 }
 
 interface CartItemProps {
@@ -36,7 +28,6 @@ export function CartItem({ item, isUpdating, onUpdateQuantity, onRemove }: CartI
   return (
     <ProductItem
       product={item.product}
-      productVariant={item.productVariant}
       quantity={item.quantity}
       imageSize="md"
       showQuantityControl={true}

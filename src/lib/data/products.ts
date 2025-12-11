@@ -6,10 +6,8 @@
 import { db } from "@/lib/db"
 import type { GetProductsOptions, GetProductsResult } from "@/lib/types/data"
 import type {
-  ProductVariantWhereInput,
   ProductWhereInput,
   ProductWithInspirations,
-  ProductWithVariants,
   ProductWithVariantsAndCollection,
 } from "@/lib/types/prisma"
 import { adjustPrice } from "@/lib/utils"
@@ -17,25 +15,22 @@ import { ITEMS_PER_PAGE } from "../consts"
 import { withTiming } from "./logger"
 
 /**
- * Apply price multiplier to a single product's variants
+ * Apply price multiplier to a single product
  */
-function applyMultiplierToProduct<T extends ProductWithVariants>(
+function applyMultiplierToProduct<T extends { price: number; [key: string]: unknown }>(
   product: T,
   multiplier: number
 ): T {
   return {
     ...product,
-    variants: product.variants.map((variant) => ({
-      ...variant,
-      price: adjustPrice(variant.price, multiplier),
-    })),
+    price: adjustPrice(product.price, multiplier),
   }
 }
 
 /**
  * Apply price multiplier to an array of products
  */
-function applyMultiplierToProducts<T extends ProductWithVariants>(
+function applyMultiplierToProducts<T extends { price: number; [key: string]: unknown }>(
   products: T[],
   multiplier: number
 ): T[] {
@@ -43,13 +38,13 @@ function applyMultiplierToProducts<T extends ProductWithVariants>(
 }
 
 /**
- * Get a single product by ID with variants
+ * Get a single product by ID
  * Returns null if not found
  */
 export async function getProductById(
   id: string,
   priceMultiplier = 1.0
-): Promise<ProductWithVariants | null> {
+): Promise<ProductWithVariantsAndCollection | null> {
   return withTiming(
     "getProductById",
     id,
@@ -57,12 +52,16 @@ export async function getProductById(
       const product = await db.product.findUnique({
         where: { id },
         include: {
-          variants: true,
+          productCollections: {
+            include: {
+              collection: true,
+            },
+          },
         },
       })
 
       if (!product) return null
-      return applyMultiplierToProduct(product, priceMultiplier)
+      return applyMultiplierToProduct(product as ProductWithVariantsAndCollection, priceMultiplier)
     },
     { logNotFound: true }
   )
@@ -107,35 +106,16 @@ export async function getProducts(
       ]
     }
 
-    // Build variant filters
-    const variantFilter: ProductVariantWhereInput = {}
-
-    if (options.stemLengthMin !== undefined || options.stemLengthMax !== undefined) {
-      variantFilter.stemLength = {}
-      if (options.stemLengthMin !== undefined) {
-        variantFilter.stemLength.gte = options.stemLengthMin
-      }
-      if (options.stemLengthMax !== undefined) {
-        variantFilter.stemLength.lte = options.stemLengthMax
-      }
-    }
-
+    // Price filtering on the product itself
     if (options.priceMin !== undefined || options.priceMax !== undefined) {
-      variantFilter.price = {}
+      const priceWhere: Record<string, number> = {}
       if (options.priceMin !== undefined) {
-        variantFilter.price.gte = options.priceMin
+        priceWhere.gte = options.priceMin
       }
       if (options.priceMax !== undefined) {
-        variantFilter.price.lte = options.priceMax
+        priceWhere.lte = options.priceMax
       }
-    }
-
-    if (options.boxlotOnly) {
-      variantFilter.isBoxlot = true
-    }
-
-    if (Object.keys(variantFilter).length > 0) {
-      where.variants = { some: variantFilter }
+      where.price = priceWhere
     }
 
     // Set default pagination values
@@ -151,7 +131,7 @@ export async function getProducts(
       const sortField = options.sort as keyof typeof orderBy
       const sortOrder = options.order ?? "asc"
       // Validate sort field to prevent injection
-      const validFields = ["name", "createdAt", "featured", "description"]
+      const validFields = ["name", "createdAt", "featured", "description", "price"]
       if (validFields.includes(options.sort)) {
         orderBy = { [sortField]: sortOrder }
       }
@@ -165,11 +145,6 @@ export async function getProducts(
             collection: true,
           },
         },
-        variants: options.boxlotOnly
-          ? {
-              where: { isBoxlot: true },
-            }
-          : true,
       },
       orderBy,
       take: limit,
@@ -201,7 +176,7 @@ export async function getFeaturedProducts(
 }
 
 /**
- * Get a product by slug with variants, collection, and inspirations
+ * Get a product by slug with collections and inspirations
  * Used for product detail pages
  * Returns null if not found
  */
@@ -232,12 +207,11 @@ export async function getProductWithInspirations(
               },
             },
           },
-          variants: true,
         },
       })
 
       if (!product) return null
-      return applyMultiplierToProduct(product, priceMultiplier)
+      return applyMultiplierToProduct(product as ProductWithInspirations, priceMultiplier)
     },
     { logNotFound: true }
   )

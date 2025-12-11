@@ -2,31 +2,14 @@ import Image from "next/image"
 import Link from "next/link"
 import { ColorsMiniDisplay } from "@/components/ui/ColorsMiniDisplay"
 import { TableCell, TableRow } from "@/components/ui/table"
-import type { ProductModel, ProductVariantModel } from "@/generated/models"
+import type { ProductModel } from "@/generated/models"
 import { formatPrice } from "@/lib/utils"
 
 interface ShopProductTableRowProps {
-  product: ProductModel & {
-    variants?: ProductVariantModel[]
-  }
+  product: ProductModel
 }
 
 export function ShopProductTableRow({ product }: ShopProductTableRowProps) {
-  // Calculate price range
-  const getPriceRange = (variants?: ProductVariantModel[]) => {
-    if (!variants || variants.length === 0) return { minPrice: 0, maxPrice: 0 }
-    const prices = variants.map((v) => v.price)
-    const minPrice = Math.min(...prices)
-    const maxPrice = Math.max(...prices)
-    return { minPrice, maxPrice }
-  }
-
-  const { minPrice, maxPrice } = getPriceRange(product.variants)
-  const priceDisplay =
-    minPrice === maxPrice
-      ? `${formatPrice(minPrice)}`
-      : `${formatPrice(minPrice)} - ${formatPrice(maxPrice)}`
-
   return (
     <TableRow>
       {/* Image */}
@@ -70,7 +53,7 @@ export function ShopProductTableRow({ product }: ShopProductTableRowProps) {
       </TableCell>
 
       {/* Price */}
-      <TableCell>{product.variants && product.variants.length > 0 ? priceDisplay : "—"}</TableCell>
+      <TableCell>{formatPrice(product.price)}</TableCell>
     </TableRow>
   )
 }

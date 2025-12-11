@@ -16,9 +16,6 @@ export default async function EditProductPage({ params }: EditProductPageProps) 
     db.product.findUnique({
       where: { id },
       include: {
-        variants: {
-          orderBy: [{ stemLength: "asc" }, { quantityPerBunch: "asc" }],
-        },
         productCollections: {
           select: { collectionId: true },
         },

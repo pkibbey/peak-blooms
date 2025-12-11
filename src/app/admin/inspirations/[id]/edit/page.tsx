@@ -19,7 +19,6 @@ export default async function EditInspirationPage({ params }: EditInspirationPag
         products: {
           select: {
             productId: true,
-            productVariantId: true,
             quantity: true,
           },
         },
@@ -34,7 +33,6 @@ export default async function EditInspirationPage({ params }: EditInspirationPag
             },
           },
         },
-        variants: true,
       },
       orderBy: { name: "asc" },
     }),

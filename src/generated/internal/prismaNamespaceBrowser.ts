@@ -61,7 +61,6 @@ export const ModelName = {
   Product: 'Product',
   ProductCollection: 'ProductCollection',
   InspirationProduct: 'InspirationProduct',
-  ProductVariant: 'ProductVariant',
   ShoppingCart: 'ShoppingCart',
   CartItem: 'CartItem',
   Order: 'Order',
@@ -202,6 +201,7 @@ export const ProductScalarFieldEnum = {
   slug: 'slug',
   description: 'description',
   image: 'image',
+  price: 'price',
   colors: 'colors',
   featured: 'featured',
   productType: 'productType',
@@ -226,26 +226,11 @@ export const InspirationProductScalarFieldEnum = {
   id: 'id',
   inspirationId: 'inspirationId',
   productId: 'productId',
-  productVariantId: 'productVariantId',
   quantity: 'quantity',
   createdAt: 'createdAt'
 } as const
 
 export type InspirationProductScalarFieldEnum = (typeof InspirationProductScalarFieldEnum)[keyof typeof InspirationProductScalarFieldEnum]
-
-
-export const ProductVariantScalarFieldEnum = {
-  id: 'id',
-  productId: 'productId',
-  price: 'price',
-  stemLength: 'stemLength',
-  quantityPerBunch: 'quantityPerBunch',
-  isBoxlot: 'isBoxlot',
-  createdAt: 'createdAt',
-  updatedAt: 'updatedAt'
-} as const
-
-export type ProductVariantScalarFieldEnum = (typeof ProductVariantScalarFieldEnum)[keyof typeof ProductVariantScalarFieldEnum]
 
 
 export const ShoppingCartScalarFieldEnum = {
@@ -264,8 +249,7 @@ export const CartItemScalarFieldEnum = {
   productId: 'productId',
   quantity: 'quantity',
   createdAt: 'createdAt',
-  updatedAt: 'updatedAt',
-  productVariantId: 'productVariantId'
+  updatedAt: 'updatedAt'
 } as const
 
 export type CartItemScalarFieldEnum = (typeof CartItemScalarFieldEnum)[keyof typeof CartItemScalarFieldEnum]
@@ -293,8 +277,7 @@ export const OrderItemScalarFieldEnum = {
   orderId: 'orderId',
   productId: 'productId',
   quantity: 'quantity',
-  price: 'price',
-  productVariantId: 'productVariantId'
+  price: 'price'
 } as const
 
 export type OrderItemScalarFieldEnum = (typeof OrderItemScalarFieldEnum)[keyof typeof OrderItemScalarFieldEnum]

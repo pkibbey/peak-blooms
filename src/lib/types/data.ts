@@ -17,11 +17,8 @@ export interface GetProductsOptions {
   collectionIds?: string[]
   featured?: boolean
   colors?: string[]
-  stemLengthMin?: number
-  stemLengthMax?: number
   priceMin?: number
   priceMax?: number
-  boxlotOnly?: boolean
   search?: string
   limit?: number
   offset?: number

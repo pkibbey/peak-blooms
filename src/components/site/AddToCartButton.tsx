@@ -8,7 +8,6 @@ import { useSession } from "@/lib/auth-client"
 
 interface AddToCartButtonProps {
   productId: string
-  productVariantId?: string | null
   productName?: string
   disabled?: boolean
   quantity?: number
@@ -16,7 +15,6 @@ interface AddToCartButtonProps {
 
 export default function AddToCartButton({
   productId,
-  productVariantId,
   productName,
   disabled,
   quantity = 1,
@@ -47,7 +45,6 @@ export default function AddToCartButton({
         },
         body: JSON.stringify({
           productId,
-          productVariantId: productVariantId || undefined,
           quantity: qty,
         }),
       })

@@ -5,12 +5,7 @@ interface Product {
   name: string
   slug: string
   image: string | null
-}
-
-interface ProductVariant {
-  id: string
-  stemLength: number | null
-  quantityPerBunch: number | null
+  price: number
 }
 
 interface OrderItemData {
@@ -18,7 +13,6 @@ interface OrderItemData {
   price: number
   quantity: number
   product: Product
-  productVariant: ProductVariant | null
 }
 
 interface OrderItemProps {
@@ -28,17 +22,13 @@ interface OrderItemProps {
 export function OrderItem({ item }: OrderItemProps) {
   return (
     <ProductItem
-      product={item.product}
-      productVariant={
-        item.productVariant
-          ? {
-              id: item.productVariant.id,
-              price: item.price,
-              stemLength: item.productVariant.stemLength,
-              quantityPerBunch: item.productVariant.quantityPerBunch,
-            }
-          : null
-      }
+      product={{
+        id: item.product.id,
+        name: item.product.name,
+        slug: item.product.slug,
+        image: item.product.image,
+        price: item.price,
+      }}
       quantity={item.quantity}
       imageSize="sm"
       showQuantityControl={false}

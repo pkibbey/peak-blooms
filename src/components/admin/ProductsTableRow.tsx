@@ -17,15 +17,12 @@ interface ProductRowProps {
     slug: string
     featured: boolean
     image: string | null
+    price: number
     productCollections: {
       collection: {
         id: string
         name: string
       }
-    }[]
-    variants: {
-      id: string
-      price: number
     }[]
     description?: string | null
     colors?: string[] | null
@@ -36,18 +33,7 @@ export default function ProductsTableRow({ product }: ProductRowProps) {
   const router = useRouter()
   const [featured, setFeatured] = useState<boolean>(!!product.featured)
 
-  const getPriceRange = (variants: { price: number }[]) => {
-    const prices = variants.map((v) => v.price)
-    const minPrice = prices.length > 0 ? Math.min(...prices) : 0
-    const maxPrice = prices.length > 0 ? Math.max(...prices) : 0
-    return { minPrice, maxPrice }
-  }
-
-  const { minPrice, maxPrice } = getPriceRange(product.variants)
-  const priceDisplay =
-    minPrice === maxPrice
-      ? `${formatPrice(minPrice)}`
-      : `${formatPrice(minPrice)} - ${formatPrice(maxPrice)}`
+  const priceDisplay = formatPrice(product.price)
 
   return (
     <TableRow key={product.id} className={cn(product.featured && "bg-blue-300/10")}>
@@ -82,9 +68,7 @@ export default function ProductsTableRow({ product }: ProductRowProps) {
       </TableCell>
 
       {/* Price */}
-      <TableCell className="hidden lg:table-cell">
-        {product.variants.length > 0 ? priceDisplay : "—"}
-      </TableCell>
+      <TableCell className="hidden lg:table-cell">{priceDisplay}</TableCell>
 
       {/* Colors */}
       <TableCell className="hidden md:table-cell">

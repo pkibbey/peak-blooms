@@ -1,7 +1,7 @@
 import { Suspense } from "react"
 import { BoxlotFilter } from "@/components/site/BoxlotFilter"
 import { PageHeader } from "@/components/site/PageHeader"
-import { ProductCard } from "@/components/site/ProductCard"
+import { ProductItem } from "@/components/site/ProductItem"
 import { ShippingBanner } from "@/components/site/ShippingBanner"
 import { ShopFilters } from "@/components/site/ShopFilters"
 import { ShopPagination } from "@/components/site/ShopPagination"
@@ -50,14 +50,9 @@ export default async function ShopPage({ searchParams }: ShopPageProps) {
       : Array.isArray(params.colors)
         ? params.colors
         : undefined
-  const stemLengthMin =
-    typeof params.stemLengthMin === "string" ? parseInt(params.stemLengthMin, 10) : undefined
-  const stemLengthMax =
-    typeof params.stemLengthMax === "string" ? parseInt(params.stemLengthMax, 10) : undefined
   const priceMin = typeof params.priceMin === "string" ? parseFloat(params.priceMin) : undefined
   const priceMax = typeof params.priceMax === "string" ? parseFloat(params.priceMax) : undefined
   const search = typeof params.search === "string" ? params.search : undefined
-  const boxlotOnly = params.boxlotOnly === "true"
   const viewMode = typeof params.view === "string" ? params.view : "grid"
   const page = typeof params.page === "string" ? parseInt(params.page, 10) : 1
   const offset = Math.max(0, (page - 1) * ITEMS_PER_PAGE)
@@ -71,32 +66,21 @@ export default async function ShopPage({ searchParams }: ShopPageProps) {
     {
       collectionIds: collectionIds || undefined,
       colors: colors,
-      stemLengthMin:
-        stemLengthMin !== undefined && !Number.isNaN(stemLengthMin) ? stemLengthMin : undefined,
-      stemLengthMax:
-        stemLengthMax !== undefined && !Number.isNaN(stemLengthMax) ? stemLengthMax : undefined,
       priceMin: priceMin !== undefined && !Number.isNaN(priceMin) ? priceMin : undefined,
       priceMax: priceMax !== undefined && !Number.isNaN(priceMax) ? priceMax : undefined,
       search: search || undefined,
-      boxlotOnly,
       limit: ITEMS_PER_PAGE,
       offset,
       // Pass sort to data layer only for database-sortable fields
-      sort: sort && ["name", "createdAt", "featured"].includes(sort) ? sort : undefined,
+      sort: sort && ["name", "createdAt", "featured", "price"].includes(sort) ? sort : undefined,
       order,
     },
     multiplier
   )
 
-  // Apply client-side sorting for price and description
+  // Apply client-side sorting for description only (price is now server-side)
   const products = [...result.products]
-  if (sort === "price") {
-    products.sort((a, b) => {
-      const aPrice = a.variants[0]?.price ?? 0
-      const bPrice = b.variants[0]?.price ?? 0
-      return order === "desc" ? bPrice - aPrice : aPrice - bPrice
-    })
-  } else if (sort === "description") {
+  if (sort === "description") {
     products.sort((a, b) => {
       const aDesc = a.description ?? ""
       const bDesc = b.description ?? ""
@@ -178,8 +162,8 @@ export default async function ShopPage({ searchParams }: ShopPageProps) {
               </div>
             ) : viewMode === "table" ? (
               <>
-                <div className="rounded-md border mb-4">
-                  <Table>
+                <div className="rounded-md border mb-4 md:max-w-2xl">
+                  <Table className="w-full">
                     <TableHeader>
                       <TableRow>
                         <TableHead>Image</TableHead>
@@ -231,7 +215,7 @@ export default async function ShopPage({ searchParams }: ShopPageProps) {
               <>
                 <div className="grid grid-cols-2 gap-4 sm:gap-6 md:grid-cols-3 mb-8">
                   {products.map((product) => (
-                    <ProductCard key={product.slug} product={product} user={user} />
+                    <ProductItem key={product.slug} product={product} user={user} layout="grid" />
                   ))}
                 </div>
 

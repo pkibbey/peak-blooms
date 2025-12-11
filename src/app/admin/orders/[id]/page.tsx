@@ -30,7 +30,6 @@ export default async function AdminOrderDetailPage({ params }: AdminOrderDetailP
       items: {
         include: {
           product: true,
-          productVariant: true,
         },
       },
       shippingAddress: true,
