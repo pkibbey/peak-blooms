@@ -19,6 +19,7 @@ import {
   Plus,
   RefreshCw,
   Rose,
+  Search,
   Settings,
   ShoppingBag,
   ShoppingCart,
@@ -188,6 +189,12 @@ export function IconLogOut(props: React.ComponentProps<typeof LogOut>) {
 export function IconBarChart3(props: React.ComponentProps<typeof BarChart3>) {
   return (
     <BarChart3 {...props} className={[IconSizeClass, props.className].filter(Boolean).join(" ")} />
+  )
+}
+
+export function IconSearch(props: React.ComponentProps<typeof Search>) {
+  return (
+    <Search {...props} className={[IconSizeClass, props.className].filter(Boolean).join(" ")} />
   )
 }
 

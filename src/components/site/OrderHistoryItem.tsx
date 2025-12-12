@@ -10,7 +10,7 @@ import { formatDate, formatPrice } from "@/lib/utils"
  * Omits FK and fields not needed in UI
  */
 interface OrderHistoryItemProps {
-  order: Omit<OrderModel, "userId" | "shippingAddressId"> & {
+  order: Omit<OrderModel, "userId" | "deliveryAddressId"> & {
     items: (Omit<OrderItemModel, "orderId" | "productId"> & { product: ProductModel })[]
   }
 }

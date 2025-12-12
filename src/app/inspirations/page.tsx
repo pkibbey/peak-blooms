@@ -1,6 +1,6 @@
 import { InspirationCard } from "@/components/site/InspirationCard"
 import { PageHeader } from "@/components/site/PageHeader"
-import { ShippingBanner } from "@/components/site/ShippingBanner"
+import { DeliveryBanner } from "@/components/site/DeliveryBanner"
 import { getInspirationsWithCounts } from "@/lib/data"
 
 export const metadata = {
@@ -28,7 +28,7 @@ export default async function InspirationPage() {
         </div>
       </div>
 
-      <ShippingBanner />
+      <DeliveryBanner />
     </>
   )
 }

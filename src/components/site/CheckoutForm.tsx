@@ -82,7 +82,7 @@ export default function CheckoutForm({
     savedAddresses.length > 0 ? savedAddresses[0].id : "new"
   )
 
-  const getInitialShippingAddress = () => {
+  const getInitialDeliveryAddress = () => {
     if (savedAddresses.length > 0) {
       const addr = savedAddresses[0]
       return {
@@ -107,8 +107,8 @@ export default function CheckoutForm({
       phone: userPhone || "",
       notes: "",
       selectedAddressId: selectedAddressId,
-      shippingAddress: getInitialShippingAddress(),
-      saveShippingAddress: true,
+      deliveryAddress: getInitialDeliveryAddress(),
+      saveDeliveryAddress: true,
     },
   })
 
@@ -117,12 +117,12 @@ export default function CheckoutForm({
     form.setValue("selectedAddressId", addressId)
 
     if (addressId === "new") {
-      form.setValue("shippingAddress", emptyAddress)
-      form.setValue("saveShippingAddress", false)
+      form.setValue("deliveryAddress", emptyAddress)
+      form.setValue("saveDeliveryAddress", false)
     } else {
       const addr = savedAddresses.find((a) => a.id === addressId)
       if (addr) {
-        form.setValue("shippingAddress", {
+        form.setValue("deliveryAddress", {
           firstName: addr.firstName,
           lastName: addr.lastName,
           company: addr.company,
@@ -137,9 +137,9 @@ export default function CheckoutForm({
     }
   }
 
-  // When shipping address fields change, check if it matches a saved address
-  const handleShippingFieldChange = () => {
-    const currentAddress = form.getValues("shippingAddress")
+  // When delivery address fields change, check if it matches a saved address
+  const handleDeliveryFieldChange = () => {
+    const currentAddress = form.getValues("deliveryAddress")
 
     // Check if the current address matches any saved address
     const matchingSavedAddress = savedAddresses.find((saved) => {
@@ -173,19 +173,19 @@ export default function CheckoutForm({
     try {
       // Determine if we should save the address (prevent duplicates)
       let shouldSaveAddress = false
-      if (selectedAddressId === "new" && data.saveShippingAddress) {
+      if (selectedAddressId === "new" && data.saveDeliveryAddress) {
         // Check if this exact address already exists
         const isDuplicate = savedAddresses.some((saved) => {
           return (
-            saved.firstName === data.shippingAddress.firstName &&
-            saved.lastName === data.shippingAddress.lastName &&
-            saved.company === data.shippingAddress.company &&
-            saved.street1 === data.shippingAddress.street1 &&
-            saved.street2 === (data.shippingAddress.street2 || null) &&
-            saved.city === data.shippingAddress.city &&
-            saved.state === data.shippingAddress.state &&
-            saved.zip === data.shippingAddress.zip &&
-            saved.country === data.shippingAddress.country
+            saved.firstName === data.deliveryAddress.firstName &&
+            saved.lastName === data.deliveryAddress.lastName &&
+            saved.company === data.deliveryAddress.company &&
+            saved.street1 === data.deliveryAddress.street1 &&
+            saved.street2 === (data.deliveryAddress.street2 || null) &&
+            saved.city === data.deliveryAddress.city &&
+            saved.state === data.deliveryAddress.state &&
+            saved.zip === data.deliveryAddress.zip &&
+            saved.country === data.deliveryAddress.country
           )
         })
         shouldSaveAddress = !isDuplicate
@@ -195,9 +195,9 @@ export default function CheckoutForm({
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          shippingAddressId: selectedAddressId !== "new" ? selectedAddressId : null,
-          shippingAddress: selectedAddressId === "new" ? data.shippingAddress : null,
-          saveShippingAddress: shouldSaveAddress,
+          deliveryAddressId: selectedAddressId !== "new" ? selectedAddressId : null,
+          deliveryAddress: selectedAddressId === "new" ? data.deliveryAddress : null,
+          saveDeliveryAddress: shouldSaveAddress,
           email: data.email,
           phone: data.phone?.trim() || null,
           notes: data.notes?.trim() || null,
@@ -233,7 +233,7 @@ export default function CheckoutForm({
     <Form {...form}>
       <form
         onSubmit={form.handleSubmit(onSubmit)}
-        onChange={handleShippingFieldChange}
+        onChange={handleDeliveryFieldChange}
         className="grid grid-cols-1 lg:grid-cols-3 gap-8"
       >
         {/* Left Column - Forms */}
@@ -288,9 +288,9 @@ export default function CheckoutForm({
             </div>
           </div>
 
-          {/* Shipping Address */}
+          {/* Delivery Address */}
           <div className="bg-background rounded-xs shadow-sm border p-6">
-            <h2 className="heading-3 mb-4 flex items-center gap-2">Shipping Address</h2>
+            <h2 className="heading-3 mb-4 flex items-center gap-2">Delivery Address</h2>
 
             {savedAddresses.length > 0 && (
               <FormField
@@ -320,12 +320,12 @@ export default function CheckoutForm({
               />
             )}
 
-            {selectedAddressId === "new" && <AddressFields fieldPrefix="shippingAddress." />}
+            {selectedAddressId === "new" && <AddressFields fieldPrefix="deliveryAddress." />}
 
             {selectedAddressId === "new" && (
               <FormField
                 control={form.control}
-                name="saveShippingAddress"
+                name="saveDeliveryAddress"
                 render={({ field }) => (
                   <FormItem className="flex items-center gap-2 mt-4 space-y-0">
                     <FormControl>
@@ -387,7 +387,7 @@ export default function CheckoutForm({
                 <span>{formatPrice(cart.total)}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-muted-foreground">Shipping</span>
+                <span className="text-muted-foreground">Delivery</span>
                 <span className="text-green-600 font-medium">Free</span>
               </div>
             </div>

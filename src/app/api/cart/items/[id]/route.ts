@@ -1,19 +1,19 @@
 import { type NextRequest, NextResponse } from "next/server"
-import { getSession } from "@/lib/auth"
+import { getCurrentUser } from "@/lib/current-user"
 import { db } from "@/lib/db"
 
 /**
  * PATCH /api/cart/items/[id]
  * Update cart item quantity only
  * Body: { quantity: number }
- * Note: Variant changes are no longer supported - users must remove and re-add items
+ * Note: Can only edit items in CART status orders; admins can edit any order
  */
 export async function PATCH(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const { id } = await params
-    const session = await getSession()
+    const user = await getCurrentUser()
 
-    if (!session?.user?.id) {
+    if (!user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }
 
@@ -28,13 +28,39 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
       return NextResponse.json({ error: "Quantity must be at least 1" }, { status: 400 })
     }
 
-    const cartItem = await db.cartItem.update({
+    // Get the order item and its associated order
+    const orderItem = await db.orderItem.findUnique({
+      where: { id },
+      include: {
+        order: true,
+        product: true,
+      },
+    })
+
+    if (!orderItem) {
+      return NextResponse.json({ error: "Item not found" }, { status: 404 })
+    }
+
+    // Check authorization: user can only edit items from their own CART orders
+    // Admins can edit any order
+    if (user.id !== orderItem.order.userId && user.role !== "ADMIN") {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 })
+    }
+
+    if (orderItem.order.status !== "CART" && user.role !== "ADMIN") {
+      return NextResponse.json(
+        { error: "Cannot edit items in orders that are no longer in CART status" },
+        { status: 403 }
+      )
+    }
+
+    const updatedItem = await db.orderItem.update({
       where: { id },
       data: { quantity },
       include: { product: true },
     })
 
-    return NextResponse.json(cartItem)
+    return NextResponse.json(updatedItem)
   } catch (error) {
     console.error("PATCH /api/cart/items/[id] error:", error)
     return NextResponse.json({ error: "Failed to update cart item" }, { status: 500 })
@@ -44,6 +70,7 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
 /**
  * DELETE /api/cart/items/[id]
  * Remove item from cart
+ * Can only delete items from CART status orders; admins can delete from any order
  */
 export async function DELETE(
   _request: NextRequest,
@@ -51,13 +78,36 @@ export async function DELETE(
 ) {
   try {
     const { id } = await params
-    const session = await getSession()
+    const user = await getCurrentUser()
 
-    if (!session?.user?.id) {
+    if (!user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }
 
-    await db.cartItem.delete({
+    // Get the order item and its associated order
+    const orderItem = await db.orderItem.findUnique({
+      where: { id },
+      include: { order: true },
+    })
+
+    if (!orderItem) {
+      return NextResponse.json({ error: "Item not found" }, { status: 404 })
+    }
+
+    // Check authorization: user can only delete items from their own CART orders
+    // Admins can delete from any order
+    if (user.id !== orderItem.order.userId && user.role !== "ADMIN") {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 })
+    }
+
+    if (orderItem.order.status !== "CART" && user.role !== "ADMIN") {
+      return NextResponse.json(
+        { error: "Cannot edit items in orders that are no longer in CART status" },
+        { status: 403 }
+      )
+    }
+
+    await db.orderItem.delete({
       where: { id },
     })
 

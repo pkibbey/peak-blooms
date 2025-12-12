@@ -4,7 +4,7 @@ import { notFound } from "next/navigation"
 import BackLink from "@/components/site/BackLink"
 import { FeaturedInInspirations } from "@/components/site/FeaturedInInspirations"
 import { ProductControls } from "@/components/site/ProductControls"
-import { ShippingBanner } from "@/components/site/ShippingBanner"
+import { DeliveryBanner } from "@/components/site/DeliveryBanner"
 import { ColorsMiniDisplay } from "@/components/ui/ColorsMiniDisplay"
 import { Label } from "@/components/ui/label"
 import { getCurrentUser } from "@/lib/current-user"
@@ -108,8 +108,8 @@ export default async function ProductDetailPage({ params }: ProductDetailPagePro
         </div>
       </div>
 
-      {/* Shipping Banner */}
-      <ShippingBanner subtitle="Order with confidence. Free regional delivery on all arrangements." />
+      {/* Delivery Banner */}
+      <DeliveryBanner subtitle="Order with confidence. Free regional delivery on all arrangements." />
     </>
   )
 }

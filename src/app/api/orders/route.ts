@@ -66,7 +66,7 @@ export async function GET() {
 
 /**
  * POST /api/orders
- * Create a new order from shopping cart (approved users only)
+ * Finalize a CART order (transition from CART to PENDING) with checkout data (approved users only)
  */
 export async function POST(request: Request) {
   try {
@@ -97,12 +97,12 @@ export async function POST(request: Request) {
       )
     }
 
-    const { shippingAddressId, shippingAddress, saveShippingAddress, email, phone, notes } =
+    const { deliveryAddressId, deliveryAddress, saveDeliveryAddress, email, phone, notes } =
       validationResult.data
 
-    // Get user's cart
-    const cart = await db.shoppingCart.findUnique({
-      where: { userId: user.id },
+    // Get user's cart (CART order)
+    const cart = await db.order.findFirst({
+      where: { userId: user.id, status: "CART" },
       include: {
         items: {
           include: {
@@ -123,47 +123,44 @@ export async function POST(request: Request) {
       return sum + adjustedPrice * item.quantity
     }, 0)
 
-    // Handle shipping address
-    let finalShippingAddressId: string
+    // Handle delivery address
+    let finalDeliveryAddressId: string
 
-    if (shippingAddressId) {
+    if (deliveryAddressId) {
       // Using existing address - verify it belongs to user
       const existingAddress = await db.address.findFirst({
         where: {
-          id: shippingAddressId,
+          id: deliveryAddressId,
           userId: user.id,
         },
       })
 
       if (!existingAddress) {
-        return NextResponse.json({ error: "Invalid shipping address" }, { status: 400 })
+        return NextResponse.json({ error: "Invalid delivery address" }, { status: 400 })
       }
 
-      finalShippingAddressId = shippingAddressId
-    } else if (shippingAddress) {
+      finalDeliveryAddressId = deliveryAddressId
+    } else if (deliveryAddress) {
       // Creating new address
       const newAddress = await db.address.create({
         data: {
-          userId: saveShippingAddress ? user.id : null,
-          firstName: shippingAddress.firstName,
-          lastName: shippingAddress.lastName,
-          company: shippingAddress.company,
-          street1: shippingAddress.street1,
-          street2: shippingAddress.street2 || null,
-          city: shippingAddress.city,
-          state: shippingAddress.state,
-          zip: shippingAddress.zip,
-          country: shippingAddress.country || "US",
+          userId: saveDeliveryAddress ? user.id : null,
+          firstName: deliveryAddress.firstName,
+          lastName: deliveryAddress.lastName,
+          company: deliveryAddress.company,
+          street1: deliveryAddress.street1,
+          street2: deliveryAddress.street2 || null,
+          city: deliveryAddress.city,
+          state: deliveryAddress.state,
+          zip: deliveryAddress.zip,
+          country: deliveryAddress.country || "US",
         },
       })
 
-      finalShippingAddressId = newAddress.id
+      finalDeliveryAddressId = newAddress.id
     } else {
-      return NextResponse.json({ error: "Shipping address is required" }, { status: 400 })
+      return NextResponse.json({ error: "Delivery address is required" }, { status: 400 })
     }
-
-    // Generate order number
-    const orderNumber = await generateOrderNumber()
 
     // Update user's phone if provided
     if (phone && phone !== user.phone) {
@@ -173,24 +170,29 @@ export async function POST(request: Request) {
       })
     }
 
-    // Create order with items (storing adjusted prices)
-    const order = await db.order.create({
+    // Update the CART order items with final prices and transition to PENDING
+    // First, update all OrderItems with final adjusted prices
+    await db.$transaction(
+      cart.items.map((item) =>
+        db.orderItem.update({
+          where: { id: item.id },
+          data: {
+            price: adjustPrice(item.product?.price ?? 0, priceMultiplier),
+          },
+        })
+      )
+    )
+
+    // Transition the order from CART to PENDING
+    const order = await db.order.update({
+      where: { id: cart.id },
       data: {
-        orderNumber,
-        userId: user.id,
-        total: Math.round(total * 100) / 100,
         status: "PENDING",
+        total: Math.round(total * 100) / 100,
         email,
         phone: phone || null,
         notes: notes || null,
-        shippingAddressId: finalShippingAddressId,
-        items: {
-          create: cart.items.map((item) => ({
-            productId: item.productId,
-            quantity: item.quantity,
-            price: adjustPrice(item.product?.price ?? 0, priceMultiplier),
-          })),
-        },
+        deliveryAddressId: finalDeliveryAddressId,
       },
       include: {
         items: {
@@ -198,13 +200,8 @@ export async function POST(request: Request) {
             product: true,
           },
         },
-        shippingAddress: true,
+        deliveryAddress: true,
       },
-    })
-
-    // Clear the cart
-    await db.cartItem.deleteMany({
-      where: { cartId: cart.id },
     })
 
     return NextResponse.json(order, { status: 201 })

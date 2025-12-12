@@ -1,6 +1,6 @@
 import { CollectionCard } from "@/components/site/CollectionCard"
 import { PageHeader } from "@/components/site/PageHeader"
-import { ShippingBanner } from "@/components/site/ShippingBanner"
+import { DeliveryBanner } from "@/components/site/DeliveryBanner"
 import { getAllCollections } from "@/lib/data"
 
 export const metadata = {
@@ -28,7 +28,7 @@ export default async function CollectionsPage() {
         </div>
       </div>
 
-      <ShippingBanner />
+      <DeliveryBanner />
     </>
   )
 }

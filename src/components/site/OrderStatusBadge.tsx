@@ -10,7 +10,7 @@ import {
 const STATUS_CONFIG = {
   PENDING: { label: "Pending", variant: "secondary" as const, icon: IconClock },
   CONFIRMED: { label: "Confirmed", variant: "default" as const, icon: IconCheckCircle },
-  SHIPPED: { label: "Shipped", variant: "default" as const, icon: IconTruck },
+  OUT_FOR_DELIVERY: { label: "Out for Delivery", variant: "default" as const, icon: IconTruck },
   DELIVERED: { label: "Delivered", variant: "default" as const, icon: IconPackage },
   CANCELLED: { label: "Cancelled", variant: "destructive" as const, icon: IconXCircle },
 } as const

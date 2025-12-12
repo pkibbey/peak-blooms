@@ -259,7 +259,7 @@ export function ShopFilters({
 
         <div className="space-y-6">
           {/* Search Filter */}
-          <SearchInput />
+          <SearchInput className="w-48" />
 
           {/* Colors Filter */}
           {availableColorIds.length > 0 && (

@@ -5,6 +5,7 @@ import { db } from "@/lib/db"
 /**
  * GET /api/cart
  * Get current user's shopping cart (approved users only)
+ * Cart is an Order with status = 'CART'
  * Prices are automatically adjusted by user's price multiplier via getOrCreateCart()
  */
 export async function GET() {
@@ -44,6 +45,7 @@ export async function GET() {
 /**
  * POST /api/cart
  * Add item to cart or update quantity (approved users only)
+ * Cart items are OrderItems on an Order with status = 'CART'
  */
 export async function POST(request: NextRequest) {
   try {
@@ -67,45 +69,48 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Invalid product or quantity" }, { status: 400 })
     }
 
-    // Get or create cart
-    let cart = await db.shoppingCart.findUnique({
-      where: { userId: user.id },
+    // Get or create cart (Order with status = 'CART')
+    let cart = await db.order.findFirst({
+      where: { userId: user.id, status: "CART" },
     })
 
     if (!cart) {
-      cart = await db.shoppingCart.create({
-        data: { userId: user.id },
-      })
+      cart = await getOrCreateCart(user)
+    }
+
+    if (!cart) {
+      return NextResponse.json({ error: "Failed to get cart" }, { status: 500 })
     }
 
     // Check if item already in cart
-    const existingItem = await db.cartItem.findFirst({
+    const existingItem = await db.orderItem.findFirst({
       where: {
-        cartId: cart.id,
+        orderId: cart.id,
         productId,
       },
     })
 
-    let cartItem: Awaited<ReturnType<typeof db.cartItem.create>>
+    let orderItem: Awaited<ReturnType<typeof db.orderItem.create>>
     if (existingItem) {
       // SET the quantity to the provided value (absolute) rather than incrementing
-      cartItem = await db.cartItem.update({
+      orderItem = await db.orderItem.update({
         where: { id: existingItem.id },
         data: { quantity },
         include: { product: true },
       })
     } else {
-      cartItem = await db.cartItem.create({
+      orderItem = await db.orderItem.create({
         data: {
-          cartId: cart.id,
+          orderId: cart.id,
           productId,
           quantity,
+          price: 0, // Will be calculated at checkout
         },
         include: { product: true },
       })
     }
 
-    return NextResponse.json(cartItem, { status: 201 })
+    return NextResponse.json(orderItem, { status: 201 })
   } catch (error) {
     console.error("POST /api/cart error:", error)
     return NextResponse.json({ error: "Failed to add item to cart" }, { status: 500 })
@@ -131,13 +136,18 @@ export async function DELETE() {
       )
     }
 
-    const cart = await db.shoppingCart.findUnique({ where: { userId: user.id } })
+    const cart = await db.order.findFirst({
+      where: { userId: user.id, status: "CART" },
+    })
+
     if (!cart) {
       // Nothing to clear
       return NextResponse.json({ ok: true }, { status: 200 })
     }
 
-    await db.cartItem.deleteMany({ where: { cartId: cart.id } })
+    await db.orderItem.deleteMany({
+      where: { orderId: cart.id },
+    })
 
     return NextResponse.json({ ok: true }, { status: 200 })
   } catch (error) {
@@ -145,3 +155,4 @@ export async function DELETE() {
     return NextResponse.json({ error: "Failed to clear cart" }, { status: 500 })
   }
 }
+

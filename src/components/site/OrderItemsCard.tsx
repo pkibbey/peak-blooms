@@ -28,7 +28,7 @@ export function OrderItemsCard({ items, total }: OrderItemsCardProps) {
           <span>{formatPrice(total)}</span>
         </div>
         <div className="flex justify-between text-sm mb-2">
-          <span className="text-muted-foreground">Shipping</span>
+          <span className="text-muted-foreground">Delivery</span>
           <span className="text-green-600 font-medium">Free</span>
         </div>
         <div className="flex justify-between font-semibold text-lg pt-2 border-t">

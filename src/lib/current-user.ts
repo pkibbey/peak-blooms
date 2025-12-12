@@ -47,8 +47,9 @@ function applyPriceMultiplierToCartItems<
 }
 
 /**
- * Get the current user's shopping cart (creates one if it doesn't exist)
+ * Get the current user's shopping cart order (creates one if it doesn't exist)
  * Returns cart with prices adjusted by user's price multiplier
+ * A cart is an Order with status = 'CART'
  *
  * @param existingUser - Optional: pass the user if you already have it to avoid redundant DB call
  */
@@ -58,8 +59,8 @@ export async function getOrCreateCart(existingUser?: CartUser | null) {
     return null
   }
 
-  let cart = await db.shoppingCart.findUnique({
-    where: { userId: user.id },
+  let cart = await db.order.findFirst({
+    where: { userId: user.id, status: "CART" },
     include: {
       items: {
         include: {
@@ -80,8 +81,48 @@ export async function getOrCreateCart(existingUser?: CartUser | null) {
       return null
     }
 
-    cart = await db.shoppingCart.create({
-      data: { userId: user.id },
+    // Generate order number for the new cart
+    const lastOrder = await db.order.findFirst({
+      orderBy: { orderNumber: "desc" },
+      select: { orderNumber: true },
+    })
+
+    let nextNumber = 1
+    if (lastOrder?.orderNumber) {
+      const match = lastOrder.orderNumber.match(/PB-(\d+)/)
+      if (match) {
+        nextNumber = parseInt(match[1], 10) + 1
+      }
+    }
+
+    const orderNumber = `PB-${nextNumber.toString().padStart(5, "0")}`
+
+    // Create a temporary address for the cart (will be updated at checkout)
+    const tempAddress = await db.address.create({
+      data: {
+        userId: user.id,
+        firstName: "",
+        lastName: "",
+        company: "",
+        street1: "",
+        city: "",
+        state: "",
+        zip: "",
+        country: "US",
+      },
+    })
+
+    cart = await db.order.create({
+      data: {
+        orderNumber,
+        userId: user.id,
+        status: "CART",
+        total: 0,
+        email: user.email,
+        phone: user.phone,
+        notes: null,
+        deliveryAddressId: tempAddress.id,
+      },
       include: {
         items: {
           include: {

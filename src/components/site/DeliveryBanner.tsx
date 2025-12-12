@@ -1,17 +1,17 @@
 import Hero, { type GradientPreset } from "@/components/site/Hero"
 
-interface ShippingBannerProps {
+interface DeliveryBannerProps {
   subtitle?: string
   gradientPreset?: GradientPreset
 }
 
-export function ShippingBanner({
+export function DeliveryBanner({
   subtitle = "Free regional delivery on all orders. Our own delivery team ensures your flowers arrive fresh.",
   gradientPreset = "forest",
-}: ShippingBannerProps) {
+}: DeliveryBannerProps) {
   return (
     <Hero
-      title="Free Shipping"
+      title="Free Delivery"
       subtitle={subtitle}
       textPosition="center"
       gradientPreset={gradientPreset}

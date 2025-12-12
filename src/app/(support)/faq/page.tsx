@@ -37,7 +37,7 @@ const faqs: FAQItem[] = [
   {
     question: "How fresh are the flowers when they arrive?",
     answer:
-      "Freshness is our priority. Most flowers are cut within 24-48 hours of shipping and arrive at peak bloom stage. We use specialized packaging and coordinate with local delivery partners to ensure minimal time in transit. You'll get a delivery window so you can plan accordingly.",
+      "Freshness is our priority. Most flowers are cut within 24-48 hours of delivery and arrive at peak bloom stage. We use specialized packaging and coordinate with local delivery partners to ensure minimal time in transit. You'll get a delivery window so you can plan accordingly.",
   },
   {
     question: "Can I place a rush order?",

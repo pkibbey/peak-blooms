@@ -2,7 +2,7 @@ import { Suspense } from "react"
 import { BoxlotFilter } from "@/components/site/BoxlotFilter"
 import { PageHeader } from "@/components/site/PageHeader"
 import { ProductItem } from "@/components/site/ProductItem"
-import { ShippingBanner } from "@/components/site/ShippingBanner"
+import { DeliveryBanner } from "@/components/site/DeliveryBanner"
 import { ShopFilters } from "@/components/site/ShopFilters"
 import { ShopPagination } from "@/components/site/ShopPagination"
 import { ShopProductTableRow } from "@/components/site/ShopProductTableRow"
@@ -236,7 +236,7 @@ export default async function ShopPage({ searchParams }: ShopPageProps) {
       </div>
 
       <div className="mt-12">
-        <ShippingBanner />
+        <DeliveryBanner />
       </div>
     </>
   )

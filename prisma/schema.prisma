@@ -28,7 +28,6 @@ model User {
   verifications  Verification[]
   addresses      Address[]
   orders         Order[]
-  cart           ShoppingCart?
 }
 
 model Account {
@@ -98,7 +97,7 @@ model Address {
   isDefault      Boolean  @default(false)
   createdAt      DateTime @default(now())
   user           User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
-  orders         Order[]  @relation("ShippingAddress")
+  orders         Order[]  @relation("DeliveryAddress")
 
   @@index([userId])
 }
@@ -140,7 +139,6 @@ model Product {
   productType  ProductType          @default(FLOWER)
   createdAt    DateTime             @default(now())
   updatedAt    DateTime             @updatedAt
-  cartItems    CartItem[]
   inspirations InspirationProduct[]
   orderItems   OrderItem[]
   productCollections ProductCollection[]
@@ -179,43 +177,19 @@ model InspirationProduct {
   @@index([productId])
 }
 
-model ShoppingCart {
-  id        String     @id @default(cuid())
-  userId    String     @unique
-  createdAt DateTime   @default(now())
-  updatedAt DateTime   @updatedAt
-  items     CartItem[]
-  user      User       @relation(fields: [userId], references: [id], onDelete: Cascade)
-}
-
-model CartItem {
-  id        String       @id @default(cuid())
-  cartId    String
-  productId String
-  quantity  Int          @default(1)
-  createdAt DateTime     @default(now())
-  updatedAt DateTime     @updatedAt
-  cart      ShoppingCart @relation(fields: [cartId], references: [id], onDelete: Cascade)
-  product   Product      @relation(fields: [productId], references: [id], onDelete: Cascade)
-
-  @@unique([cartId, productId])
-  @@index([cartId])
-  @@index([productId])
-}
-
 model Order {
   id                String      @id @default(cuid())
   orderNumber       String      @unique
   userId            String
-  status            OrderStatus @default(PENDING)
+  status            OrderStatus @default(CART)
   total             Float
   email             String
   phone             String?
   notes             String?
-  shippingAddressId String
+  deliveryAddressId String
   createdAt         DateTime    @default(now())
   updatedAt         DateTime    @updatedAt
-  shippingAddress   Address     @relation("ShippingAddress", fields: [shippingAddressId], references: [id])
+  deliveryAddress   Address     @relation("DeliveryAddress", fields: [deliveryAddressId], references: [id])
   user              User        @relation(fields: [userId], references: [id], onDelete: Cascade)
   items             OrderItem[]
 
@@ -262,9 +236,10 @@ enum MetricType {
 }
 
 enum OrderStatus {
+  CART
   PENDING
   CONFIRMED
-  SHIPPED
+  OUT_FOR_DELIVERY
   DELIVERED
   CANCELLED
 }

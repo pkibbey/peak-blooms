@@ -79,7 +79,7 @@ export default function TermsPage() {
       </section>
 
       <section className="space-y-3">
-        <h2 className="text-2xl font-semibold">6. Shipping and Delivery</h2>
+        <h2 className="text-2xl font-semibold">6. Delivery</h2>
         <p>
           Peak Blooms operates within specific delivery areas. We are not responsible for delays
           caused by weather, natural disasters, or circumstances beyond our control. Delivery

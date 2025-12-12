@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation"
 import Cart from "@/components/site/Cart"
 import EmptyState from "@/components/site/EmptyState"
-import { ShippingBanner } from "@/components/site/ShippingBanner"
+import { DeliveryBanner } from "@/components/site/DeliveryBanner"
 import { calculateCartTotal, getCurrentUser, getOrCreateCart } from "@/lib/current-user"
 
 export default async function CartPage() {
@@ -27,7 +27,7 @@ export default async function CartPage() {
         <h1 className="heading-1 mb-8">Shopping Cart</h1>
         {cart ? <Cart initialCart={{ id: cart.id, items: cart.items, total }} /> : <EmptyState />}
       </div>
-      <ShippingBanner />
+      <DeliveryBanner />
     </>
   )
 }

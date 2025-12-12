@@ -93,7 +93,7 @@ export default function PrivacyPage() {
         <ul className="list-disc list-inside space-y-2">
           <li>
             <strong>Service Providers:</strong> Third-party vendors who assist us in operating our
-            website, processing payments, and delivering orders (e.g., payment processors, shipping
+            website, processing payments, and delivering orders (e.g., payment processors, delivery
             partners).
           </li>
           <li>

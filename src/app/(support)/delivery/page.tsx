@@ -1,25 +1,25 @@
 import type { Metadata } from "next"
 
 export const metadata: Metadata = {
-  title: "Shipping - Peak Blooms",
+  title: "Delivery - Peak Blooms",
   description:
-    "Learn about Peak Blooms shipping options, delivery areas, timing, and how we ensure your flowers arrive fresh.",
+    "Learn about Peak Blooms delivery options, delivery areas, timing, and how we ensure your flowers arrive fresh.",
 }
 
-export default function ShippingPage() {
+export default function DeliveryPage() {
   return (
     <div className="space-y-8">
       <div>
-        <h1 className="text-4xl font-semibold mb-2">Shipping & Delivery</h1>
+        <h1 className="text-4xl font-semibold mb-2">Delivery</h1>
         <p className="text-lg text-muted-foreground">
           Everything you need to know about getting your flowers delivered fresh.
         </p>
       </div>
 
       <section className="space-y-4">
-        <h2 className="text-2xl font-semibold">Delivery Areas & Free Shipping</h2>
+        <h2 className="text-2xl font-semibold">Delivery Areas & Free Delivery</h2>
         <p className="text-base text-foreground leading-relaxed">
-          Peak Blooms offers <span className="font-semibold text-green-600">free shipping</span> to
+          Peak Blooms offers <span className="font-semibold text-green-600">free delivery</span> to
           our regional delivery area. We've built our logistics around local delivery to ensure
           freshness, reliability, and affordability. If you're unsure whether your location is
           covered, contact us to confirm.
@@ -44,8 +44,8 @@ export default function ShippingPage() {
             flowers with care, using specialty packaging to protect them during transit.
           </li>
           <li className="leading-relaxed">
-            <span className="font-semibold">Deliver</span> — Your order ships via our delivery
-            partner. You'll receive a delivery window for your area.
+            <span className="font-semibold">Deliver</span> — Your order is delivered by our delivery
+            team. You'll receive a delivery window for your area.
           </li>
           <li className="leading-relaxed">
             <span className="font-semibold">Receive & Store</span> — Keep flowers cool and away from
@@ -55,11 +55,11 @@ export default function ShippingPage() {
       </section>
 
       <section className="space-y-4">
-        <h2 className="text-2xl font-semibold">Shipping & Delivery</h2>
+        <h2 className="text-2xl font-semibold">Delivery</h2>
         <p className="text-base text-foreground leading-relaxed">
           All orders include{" "}
           <span className="font-semibold text-green-600">free regional delivery</span>. No
-          additional shipping fees—ever. We deliver fresh flowers using our own team of delivery
+          additional delivery fees—ever. We deliver fresh flowers using our own team of delivery
           drivers who are trained to handle your arrangement with care and deliver it perfectly.
         </p>
         <p className="text-base text-foreground leading-relaxed">
@@ -71,7 +71,7 @@ export default function ShippingPage() {
       <section className="space-y-4">
         <h2 className="text-2xl font-semibold">Freshness Guarantee</h2>
         <p className="text-base text-foreground leading-relaxed">
-          We take pride in the quality of every shipment. Flowers are cut within 24-48 hours of
+          We take pride in the quality of every delivery. Flowers are cut within 24-48 hours of
           delivery and packed with care. If flowers arrive damaged or below our quality standards,
           contact us within 24 hours with photos, and we'll work to make it right.
         </p>

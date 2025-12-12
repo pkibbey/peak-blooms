@@ -6,8 +6,16 @@ import { useRouter } from "next/navigation"
 import { useState } from "react"
 import { toast } from "sonner"
 import NavLink from "@/components/site/NavLink"
+import { SearchInput } from "@/components/site/SearchInput"
 import UserMenu from "@/components/site/UserMenu"
-import { IconMenu, IconSettings, IconShoppingCart, IconUser, IconX } from "@/components/ui/icons"
+import {
+  IconMenu,
+  IconSearch,
+  IconSettings,
+  IconShoppingCart,
+  IconUser,
+  IconX,
+} from "@/components/ui/icons"
 import { authClient, signOut } from "@/lib/auth-client"
 import { Badge } from "../ui/badge"
 import { Button } from "../ui/button"
@@ -51,8 +59,8 @@ export default function Nav({ user, cartCount = 0 }: NavProps) {
       </a>
 
       <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
-        <div className="flex h-16 items-center justify-between">
-          <div className="flex items-center gap-6">
+        <div className="flex h-16 items-center gap-6">
+          <div className="flex items-center gap-4">
             <Link
               prefetch={false}
               href="/"
@@ -68,7 +76,7 @@ export default function Nav({ user, cartCount = 0 }: NavProps) {
               />
             </Link>
 
-            <nav className="hidden md:flex md:items-center md:gap-1" aria-label="Primary">
+            <nav className="hidden md:flex md:items-center md:gap-2" aria-label="Primary">
               {links.map((l) => (
                 <NavLink key={l.href} href={l.href}>
                   {l.label}
@@ -79,7 +87,24 @@ export default function Nav({ user, cartCount = 0 }: NavProps) {
             </nav>
           </div>
 
+          <div className="flex-1 hidden md:block">
+            <SearchInput compact={true} className="w-full" />
+          </div>
+
           <div className="flex items-center gap-4">
+            {/* Mobile search button */}
+            <Button
+              asChild
+              size="icon"
+              variant="ghost"
+              className="md:hidden"
+              aria-label="Search products"
+            >
+              <Link prefetch={false} href="/shop">
+                <IconSearch aria-hidden="true" />
+              </Link>
+            </Button>
+
             {isApproved && (
               <div className="hidden md:block">
                 <Link prefetch={false} href="/cart" className="inline-flex items-center gap-2">

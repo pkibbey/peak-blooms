@@ -36,7 +36,7 @@ This application is designed to be:
 ### Planned / Optional Improvements
 
 - Integrate a real email provider for transactional emails (SMTP / Sendgrid / Mailgun).
-- Add payment processing and shipping options to support live orders.
+- Add payment processing and delivery options to support live orders.
 - Add unit and end-to-end tests for stability, and CI checks to prevent regressions.
 - Improve perceived performance with client-side loading states and skeletons for a snappier feel.
 - Add marketing/analytics hooks, coupon codes, and a newsletter signup flow to support growth.

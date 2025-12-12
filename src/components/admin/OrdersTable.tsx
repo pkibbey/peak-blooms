@@ -52,7 +52,7 @@ export default function OrdersTable({ orders, currentStatus, sort, order }: Orde
     { value: "ALL", label: "All" },
     { value: "PENDING", label: "Pending" },
     { value: "CONFIRMED", label: "Confirmed" },
-    { value: "SHIPPED", label: "Shipped" },
+    { value: "OUT_FOR_DELIVERY", label: "Out for Delivery" },
     { value: "DELIVERED", label: "Delivered" },
     { value: "CANCELLED", label: "Cancelled" },
   ]

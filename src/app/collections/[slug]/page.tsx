@@ -2,7 +2,7 @@ import { notFound } from "next/navigation"
 import BackLink from "@/components/site/BackLink"
 import { PageHeader } from "@/components/site/PageHeader"
 import { ProductItem } from "@/components/site/ProductItem"
-import { ShippingBanner } from "@/components/site/ShippingBanner"
+import { DeliveryBanner } from "@/components/site/DeliveryBanner"
 import { getCurrentUser } from "@/lib/current-user"
 import { getCollectionBySlug } from "@/lib/data"
 import { db } from "@/lib/db"
@@ -72,8 +72,8 @@ export default async function CollectionDetailPage({ params }: CollectionDetailP
         </div>
       </div>
 
-      {/* Shipping Banner */}
-      <ShippingBanner subtitle="Order with confidence. Free regional delivery on all arrangements." />
+      {/* Delivery Banner */}
+      <DeliveryBanner subtitle="Order with confidence. Free regional delivery on all arrangements." />
     </>
   )
 }

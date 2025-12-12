@@ -63,9 +63,9 @@ const sections: SitemapSection[] = [
     links: [
       { href: "/faq", label: "FAQ", description: "Frequently asked questions" },
       {
-        href: "/shipping",
-        label: "Shipping & Delivery",
-        description: "Shipping information and delivery details",
+        href: "/delivery",
+        label: "Delivery",
+        description: "Delivery information and details",
       },
       {
         href: "/returns",

@@ -12,7 +12,7 @@ import type { OrderItemModel, OrderModel, ProductModel } from "@/generated/model
  * Omits FK and fields not needed in UI
  */
 interface OrderHistoryCardProps {
-  orders: (Omit<OrderModel, "userId" | "shippingAddressId"> & {
+  orders: (Omit<OrderModel, "userId" | "deliveryAddressId"> & {
     items: (Omit<OrderItemModel, "orderId" | "productId"> & { product: ProductModel })[]
   })[]
   currentPage: number

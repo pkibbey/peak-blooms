@@ -30,9 +30,10 @@ export type MetricType = (typeof MetricType)[keyof typeof MetricType]
 
 
 export const OrderStatus = {
+  CART: 'CART',
   PENDING: 'PENDING',
   CONFIRMED: 'CONFIRMED',
-  SHIPPED: 'SHIPPED',
+  OUT_FOR_DELIVERY: 'OUT_FOR_DELIVERY',
   DELIVERED: 'DELIVERED',
   CANCELLED: 'CANCELLED'
 } as const

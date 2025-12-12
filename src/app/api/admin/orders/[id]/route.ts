@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server"
 import { OrderStatus } from "@/generated/enums"
-import { getSession } from "@/lib/auth"
+import { getCurrentUser } from "@/lib/current-user"
 import { db } from "@/lib/db"
 
 interface RouteParams {
@@ -13,9 +13,9 @@ interface RouteParams {
  */
 export async function GET(_request: Request, { params }: RouteParams) {
   try {
-    const session = await getSession()
+    const user = await getCurrentUser()
 
-    if (!session?.user || session.user.role !== "ADMIN") {
+    if (!user || user.role !== "ADMIN") {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }
 
@@ -36,7 +36,7 @@ export async function GET(_request: Request, { params }: RouteParams) {
             product: true,
           },
         },
-        shippingAddress: true,
+        deliveryAddress: true,
       },
     })
 
@@ -53,24 +53,20 @@ export async function GET(_request: Request, { params }: RouteParams) {
 
 /**
  * PATCH /api/admin/orders/[id]
- * Update order status (admin only)
+ * Update order details (admin only)
+ * Can update: status, email, phone, notes, deliveryAddressId, items
  */
 export async function PATCH(request: Request, { params }: RouteParams) {
   try {
-    const session = await getSession()
+    const user = await getCurrentUser()
 
-    if (!session?.user || session.user.role !== "ADMIN") {
+    if (!user || user.role !== "ADMIN") {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }
 
     const { id } = await params
     const body = await request.json()
-    const { status } = body
-
-    // Validate status
-    if (!status || !Object.values(OrderStatus).includes(status)) {
-      return NextResponse.json({ error: "Invalid status" }, { status: 400 })
-    }
+    const { status, email, phone, notes, deliveryAddressId } = body
 
     // Check if order exists
     const existingOrder = await db.order.findUnique({
@@ -81,10 +77,44 @@ export async function PATCH(request: Request, { params }: RouteParams) {
       return NextResponse.json({ error: "Order not found" }, { status: 404 })
     }
 
-    // Update order status
+    // Build update data - only include provided fields
+    const updateData: Record<string, unknown> = {}
+
+    if (status !== undefined) {
+      // Validate status
+      if (!Object.values(OrderStatus).includes(status)) {
+        return NextResponse.json({ error: "Invalid status" }, { status: 400 })
+      }
+      updateData.status = status
+    }
+
+    if (email !== undefined) {
+      updateData.email = email
+    }
+
+    if (phone !== undefined) {
+      updateData.phone = phone
+    }
+
+    if (notes !== undefined) {
+      updateData.notes = notes
+    }
+
+    if (deliveryAddressId !== undefined) {
+      // Validate that the address exists
+      const address = await db.address.findUnique({
+        where: { id: deliveryAddressId },
+      })
+      if (!address) {
+        return NextResponse.json({ error: "Invalid delivery address" }, { status: 400 })
+      }
+      updateData.deliveryAddressId = deliveryAddressId
+    }
+
+    // Update order
     const updatedOrder = await db.order.update({
       where: { id },
-      data: { status },
+      data: updateData,
       include: {
         user: {
           select: {
@@ -98,7 +128,7 @@ export async function PATCH(request: Request, { params }: RouteParams) {
             product: true,
           },
         },
-        shippingAddress: true,
+        deliveryAddress: true,
       },
     })
 

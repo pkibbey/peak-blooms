@@ -1,11 +1,12 @@
 import { type NextRequest, NextResponse } from "next/server"
-import { getCurrentUser } from "@/lib/current-user"
+import { getCurrentUser, getOrCreateCart } from "@/lib/current-user"
 import { db } from "@/lib/db"
 
 /**
  * POST /api/cart/batch
  * Add multiple items to the user's cart in one request.
  * Body: { productIds: string[], quantities?: number[] | number }
+ * Cart items are OrderItems on an Order with status = 'CART'
  */
 export async function POST(request: NextRequest) {
   try {
@@ -45,10 +46,10 @@ export async function POST(request: NextRequest) {
       resolvedQuantities = productIds.map(() => 1)
     }
 
-    // Get or create cart (user already fetched above)
-    let cart = await db.shoppingCart.findUnique({ where: { userId: user.id } })
+    // Get or create cart (Order with status = 'CART')
+    let cart = await getOrCreateCart(user)
     if (!cart) {
-      cart = await db.shoppingCart.create({ data: { userId: user.id } })
+      return NextResponse.json({ error: "Failed to get cart" }, { status: 500 })
     }
 
     // Build and execute operations in a transaction for ACID compliance
@@ -58,27 +59,28 @@ export async function POST(request: NextRequest) {
         const productId = String(productIds[i])
         const quantity = Math.max(1, Number(resolvedQuantities[i] ?? 1))
 
-        const existingItem = await tx.cartItem.findFirst({
+        const existingItem = await tx.orderItem.findFirst({
           where: {
-            cartId: cart.id,
+            orderId: cart.id,
             productId,
           },
         })
 
-        let item: Awaited<ReturnType<typeof tx.cartItem.create>>
+        let item: Awaited<ReturnType<typeof tx.orderItem.create>>
         if (existingItem) {
           // Set the item's quantity to the provided absolute quantity
-          item = await tx.cartItem.update({
+          item = await tx.orderItem.update({
             where: { id: existingItem.id },
             data: { quantity },
             include: { product: true },
           })
         } else {
-          item = await tx.cartItem.create({
+          item = await tx.orderItem.create({
             data: {
-              cartId: cart.id,
+              orderId: cart.id,
               productId,
               quantity,
+              price: 0, // Will be calculated at checkout
             },
             include: { product: true },
           })

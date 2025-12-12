@@ -117,8 +117,8 @@ export default function Footer() {
                   </Link>
                 </li>
                 <li>
-                  <Link prefetch={false} href="/shipping" className="hover:underline">
-                    Shipping
+                  <Link prefetch={false} href="/delivery" className="hover:underline">
+                    Delivery
                   </Link>
                 </li>
                 <li>

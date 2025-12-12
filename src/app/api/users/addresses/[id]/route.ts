@@ -106,7 +106,7 @@ export async function DELETE(_request: Request, { params }: RouteParams) {
 
     // Check if address is used in any orders
     const ordersUsingAddress = await db.order.findFirst({
-      where: { shippingAddressId: id },
+      where: { deliveryAddressId: id },
     })
 
     if (ordersUsingAddress) {

@@ -40,7 +40,7 @@ export default async function OrderDetailPage({ params }: OrderDetailPageProps) 
           product: true,
         },
       },
-      shippingAddress: true,
+      deliveryAddress: true,
     },
   })
 
@@ -99,10 +99,10 @@ export default async function OrderDetailPage({ params }: OrderDetailPageProps) 
 
         {/* Sidebar */}
         <div className="lg:col-span-1 space-y-4">
-          {/* Shipping Address */}
+          {/* Delivery Address */}
           <div className="bg-background rounded-xs shadow-sm border p-6">
-            <h2 className="heading-3 mb-4 flex items-center gap-2">Shipping Address</h2>
-            <AddressDisplay address={order.shippingAddress} />
+            <h2 className="heading-3 mb-4 flex items-center gap-2">Delivery Address</h2>
+            <AddressDisplay address={order.deliveryAddress} />
           </div>
 
           {/* Contact Information */}

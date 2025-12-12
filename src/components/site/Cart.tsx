@@ -208,7 +208,7 @@ export default function Cart({ initialCart }: CartProps) {
               <span>{formatPrice(cart.total)}</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-muted-foreground">Shipping</span>
+              <span className="text-muted-foreground">Delivery</span>
               <span className="text-muted-foreground">Free</span>
             </div>
           </div>

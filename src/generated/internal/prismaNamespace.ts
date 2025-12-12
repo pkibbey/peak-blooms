@@ -394,8 +394,6 @@ export const ModelName = {
   Product: 'Product',
   ProductCollection: 'ProductCollection',
   InspirationProduct: 'InspirationProduct',
-  ShoppingCart: 'ShoppingCart',
-  CartItem: 'CartItem',
   Order: 'Order',
   OrderItem: 'OrderItem',
   Metric: 'Metric'
@@ -414,7 +412,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "account" | "session" | "verification" | "address" | "collection" | "inspiration" | "product" | "productCollection" | "inspirationProduct" | "shoppingCart" | "cartItem" | "order" | "orderItem" | "metric"
+    modelProps: "user" | "account" | "session" | "verification" | "address" | "collection" | "inspiration" | "product" | "productCollection" | "inspirationProduct" | "order" | "orderItem" | "metric"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -1158,154 +1156,6 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
-    ShoppingCart: {
-      payload: Prisma.$ShoppingCartPayload<ExtArgs>
-      fields: Prisma.ShoppingCartFieldRefs
-      operations: {
-        findUnique: {
-          args: Prisma.ShoppingCartFindUniqueArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$ShoppingCartPayload> | null
-        }
-        findUniqueOrThrow: {
-          args: Prisma.ShoppingCartFindUniqueOrThrowArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$ShoppingCartPayload>
-        }
-        findFirst: {
-          args: Prisma.ShoppingCartFindFirstArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$ShoppingCartPayload> | null
-        }
-        findFirstOrThrow: {
-          args: Prisma.ShoppingCartFindFirstOrThrowArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$ShoppingCartPayload>
-        }
-        findMany: {
-          args: Prisma.ShoppingCartFindManyArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$ShoppingCartPayload>[]
-        }
-        create: {
-          args: Prisma.ShoppingCartCreateArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$ShoppingCartPayload>
-        }
-        createMany: {
-          args: Prisma.ShoppingCartCreateManyArgs<ExtArgs>
-          result: BatchPayload
-        }
-        createManyAndReturn: {
-          args: Prisma.ShoppingCartCreateManyAndReturnArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$ShoppingCartPayload>[]
-        }
-        delete: {
-          args: Prisma.ShoppingCartDeleteArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$ShoppingCartPayload>
-        }
-        update: {
-          args: Prisma.ShoppingCartUpdateArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$ShoppingCartPayload>
-        }
-        deleteMany: {
-          args: Prisma.ShoppingCartDeleteManyArgs<ExtArgs>
-          result: BatchPayload
-        }
-        updateMany: {
-          args: Prisma.ShoppingCartUpdateManyArgs<ExtArgs>
-          result: BatchPayload
-        }
-        updateManyAndReturn: {
-          args: Prisma.ShoppingCartUpdateManyAndReturnArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$ShoppingCartPayload>[]
-        }
-        upsert: {
-          args: Prisma.ShoppingCartUpsertArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$ShoppingCartPayload>
-        }
-        aggregate: {
-          args: Prisma.ShoppingCartAggregateArgs<ExtArgs>
-          result: runtime.Types.Utils.Optional<Prisma.AggregateShoppingCart>
-        }
-        groupBy: {
-          args: Prisma.ShoppingCartGroupByArgs<ExtArgs>
-          result: runtime.Types.Utils.Optional<Prisma.ShoppingCartGroupByOutputType>[]
-        }
-        count: {
-          args: Prisma.ShoppingCartCountArgs<ExtArgs>
-          result: runtime.Types.Utils.Optional<Prisma.ShoppingCartCountAggregateOutputType> | number
-        }
-      }
-    }
-    CartItem: {
-      payload: Prisma.$CartItemPayload<ExtArgs>
-      fields: Prisma.CartItemFieldRefs
-      operations: {
-        findUnique: {
-          args: Prisma.CartItemFindUniqueArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$CartItemPayload> | null
-        }
-        findUniqueOrThrow: {
-          args: Prisma.CartItemFindUniqueOrThrowArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$CartItemPayload>
-        }
-        findFirst: {
-          args: Prisma.CartItemFindFirstArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$CartItemPayload> | null
-        }
-        findFirstOrThrow: {
-          args: Prisma.CartItemFindFirstOrThrowArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$CartItemPayload>
-        }
-        findMany: {
-          args: Prisma.CartItemFindManyArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$CartItemPayload>[]
-        }
-        create: {
-          args: Prisma.CartItemCreateArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$CartItemPayload>
-        }
-        createMany: {
-          args: Prisma.CartItemCreateManyArgs<ExtArgs>
-          result: BatchPayload
-        }
-        createManyAndReturn: {
-          args: Prisma.CartItemCreateManyAndReturnArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$CartItemPayload>[]
-        }
-        delete: {
-          args: Prisma.CartItemDeleteArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$CartItemPayload>
-        }
-        update: {
-          args: Prisma.CartItemUpdateArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$CartItemPayload>
-        }
-        deleteMany: {
-          args: Prisma.CartItemDeleteManyArgs<ExtArgs>
-          result: BatchPayload
-        }
-        updateMany: {
-          args: Prisma.CartItemUpdateManyArgs<ExtArgs>
-          result: BatchPayload
-        }
-        updateManyAndReturn: {
-          args: Prisma.CartItemUpdateManyAndReturnArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$CartItemPayload>[]
-        }
-        upsert: {
-          args: Prisma.CartItemUpsertArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$CartItemPayload>
-        }
-        aggregate: {
-          args: Prisma.CartItemAggregateArgs<ExtArgs>
-          result: runtime.Types.Utils.Optional<Prisma.AggregateCartItem>
-        }
-        groupBy: {
-          args: Prisma.CartItemGroupByArgs<ExtArgs>
-          result: runtime.Types.Utils.Optional<Prisma.CartItemGroupByOutputType>[]
-        }
-        count: {
-          args: Prisma.CartItemCountArgs<ExtArgs>
-          result: runtime.Types.Utils.Optional<Prisma.CartItemCountAggregateOutputType> | number
-        }
-      }
-    }
     Order: {
       payload: Prisma.$OrderPayload<ExtArgs>
       fields: Prisma.OrderFieldRefs
@@ -1716,28 +1566,6 @@ export const InspirationProductScalarFieldEnum = {
 export type InspirationProductScalarFieldEnum = (typeof InspirationProductScalarFieldEnum)[keyof typeof InspirationProductScalarFieldEnum]
 
 
-export const ShoppingCartScalarFieldEnum = {
-  id: 'id',
-  userId: 'userId',
-  createdAt: 'createdAt',
-  updatedAt: 'updatedAt'
-} as const
-
-export type ShoppingCartScalarFieldEnum = (typeof ShoppingCartScalarFieldEnum)[keyof typeof ShoppingCartScalarFieldEnum]
-
-
-export const CartItemScalarFieldEnum = {
-  id: 'id',
-  cartId: 'cartId',
-  productId: 'productId',
-  quantity: 'quantity',
-  createdAt: 'createdAt',
-  updatedAt: 'updatedAt'
-} as const
-
-export type CartItemScalarFieldEnum = (typeof CartItemScalarFieldEnum)[keyof typeof CartItemScalarFieldEnum]
-
-
 export const OrderScalarFieldEnum = {
   id: 'id',
   orderNumber: 'orderNumber',
@@ -1747,7 +1575,7 @@ export const OrderScalarFieldEnum = {
   email: 'email',
   phone: 'phone',
   notes: 'notes',
-  shippingAddressId: 'shippingAddressId',
+  deliveryAddressId: 'deliveryAddressId',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const
@@ -2030,8 +1858,6 @@ export type GlobalOmitConfig = {
   product?: Prisma.ProductOmit
   productCollection?: Prisma.ProductCollectionOmit
   inspirationProduct?: Prisma.InspirationProductOmit
-  shoppingCart?: Prisma.ShoppingCartOmit
-  cartItem?: Prisma.CartItemOmit
   order?: Prisma.OrderOmit
   orderItem?: Prisma.OrderItemOmit
   metric?: Prisma.MetricOmit

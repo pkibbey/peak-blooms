@@ -68,16 +68,6 @@ export type ProductCollection = Prisma.ProductCollectionModel
  */
 export type InspirationProduct = Prisma.InspirationProductModel
 /**
- * Model ShoppingCart
- * 
- */
-export type ShoppingCart = Prisma.ShoppingCartModel
-/**
- * Model CartItem
- * 
- */
-export type CartItem = Prisma.CartItemModel
-/**
  * Model Order
  * 
  */
