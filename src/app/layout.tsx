@@ -1,12 +1,13 @@
 import type { Metadata } from "next"
-import { Geist, Geist_Mono, Playfair_Display } from "next/font/google"
+import { Geist, Geist_Mono, Playfair_Display, Raleway } from "next/font/google"
 import { Toaster } from "sonner"
 import "./globals.css"
 import Footer from "@/components/site/Footer"
 import Nav from "@/components/site/Nav"
 import { NewsletterBanner } from "@/components/site/NewsletterBanner"
-import { ThemeProvider } from "@/components/ThemeProvider"
 import { getCurrentUser, getOrCreateCart } from "@/lib/current-user"
+
+const raleway = Raleway({ subsets: ["latin"], variable: "--font-sans" })
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -56,17 +57,15 @@ export default async function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} ${playfairDisplay.variable} antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} ${playfairDisplay.variable} ${raleway.variable} antialiased`}
       >
-        <ThemeProvider>
-          <Nav user={user} cartCount={cartCount} />
+        <Nav user={user} cartCount={cartCount} />
 
-          <main id="content">{children}</main>
+        <main id="content">{children}</main>
 
-          <NewsletterBanner />
-          <Footer />
-          <Toaster position="bottom-center" richColors />
-        </ThemeProvider>
+        <NewsletterBanner />
+        <Footer />
+        <Toaster position="bottom-center" richColors />
       </body>
     </html>
   )

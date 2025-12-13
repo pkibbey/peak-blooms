@@ -9,7 +9,7 @@
     "start": "next start",
     "lint": "biome lint --write .",
     "format": "biome format --write .",
-    "postinstall": "prisma generate",
+    "postinstall": "node ./scripts/postinstall.js",
     "knip": "dotenv -e .env.local -- knip",
     "db:docker:up": "docker-compose up -d postgres && sleep 3 && npm run db:docker:push && npm run db:docker:reset && npm run db:docker:seed",
     "db:docker:down": "docker-compose down",
@@ -18,12 +18,14 @@
     "db:docker:dev": "dotenv -e .env.local -- prisma migrate dev",
     "db:docker:reset": "dotenv -e .env.local -- prisma migrate reset --force && npm run db:docker:seed",
     "db:docker:seed": "dotenv -e .env.local -- prisma db seed",
+    "db:prod:generate": "prisma generate",
     "db:prod:reset": "dotenv -e .env.prod -- prisma migrate reset --force && db:prod:seed",
     "db:prod:seed": "dotenv -e .env.prod -- prisma db seed",
     "db:docker:studio": "dotenv -e .env.local -- prisma studio",
     "db:prod:studio": "dotenv -e .env.prod -- prisma studio"
   },
   "dependencies": {
+    "@base-ui/react": "^1.0.0",
     "@hookform/resolvers": "^5.2.2",
     "@prisma/adapter-pg": "^7.1.0",
     "@prisma/client": "7.1.0",
@@ -48,6 +50,7 @@
     "react": "19.2.3",
     "react-dom": "19.2.3",
     "react-hook-form": "^7.68.0",
+    "shadcn": "^3.6.1",
     "sonner": "^2.0.7",
     "tailwind-merge": "^3.4.0",
     "zod": "^4.1.13"

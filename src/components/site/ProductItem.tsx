@@ -14,7 +14,7 @@ interface ProductItemProps {
   product: ProductModel
   quantity?: number
   layout?: "grid" | "stacked"
-  imageSize?: "sm" | "md"
+  imageSize?: "xs" | "sm" | "md"
   showQuantityControl?: boolean
   showSimilarLink?: boolean
   user?: {
@@ -26,6 +26,7 @@ interface ProductItemProps {
 }
 
 const imageSizes = {
+  xs: { container: "h-16 w-16", size: "64px" },
   sm: { container: "h-24 w-24", size: "96px" },
   md: { container: "h-36 w-full md:w-36", size: "144px" },
 }
