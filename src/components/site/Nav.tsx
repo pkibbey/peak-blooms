@@ -1,12 +1,7 @@
-"use client"
-
 import Image from "next/image"
 import Link from "next/link"
-import { useRouter } from "next/navigation"
-import { useState } from "react"
 import { toast } from "sonner"
 import NavLink from "@/components/site/NavLink"
-import { SearchInput } from "@/components/site/SearchInput"
 import UserMenu from "@/components/site/UserMenu"
 import {
   IconMenu,
@@ -14,11 +9,11 @@ import {
   IconSettings,
   IconShoppingCart,
   IconUser,
-  IconX,
 } from "@/components/ui/icons"
-import { authClient, signOut } from "@/lib/auth-client"
+import { signOut } from "@/lib/auth-client"
 import { Badge } from "../ui/badge"
 import { Button } from "../ui/button"
+import SignInWithGoogle from "./SignInWithGoogle"
 
 const links = [
   { label: "Shop", href: "/shop" },
@@ -36,21 +31,8 @@ interface NavProps {
   cartCount?: number
 }
 
-export default function Nav({ user, cartCount = 0 }: NavProps) {
-  const [open, setOpen] = useState(false)
-  const router = useRouter()
+export default async function Nav({ user, cartCount = 0 }: NavProps) {
   const isApproved = user?.approved === true
-
-  const handleGoogleSignIn = async () => {
-    try {
-      await authClient.signIn.social({
-        provider: "google",
-      })
-    } catch (error) {
-      toast.error("Failed to sign in")
-      console.error("[SignIn] Error during Google sign-in:", error)
-    }
-  }
 
   return (
     <header className="sticky top-0 z-50 w-full bg-background/70 backdrop-blur-sm border-b border-b-border">
@@ -72,7 +54,7 @@ export default function Nav({ user, cartCount = 0 }: NavProps) {
                 width={384}
                 height={44}
                 loading="eager"
-                className="h-8 w-[139px] shrink-0"
+                className="h-8 w-34.75 shrink-0"
               />
             </Link>
 
@@ -87,22 +69,13 @@ export default function Nav({ user, cartCount = 0 }: NavProps) {
             </nav>
           </div>
 
-          <div className="flex-1 hidden md:block">
-            <SearchInput compact={true} className="w-full" />
-          </div>
+          {/* Search Input */}
+          <div className="flex-1 bg-amber-100 text-center">SEARCH</div>
 
           <div className="flex items-center gap-4">
             {/* Mobile search button */}
-            <Button
-              asChild
-              size="icon"
-              variant="ghost"
-              className="md:hidden"
-              aria-label="Search products"
-            >
-              <Link prefetch={false} href="/shop">
-                <IconSearch aria-hidden="true" />
-              </Link>
+            <Button size="icon" variant="ghost" className="md:hidden" aria-label="Search products">
+              <IconSearch aria-hidden="true" />
             </Button>
 
             {isApproved && (
@@ -118,83 +91,72 @@ export default function Nav({ user, cartCount = 0 }: NavProps) {
             {/* Consolidated user/account/admin menu */}
             <UserMenu user={user} />
 
-            <Button
-              aria-label={open ? "Close menu" : "Open menu"}
-              aria-expanded={open}
-              onClick={() => setOpen((v) => !v)}
-              size="icon"
-              className="md:hidden"
-              variant="default"
-            >
-              {open ? <IconX aria-hidden="true" /> : <IconMenu aria-hidden="true" />}
+            <Button size="icon" className="md:hidden" variant="default">
+              {<IconMenu aria-hidden="true" />}
             </Button>
           </div>
         </div>
 
         {/* Mobile menu */}
-        {open && (
-          <div className="md:hidden mt-2 pb-4 border-t border-t-border">
-            <div className="flex flex-col gap-1 py-2">
-              {links.map((l) => (
-                <NavLink key={l.href} href={l.href} className="px-4 py-2">
-                  {l.label}
+
+        <div className="md:hidden mt-2 pb-4 border-t border-t-border">
+          <div className="flex flex-col gap-1 py-2">
+            {links.map((l) => (
+              <NavLink key={l.href} href={l.href} className="px-4 py-2">
+                {l.label}
+              </NavLink>
+            ))}
+            {isApproved && (
+              <Button asChild variant="ghost">
+                <Link
+                  prefetch={false}
+                  href="/cart"
+                  className="inline-flex items-center gap-2 px-4 py-2"
+                >
+                  <IconShoppingCart aria-hidden="true" />
+                  <span>Cart</span>
+                  {cartCount > 0 && <Badge variant="default">{cartCount}</Badge>}
+                </Link>
+              </Button>
+            )}
+            {user ? (
+              <>
+                <NavLink href="/account" icon={<IconUser />} className="px-4 py-2">
+                  Account
                 </NavLink>
-              ))}
-              {isApproved && (
-                <Button asChild variant="ghost">
-                  <Link
-                    prefetch={false}
-                    href="/cart"
-                    className="inline-flex items-center gap-2 px-4 py-2"
-                  >
-                    <IconShoppingCart aria-hidden="true" />
-                    <span>Cart</span>
-                    {cartCount > 0 && <Badge variant="default">{cartCount}</Badge>}
+                {user.role === "ADMIN" && (
+                  <NavLink href="/admin" icon={<IconSettings />} className="px-4 py-2">
+                    Admin Dashboard
+                  </NavLink>
+                )}
+                <Button
+                  variant="ghost"
+                  onClick={async () => {
+                    await signOut({
+                      fetchOptions: {
+                        onSuccess: () => {
+                          toast.success("Signed out successfully")
+                        },
+                      },
+                    })
+                  }}
+                  className="text-destructive"
+                >
+                  Sign Out
+                </Button>
+              </>
+            ) : (
+              <>
+                <SignInWithGoogle />
+                <Button asChild>
+                  <Link prefetch={false} href="/auth/signup" className="px-4 py-2">
+                    Sign Up
                   </Link>
                 </Button>
-              )}
-              {user ? (
-                <>
-                  <NavLink href="/account" icon={<IconUser />} className="px-4 py-2">
-                    Account
-                  </NavLink>
-                  {user.role === "ADMIN" && (
-                    <NavLink href="/admin" icon={<IconSettings />} className="px-4 py-2">
-                      Admin Dashboard
-                    </NavLink>
-                  )}
-                  <Button
-                    variant="ghost"
-                    onClick={async () => {
-                      await signOut({
-                        fetchOptions: {
-                          onSuccess: () => {
-                            toast.success("Signed out successfully")
-                            router.refresh()
-                          },
-                        },
-                      })
-                    }}
-                    className="text-destructive"
-                  >
-                    Sign Out
-                  </Button>
-                </>
-              ) : (
-                <>
-                  <Button onClick={handleGoogleSignIn} variant="ghost">
-                    Sign In
-                  </Button>
-                  <Button asChild>
-                    <Link prefetch={false} href="/auth/signup" className="px-4 py-2">
-                      Sign Up
-                    </Link>
-                  </Button>
-                </>
-              )}
-            </div>
+              </>
+            )}
           </div>
-        )}
+        </div>
       </div>
     </header>
   )
