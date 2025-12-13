@@ -1,6 +1,6 @@
+import { DeliveryBanner } from "@/components/site/DeliveryBanner"
 import { InspirationCard } from "@/components/site/InspirationCard"
 import { PageHeader } from "@/components/site/PageHeader"
-import { DeliveryBanner } from "@/components/site/DeliveryBanner"
 import { getInspirationsWithCounts } from "@/lib/data"
 
 export const metadata = {

@@ -368,9 +368,9 @@ async function main() {
         const productB = firstThreeProducts[1]
         const productC = firstThreeProducts[2]
 
-        // Create both shipping addresses in parallel
+        // Create both delivery addresses in parallel
         const start_createAddresses = performance.now()
-        const [shippingAddress1, shippingAddress2] = await Promise.all([
+        const [deliveryAddress1, deliveryAddress2] = await Promise.all([
           tx.address.create({
             data: {
               firstName: "Test",
@@ -400,7 +400,7 @@ async function main() {
         ])
         await captureMetric(
           MetricType.SEED,
-          "create shipping addresses",
+          "create delivery addresses",
           performance.now() - start_createAddresses
         )
 
@@ -419,7 +419,7 @@ async function main() {
             status: "DELIVERED",
             total: order1Total,
             createdAt: order1Date,
-            shippingAddressId: shippingAddress1.id,
+            deliveryAddressId: deliveryAddress1.id,
             items: {
               create: [
                 productA
@@ -462,7 +462,7 @@ async function main() {
             status: "CONFIRMED",
             total: order2Total,
             createdAt: order2Date,
-            shippingAddressId: shippingAddress2.id,
+            deliveryAddressId: deliveryAddress2.id,
             items: {
               create: [
                 productA
