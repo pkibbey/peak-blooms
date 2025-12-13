@@ -60,6 +60,7 @@ export default function OrderHistoryItem({ order }: OrderHistoryItemProps) {
         <p className="text-sm font-medium">{formatPrice(order.total)}</p>
         <ReorderButton
           orderNumber={order.orderNumber}
+          orderStatus={order.status}
           items={order.items.map((item) => ({
             productId: item.product.id,
             quantity: item.quantity,

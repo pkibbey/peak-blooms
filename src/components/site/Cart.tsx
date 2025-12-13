@@ -8,15 +8,16 @@ import { CartItem, type CartItemData } from "@/components/site/CartItem"
 import EmptyState from "@/components/site/EmptyState"
 import { Button } from "@/components/ui/button"
 import { IconShoppingBag } from "@/components/ui/icons"
-import type { ShoppingCartModel } from "@/generated/models"
+import type { OrderModel } from "@/generated/models"
 import { useDebouncedCallback } from "@/lib/useDebouncedCallback"
 import { formatPrice } from "@/lib/utils"
 
 /**
  * CartData - Omits FK and timestamp fields not needed in UI
- * Extends ShoppingCartModel with items (CartItemData[]) and total
+ * Represents an Order with status = 'CART', items (OrderItemData[]) and total
  */
-interface CartData extends Omit<ShoppingCartModel, "userId" | "createdAt" | "updatedAt"> {
+interface CartData
+  extends Omit<OrderModel, "userId" | "deliveryAddressId" | "createdAt" | "updatedAt"> {
   items: CartItemData[]
   total: number
 }

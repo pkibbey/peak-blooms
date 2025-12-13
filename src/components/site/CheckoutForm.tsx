@@ -46,7 +46,7 @@ interface CartItem {
 }
 
 interface CartData {
-  id: string
+  id?: string
   items: CartItem[]
   total: number
 }

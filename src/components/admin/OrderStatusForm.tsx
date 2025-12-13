@@ -15,10 +15,11 @@ import {
 
 interface OrderStatusFormProps {
   orderId: string
-  currentStatus: "PENDING" | "CONFIRMED" | "OUT_FOR_DELIVERY" | "DELIVERED" | "CANCELLED"
+  currentStatus: "CART" | "PENDING" | "CONFIRMED" | "OUT_FOR_DELIVERY" | "DELIVERED" | "CANCELLED"
 }
 
 const statusOptions = [
+  { value: "CART", label: "Cart" },
   { value: "PENDING", label: "Pending" },
   { value: "CONFIRMED", label: "Confirmed" },
   { value: "OUT_FOR_DELIVERY", label: "Out for Delivery" },

@@ -11,14 +11,12 @@ import type { Prisma } from "@/generated/client"
 // Re-export base model types for convenience
 export type {
   AddressModel,
-  CartItemModel,
   CollectionModel,
   InspirationModel,
   InspirationProductModel,
   OrderItemModel,
   OrderModel,
   ProductModel,
-  ShoppingCartModel,
   UserModel,
 } from "@/generated/models"
 
@@ -30,7 +28,8 @@ export type {
 export interface CartUser {
   id: string
   priceMultiplier: number
-  email?: string
+  email: string
+  phone: string | null
   name?: string
   role?: string
   approved?: boolean
@@ -44,10 +43,11 @@ export type UserWithAddresses = Prisma.UserGetPayload<{
   include: { addresses: true }
 }>
 
-/** User with cart and cart items */
+/** User with cart orders (CART status orders) */
 export type UserWithCart = Prisma.UserGetPayload<{
   include: {
-    cart: {
+    orders: {
+      where: { status: "CART" }
       include: {
         items: {
           include: {

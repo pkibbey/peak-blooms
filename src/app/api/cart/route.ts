@@ -72,10 +72,21 @@ export async function POST(request: NextRequest) {
     // Get or create cart (Order with status = 'CART')
     let cart = await db.order.findFirst({
       where: { userId: user.id, status: "CART" },
+      include: {
+        items: {
+          include: {
+            product: true,
+          },
+        },
+      },
     })
 
     if (!cart) {
-      cart = await getOrCreateCart(user)
+      const cartWithItems = await getOrCreateCart(user)
+      if (!cartWithItems) {
+        return NextResponse.json({ error: "Failed to get cart" }, { status: 500 })
+      }
+      cart = { ...cartWithItems, phone: cartWithItems.phone ?? null }
     }
 
     if (!cart) {
@@ -155,4 +166,3 @@ export async function DELETE() {
     return NextResponse.json({ error: "Failed to clear cart" }, { status: 500 })
   }
 }
-

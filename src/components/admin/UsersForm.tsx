@@ -90,12 +90,7 @@ export function UsersForm() {
             <FormItem>
               <FormLabel>Email *</FormLabel>
               <FormControl>
-                <Input
-                  placeholder="user@example.com"
-                  type="email"
-                  required
-                  {...field}
-                />
+                <Input placeholder="user@example.com" type="email" required {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -185,9 +180,7 @@ export function UsersForm() {
                   onChange={(e) => field.onChange(e.target.checked)}
                 />
               </FormControl>
-              <FormLabel className="font-normal">
-                Approve user immediately
-              </FormLabel>
+              <FormLabel className="font-normal">Approve user immediately</FormLabel>
             </FormItem>
           )}
         />

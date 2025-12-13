@@ -27,10 +27,7 @@ export async function POST(request: Request) {
     const { userId, items, email, phone, notes, deliveryAddressId } = body
 
     if (!userId || !items || !Array.isArray(items) || items.length === 0) {
-      return NextResponse.json(
-        { error: "userId and items array are required" },
-        { status: 400 }
-      )
+      return NextResponse.json({ error: "userId and items array are required" }, { status: 400 })
     }
 
     // Verify customer exists

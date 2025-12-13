@@ -47,8 +47,8 @@ export async function POST(request: NextRequest) {
     }
 
     // Get or create cart (Order with status = 'CART')
-    let cart = await getOrCreateCart(user)
-    if (!cart) {
+    const cart = await getOrCreateCart(user)
+    if (!cart || !cart.id) {
       return NextResponse.json({ error: "Failed to get cart" }, { status: 500 })
     }
 
@@ -61,7 +61,7 @@ export async function POST(request: NextRequest) {
 
         const existingItem = await tx.orderItem.findFirst({
           where: {
-            orderId: cart.id,
+            orderId: cart.id as string,
             productId,
           },
         })
@@ -77,7 +77,7 @@ export async function POST(request: NextRequest) {
         } else {
           item = await tx.orderItem.create({
             data: {
-              orderId: cart.id,
+              orderId: cart.id as string,
               productId,
               quantity,
               price: 0, // Will be calculated at checkout

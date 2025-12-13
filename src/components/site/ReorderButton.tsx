@@ -13,10 +13,14 @@ interface OrderItem {
 interface ReorderButtonProps {
   orderNumber: string
   items: OrderItem[]
+  orderStatus: string
 }
 
-export default function ReorderButton({ orderNumber, items }: ReorderButtonProps) {
+export default function ReorderButton({ orderNumber, items, orderStatus }: ReorderButtonProps) {
   const [isLoading, setIsLoading] = useState(false)
+
+  // Can only reorder if order is NOT in PENDING, CONFIRMED, or OUT_FOR_DELIVERY status
+  const canReorder = !["PENDING", "CONFIRMED", "OUT_FOR_DELIVERY"].includes(orderStatus)
 
   const handleReorder = async () => {
     if (items.length === 0) {
@@ -51,6 +55,10 @@ export default function ReorderButton({ orderNumber, items }: ReorderButtonProps
     } finally {
       setIsLoading(false)
     }
+  }
+
+  if (!canReorder) {
+    return null
   }
 
   return (

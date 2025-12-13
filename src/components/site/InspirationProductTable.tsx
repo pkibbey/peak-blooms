@@ -3,6 +3,7 @@
 import { useState } from "react"
 import AddAllToCartButton from "@/components/site/AddAllToCartButton"
 import { ProductItem } from "@/components/site/ProductItem"
+import type { ProductType } from "@/generated/enums"
 
 interface Product {
   id: string
@@ -11,6 +12,12 @@ interface Product {
   image: string | null
   price: number
   quantity: number
+  description: string | null
+  createdAt: Date
+  updatedAt: Date
+  featured: boolean
+  colors: string[]
+  productType: ProductType
 }
 
 interface InspirationProductTableProps {

@@ -119,7 +119,7 @@ export async function getOrCreateCart(existingUser?: CartUser | null) {
         status: "CART",
         total: 0,
         email: user.email,
-        phone: user.phone,
+        phone: user.phone ?? undefined,
         notes: null,
         deliveryAddressId: tempAddress.id,
       },

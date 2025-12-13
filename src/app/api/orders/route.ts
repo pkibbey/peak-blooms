@@ -5,26 +5,6 @@ import { adjustPrice } from "@/lib/utils"
 import { createOrderSchema } from "@/lib/validations/checkout"
 
 /**
- * Generate the next order number in sequence (PB-00001, PB-00002, etc.)
- */
-async function generateOrderNumber(): Promise<string> {
-  const lastOrder = await db.order.findFirst({
-    orderBy: { orderNumber: "desc" },
-    select: { orderNumber: true },
-  })
-
-  let nextNumber = 1
-  if (lastOrder?.orderNumber) {
-    const match = lastOrder.orderNumber.match(/PB-(\d+)/)
-    if (match) {
-      nextNumber = parseInt(match[1], 10) + 1
-    }
-  }
-
-  return `PB-${nextNumber.toString().padStart(5, "0")}`
-}
-
-/**
  * GET /api/orders
  * Get current user's orders (approved users only)
  */

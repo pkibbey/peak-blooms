@@ -3,11 +3,13 @@ import {
   IconCheckCircle,
   IconClock,
   IconPackage,
+  IconShoppingCart,
   IconTruck,
   IconXCircle,
 } from "@/components/ui/icons"
 
 const STATUS_CONFIG = {
+  CART: { label: "Cart", variant: "secondary" as const, icon: IconShoppingCart },
   PENDING: { label: "Pending", variant: "secondary" as const, icon: IconClock },
   CONFIRMED: { label: "Confirmed", variant: "default" as const, icon: IconCheckCircle },
   OUT_FOR_DELIVERY: { label: "Out for Delivery", variant: "default" as const, icon: IconTruck },

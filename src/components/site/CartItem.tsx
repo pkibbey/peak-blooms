@@ -1,15 +1,16 @@
 "use client"
 
 import { ProductItem } from "@/components/site/ProductItem"
-import type { CartItemModel, ProductModel } from "@/generated/models"
+import type { OrderItemModel, ProductModel } from "@/generated/models"
 
 /**
  * CartItemData - Omits fields not used in UI (FK references, timestamps)
  * Keeps only: id, quantity, product
+ * OrderItem represents an item in a CART order (status = 'CART')
  */
 export type CartItemData = Omit<
-  CartItemModel,
-  "productId" | "cartId" | "createdAt" | "updatedAt"
+  OrderItemModel,
+  "productId" | "orderId" | "price" | "createdAt" | "updatedAt"
 > & {
   product: ProductModel
 }

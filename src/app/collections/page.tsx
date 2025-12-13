@@ -1,6 +1,6 @@
 import { CollectionCard } from "@/components/site/CollectionCard"
-import { PageHeader } from "@/components/site/PageHeader"
 import { DeliveryBanner } from "@/components/site/DeliveryBanner"
+import { PageHeader } from "@/components/site/PageHeader"
 import { getAllCollections } from "@/lib/data"
 
 export const metadata = {
