@@ -8,12 +8,7 @@ const Autocomplete = AutocompletePrimitive.Root
 
 function AutocompleteInput(props: AutocompletePrimitive.Input.Props) {
   return (
-    <AutocompletePrimitive.Input
-      data-slot="autocomplete-input"
-      nativeButton={false}
-      render={<Input />}
-      {...props}
-    />
+    <AutocompletePrimitive.Input data-slot="autocomplete-input" render={<Input />} {...props} />
   )
 }
 
@@ -135,7 +130,6 @@ function AutocompleteTrigger({ className, ...props }: AutocompletePrimitive.Trig
     <AutocompletePrimitive.Trigger
       data-slot="autocomplete-trigger"
       className={cn(className)}
-      nativeButton={false}
       render={<Button variant="outline" />}
       {...props}
     />

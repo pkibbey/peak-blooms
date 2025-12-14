@@ -13,6 +13,7 @@ import {
 import { signOut } from "@/lib/auth-client"
 import { Badge } from "../ui/badge"
 import { Button } from "../ui/button"
+import NavSearch from "./NavSearch"
 import SignInWithGoogle from "./SignInWithGoogle"
 
 const links = [
@@ -69,8 +70,10 @@ export default async function Nav({ user, cartCount = 0 }: NavProps) {
             </nav>
           </div>
 
-          {/* Search Input */}
-          <div className="flex-1 bg-amber-100 text-center">SEARCH</div>
+          {/* Nav search autocomplete */}
+          <div className="flex-1">
+            <NavSearch />
+          </div>
 
           <div className="flex items-center gap-4">
             {/* Mobile search button */}

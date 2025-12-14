@@ -268,7 +268,7 @@ export function ShopFilters({
                 selectedColors={selectedColors}
                 onChange={handleColorsChange}
                 showLabel={false}
-                compact={true}
+                compact
               />
             </FilterSection>
           )}

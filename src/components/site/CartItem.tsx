@@ -28,8 +28,8 @@ export function CartItem({ item, isUpdating, onUpdateQuantity, onRemove }: CartI
       product={item.product}
       quantity={item.quantity}
       imageSize="md"
-      showQuantityControl={true}
-      showSimilarLink={true}
+      showQuantityControl
+      showSimilarLink
       isUpdating={isUpdating}
       onQuantityChange={(newQuantity) => onUpdateQuantity(item.id, newQuantity)}
       onRemove={() => onRemove(item.id, item.product.name)}

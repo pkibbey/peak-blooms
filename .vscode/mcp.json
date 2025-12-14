@@ -21,6 +21,10 @@
     "Vercel": {
       "url": "https://mcp.vercel.com",
       "type": "http"
+    },
+    "chrome-devtools": {
+      "command": "npx",
+      "args": ["chrome-devtools-mcp@latest"]
     }
   },
   "inputs": []
