@@ -22,19 +22,15 @@ interface ProductControlsProps {
 }
 
 export function ProductControls({ product, user, mode = "card" }: ProductControlsProps) {
-  const isUnapproved = user && !user.approved
-  const isSignedOut = !user
+  const isApproved = !!user?.approved
+  const isSignedIn = !!user
 
   const [addQuantity, setAddQuantity] = useState<number>(1)
-
-  if (isSignedOut && isUnapproved) {
-    return null
-  }
 
   return (
     <div className={cn("flex flex-col", mode === "detail" ? "gap-6" : "gap-3")}>
       {/* Price Display */}
-      {isSignedOut && !isUnapproved && (
+      {isSignedIn && isApproved && (
         <div
           className={cn("font-semibold text-primary", mode === "detail" ? "text-4xl" : "text-2xl")}
         >
@@ -42,36 +38,52 @@ export function ProductControls({ product, user, mode = "card" }: ProductControl
         </div>
       )}
 
-      {/* Add to Cart Button */}
-      {isSignedOut ? (
+      {/* Unapproved User CTA - Show on detail page only */}
+      {isSignedIn && !isApproved && mode === "detail" && (
+        <div className="flex flex-col gap-4">
+          <Button
+            className="w-full"
+            nativeButton={false}
+            render={
+              <Link prefetch={false} href="/auth/signin">
+                Sign in to view pricing and purchase
+              </Link>
+            }
+          />
+        </div>
+      )}
+
+      {/* Sign in Button */}
+      {!isSignedIn && (
         <Button
           className="w-full"
           nativeButton={false}
+          variant="outline"
           render={
             <Link prefetch={false} href="/auth/signin">
               Sign in to view pricing
             </Link>
           }
         />
-      ) : (
-        !isUnapproved && (
-          <div className={cn("flex items-center gap-2 flex-wrap", mode === "detail" ? "" : "")}>
-            {/* Quantity stepper */}
-            <QuantityStepper
-              size="xs"
-              value={addQuantity}
-              onChange={setAddQuantity}
-              min={1}
-              max={999}
-            />
+      )}
 
-            <AddToCartButton
-              productId={product.id}
-              quantity={addQuantity}
-              productName={product.name}
-            />
-          </div>
-        )
+      {isSignedIn && isApproved && (
+        <div className={cn("flex items-center gap-2 flex-wrap", mode === "detail" ? "" : "")}>
+          {/* Quantity stepper */}
+          <QuantityStepper
+            size="xs"
+            value={addQuantity}
+            onChange={setAddQuantity}
+            min={1}
+            max={999}
+          />
+
+          <AddToCartButton
+            productId={product.id}
+            quantity={addQuantity}
+            productName={product.name}
+          />
+        </div>
       )}
     </div>
   )

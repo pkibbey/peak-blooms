@@ -86,7 +86,6 @@ export default async function ProductDetailPage({ params }: ProductDetailPagePro
                 <span className="mx-2">/</span>
                 <span>{product.name}</span>
               </div>
-
               {/* Product Title */}
               <div>
                 <h1 className="text-4xl font-extrabold font-serif mb-2">{product.name}</h1>
@@ -97,7 +96,6 @@ export default async function ProductDetailPage({ params }: ProductDetailPagePro
                 <Label>Colors</Label>
                 <ColorsMiniDisplay colorIds={product.colors} size="md" />
               </div>
-
               {/* Product Controls */}
               <ProductControls product={product} user={user} mode="detail" />
             </div>

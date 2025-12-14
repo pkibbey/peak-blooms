@@ -7,9 +7,12 @@ import { formatPrice } from "@/lib/utils"
 
 interface ShopProductTableRowProps {
   product: ProductModel
+  user?: { approved: boolean } | null
 }
 
-export function ShopProductTableRow({ product }: ShopProductTableRowProps) {
+export function ShopProductTableRow({ product, user }: ShopProductTableRowProps) {
+  const isApproved = !!user?.approved
+
   return (
     <TableRow>
       {/* Image */}
@@ -53,7 +56,7 @@ export function ShopProductTableRow({ product }: ShopProductTableRowProps) {
       </TableCell>
 
       {/* Price */}
-      <TableCell>{formatPrice(product.price)}</TableCell>
+      <TableCell>{isApproved ? formatPrice(product.price) : "-"}</TableCell>
     </TableRow>
   )
 }

@@ -47,6 +47,7 @@ export function InspirationProductTable({ products, setName, user }: Inspiration
             imageSize="md"
             showQuantityControl
             showSimilarLink={false}
+            user={user}
             onQuantityChange={(newValue) => handleQuantityChange(index, newValue)}
           />
         ))}

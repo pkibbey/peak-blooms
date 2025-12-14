@@ -6,11 +6,9 @@ Provide the customer with vauge information about delivery
 Before the order is confirmed, the user might want to edit it
 Ask the user to choose how they want to recieve a notification, or just give them one option
 Combine delivery and contact info
-Add in the stem legnth selector for roses
-Hide prices properly for unapproved users
+Add in the stem length selector for roses
 Talk about box lot user journey
 Fix type system as much as possible - use generated types
-
 
 ### 🌟 Next Steps
 

@@ -60,7 +60,7 @@ export default function NavSearch() {
   return (
     <div className="relative w-full max-w-md">
       <Autocomplete items={searchResults}>
-        <div className="mt-2 flex items-center gap-2 relative">
+        <div className="flex items-center gap-2 relative">
           <AutocompleteInput
             id="tags"
             placeholder="Search products..."

@@ -194,7 +194,7 @@ export default async function ShopPage({ searchParams }: ShopPageProps) {
                     </TableHeader>
                     <TableBody>
                       {products.map((product) => (
-                        <ShopProductTableRow key={product.slug} product={product} />
+                        <ShopProductTableRow key={product.slug} product={product} user={user} />
                       ))}
                     </TableBody>
                   </Table>

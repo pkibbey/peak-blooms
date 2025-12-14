@@ -14,11 +14,21 @@ import { createProductSchema } from "@/lib/validations/product"
  */
 export async function GET(request: NextRequest) {
   try {
-    // Get current user's price multiplier if authenticated
+    // Get current user's price multiplier and approval status if authenticated
     let priceMultiplier = 1.0
+    let isApproved = false
     const session = await getSession()
     if (session?.user) {
       priceMultiplier = session.user.priceMultiplier ?? 1.0
+      isApproved = (session.user.approved as boolean) ?? false
+    }
+
+    // Return 403 if unapproved user requests price data
+    if (session?.user && !isApproved) {
+      return NextResponse.json(
+        { error: "Prices are only visible to approved users" },
+        { status: 403 }
+      )
     }
 
     const { searchParams } = new URL(request.url)
