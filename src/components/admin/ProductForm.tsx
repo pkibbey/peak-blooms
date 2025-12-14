@@ -241,9 +241,8 @@ export default function ProductForm({ collections, product }: ProductFormProps) 
                           <FormControl>
                             <Checkbox
                               checked={isChecked}
-                              onChange={(e) => {
-                                const checked = (e.target as HTMLInputElement).checked
-                                const newValue = checked
+                              onCheckedChange={(value) => {
+                                const newValue = value
                                   ? [...(field.value || []), col.id]
                                   : (field.value || []).filter((id) => id !== col.id)
                                 field.onChange(newValue)
@@ -308,10 +307,7 @@ export default function ProductForm({ collections, product }: ProductFormProps) 
           render={({ field }) => (
             <FormItem className="flex items-center gap-2 space-y-0">
               <FormControl>
-                <Checkbox
-                  checked={field.value}
-                  onChange={(e) => field.onChange(e.target.checked)}
-                />
+                <Checkbox checked={field.value} onCheckedChange={field.onChange} />
               </FormControl>
               <FormLabel className="cursor-pointer font-normal">
                 Featured product (show on homepage)
@@ -326,11 +322,15 @@ export default function ProductForm({ collections, product }: ProductFormProps) 
             <Button type="submit" disabled={isSubmitting}>
               {isSubmitting ? "Saving..." : "Save Product"}
             </Button>
-            <Button type="button" variant="outline" asChild>
-              <Link prefetch={false} href="/admin/products">
-                Cancel
-              </Link>
-            </Button>
+            <Button
+              variant="outline"
+              nativeButton={false}
+              render={
+                <Link prefetch={false} href="/admin/products">
+                  Cancel
+                </Link>
+              }
+            />
           </div>
           {isEditing && (
             <Button

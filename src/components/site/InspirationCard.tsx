@@ -51,16 +51,20 @@ export function InspirationCard({ inspiration }: InspirationCardProps) {
           </p>
         </div>
 
-        <Button asChild className="mt-4 w-full">
-          <Link
-            prefetch={false}
-            href={`/inspirations/${inspiration.slug}`}
-            className="inline-flex items-center justify-center gap-2"
-          >
-            View Inspiration
-            <IconArrowRight aria-hidden="true" />
-          </Link>
-        </Button>
+        <Button
+          className="mt-4 w-full"
+          nativeButton={false}
+          render={
+            <Link
+              prefetch={false}
+              href={`/inspirations/${inspiration.slug}`}
+              className="inline-flex items-center justify-center gap-2"
+            >
+              View Inspiration
+              <IconArrowRight aria-hidden="true" />
+            </Link>
+          }
+        ></Button>
       </div>
     </div>
   )

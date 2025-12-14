@@ -71,19 +71,20 @@ export default function OrdersTable({ orders, currentStatus, sort, order }: Orde
                 key={filter.value}
                 variant={currentStatus === filter.value ? "default" : "outline"}
                 size="sm"
-                asChild
-              >
-                <Link
-                  prefetch={false}
-                  href={
-                    filter.value === "ALL"
-                      ? "/admin/orders"
-                      : `/admin/orders?status=${filter.value}`
-                  }
-                >
-                  {filter.label}
-                </Link>
-              </Button>
+                nativeButton={false}
+                render={
+                  <Link
+                    prefetch={false}
+                    href={
+                      filter.value === "ALL"
+                        ? "/admin/orders"
+                        : `/admin/orders?status=${filter.value}`
+                    }
+                  >
+                    {filter.label}
+                  </Link>
+                }
+              />
             ))}
           </div>
         </div>
@@ -178,12 +179,17 @@ export default function OrdersTable({ orders, currentStatus, sort, order }: Orde
                       {formatPrice(order.total)}
                     </TableCell>
                     <TableCell className="text-right">
-                      <Button variant="outline" size="sm" asChild>
-                        <Link prefetch={false} href={`/admin/orders/${order.id}`}>
-                          <IconEye className="h-4 w-4 mr-1" />
-                          View
-                        </Link>
-                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        nativeButton={false}
+                        render={
+                          <Link prefetch={false} href={`/admin/orders/${order.id}`}>
+                            <IconEye className="h-4 w-4 mr-1" />
+                            View
+                          </Link>
+                        }
+                      />
                     </TableCell>
                   </TableRow>
                 )

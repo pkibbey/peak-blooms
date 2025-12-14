@@ -32,11 +32,14 @@ export default function EmptyState({
       {description ? <p className="text-muted-foreground mb-6">{description}</p> : null}
 
       {primaryAction ?? (
-        <Button asChild>
-          <Link prefetch={false} href="/shop">
-            Browse Products
-          </Link>
-        </Button>
+        <Button
+          nativeButton={false}
+          render={
+            <Link prefetch={false} href="/shop">
+              Browse Products
+            </Link>
+          }
+        />
       )}
     </div>
   )

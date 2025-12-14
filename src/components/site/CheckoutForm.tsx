@@ -112,7 +112,9 @@ export default function CheckoutForm({
     },
   })
 
-  const handleAddressSelect = (addressId: string) => {
+  const handleAddressSelect = (addressId: string | null) => {
+    if (addressId === null) return
+
     setSelectedAddressId(addressId)
     form.setValue("selectedAddressId", addressId)
 
@@ -332,7 +334,7 @@ export default function CheckoutForm({
                       <Checkbox
                         id="saveAddress"
                         checked={field.value}
-                        onChange={(e) => field.onChange(e.target.checked)}
+                        onCheckedChange={field.onChange}
                       />
                     </FormControl>
                     <FormLabel htmlFor="saveAddress" className="cursor-pointer text-sm font-normal">
@@ -404,11 +406,16 @@ export default function CheckoutForm({
             </Button>
 
             <div className="mt-4">
-              <Button variant="outline" asChild className="w-full">
-                <Link prefetch={false} href="/cart">
-                  Return to Cart
-                </Link>
-              </Button>
+              <Button
+                variant="outline"
+                className="w-full"
+                nativeButton={false}
+                render={
+                  <Link prefetch={false} href="/cart">
+                    Return to Cart
+                  </Link>
+                }
+              />
             </div>
 
             <p className="text-xs text-muted-foreground text-center mt-4">

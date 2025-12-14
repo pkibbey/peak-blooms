@@ -49,15 +49,19 @@ export default async function PendingApprovalPage() {
             If you need your account approved urgently, please reach out to our team:
           </p>
           <div className="space-y-2">
-            <Button asChild variant="outline">
-              <a
-                href="mailto:hello@peakblooms.com?subject=Account%20Approval%20Request"
-                className="inline-flex items-center gap-2"
-              >
-                <IconMail aria-hidden="true" />
-                Email Support
-              </a>
-            </Button>
+            <Button
+              variant="outline"
+              nativeButton={false}
+              render={
+                <a
+                  href="mailto:hello@peakblooms.com?subject=Account%20Approval%20Request"
+                  className="inline-flex items-center gap-2"
+                >
+                  <IconMail aria-hidden="true" />
+                  Email Support
+                </a>
+              }
+            />
             <div className="text-sm text-muted-foreground">
               Or call us at{" "}
               <a href="tel:+16199321139" className="font-medium hover:underline">
@@ -72,11 +76,15 @@ export default async function PendingApprovalPage() {
         </Suspense>
 
         <div className="text-center">
-          <Button asChild variant="outline">
-            <Link prefetch={false} href="/">
-              Return to home
-            </Link>
-          </Button>
+          <Button
+            variant="outline"
+            nativeButton={false}
+            render={
+              <Link prefetch={false} href="/">
+                Return to home
+              </Link>
+            }
+          />
         </div>
       </div>
     </div>

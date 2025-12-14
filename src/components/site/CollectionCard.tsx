@@ -54,16 +54,20 @@ export function CollectionCard({ collection }: CollectionCardProps) {
           </p>
         </div>
 
-        <Button asChild className="mt-6 w-full">
-          <Link
-            prefetch={false}
-            href={`/collections/${collection.slug}`}
-            className="inline-flex items-center justify-center gap-2"
-          >
-            View Collection
-            <IconArrowRight aria-hidden="true" />
-          </Link>
-        </Button>
+        <Button
+          className="mt-6 w-full"
+          nativeButton={false}
+          render={
+            <Link
+              prefetch={false}
+              href={`/collections/${collection.slug}`}
+              className="inline-flex items-center justify-center gap-2"
+            >
+              View Collection
+              <IconArrowRight aria-hidden="true" />
+            </Link>
+          }
+        />
       </div>
     </div>
   )

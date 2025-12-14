@@ -56,11 +56,14 @@ export default async function AdminInspirationsPage({ searchParams }: AdminInspi
             Curate inspirations ({inspirations.length} total)
           </p>
         </div>
-        <Button asChild>
-          <Link prefetch={false} href="/admin/inspirations/new">
-            Add New Inspiration
-          </Link>
-        </Button>
+        <Button
+          nativeButton={false}
+          render={
+            <Link prefetch={false} href="/admin/inspirations/new">
+              Add New Inspiration
+            </Link>
+          }
+        />
       </div>
 
       {/* Inspirations Table */}

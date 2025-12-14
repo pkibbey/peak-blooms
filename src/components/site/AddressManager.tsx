@@ -176,7 +176,7 @@ export default function AddressManager({ addresses }: AddressManagerProps) {
             <Checkbox
               id="setAsDefault"
               checked={setAsDefault}
-              onChange={(e) => setSetAsDefault(e.target.checked)}
+              onCheckedChange={setSetAsDefault}
               disabled={isSaving}
             />
             <Label htmlFor="setAsDefault" className="cursor-pointer text-sm">

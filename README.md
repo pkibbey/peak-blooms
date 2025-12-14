@@ -74,4 +74,4 @@ For local development the seed script creates a few test users you can use in th
 
 ## Conventions
 
-UI primitives are located in `src/components/ui/`. For consistent visual tokens, accessible keyboard/focus behavior, and predictable styling, use the shared `Button` component for all interactive controls and CTAs. To style a Next.js `Link` like a button, use the `Button` component's `asChild` API and place the `Link` inside it so routing semantics are preserved.
+UI primitives are located in `src/components/ui/`. For consistent visual tokens, accessible keyboard/focus behavior, and predictable styling, use the shared `Button` component for all interactive controls and CTAs. To style a Next.js `Link` like a button, use the `Button` component's `render` prop and pass the `Link` element to it so routing semantics are preserved.

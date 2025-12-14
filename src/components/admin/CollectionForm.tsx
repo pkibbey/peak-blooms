@@ -209,10 +209,7 @@ export default function CollectionForm({ collection, products = [] }: Collection
           render={({ field }) => (
             <FormItem className="flex flex-row items-center space-x-3 space-y-0 rounded-md border p-4">
               <FormControl>
-                <Checkbox
-                  checked={field.value}
-                  onChange={(e) => field.onChange((e.target as HTMLInputElement).checked)}
-                />
+                <Checkbox checked={field.value} onCheckedChange={field.onChange} />
               </FormControl>
               <div className="space-y-1 leading-none">
                 <FormLabel>Featured collection (show on homepage)</FormLabel>
@@ -253,11 +250,15 @@ export default function CollectionForm({ collection, products = [] }: Collection
             <Button type="submit" disabled={isSubmitting}>
               {isSubmitting ? "Saving..." : "Save Collection"}
             </Button>
-            <Button type="button" variant="outline" asChild>
-              <Link prefetch={false} href="/admin/collections">
-                Cancel
-              </Link>
-            </Button>
+            <Button
+              variant="outline"
+              nativeButton={false}
+              render={
+                <Link prefetch={false} href="/admin/collections">
+                  Cancel
+                </Link>
+              }
+            />
           </div>
           {isEditing && (
             <Button

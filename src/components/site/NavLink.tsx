@@ -17,7 +17,6 @@ export default function NavLink({ href, children, className, icon, ...props }: N
 
   return (
     <Button
-      asChild
       variant="ghost"
       className={cn(
         active
@@ -25,16 +24,18 @@ export default function NavLink({ href, children, className, icon, ...props }: N
           : "hover:bg-secondary/50 hover:text-foreground",
         className
       )}
-    >
-      <Link prefetch={false} href={href} aria-current={active ? "page" : undefined} {...props}>
-        {icon ? (
-          <span className="inline-flex items-center" aria-hidden="true">
-            {icon}
-          </span>
-        ) : null}
+      nativeButton={false}
+      render={
+        <Link prefetch={false} href={href} aria-current={active ? "page" : undefined} {...props}>
+          {icon ? (
+            <span className="inline-flex items-center" aria-hidden="true">
+              {icon}
+            </span>
+          ) : null}
 
-        {children}
-      </Link>
-    </Button>
+          {children}
+        </Link>
+      }
+    ></Button>
   )
 }

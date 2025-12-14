@@ -47,11 +47,14 @@ export default function Hero({
     if (cta) return cta
     if (ctaText && ctaLink) {
       return (
-        <Button asChild>
-          <Link prefetch={false} href={ctaLink} className="inline-flex items-center gap-1">
-            {ctaText}
-          </Link>
-        </Button>
+        <Button
+          nativeButton={false}
+          render={
+            <Link prefetch={false} href={ctaLink} className="inline-flex items-center gap-1">
+              {ctaText}
+            </Link>
+          }
+        />
       )
     }
     return null

@@ -44,11 +44,15 @@ export function ProductControls({ product, user, mode = "card" }: ProductControl
 
       {/* Add to Cart Button */}
       {isSignedOut ? (
-        <Button className="w-full" asChild>
-          <Link prefetch={false} href="/auth/signin">
-            Sign in to view pricing
-          </Link>
-        </Button>
+        <Button
+          className="w-full"
+          nativeButton={false}
+          render={
+            <Link prefetch={false} href="/auth/signin">
+              Sign in to view pricing
+            </Link>
+          }
+        />
       ) : (
         !isUnapproved && (
           <div className={cn("flex items-center gap-2 flex-wrap", mode === "detail" ? "" : "")}>

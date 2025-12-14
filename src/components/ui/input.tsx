@@ -1,38 +1,24 @@
-"use client"
-
-import { cva, type VariantProps } from "class-variance-authority"
-import * as React from "react"
+import { Input as InputPrimitive } from "@base-ui/react/input"
+import type * as React from "react"
 
 import { cn } from "@/lib/utils"
 
-const inputVariants = cva(
-  "flex h-10 w-full rounded-md border border-border bg-background px-3 py-2 text-sm placeholder:text-muted-foreground outline-none focus-visible:ring-ring/50 focus-visible:border-ring disabled:opacity-50 disabled:cursor-not-allowed",
-  {
-    variants: {
-      variant: {
-        default: "",
-        subtle: "bg-muted/20",
-      },
-      size: {
-        default: "h-10",
-        sm: "h-8 px-2 text-sm",
-        lg: "h-12 px-4 text-base",
-      },
-    },
-    defaultVariants: {
-      variant: "default",
-      size: "default",
-    },
-  }
-)
+function Input({
+  className,
+  type,
+  ...props
+}: InputPrimitive.Props & React.RefAttributes<HTMLInputElement>) {
+  return (
+    <InputPrimitive
+      type={type}
+      data-slot="input"
+      className={cn(
+        "file:text-foreground placeholder:text-muted-foreground selection:bg-primary selection:text-primary-foreground dark:bg-input/30 border-input flex h-9 w-full min-w-0 rounded-md border bg-transparent px-3 py-1 text-base shadow-xs transition-[color,box-shadow] outline-none file:inline-flex file:h-7 file:border-0 file:bg-transparent file:text-sm file:font-medium disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 md:text-sm focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive",
+        className
+      )}
+      {...props}
+    />
+  )
+}
 
-const Input = React.forwardRef<
-  HTMLInputElement,
-  React.InputHTMLAttributes<HTMLInputElement> & VariantProps<typeof inputVariants>
->(({ className, variant, size, ...props }, ref) => {
-  return <input ref={ref} className={cn(inputVariants({ variant, size, className }))} {...props} />
-})
-
-Input.displayName = "Input"
-
-export { Input, inputVariants }
+export { Input }

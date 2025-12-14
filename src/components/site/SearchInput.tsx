@@ -6,12 +6,7 @@ import { useState } from "react"
 import { useDebouncedCallback } from "@/lib/useDebouncedCallback"
 import { cn } from "@/lib/utils"
 
-interface SearchInputProps {
-  compact?: boolean
-  className?: string
-}
-
-export function SearchInput({ compact = false, className }: SearchInputProps) {
+export function SearchInput() {
   const searchParams = useSearchParams()
   const router = useRouter()
   const currentSearch = searchParams.get("search") || ""

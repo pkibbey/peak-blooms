@@ -71,16 +71,15 @@ export default function CollectionsTableRow({ collection }: { collection: Collec
         <div className="flex items-center gap-2">
           <Checkbox
             checked={!!featured}
-            onChange={async (e) => {
-              const newVal = (e.target as HTMLInputElement).checked
+            onCheckedChange={async (value) => {
               const previous = featured
-              setFeatured(newVal)
+              setFeatured(value)
 
               try {
                 const res = await fetch(`/api/collections/${collection.id}`, {
                   method: "PUT",
                   headers: { "Content-Type": "application/json" },
-                  body: JSON.stringify({ featured: newVal }),
+                  body: JSON.stringify({ featured: value }),
                 })
 
                 if (!res.ok) {
@@ -89,7 +88,7 @@ export default function CollectionsTableRow({ collection }: { collection: Collec
                 }
 
                 toast.success(
-                  `${newVal ? "Marked featured" : "Removed featured"} — ${collection.name}`
+                  `${value ? "Marked featured" : "Removed featured"} — ${collection.name}`
                 )
                 router.refresh()
               } catch (err) {

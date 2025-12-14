@@ -33,17 +33,26 @@ export default async function UnauthorizedPage() {
             </p>
 
             <div className="grid gap-3">
-              <Button asChild variant="outline" className="w-full">
-                <a href="mailto:hello@peakblooms.com?subject=Admin%20Access%20Request">
-                  Request Admin Access
-                </a>
-              </Button>
+              <Button
+                variant="outline"
+                className="w-full"
+                nativeButton={false}
+                render={
+                  <a href="mailto:hello@peakblooms.com?subject=Admin%20Access%20Request">
+                    Request Admin Access
+                  </a>
+                }
+              />
 
-              <Button asChild className="w-full">
-                <Link prefetch={false} href="/">
-                  Return to home
-                </Link>
-              </Button>
+              <Button
+                className="w-full"
+                nativeButton={false}
+                render={
+                  <Link prefetch={false} href="/">
+                    Return to home
+                  </Link>
+                }
+              />
             </div>
           </>
         ) : (
@@ -53,17 +62,26 @@ export default async function UnauthorizedPage() {
             </p>
 
             <div className="grid gap-3">
-              <Button asChild variant="outline" className="w-full">
-                <Link prefetch={false} href="/auth/signin?callbackUrl=/admin">
-                  Sign in to Admin
-                </Link>
-              </Button>
+              <Button
+                variant="outline"
+                className="w-full"
+                nativeButton={false}
+                render={
+                  <Link prefetch={false} href="/auth/signin?callbackUrl=/admin">
+                    Sign in to Admin
+                  </Link>
+                }
+              />
 
-              <Button asChild className="w-full">
-                <Link prefetch={false} href="/">
-                  Return to home
-                </Link>
-              </Button>
+              <Button
+                className="w-full"
+                nativeButton={false}
+                render={
+                  <Link prefetch={false} href="/">
+                    Return to home
+                  </Link>
+                }
+              />
             </div>
           </>
         )}

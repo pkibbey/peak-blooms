@@ -171,11 +171,14 @@ export default function Cart({ initialCart }: CartProps) {
         title="Your cart is empty"
         description={"Looks like you haven't added any flowers to your cart yet."}
         primaryAction={
-          <Button asChild>
-            <Link prefetch={false} href="/shop">
-              Browse Products
-            </Link>
-          </Button>
+          <Button
+            nativeButton={false}
+            render={
+              <Link prefetch={false} href="/shop">
+                Browse Products
+              </Link>
+            }
+          />
         }
       />
     )
@@ -229,18 +232,28 @@ export default function Cart({ initialCart }: CartProps) {
             <span>{formatPrice(cart.total)}</span>
           </div>
 
-          <Button size="lg" className="w-full" asChild>
-            <Link prefetch={false} href="/checkout">
-              Proceed to Checkout
-            </Link>
-          </Button>
+          <Button
+            size="lg"
+            className="w-full"
+            nativeButton={false}
+            render={
+              <Link prefetch={false} href="/checkout">
+                Proceed to Checkout
+              </Link>
+            }
+          />
 
           <div className="mt-4">
-            <Button variant="outline" asChild className="w-full">
-              <Link prefetch={false} href="/shop">
-                Continue Shopping
-              </Link>
-            </Button>
+            <Button
+              variant="outline"
+              className="w-full"
+              nativeButton={false}
+              render={
+                <Link prefetch={false} href="/shop">
+                  Continue Shopping
+                </Link>
+              }
+            />
             <div className="mt-3">
               <Button
                 variant="ghost"

@@ -45,11 +45,14 @@ export default async function CheckoutPage() {
           <p className="text-muted-foreground mb-6">
             Add some items to your cart before checking out.
           </p>
-          <Button asChild>
-            <Link prefetch={false} href="/shop">
-              Browse Products
-            </Link>
-          </Button>
+          <Button
+            nativeButton={false}
+            render={
+              <Link prefetch={false} href="/shop">
+                Browse Products
+              </Link>
+            }
+          />
         </div>
       </div>
     )

@@ -46,11 +46,14 @@ export default async function OrderHistoryPage() {
         <div className="text-center py-12">
           <IconPackage className="h-12 w-12 mx-auto text-muted-foreground mb-3" />
           <p className="text-muted-foreground mb-4">No orders yet</p>
-          <Button asChild>
-            <Link prefetch={false} href="/shop">
-              Browse Products
-            </Link>
-          </Button>
+          <Button
+            nativeButton={false}
+            render={
+              <Link prefetch={false} href="/shop">
+                Browse Products
+              </Link>
+            }
+          />
         </div>
       )}
     </>

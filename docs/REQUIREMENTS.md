@@ -93,7 +93,7 @@ toast.success(`Added "${productName}" to cart!`);
 - **Approved users:** Show full pricing, specs, and enabled purchase actions
 
 ### UI Controls & Buttons
-- **Consistency requirement:** All primary, secondary, and interactive controls (CTAs, cart links, menu toggles, etc.) MUST use the shared `Button` primitive located at `src/components/ui/button.tsx`. This guarantees consistent visuals, behavior, and keyboard/focus accessibility across the application. Use `asChild` when wrapping Next.js `Link` to preserve routing semantics while applying button styling.
+- **Consistency requirement:** All primary, secondary, and interactive controls (CTAs, cart links, menu toggles, etc.) MUST use the shared `Button` primitive located at `src/components/ui/button.tsx`. This guarantees consistent visuals, behavior, and keyboard/focus accessibility across the application. Use the `render` prop when wrapping Next.js `Link` to preserve routing semantics while applying button styling.
 - **Button text must never change.** Button labels should remain static at all times. Loading or processing states are indicated only through the disabled state styling (opacity reduction, cursor: not-allowed, disabled pointer events). Do not change button text based on form state, submission status, or any other dynamic condition.
 
 ## Component & Architecture Standards

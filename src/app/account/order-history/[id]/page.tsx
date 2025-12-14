@@ -60,11 +60,15 @@ export default async function OrderDetailPage({ params }: OrderDetailPageProps) 
           </div>
           <p className="text-muted-foreground">Placed on {formatDate(order.createdAt)}</p>
         </div>
-        <Button variant="outline" asChild>
-          <Link prefetch={false} href="/account/order-history">
-            View All Orders
-          </Link>
-        </Button>
+        <Button
+          variant="outline"
+          nativeButton={false}
+          render={
+            <Link prefetch={false} href="/account/order-history">
+              View All Orders
+            </Link>
+          }
+        />
       </div>
 
       {/* Success Message for new orders */}
@@ -126,11 +130,14 @@ export default async function OrderDetailPage({ params }: OrderDetailPageProps) 
 
       {/* Actions */}
       <div className="mt-8 flex gap-4">
-        <Button asChild>
-          <Link prefetch={false} href="/shop">
-            Continue Shopping
-          </Link>
-        </Button>
+        <Button
+          nativeButton={false}
+          render={
+            <Link prefetch={false} href="/shop">
+              Continue Shopping
+            </Link>
+          }
+        />
       </div>
     </>
   )

@@ -41,20 +41,21 @@ export function ShopPagination({ currentPage, totalPages, searchParams }: ShopPa
       <Button
         variant="outline"
         size="sm"
-        asChild
         disabled={currentPage === 1}
         className="disabled:opacity-50"
-      >
-        {currentPage === 1 ? (
-          <button type="button" disabled>
-            <ChevronLeft className="w-4 h-4" />
-          </button>
-        ) : (
-          <Link prefetch={false} href={buildUrl(currentPage - 1)}>
-            <ChevronLeft className="w-4 h-4" />
-          </Link>
-        )}
-      </Button>
+        nativeButton={currentPage === 1}
+        render={
+          currentPage === 1 ? (
+            <button type="button" disabled>
+              <ChevronLeft className="w-4 h-4" />
+            </button>
+          ) : (
+            <Link prefetch={false} href={buildUrl(currentPage - 1)}>
+              <ChevronLeft className="w-4 h-4" />
+            </Link>
+          )
+        }
+      />
 
       {/* Page Numbers */}
       <div className="flex items-center gap-1">
@@ -78,12 +79,13 @@ export function ShopPagination({ currentPage, totalPages, searchParams }: ShopPa
               key={page}
               variant={page === currentPage ? "default" : "outline"}
               size="sm"
-              asChild
-            >
-              <Link prefetch={false} href={buildUrl(page as number)}>
-                {page}
-              </Link>
-            </Button>
+              nativeButton={false}
+              render={
+                <Link prefetch={false} href={buildUrl(page as number)}>
+                  {page}
+                </Link>
+              }
+            />
           )
         })}
       </div>
@@ -92,20 +94,21 @@ export function ShopPagination({ currentPage, totalPages, searchParams }: ShopPa
       <Button
         variant="outline"
         size="sm"
-        asChild
         disabled={currentPage === totalPages}
         className="disabled:opacity-50"
-      >
-        {currentPage === totalPages ? (
-          <button type="button" disabled>
-            <ChevronRight className="w-4 h-4" />
-          </button>
-        ) : (
-          <Link prefetch={false} href={buildUrl(currentPage + 1)}>
-            <ChevronRight className="w-4 h-4" />
-          </Link>
-        )}
-      </Button>
+        nativeButton={currentPage === totalPages}
+        render={
+          currentPage === totalPages ? (
+            <button type="button" disabled>
+              <ChevronRight className="w-4 h-4" />
+            </button>
+          ) : (
+            <Link prefetch={false} href={buildUrl(currentPage + 1)}>
+              <ChevronRight className="w-4 h-4" />
+            </Link>
+          )
+        }
+      />
     </div>
   )
 }

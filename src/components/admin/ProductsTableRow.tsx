@@ -90,16 +90,15 @@ export default function ProductsTableRow({ product }: ProductRowProps) {
         <div className="flex items-center gap-2">
           <Checkbox
             checked={!!featured}
-            onChange={async (e) => {
-              const newVal = (e.target as HTMLInputElement).checked
+            onCheckedChange={async (value) => {
               const previous = featured
-              setFeatured(newVal)
+              setFeatured(value)
 
               try {
                 const res = await fetch(`/api/products/${product.id}`, {
                   method: "PUT",
                   headers: { "Content-Type": "application/json" },
-                  body: JSON.stringify({ featured: newVal }),
+                  body: JSON.stringify({ featured: value }),
                 })
 
                 if (!res.ok) {
@@ -107,9 +106,7 @@ export default function ProductsTableRow({ product }: ProductRowProps) {
                   throw new Error(body?.error || "Failed to update product")
                 }
 
-                toast.success(
-                  `${newVal ? "Marked featured" : "Removed featured"} — ${product.name}`
-                )
+                toast.success(`${value ? "Marked featured" : "Removed featured"} — ${product.name}`)
                 router.refresh()
               } catch (err) {
                 setFeatured(previous)

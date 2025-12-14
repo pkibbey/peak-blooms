@@ -84,11 +84,16 @@ export default function AddAllToCartButton({
   if (isSignedOut) {
     return (
       <>
-        <Button size="lg" className="w-full" asChild>
-          <Link prefetch={false} href="/auth/signin">
-            Sign in to purchase all
-          </Link>
-        </Button>
+        <Button
+          size="lg"
+          className="w-full"
+          nativeButton={false}
+          render={
+            <Link prefetch={false} href="/auth/signin">
+              Sign in to purchase all
+            </Link>
+          }
+        />
         {error ? <p className="mt-2 text-sm text-destructive">{error}</p> : null}
       </>
     )

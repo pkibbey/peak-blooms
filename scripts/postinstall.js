@@ -1,4 +1,4 @@
-import { spawnSync } from "child_process"
+import { spawnSync } from "node:child_process"
 
 const env = process.env.NODE_ENV || "development"
 const isProd = env === "production"

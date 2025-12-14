@@ -56,11 +56,14 @@ export default async function AdminCollectionsPage({ searchParams }: AdminCollec
             Organize products into collections ({collections.length} total)
           </p>
         </div>
-        <Button asChild>
-          <Link prefetch={false} href="/admin/collections/new">
-            Add New Collection
-          </Link>
-        </Button>
+        <Button
+          nativeButton={false}
+          render={
+            <Link prefetch={false} href="/admin/collections/new">
+              Add New Collection
+            </Link>
+          }
+        />
       </div>
 
       {/* Collections Table */}

@@ -276,11 +276,15 @@ export default function InspirationForm({ products, inspiration }: InspirationFo
             <Button type="submit" disabled={isSubmitting}>
               {isSubmitting ? "Saving..." : "Save Inspiration"}
             </Button>
-            <Button type="button" variant="outline" asChild>
-              <Link prefetch={false} href="/admin/inspirations">
-                Cancel
-              </Link>
-            </Button>
+            <Button
+              variant="outline"
+              nativeButton={false}
+              render={
+                <Link prefetch={false} href="/admin/inspirations">
+                  Cancel
+                </Link>
+              }
+            />
           </div>
           {isEditing && (
             <Button

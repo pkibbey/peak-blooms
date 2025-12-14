@@ -30,16 +30,25 @@ export default async function ErrorPage({
         </div>
 
         <div className="space-y-2">
-          <Button asChild className="w-full">
-            <Link prefetch={false} href="/auth/signin">
-              Try signing in again
-            </Link>
-          </Button>
-          <Button asChild variant="outline" className="w-full">
-            <Link prefetch={false} href="/">
-              Return to home
-            </Link>
-          </Button>
+          <Button
+            className="w-full"
+            nativeButton={false}
+            render={
+              <Link prefetch={false} href="/auth/signin">
+                Try signing in again
+              </Link>
+            }
+          />
+          <Button
+            variant="outline"
+            className="w-full"
+            nativeButton={false}
+            render={
+              <Link prefetch={false} href="/">
+                Return to home
+              </Link>
+            }
+          />
         </div>
       </div>
     </div>

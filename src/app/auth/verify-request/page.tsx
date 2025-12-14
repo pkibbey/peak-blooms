@@ -26,11 +26,16 @@ export default function VerifyRequestPage() {
           <p>Didn&apos;t receive the email? Check your spam folder.</p>
         </div>
 
-        <Button asChild variant="outline" className="w-full">
-          <Link prefetch={false} href="/">
-            Return to home
-          </Link>
-        </Button>
+        <Button
+          variant="outline"
+          className="w-full"
+          nativeButton={false}
+          render={
+            <Link prefetch={false} href="/">
+              Return to home
+            </Link>
+          }
+        />
       </div>
     </div>
   )

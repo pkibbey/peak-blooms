@@ -175,10 +175,7 @@ export function UsersForm() {
           render={({ field }) => (
             <FormItem className="flex flex-row items-center space-x-3 space-y-0">
               <FormControl>
-                <Checkbox
-                  checked={field.value}
-                  onChange={(e) => field.onChange(e.target.checked)}
-                />
+                <Checkbox checked={field.value} onCheckedChange={field.onChange} />
               </FormControl>
               <FormLabel className="font-normal">Approve user immediately</FormLabel>
             </FormItem>

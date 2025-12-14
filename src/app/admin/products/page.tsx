@@ -59,11 +59,14 @@ export default async function AdminProductsPage({ searchParams }: AdminProductsP
             Manage your product catalog ({result.total} total)
           </p>
         </div>
-        <Button asChild>
-          <Link prefetch={false} href="/admin/products/new">
-            Add New Product
-          </Link>
-        </Button>
+        <Button
+          nativeButton={false}
+          render={
+            <Link prefetch={false} href="/admin/products/new">
+              Add New Product
+            </Link>
+          }
+        />
       </div>
 
       {/* Summary + Pagination */}

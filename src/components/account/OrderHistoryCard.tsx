@@ -71,20 +71,21 @@ export default function OrderHistoryCard({
               <Button
                 variant="outline"
                 size="sm"
-                asChild
                 disabled={currentPage === 1}
                 className="disabled:opacity-50"
-              >
-                {currentPage === 1 ? (
-                  <button type="button" disabled>
-                    <ChevronLeft className="w-4 h-4" />
-                  </button>
-                ) : (
-                  <Link prefetch={false} href={buildUrl(currentPage - 1)}>
-                    <ChevronLeft className="w-4 h-4" />
-                  </Link>
-                )}
-              </Button>
+                nativeButton={false}
+                render={
+                  currentPage === 1 ? (
+                    <button type="button" disabled>
+                      <ChevronLeft className="w-4 h-4" />
+                    </button>
+                  ) : (
+                    <Link prefetch={false} href={buildUrl(currentPage - 1)}>
+                      <ChevronLeft className="w-4 h-4" />
+                    </Link>
+                  )
+                }
+              />
 
               <div className="flex items-center gap-1">
                 {pages.map((page, index) => {
@@ -105,12 +106,13 @@ export default function OrderHistoryCard({
                       key={page}
                       variant={page === currentPage ? "default" : "outline"}
                       size="sm"
-                      asChild
-                    >
-                      <Link prefetch={false} href={buildUrl(page as number)}>
-                        {page}
-                      </Link>
-                    </Button>
+                      nativeButton={false}
+                      render={
+                        <Link prefetch={false} href={buildUrl(page as number)}>
+                          {page}
+                        </Link>
+                      }
+                    />
                   )
                 })}
               </div>
@@ -118,20 +120,21 @@ export default function OrderHistoryCard({
               <Button
                 variant="outline"
                 size="sm"
-                asChild
                 disabled={currentPage === totalPages}
                 className="disabled:opacity-50"
-              >
-                {currentPage === totalPages ? (
-                  <button type="button" disabled>
-                    <ChevronRight className="w-4 h-4" />
-                  </button>
-                ) : (
-                  <Link prefetch={false} href={buildUrl(currentPage + 1)}>
-                    <ChevronRight className="w-4 h-4" />
-                  </Link>
-                )}
-              </Button>
+                nativeButton={currentPage === totalPages}
+                render={
+                  currentPage === totalPages ? (
+                    <button type="button" disabled>
+                      <ChevronRight className="w-4 h-4" />
+                    </button>
+                  ) : (
+                    <Link prefetch={false} href={buildUrl(currentPage + 1)}>
+                      <ChevronRight className="w-4 h-4" />
+                    </Link>
+                  )
+                }
+              />
             </div>
           )}
         </>
@@ -139,11 +142,14 @@ export default function OrderHistoryCard({
         <div className="text-center py-12">
           <IconPackage className="h-12 w-12 mx-auto text-muted-foreground mb-3" />
           <p className="text-muted-foreground mb-4">No orders yet</p>
-          <Button asChild>
-            <Link prefetch={false} href="/shop">
-              Browse Products
-            </Link>
-          </Button>
+          <Button
+            nativeButton={false}
+            render={
+              <Link prefetch={false} href="/shop">
+                Browse Products
+              </Link>
+            }
+          />
         </div>
       )}
     </div>

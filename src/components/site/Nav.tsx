@@ -107,17 +107,21 @@ export default async function Nav({ user, cartCount = 0 }: NavProps) {
               </NavLink>
             ))}
             {isApproved && (
-              <Button asChild variant="ghost">
-                <Link
-                  prefetch={false}
-                  href="/cart"
-                  className="inline-flex items-center gap-2 px-4 py-2"
-                >
-                  <IconShoppingCart aria-hidden="true" />
-                  <span>Cart</span>
-                  {cartCount > 0 && <Badge variant="default">{cartCount}</Badge>}
-                </Link>
-              </Button>
+              <Button
+                variant="ghost"
+                nativeButton={false}
+                render={
+                  <Link
+                    prefetch={false}
+                    href="/cart"
+                    className="inline-flex items-center gap-2 px-4 py-2"
+                  >
+                    <IconShoppingCart aria-hidden="true" />
+                    <span>Cart</span>
+                    {cartCount > 0 && <Badge variant="default">{cartCount}</Badge>}
+                  </Link>
+                }
+              />
             )}
             {user ? (
               <>
@@ -148,11 +152,14 @@ export default async function Nav({ user, cartCount = 0 }: NavProps) {
             ) : (
               <>
                 <SignInWithGoogle />
-                <Button asChild>
-                  <Link prefetch={false} href="/auth/signup" className="px-4 py-2">
-                    Sign Up
-                  </Link>
-                </Button>
+                <Button
+                  nativeButton={false}
+                  render={
+                    <Link prefetch={false} href="/auth/signup" className="px-4 py-2">
+                      Sign Up
+                    </Link>
+                  }
+                />
               </>
             )}
           </div>

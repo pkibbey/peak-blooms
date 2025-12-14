@@ -259,7 +259,7 @@ export function ShopFilters({
 
         <div className="space-y-6">
           {/* Search Filter */}
-          <SearchInput className="w-48" />
+          <SearchInput />
 
           {/* Colors Filter */}
           {availableColorIds.length > 0 && (
@@ -281,7 +281,7 @@ export function ShopFilters({
                   <Checkbox
                     id="collection-all"
                     checked={selectedCollectionIds.length === 0}
-                    onChange={clearCollections}
+                    onCheckedChange={clearCollections}
                   />
                   <label htmlFor="collection-all" className="text-sm cursor-pointer">
                     All Collections
@@ -292,7 +292,7 @@ export function ShopFilters({
                     <Checkbox
                       id={`collection-${collection.id}`}
                       checked={selectedCollectionIds.includes(collection.id)}
-                      onChange={() => toggleCollection(collection.id)}
+                      onCheckedChange={() => toggleCollection(collection.id)}
                     />
                     <label
                       htmlFor={`collection-${collection.id}`}

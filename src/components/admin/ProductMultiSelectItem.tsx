@@ -39,7 +39,7 @@ export function ProductMultiSelectItem({
       >
         <Checkbox
           checked={isSelected}
-          onChange={() => onToggle(product.id)}
+          onCheckedChange={() => onToggle(product.id)}
           disabled={disabled}
           className="h-4 w-4 rounded"
         />
