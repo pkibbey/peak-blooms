@@ -57,9 +57,7 @@ export default async function AccountPage({
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        <ProfileCard
-          user={{ id: user.id, name: user.name, email: user.email ?? "", phone: user.phone }}
-        />
+        <ProfileCard user={{ id: user.id, name: user.name, email: user.email ?? "" }} />
         <AddressesCard addresses={addresses} />
       </div>
 

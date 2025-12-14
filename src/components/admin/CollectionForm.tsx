@@ -263,7 +263,7 @@ export default function CollectionForm({ collection, products = [] }: Collection
           {isEditing && (
             <Button
               type="button"
-              variant="destructive"
+              variant="outline-destructive"
               onClick={handleDelete}
               disabled={isDeleting}
             >

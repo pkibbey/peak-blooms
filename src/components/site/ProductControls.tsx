@@ -71,7 +71,7 @@ export function ProductControls({ product, user, mode = "card" }: ProductControl
         <div className={cn("flex items-center gap-2 flex-wrap", mode === "detail" ? "" : "")}>
           {/* Quantity stepper */}
           <QuantityStepper
-            size="xs"
+            size={mode === "detail" ? "sm" : "xs"}
             value={addQuantity}
             onChange={setAddQuantity}
             min={1}

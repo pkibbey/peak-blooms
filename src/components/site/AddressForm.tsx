@@ -2,6 +2,7 @@
 
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { formatPhoneNumber } from "@/lib/phone"
 import type { AddressFormData } from "@/lib/validations/address"
 
 export function validateAddress(addr: AddressFormData): string | null {
@@ -12,6 +13,7 @@ export function validateAddress(addr: AddressFormData): string | null {
   if (!addr.city.trim()) return "City is required"
   if (!addr.state.trim()) return "State is required"
   if (!addr.zip.trim()) return "ZIP code is required"
+  if (!addr.phone.trim()) return "Phone number is required"
   return null
 }
 
@@ -71,6 +73,25 @@ export default function AddressForm({
           value={address.company}
           onChange={(e) => onChange("company", e.target.value)}
           placeholder="Company name"
+          disabled={disabled}
+        />
+      </div>
+
+      <div className="space-y-2">
+        <Label htmlFor={id("phone")}>Phone {required && "*"}</Label>
+        <Input
+          id={id("phone")}
+          type="tel"
+          required={required}
+          value={address.phone}
+          onChange={(e) => onChange("phone", e.target.value)}
+          onBlur={(e) => {
+            if (e.target.value) {
+              const formatted = formatPhoneNumber(e.target.value)
+              onChange("phone", formatted)
+            }
+          }}
+          placeholder="(555) 123-4567"
           disabled={disabled}
         />
       </div>

@@ -29,7 +29,6 @@ export interface CartUser {
   id: string
   priceMultiplier: number
   email: string
-  phone: string | null
   name?: string
   role?: string
   approved?: boolean

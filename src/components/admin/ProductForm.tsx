@@ -24,6 +24,7 @@ import {
   Select,
   SelectContent,
   SelectItem,
+  SelectPositioner,
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
@@ -274,11 +275,13 @@ export default function ProductForm({ collections, product }: ProductFormProps) 
                     <SelectValue placeholder="Select a product type" />
                   </SelectTrigger>
                 </FormControl>
-                <SelectContent>
-                  <SelectItem value="FLOWER">Flower</SelectItem>
-                  <SelectItem value="ROSE">Rose</SelectItem>
-                  <SelectItem value="FILLER">Filler</SelectItem>
-                </SelectContent>
+                <SelectPositioner alignItemWithTrigger>
+                  <SelectContent>
+                    <SelectItem value="FLOWER">Flower</SelectItem>
+                    <SelectItem value="ROSE">Rose</SelectItem>
+                    <SelectItem value="FILLER">Filler</SelectItem>
+                  </SelectContent>
+                </SelectPositioner>
               </Select>
               <FormMessage />
             </FormItem>
@@ -335,7 +338,7 @@ export default function ProductForm({ collections, product }: ProductFormProps) 
           {isEditing && (
             <Button
               type="button"
-              variant="destructive"
+              variant="outline-destructive"
               onClick={handleDelete}
               disabled={isDeleting}
             >

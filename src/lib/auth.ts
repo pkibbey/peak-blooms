@@ -42,9 +42,6 @@ export const auth = betterAuth({
         type: "number",
         defaultValue: 1.0,
       },
-      phone: {
-        type: "string",
-      },
     },
   },
 })

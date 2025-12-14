@@ -67,7 +67,6 @@ export default function UserMenu({ user }: UserMenuProps) {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger
-        nativeButton={false}
         render={
           <Button size="sm" variant="outline" className="hidden md:inline-flex items-center gap-2">
             <IconUser aria-hidden="true" />

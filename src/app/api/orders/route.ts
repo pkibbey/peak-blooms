@@ -77,7 +77,7 @@ export async function POST(request: Request) {
       )
     }
 
-    const { deliveryAddressId, deliveryAddress, saveDeliveryAddress, email, phone, notes } =
+    const { deliveryAddressId, deliveryAddress, saveDeliveryAddress, email, notes } =
       validationResult.data
 
     // Get user's cart (CART order)
@@ -103,11 +103,12 @@ export async function POST(request: Request) {
       return sum + adjustedPrice * item.quantity
     }, 0)
 
-    // Handle delivery address
+    // Handle delivery address and extract phone
     let finalDeliveryAddressId: string
+    let phoneSnapshot: string
 
     if (deliveryAddressId) {
-      // Using existing address - verify it belongs to user
+      // Using existing address - verify it belongs to user and get phone
       const existingAddress = await db.address.findFirst({
         where: {
           id: deliveryAddressId,
@@ -120,8 +121,9 @@ export async function POST(request: Request) {
       }
 
       finalDeliveryAddressId = deliveryAddressId
+      phoneSnapshot = existingAddress.phone
     } else if (deliveryAddress) {
-      // Creating new address
+      // Creating new address - phone is part of deliveryAddress
       const newAddress = await db.address.create({
         data: {
           userId: saveDeliveryAddress ? user.id : null,
@@ -134,34 +136,15 @@ export async function POST(request: Request) {
           state: deliveryAddress.state,
           zip: deliveryAddress.zip,
           country: deliveryAddress.country || "US",
+          phone: deliveryAddress.phone,
         },
       })
 
       finalDeliveryAddressId = newAddress.id
+      phoneSnapshot = deliveryAddress.phone
     } else {
       return NextResponse.json({ error: "Delivery address is required" }, { status: 400 })
     }
-
-    // Update user's phone if provided
-    if (phone && phone !== user.phone) {
-      await db.user.update({
-        where: { id: user.id },
-        data: { phone },
-      })
-    }
-
-    // Update the CART order items with final prices and transition to PENDING
-    // First, update all OrderItems with final adjusted prices
-    await db.$transaction(
-      cart.items.map((item) =>
-        db.orderItem.update({
-          where: { id: item.id },
-          data: {
-            price: adjustPrice(item.product?.price ?? 0, priceMultiplier),
-          },
-        })
-      )
-    )
 
     // Transition the order from CART to PENDING
     const order = await db.order.update({
@@ -170,7 +153,7 @@ export async function POST(request: Request) {
         status: "PENDING",
         total: Math.round(total * 100) / 100,
         email,
-        phone: phone || null,
+        phone: phoneSnapshot,
         notes: notes || null,
         deliveryAddressId: finalDeliveryAddressId,
       },

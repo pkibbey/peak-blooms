@@ -42,8 +42,9 @@ export async function GET() {
 
 /**
  * PATCH /api/users/profile
- * Update current user's profile (name and phone)
+ * Update current user's profile (name only)
  * Email cannot be changed - it's verified by Google OAuth
+ * Phone is now part of delivery addresses
  */
 export async function PATCH(request: NextRequest) {
   try {
@@ -64,23 +65,20 @@ export async function PATCH(request: NextRequest) {
       )
     }
 
-    const { name, phone } = validationResult.data
+    const { name } = validationResult.data
     const currentUser = await db.user.findUnique({
       where: { id: session.user.id },
-      select: { email: true, name: true, phone: true },
+      select: { email: true, name: true },
     })
 
     if (!currentUser) {
       return NextResponse.json({ error: "User not found" }, { status: 404 })
     }
 
-    // Update user's name and/or phone if provided
-    const updateData: { name?: string | null; phone?: string | null } = {}
+    // Update user's name if provided
+    const updateData: { name?: string | null } = {}
     if (name !== undefined && name !== currentUser.name) {
       updateData.name = name || null
-    }
-    if (phone !== undefined && phone !== currentUser.phone) {
-      updateData.phone = phone || null
     }
 
     if (Object.keys(updateData).length > 0) {
@@ -98,7 +96,6 @@ export async function PATCH(request: NextRequest) {
         id: true,
         email: true,
         name: true,
-        phone: true,
         image: true,
         role: true,
         approved: true,

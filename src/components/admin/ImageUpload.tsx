@@ -262,7 +262,7 @@ export function ImageUpload({
             </div>
             <Button
               type="button"
-              variant="destructive"
+              variant="outline-destructive"
               size="icon-sm"
               className="absolute right-2 top-2 opacity-0 transition-opacity group-hover:opacity-100"
               onClick={(e) => {

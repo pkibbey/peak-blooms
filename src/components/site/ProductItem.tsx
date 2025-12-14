@@ -114,7 +114,7 @@ export function ProductItem({
       </Link>
 
       {/* Product Details */}
-      <div className="flex flex-1 flex-col p-4">
+      <div className="flex flex-1 flex-col px-4 py-3">
         <div className="flex justify-between items-start">
           <div>
             <Link
@@ -142,7 +142,7 @@ export function ProductItem({
           <div className="flex flex-col items-end justify-end gap-2">
             <p className="text-xl font-medium text-foreground">{formatPrice(lineTotal)}</p>
             {showQuantityControl ? (
-              <div className="flex flex-col items-end gap-2">
+              <div className="flex flex-col items-end gap-4">
                 <QuantityStepper
                   size="sm"
                   value={quantity}
@@ -152,12 +152,11 @@ export function ProductItem({
                 />
                 {onRemove && (
                   <Button
-                    variant="outline"
+                    variant="outline-destructive"
                     size="sm"
                     onClick={onRemove}
                     disabled={isUpdating}
                     aria-label={`Remove ${product.name} from cart`}
-                    className="border-destructive text-gray-600 hover:bg-destructive hover:text-destructive"
                   >
                     <IconTrash className="h-4 w-4 mr-1" />
                     Remove

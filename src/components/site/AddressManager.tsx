@@ -43,6 +43,7 @@ export default function AddressManager({ addresses }: AddressManagerProps) {
       state: address.state,
       zip: address.zip,
       country: address.country,
+      phone: address.phone,
     })
     setSetAsDefault(address.isDefault)
     setIsAdding(true)
@@ -119,6 +120,7 @@ export default function AddressManager({ addresses }: AddressManagerProps) {
                       <p className="text-sm">
                         {defaultAddress.city}, {defaultAddress.state} {defaultAddress.zip}
                       </p>
+                      <p className="text-sm font-medium mt-2">{defaultAddress.phone}</p>
                     </div>
                     <Button variant="ghost" size="sm" onClick={() => handleEdit(defaultAddress)}>
                       Edit

@@ -289,7 +289,7 @@ export default function InspirationForm({ products, inspiration }: InspirationFo
           {isEditing && (
             <Button
               type="button"
-              variant="destructive"
+              variant="outline-destructive"
               onClick={handleDelete}
               disabled={isDeleting}
             >

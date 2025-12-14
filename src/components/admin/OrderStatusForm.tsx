@@ -9,6 +9,7 @@ import {
   Select,
   SelectContent,
   SelectItem,
+  SelectPositioner,
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
@@ -72,13 +73,15 @@ export default function OrderStatusForm({ orderId, currentStatus }: OrderStatusF
           <SelectTrigger id="status" className="w-full">
             <SelectValue placeholder="Select status" />
           </SelectTrigger>
-          <SelectContent>
-            {statusOptions.map((option) => (
-              <SelectItem key={option.value} value={option.value}>
-                {option.label}
-              </SelectItem>
-            ))}
-          </SelectContent>
+          <SelectPositioner alignItemWithTrigger>
+            <SelectContent>
+              {statusOptions.map((option) => (
+                <SelectItem key={option.value} value={option.value}>
+                  {option.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </SelectPositioner>
         </Select>
       </div>
       <Button type="submit" disabled={isSubmitting || status === currentStatus}>

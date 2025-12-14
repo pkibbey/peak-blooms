@@ -256,9 +256,9 @@ export default function Cart({ initialCart }: CartProps) {
             />
             <div className="mt-3">
               <Button
-                variant="ghost"
+                variant="outline-destructive"
                 size="sm"
-                className="w-full text-destructive"
+                className="w-full"
                 onClick={emptyCart}
                 disabled={isEmptying}
               >

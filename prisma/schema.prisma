@@ -21,7 +21,6 @@ model User {
   approved        Boolean       @default(false)
   role            Role          @default(CUSTOMER)
   priceMultiplier Float         @default(1.0)
-  phone           String?
   
   accounts       Account[]
   sessions       Session[]
@@ -94,6 +93,7 @@ model Address {
   state          String
   zip            String
   country        String   @default("US")
+  phone          String   @default("")
   isDefault      Boolean  @default(false)
   createdAt      DateTime @default(now())
   user           User?    @relation(fields: [userId], references: [id], onDelete: Cascade)

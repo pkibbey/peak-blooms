@@ -71,7 +71,7 @@ export function QuantityStepper({
       <Button
         type="button"
         variant="outline"
-        size="icon-sm"
+        size={size === "xs" ? "icon-xs" : "icon-sm"}
         onClick={handleDecrement}
         disabled={disabled || value <= min}
         aria-label="Decrease quantity"
@@ -90,7 +90,7 @@ export function QuantityStepper({
       <Button
         type="button"
         variant="outline"
-        size="icon-sm"
+        size={size === "xs" ? "icon-xs" : "icon-sm"}
         onClick={handleIncrement}
         disabled={disabled || value >= max}
         aria-label="Increase quantity"

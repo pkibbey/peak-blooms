@@ -10,7 +10,7 @@ import { adjustPrice } from "./utils"
  *
  * Better Auth provides user data directly in the session with custom fields
  */
-export const getCurrentUser = cache(async () => {
+export const getCurrentUser = cache(async (): Promise<CartUser | null> => {
   const session = await getSession()
 
   if (!session?.user?.email) {
@@ -22,7 +22,6 @@ export const getCurrentUser = cache(async () => {
     id: session.user.id,
     email: session.user.email,
     name: session.user.name ?? null,
-    phone: (session.user.phone as string | null | undefined) ?? null,
     role: (session.user.role as "CUSTOMER" | "ADMIN") ?? "CUSTOMER",
     approved: (session.user.approved as boolean) ?? false,
     priceMultiplier: (session.user.priceMultiplier as number) ?? 1.0,
@@ -109,6 +108,7 @@ export async function getOrCreateCart(existingUser?: CartUser | null) {
         state: "",
         zip: "",
         country: "US",
+        phone: "",
       },
     })
 
@@ -119,7 +119,6 @@ export async function getOrCreateCart(existingUser?: CartUser | null) {
         status: "CART",
         total: 0,
         email: user.email,
-        phone: user.phone ?? undefined,
         notes: null,
         deliveryAddressId: tempAddress.id,
       },

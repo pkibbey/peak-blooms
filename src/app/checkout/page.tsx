@@ -65,7 +65,6 @@ export default async function CheckoutPage() {
         cart={{ ...cart, total }}
         savedAddresses={savedAddresses}
         userEmail={user.email || ""}
-        userPhone={user.phone}
       />
     </div>
   )

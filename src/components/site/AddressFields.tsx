@@ -3,6 +3,7 @@
 import { useFormContext } from "react-hook-form"
 import { FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
+import { formatPhoneNumber } from "@/lib/phone"
 
 interface AddressFieldsProps {
   fieldPrefix?: string
@@ -67,6 +68,32 @@ export default function AddressFields({ fieldPrefix = "", disabled = false }: Ad
             <FormLabel>Company *</FormLabel>
             <FormControl>
               <Input {...field} placeholder="Company name" disabled={disabled} />
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
+
+      <FormField
+        control={control}
+        name={fieldName("phone")}
+        render={({ field }) => (
+          <FormItem>
+            <FormLabel>Phone *</FormLabel>
+            <FormControl>
+              <Input
+                {...field}
+                type="tel"
+                placeholder="(555) 123-4567"
+                disabled={disabled}
+                onBlur={(e) => {
+                  if (e.target.value) {
+                    const formatted = formatPhoneNumber(e.target.value)
+                    field.onChange(formatted)
+                  }
+                  field.onBlur()
+                }}
+              />
             </FormControl>
             <FormMessage />
           </FormItem>

@@ -1,7 +1,7 @@
 import Image from "next/image"
 import Link from "next/link"
-import { toast } from "sonner"
 import NavLink from "@/components/site/NavLink"
+import SignOutButton from "@/components/site/SignOutButton"
 import UserMenu from "@/components/site/UserMenu"
 import {
   IconMenu,
@@ -10,7 +10,6 @@ import {
   IconShoppingCart,
   IconUser,
 } from "@/components/ui/icons"
-import { signOut } from "@/lib/auth-client"
 import { Badge } from "../ui/badge"
 import { Button } from "../ui/button"
 import NavSearch from "./NavSearch"
@@ -136,21 +135,7 @@ export default async function Nav({ user, cartCount = 0 }: NavProps) {
                     Admin Dashboard
                   </NavLink>
                 )}
-                <Button
-                  variant="ghost"
-                  onClick={async () => {
-                    await signOut({
-                      fetchOptions: {
-                        onSuccess: () => {
-                          toast.success("Signed out successfully")
-                        },
-                      },
-                    })
-                  }}
-                  className="text-destructive"
-                >
-                  Sign Out
-                </Button>
+                <SignOutButton />
               </>
             ) : (
               <>

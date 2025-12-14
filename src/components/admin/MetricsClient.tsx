@@ -95,7 +95,7 @@ export default function MetricsClient({ types }: MetricsClientProps) {
   return (
     <div className="space-y-6">
       <div className="flex gap-3">
-        <Button onClick={handleClearMetrics} disabled={isClearing} variant="destructive">
+        <Button onClick={handleClearMetrics} disabled={isClearing} variant="outline-destructive">
           {isClearing ? "Clearing..." : "Clear Metrics"}
         </Button>
       </div>

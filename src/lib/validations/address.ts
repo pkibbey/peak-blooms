@@ -1,4 +1,5 @@
 import { z } from "zod"
+import { isValidPhoneNumber } from "@/lib/phone"
 
 export const addressSchema = z.object({
   firstName: z.string().min(1, "First name is required"),
@@ -10,6 +11,7 @@ export const addressSchema = z.object({
   state: z.string().min(1, "State is required"),
   zip: z.string().min(1, "ZIP code is required"),
   country: z.string(),
+  phone: z.string().refine(isValidPhoneNumber, "Please enter a valid phone number"),
 })
 
 export type AddressFormData = z.infer<typeof addressSchema>
@@ -24,4 +26,5 @@ export const emptyAddress: AddressFormData = {
   state: "",
   zip: "",
   country: "US",
+  phone: "",
 }

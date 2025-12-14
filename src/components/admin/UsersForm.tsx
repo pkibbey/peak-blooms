@@ -19,6 +19,7 @@ import {
   Select,
   SelectContent,
   SelectItem,
+  SelectPositioner,
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
@@ -137,11 +138,13 @@ export function UsersForm() {
                     <SelectValue />
                   </SelectTrigger>
                 </FormControl>
-                <SelectContent>
-                  <SelectItem value="CUSTOMER">Customer</SelectItem>
-                  <SelectItem value="ADMIN">Admin</SelectItem>
-                  <SelectItem value="SUBSCRIBER">Subscriber</SelectItem>
-                </SelectContent>
+                <SelectPositioner alignItemWithTrigger>
+                  <SelectContent>
+                    <SelectItem value="CUSTOMER">Customer</SelectItem>
+                    <SelectItem value="ADMIN">Admin</SelectItem>
+                    <SelectItem value="SUBSCRIBER">Subscriber</SelectItem>
+                  </SelectContent>
+                </SelectPositioner>
               </Select>
               <FormMessage />
             </FormItem>

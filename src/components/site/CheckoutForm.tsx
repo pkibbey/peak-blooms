@@ -22,11 +22,11 @@ import {
   Select,
   SelectContent,
   SelectItem,
+  SelectPositioner,
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
-import { formatPhoneNumber } from "@/lib/phone"
 import { formatPrice } from "@/lib/utils"
 import { emptyAddress } from "@/lib/validations/address"
 import { type CheckoutFormData, checkoutSchema } from "@/lib/validations/checkout"
@@ -62,21 +62,16 @@ interface SavedAddress {
   state: string
   zip: string
   country: string
+  phone: string
 }
 
 interface CheckoutFormProps {
   cart: CartData
   savedAddresses: SavedAddress[]
   userEmail: string
-  userPhone?: string | null
 }
 
-export default function CheckoutForm({
-  cart,
-  savedAddresses,
-  userEmail,
-  userPhone,
-}: CheckoutFormProps) {
+export default function CheckoutForm({ cart, savedAddresses, userEmail }: CheckoutFormProps) {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [selectedAddressId, setSelectedAddressId] = useState<string>(
     savedAddresses.length > 0 ? savedAddresses[0].id : "new"
@@ -95,6 +90,7 @@ export default function CheckoutForm({
         state: addr.state,
         zip: addr.zip,
         country: addr.country,
+        phone: addr.phone,
       }
     }
     return emptyAddress
@@ -104,7 +100,6 @@ export default function CheckoutForm({
     resolver: zodResolver(checkoutSchema),
     defaultValues: {
       email: userEmail,
-      phone: userPhone || "",
       notes: "",
       selectedAddressId: selectedAddressId,
       deliveryAddress: getInitialDeliveryAddress(),
@@ -134,6 +129,7 @@ export default function CheckoutForm({
           state: addr.state,
           zip: addr.zip,
           country: addr.country,
+          phone: addr.phone,
         })
       }
     }
@@ -154,7 +150,8 @@ export default function CheckoutForm({
         saved.city === currentAddress.city &&
         saved.state === currentAddress.state &&
         saved.zip === currentAddress.zip &&
-        saved.country === currentAddress.country
+        saved.country === currentAddress.country &&
+        saved.phone === currentAddress.phone
       )
     })
 
@@ -187,7 +184,8 @@ export default function CheckoutForm({
             saved.city === data.deliveryAddress.city &&
             saved.state === data.deliveryAddress.state &&
             saved.zip === data.deliveryAddress.zip &&
-            saved.country === data.deliveryAddress.country
+            saved.country === data.deliveryAddress.country &&
+            saved.phone === data.deliveryAddress.phone
           )
         })
         shouldSaveAddress = !isDuplicate
@@ -201,7 +199,6 @@ export default function CheckoutForm({
           deliveryAddress: selectedAddressId === "new" ? data.deliveryAddress : null,
           saveDeliveryAddress: shouldSaveAddress,
           email: data.email,
-          phone: data.phone?.trim() || null,
           notes: data.notes?.trim() || null,
         }),
       })
@@ -249,45 +246,19 @@ export default function CheckoutForm({
           {/* Contact Information */}
           <div className="bg-background rounded-xs shadow-sm border p-6">
             <h2 className="heading-3 mb-4">Contact Information</h2>
-            <div className="grid gap-4 md:grid-cols-2">
-              <FormField
-                control={form.control}
-                name="email"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Email *</FormLabel>
-                    <FormControl>
-                      <Input {...field} type="email" placeholder="your@email.com" />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="phone"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Phone</FormLabel>
-                    <FormControl>
-                      <Input
-                        {...field}
-                        type="tel"
-                        placeholder="(555) 123-4567"
-                        onBlur={(e) => {
-                          if (e.target.value) {
-                            const formatted = formatPhoneNumber(e.target.value)
-                            field.onChange(formatted)
-                          }
-                          field.onBlur()
-                        }}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
+            <FormField
+              control={form.control}
+              name="email"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Email *</FormLabel>
+                  <FormControl>
+                    <Input {...field} type="email" placeholder="your@email.com" />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
           </div>
 
           {/* Delivery Address */}
@@ -307,14 +278,16 @@ export default function CheckoutForm({
                           <SelectValue placeholder="Select an address" />
                         </SelectTrigger>
                       </FormControl>
-                      <SelectContent>
-                        {savedAddresses.map((addr) => (
-                          <SelectItem key={addr.id} value={addr.id}>
-                            {formatAddressPreview(addr)}
-                          </SelectItem>
-                        ))}
-                        <SelectItem value="new">Enter a new address</SelectItem>
-                      </SelectContent>
+                      <SelectPositioner alignItemWithTrigger>
+                        <SelectContent>
+                          {savedAddresses.map((addr) => (
+                            <SelectItem key={addr.id} value={addr.id}>
+                              {formatAddressPreview(addr)}
+                            </SelectItem>
+                          ))}
+                          <SelectItem value="new">Enter a new address</SelectItem>
+                        </SelectContent>
+                      </SelectPositioner>
                     </Select>
                     <FormMessage />
                   </FormItem>

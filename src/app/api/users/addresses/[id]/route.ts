@@ -50,9 +50,36 @@ export async function PATCH(request: Request, { params }: RouteParams) {
       return NextResponse.json({ error: "Address not found" }, { status: 404 })
     }
 
+    // Check if address is used in any orders with status beyond PENDING
+    // CART and PENDING orders can be edited, but once past PENDING, locked
+    const lockedOrder = await db.order.findFirst({
+      where: {
+        deliveryAddressId: id,
+        status: { notIn: ["CART", "PENDING"] },
+      },
+    })
+
+    if (lockedOrder) {
+      return NextResponse.json(
+        { error: "Cannot modify address associated with confirmed orders" },
+        { status: 403 }
+      )
+    }
+
     const body = await request.json()
-    const { firstName, lastName, company, street1, street2, city, state, zip, country, isDefault } =
-      body
+    const {
+      firstName,
+      lastName,
+      company,
+      street1,
+      street2,
+      city,
+      state,
+      zip,
+      country,
+      phone,
+      isDefault,
+    } = body
 
     // If this address is being set as default, clear other defaults first
     if (isDefault === true) {
@@ -74,6 +101,7 @@ export async function PATCH(request: Request, { params }: RouteParams) {
         ...(state !== undefined && { state }),
         ...(zip !== undefined && { zip }),
         ...(country !== undefined && { country }),
+        ...(phone !== undefined && { phone }),
         ...(isDefault !== undefined && { isDefault }),
       },
     })

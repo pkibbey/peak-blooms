@@ -1427,8 +1427,7 @@ export const UserScalarFieldEnum = {
   updatedAt: 'updatedAt',
   approved: 'approved',
   role: 'role',
-  priceMultiplier: 'priceMultiplier',
-  phone: 'phone'
+  priceMultiplier: 'priceMultiplier'
 } as const
 
 export type UserScalarFieldEnum = (typeof UserScalarFieldEnum)[keyof typeof UserScalarFieldEnum]
@@ -1492,6 +1491,7 @@ export const AddressScalarFieldEnum = {
   state: 'state',
   zip: 'zip',
   country: 'country',
+  phone: 'phone',
   isDefault: 'isDefault',
   createdAt: 'createdAt'
 } as const

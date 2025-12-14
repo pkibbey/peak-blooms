@@ -18,6 +18,7 @@ export interface Address {
   state: string
   zip: string
   country: string
+  phone: string
   isDefault: boolean
 }
 
@@ -101,6 +102,7 @@ export default function AddressCard({ address, onEdit }: AddressCardProps) {
             {address.city}, {address.state} {address.zip}
           </p>
           <p className="text-sm text-muted-foreground">{address.country}</p>
+          <p className="text-sm text-muted-foreground font-medium mt-2">{address.phone}</p>
         </div>
 
         <div className="flex flex-col gap-2">
