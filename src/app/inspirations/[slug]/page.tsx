@@ -88,11 +88,11 @@ export default async function InspirationDetailPage({ params }: InspirationDetai
             Adjust quantities as needed—these are suggested amounts based on the inspiration
           </p>
 
-          <InspirationProductTable
+          {/* <InspirationProductTable
             products={productsWithVariants}
             setName={inspiration.name}
             user={user}
-          />
+          /> */}
         </div>
       </div>
     </div>

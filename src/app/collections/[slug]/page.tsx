@@ -58,14 +58,14 @@ export default async function CollectionDetailPage({ params }: CollectionDetailP
               </div>
             ) : (
               <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
-                {collection.productCollections.map((pc) => (
+                {/* {collection.productCollections.map((pc) => (
                   <ProductItem
                     key={pc.product.slug}
                     product={pc.product}
                     user={user}
                     layout="grid"
                   />
-                ))}
+                ))} */}
               </div>
             )}
           </div>

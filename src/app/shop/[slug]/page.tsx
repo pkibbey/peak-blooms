@@ -97,7 +97,7 @@ export default async function ProductDetailPage({ params }: ProductDetailPagePro
                 <ColorsMiniDisplay colorIds={product.colors} size="md" />
               </div>
               {/* Product Controls */}
-              <ProductControls product={product} user={user} mode="detail" />
+              {/* <ProductControls product={product} user={user} mode="detail" /> */}
             </div>
           </div>
 

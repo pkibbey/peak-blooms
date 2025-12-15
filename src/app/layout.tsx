@@ -59,7 +59,7 @@ export default async function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} ${playfairDisplay.variable} ${raleway.variable} antialiased`}
       >
-        <Nav user={user} cartCount={cartCount} />
+        {/* <Nav user={user} cartCount={cartCount} /> */}
 
         <main id="content">{children}</main>
 

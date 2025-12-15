@@ -126,7 +126,7 @@ export async function POST(request: Request) {
         status: "CART",
         total: Math.round(totalPrice * 100) / 100,
         email: email || customer.email,
-        phone: phone || customer.phone,
+        phone: phone,
         notes: notes || null,
         deliveryAddressId: finalDeliveryAddressId,
         items: {

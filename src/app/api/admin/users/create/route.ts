@@ -42,7 +42,6 @@ export async function POST(request: NextRequest) {
         data: {
           email: data.email,
           name: data.name,
-          phone: data.phone,
           role: data.role,
           priceMultiplier: data.priceMultiplier,
           emailVerified: true,
