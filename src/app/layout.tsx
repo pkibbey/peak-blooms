@@ -35,26 +35,13 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode
 }>) {
-  const user = await getCurrentUser()
-
-  // Fetch cart count for approved users (count of unique items, not total quantity)
-  let cartCount = 0
-  if (user?.approved) {
-    const cart = await getOrCreateCart(user)
-    if (cart?.items) {
-      cartCount = cart.items.length
-    }
-  }
-
   return (
     <html lang="en">
       <body
         className={`${geistSans.variable} ${geistMono.variable} ${playfairDisplay.variable} ${raleway.variable} antialiased`}
       >
-        {/* <Nav user={user} cartCount={cartCount} /> */}
-
+        <Nav />
         <main id="content">{children}</main>
-
         <NewsletterBanner />
         <Footer />
         <Toaster position="bottom-center" richColors />

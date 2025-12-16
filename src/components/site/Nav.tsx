@@ -2,7 +2,7 @@ import Image from "next/image"
 import Link from "next/link"
 import NavLink from "@/components/site/NavLink"
 import SignOutButton from "@/components/site/SignOutButton"
-import UserMenu from "@/components/site/UserMenu"
+// import UserMenu from "@/components/site/UserMenu"
 import {
   IconMenu,
   IconSearch,
@@ -10,10 +10,12 @@ import {
   IconShoppingCart,
   IconUser,
 } from "@/components/ui/icons"
+import { getCurrentUser, getOrCreateCart } from "@/lib/current-user"
 import { Badge } from "../ui/badge"
 import { Button } from "../ui/button"
 import NavSearch from "./NavSearch"
 import SignInWithGoogle from "./SignInWithGoogle"
+import UserMenu from "./UserMenu"
 
 const links = [
   { label: "Shop", href: "/shop" },
@@ -21,18 +23,18 @@ const links = [
   { label: "Inspirations", href: "/inspirations" },
 ]
 
-interface NavProps {
-  user: {
-    role: "CUSTOMER" | "ADMIN"
-    approved: boolean
-    email: string | null
-    name?: string | null
-  } | null
-  cartCount?: number
-}
-
-export default async function Nav({ user, cartCount = 0 }: NavProps) {
+export default async function Nav() {
+  const user = await getCurrentUser()
   const isApproved = user?.approved === true
+
+  // Fetch cart count for approved users (count of unique items, not total quantity)
+  let cartCount = 0
+  if (isApproved) {
+    const cart = await getOrCreateCart(user)
+    if (cart?.items) {
+      cartCount = cart.items.length
+    }
+  }
 
   return (
     <header className="sticky top-0 z-50 w-full bg-background/70 backdrop-blur-sm border-b border-b-border">
@@ -91,7 +93,7 @@ export default async function Nav({ user, cartCount = 0 }: NavProps) {
             )}
 
             {/* Consolidated user/account/admin menu */}
-            {/* <UserMenu user={user} /> */}
+            <UserMenu user={user} />
 
             <Button size="icon" className="md:hidden" variant="default">
               {<IconMenu aria-hidden="true" />}
@@ -140,14 +142,9 @@ export default async function Nav({ user, cartCount = 0 }: NavProps) {
             ) : (
               <>
                 <SignInWithGoogle />
-                <Button
-                  nativeButton={false}
-                  render={
-                    <Link prefetch={false} href="/auth/signup" className="px-4 py-2">
-                      Sign Up
-                    </Link>
-                  }
-                />
+                <NavLink href="/auth/signup" className="px-4 py-2">
+                  Sign Up
+                </NavLink>
               </>
             )}
           </div>
