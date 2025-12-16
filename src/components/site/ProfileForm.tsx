@@ -14,14 +14,11 @@ import {
   FormMessage,
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
+import type { SessionUser } from "@/lib/types/prisma"
 import { type ProfileFormData, profileSchema } from "@/lib/validations/auth"
 
 interface ProfileFormProps {
-  user: {
-    id: string
-    name: string | null
-    email: string
-  }
+  user: SessionUser
 }
 
 export default function ProfileForm({ user }: ProfileFormProps) {

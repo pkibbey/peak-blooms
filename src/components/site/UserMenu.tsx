@@ -21,14 +21,10 @@ import {
   IconUser,
 } from "@/components/ui/icons"
 import { authClient, signOut } from "@/lib/auth-client"
+import type { SessionUser } from "@/lib/types/prisma"
 
 interface UserMenuProps {
-  user: {
-    role: "CUSTOMER" | "ADMIN"
-    approved: boolean
-    email: string | null
-    name?: string | null
-  } | null
+  user: SessionUser | null
 }
 
 export default function UserMenu({ user }: UserMenuProps) {

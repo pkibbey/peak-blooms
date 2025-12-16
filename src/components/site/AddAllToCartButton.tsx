@@ -6,12 +6,13 @@ import { useState } from "react"
 import { toast } from "sonner"
 import { Button } from "@/components/ui/button"
 import { useSession } from "@/lib/auth-client"
+import type { SessionUser } from "@/lib/types/prisma"
 
 interface AddAllToCartButtonProps {
   productIds: string[]
   quantities?: number[]
   setName?: string
-  user?: { approved: boolean } | null
+  user?: SessionUser | null
 }
 
 export default function AddAllToCartButton({

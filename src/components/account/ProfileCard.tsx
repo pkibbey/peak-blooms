@@ -1,12 +1,8 @@
 import ProfileForm from "@/components/site/ProfileForm"
+import type { SessionUser } from "@/lib/types/prisma"
 
 interface ProfileCardProps {
-  user: {
-    id: string
-    name: string | null
-    email: string
-    phone?: string | null
-  }
+  user: SessionUser
 }
 
 export default function ProfileCard({ user }: ProfileCardProps) {

@@ -91,7 +91,7 @@ export default async function Nav({ user, cartCount = 0 }: NavProps) {
             )}
 
             {/* Consolidated user/account/admin menu */}
-            <UserMenu user={user} />
+            {/* <UserMenu user={user} /> */}
 
             <Button size="icon" className="md:hidden" variant="default">
               {<IconMenu aria-hidden="true" />}

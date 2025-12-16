@@ -25,7 +25,7 @@ export type {
 // =============================================================================
 
 /** Minimal user data for cart operations (from getCurrentUser) */
-export interface CartUser {
+export interface SessionUser {
   id: string
   priceMultiplier: number
   email: string

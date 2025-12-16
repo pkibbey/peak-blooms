@@ -5,6 +5,7 @@ import { useState } from "react"
 import AddToCartButton from "@/components/site/AddToCartButton"
 import { Button } from "@/components/ui/button"
 import { QuantityStepper } from "@/components/ui/QuantityStepper"
+import type { SessionUser } from "@/lib/types/prisma"
 import { cn, formatPrice } from "@/lib/utils"
 
 interface Product {
@@ -15,9 +16,7 @@ interface Product {
 
 interface ProductControlsProps {
   product: Product
-  user?: {
-    approved: boolean
-  } | null
+  user?: SessionUser | null
   mode?: "card" | "detail"
 }
 

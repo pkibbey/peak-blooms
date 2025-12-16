@@ -8,6 +8,7 @@ import { ColorsMiniDisplay } from "@/components/ui/ColorsMiniDisplay"
 import { IconTrash } from "@/components/ui/icons"
 import { QuantityStepper } from "@/components/ui/QuantityStepper"
 import type { ProductModel } from "@/generated/models"
+import type { SessionUser } from "@/lib/types/prisma"
 import { formatPrice } from "@/lib/utils"
 
 interface ProductItemProps {
@@ -17,9 +18,7 @@ interface ProductItemProps {
   imageSize?: "xs" | "sm" | "md"
   showQuantityControl?: boolean
   showSimilarLink?: boolean
-  user?: {
-    approved: boolean
-  } | null
+  user?: SessionUser | null
   onQuantityChange?: (newQuantity: number) => void
   onRemove?: () => void
   isUpdating?: boolean

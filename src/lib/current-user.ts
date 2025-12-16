@@ -1,7 +1,7 @@
 import { cache } from "react"
 import { getSession } from "./auth"
 import { db } from "./db"
-import type { CartUser } from "./types/prisma"
+import type { SessionUser } from "./types/prisma"
 import { adjustPrice } from "./utils"
 
 /**
@@ -10,7 +10,7 @@ import { adjustPrice } from "./utils"
  *
  * Better Auth provides user data directly in the session with custom fields
  */
-export const getCurrentUser = cache(async (): Promise<CartUser | null> => {
+export const getCurrentUser = cache(async (): Promise<SessionUser | null> => {
   const session = await getSession()
 
   if (!session?.user?.email) {
@@ -50,14 +50,9 @@ function applyPriceMultiplierToCartItems<
  * Returns cart with prices adjusted by user's price multiplier
  * A cart is an Order with status = 'CART'
  *
- * @param existingUser - Optional: pass the user if you already have it to avoid redundant DB call
+ * @param user - pass the user if you already have it to avoid redundant DB call
  */
-export async function getOrCreateCart(existingUser?: CartUser | null) {
-  const user = existingUser ?? (await getCurrentUser())
-  if (!user) {
-    return null
-  }
-
+export async function getOrCreateCart(user: SessionUser) {
   let cart = await db.order.findFirst({
     where: { userId: user.id, status: "CART" },
     include: {

@@ -4,6 +4,7 @@ import { useState } from "react"
 import AddAllToCartButton from "@/components/site/AddAllToCartButton"
 import { ProductItem } from "@/components/site/ProductItem"
 import type { ProductType } from "@/generated/enums"
+import type { SessionUser } from "@/lib/types/prisma"
 
 interface Product {
   id: string
@@ -23,7 +24,7 @@ interface Product {
 interface InspirationProductTableProps {
   products: Product[]
   setName: string
-  user?: { approved: boolean } | null
+  user?: SessionUser | null
 }
 
 export function InspirationProductTable({ products, setName, user }: InspirationProductTableProps) {

@@ -35,20 +35,12 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode
 }>) {
-  const currentUser = await getCurrentUser()
-  const user = currentUser
-    ? {
-        role: currentUser.role,
-        approved: currentUser.approved,
-        email: currentUser.email,
-        name: currentUser.name,
-      }
-    : null
+  const user = await getCurrentUser()
 
   // Fetch cart count for approved users (count of unique items, not total quantity)
   let cartCount = 0
-  if (currentUser?.approved) {
-    const cart = await getOrCreateCart(currentUser)
+  if (user?.approved) {
+    const cart = await getOrCreateCart(user)
     if (cart?.items) {
       cartCount = cart.items.length
     }
