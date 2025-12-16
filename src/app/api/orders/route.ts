@@ -77,8 +77,7 @@ export async function POST(request: Request) {
       )
     }
 
-    const { deliveryAddressId, deliveryAddress, saveDeliveryAddress, email, notes } =
-      validationResult.data
+    const { deliveryAddressId, deliveryAddress, saveDeliveryAddress, notes } = validationResult.data
 
     // Get user's cart (CART order)
     const cart = await db.order.findFirst({
@@ -103,12 +102,11 @@ export async function POST(request: Request) {
       return sum + adjustedPrice * item.quantity
     }, 0)
 
-    // Handle delivery address and extract phone
+    // Handle delivery address
     let finalDeliveryAddressId: string
-    let phoneSnapshot: string
 
     if (deliveryAddressId) {
-      // Using existing address - verify it belongs to user and get phone
+      // Using existing address - verify it belongs to user
       const existingAddress = await db.address.findFirst({
         where: {
           id: deliveryAddressId,
@@ -121,9 +119,8 @@ export async function POST(request: Request) {
       }
 
       finalDeliveryAddressId = deliveryAddressId
-      phoneSnapshot = existingAddress.phone
     } else if (deliveryAddress) {
-      // Creating new address - phone is part of deliveryAddress
+      // Creating new address
       const newAddress = await db.address.create({
         data: {
           userId: saveDeliveryAddress ? user.id : null,
@@ -136,12 +133,12 @@ export async function POST(request: Request) {
           state: deliveryAddress.state,
           zip: deliveryAddress.zip,
           country: deliveryAddress.country || "US",
+          email: deliveryAddress.email,
           phone: deliveryAddress.phone,
         },
       })
 
       finalDeliveryAddressId = newAddress.id
-      phoneSnapshot = deliveryAddress.phone
     } else {
       return NextResponse.json({ error: "Delivery address is required" }, { status: 400 })
     }
@@ -152,8 +149,6 @@ export async function POST(request: Request) {
       data: {
         status: "PENDING",
         total: Math.round(total * 100) / 100,
-        email,
-        phone: phoneSnapshot,
         notes: notes || null,
         deliveryAddressId: finalDeliveryAddressId,
       },

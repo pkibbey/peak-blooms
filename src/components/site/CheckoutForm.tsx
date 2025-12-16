@@ -17,7 +17,6 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form"
-import { Input } from "@/components/ui/input"
 import {
   Select,
   SelectContent,
@@ -62,16 +61,16 @@ interface SavedAddress {
   state: string
   zip: string
   country: string
+  email: string
   phone: string
 }
 
 interface CheckoutFormProps {
   cart: CartData
   savedAddresses: SavedAddress[]
-  userEmail: string
 }
 
-export default function CheckoutForm({ cart, savedAddresses, userEmail }: CheckoutFormProps) {
+export default function CheckoutForm({ cart, savedAddresses }: CheckoutFormProps) {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [selectedAddressId, setSelectedAddressId] = useState<string>(
     savedAddresses.length > 0 ? savedAddresses[0].id : "new"
@@ -90,6 +89,7 @@ export default function CheckoutForm({ cart, savedAddresses, userEmail }: Checko
         state: addr.state,
         zip: addr.zip,
         country: addr.country,
+        email: addr.email,
         phone: addr.phone,
       }
     }
@@ -99,7 +99,6 @@ export default function CheckoutForm({ cart, savedAddresses, userEmail }: Checko
   const form = useForm<CheckoutFormData>({
     resolver: zodResolver(checkoutSchema),
     defaultValues: {
-      email: userEmail,
       notes: "",
       selectedAddressId: selectedAddressId,
       deliveryAddress: getInitialDeliveryAddress(),
@@ -129,6 +128,7 @@ export default function CheckoutForm({ cart, savedAddresses, userEmail }: Checko
           state: addr.state,
           zip: addr.zip,
           country: addr.country,
+          email: addr.email,
           phone: addr.phone,
         })
       }
@@ -151,6 +151,7 @@ export default function CheckoutForm({ cart, savedAddresses, userEmail }: Checko
         saved.state === currentAddress.state &&
         saved.zip === currentAddress.zip &&
         saved.country === currentAddress.country &&
+        saved.email === currentAddress.email &&
         saved.phone === currentAddress.phone
       )
     })
@@ -185,6 +186,7 @@ export default function CheckoutForm({ cart, savedAddresses, userEmail }: Checko
             saved.state === data.deliveryAddress.state &&
             saved.zip === data.deliveryAddress.zip &&
             saved.country === data.deliveryAddress.country &&
+            saved.email === data.deliveryAddress.email &&
             saved.phone === data.deliveryAddress.phone
           )
         })
@@ -198,7 +200,6 @@ export default function CheckoutForm({ cart, savedAddresses, userEmail }: Checko
           deliveryAddressId: selectedAddressId !== "new" ? selectedAddressId : null,
           deliveryAddress: selectedAddressId === "new" ? data.deliveryAddress : null,
           saveDeliveryAddress: shouldSaveAddress,
-          email: data.email,
           notes: data.notes?.trim() || null,
         }),
       })
@@ -243,24 +244,6 @@ export default function CheckoutForm({ cart, savedAddresses, userEmail }: Checko
             </div>
           )}
 
-          {/* Contact Information */}
-          <div className="bg-background rounded-xs shadow-sm border p-6">
-            <h2 className="heading-3 mb-4">Contact Information</h2>
-            <FormField
-              control={form.control}
-              name="email"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Email *</FormLabel>
-                  <FormControl>
-                    <Input {...field} type="email" placeholder="your@email.com" />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          </div>
-
           {/* Delivery Address */}
           <div className="bg-background rounded-xs shadow-sm border p-6">
             <h2 className="heading-3 mb-4 flex items-center gap-2">Delivery Address</h2>
@@ -272,7 +255,14 @@ export default function CheckoutForm({ cart, savedAddresses, userEmail }: Checko
                 render={({ field }) => (
                   <FormItem className="mb-4">
                     <FormLabel>Select Address</FormLabel>
-                    <Select value={field.value} onValueChange={handleAddressSelect}>
+                    <Select
+                      value={field.value}
+                      onValueChange={handleAddressSelect}
+                      items={savedAddresses.map((address) => ({
+                        label: formatAddressPreview(address),
+                        value: address.id,
+                      }))}
+                    >
                       <FormControl>
                         <SelectTrigger className="w-full">
                           <SelectValue placeholder="Select an address" />

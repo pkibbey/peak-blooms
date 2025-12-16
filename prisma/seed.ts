@@ -372,6 +372,7 @@ async function main() {
               state: "OR",
               zip: "97201",
               country: "USA",
+              email: "customer1@example.com",
               phone: "(503) 555-0123",
               isDefault: true,
             },
@@ -386,6 +387,7 @@ async function main() {
               state: "WA",
               zip: "98101",
               country: "USA",
+              email: "customer2@example.com",
               phone: "(206) 555-0456",
               isDefault: false,
             },
@@ -408,7 +410,6 @@ async function main() {
           data: {
             orderNumber: `ORD-${Date.now()}-1`,
             userId: approvedCustomer.id,
-            email: approvedCustomer.email,
             status: "DELIVERED",
             total: order1Total,
             createdAt: order1Date,
@@ -451,7 +452,6 @@ async function main() {
           data: {
             orderNumber: `ORD-${Date.now()}-2`,
             userId: approvedCustomer.id,
-            email: approvedCustomer.email,
             status: "CONFIRMED",
             total: order2Total,
             createdAt: order2Date,

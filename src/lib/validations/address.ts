@@ -11,6 +11,7 @@ export const addressSchema = z.object({
   state: z.string().min(1, "State is required"),
   zip: z.string().min(1, "ZIP code is required"),
   country: z.string(),
+  email: z.string().min(1, "Email is required").email("Please enter a valid email address"),
   phone: z.string().refine(isValidPhoneNumber, "Please enter a valid phone number"),
 })
 
@@ -26,5 +27,6 @@ export const emptyAddress: AddressFormData = {
   state: "",
   zip: "",
   country: "US",
+  email: "",
   phone: "",
 }

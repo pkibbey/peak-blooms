@@ -103,6 +103,7 @@ export async function getOrCreateCart(user: SessionUser) {
         state: "",
         zip: "",
         country: "US",
+        email: user.email,
         phone: "",
       },
     })
@@ -113,7 +114,6 @@ export async function getOrCreateCart(user: SessionUser) {
         userId: user.id,
         status: "CART",
         total: 0,
-        email: user.email,
         notes: null,
         deliveryAddressId: tempAddress.id,
       },

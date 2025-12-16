@@ -30,6 +30,11 @@ export default async function AdminOrdersPage({ searchParams }: AdminOrdersPageP
           name: true,
         },
       },
+      deliveryAddress: {
+        select: {
+          email: true,
+        },
+      },
       _count: {
         select: {
           items: true,

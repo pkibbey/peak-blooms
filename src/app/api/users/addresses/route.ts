@@ -43,12 +43,13 @@ export async function POST(request: Request) {
       state,
       zip,
       country = "US",
+      email,
       phone,
       isDefault = false,
     } = body
 
     // Validate required fields
-    if (!firstName || !lastName || !street1 || !city || !state || !zip || !phone) {
+    if (!firstName || !lastName || !street1 || !city || !state || !zip || !email || !phone) {
       return NextResponse.json({ error: "Missing required fields" }, { status: 400 })
     }
 
@@ -72,6 +73,7 @@ export async function POST(request: Request) {
         state,
         zip,
         country,
+        email,
         phone,
         isDefault,
       },

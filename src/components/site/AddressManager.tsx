@@ -43,6 +43,7 @@ export default function AddressManager({ addresses }: AddressManagerProps) {
       state: address.state,
       zip: address.zip,
       country: address.country,
+      email: address.email,
       phone: address.phone,
     })
     setSetAsDefault(address.isDefault)

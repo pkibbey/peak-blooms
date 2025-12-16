@@ -13,6 +13,7 @@ export function validateAddress(addr: AddressFormData): string | null {
   if (!addr.city.trim()) return "City is required"
   if (!addr.state.trim()) return "State is required"
   if (!addr.zip.trim()) return "ZIP code is required"
+  if (!addr.email.trim()) return "Email is required"
   if (!addr.phone.trim()) return "Phone number is required"
   return null
 }
@@ -65,14 +66,14 @@ export default function AddressForm({
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor={id("company")}>Company {required && "*"}</Label>
+        <Label htmlFor={id("email")}>Email {required && "*"}</Label>
         <Input
-          id={id("company")}
-          type="text"
+          id={id("email")}
+          type="email"
           required={required}
-          value={address.company}
-          onChange={(e) => onChange("company", e.target.value)}
-          placeholder="Company name"
+          value={address.email}
+          onChange={(e) => onChange("email", e.target.value)}
+          placeholder="your@email.com"
           disabled={disabled}
         />
       </div>
@@ -92,6 +93,19 @@ export default function AddressForm({
             }
           }}
           placeholder="(555) 123-4567"
+          disabled={disabled}
+        />
+      </div>
+
+      <div className="space-y-2">
+        <Label htmlFor={id("company")}>Company {required && "*"}</Label>
+        <Input
+          id={id("company")}
+          type="text"
+          required={required}
+          value={address.company}
+          onChange={(e) => onChange("company", e.target.value)}
+          placeholder="Company name"
           disabled={disabled}
         />
       </div>

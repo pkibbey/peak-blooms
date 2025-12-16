@@ -115,12 +115,12 @@ export default async function OrderDetailPage({ params }: OrderDetailPageProps) 
             <div className="text-sm space-y-2">
               <p>
                 <span className="text-muted-foreground">Email:</span>{" "}
-                <span className="font-medium">{order.email}</span>
+                <span className="font-medium">{order.deliveryAddress.email}</span>
               </p>
-              {order.phone && (
+              {order.deliveryAddress.phone && (
                 <p>
                   <span className="text-muted-foreground">Phone:</span>{" "}
-                  <span className="font-medium">{order.phone}</span>
+                  <span className="font-medium">{order.deliveryAddress.phone}</span>
                 </p>
               )}
             </div>

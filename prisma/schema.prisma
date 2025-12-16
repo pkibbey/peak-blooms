@@ -7,7 +7,6 @@ datasource db {
   provider = "postgresql"
 }
 
-// Better Auth Models
 model User {
   id            String         @id @default(cuid())
   email         String         @unique
@@ -80,7 +79,6 @@ model Verification {
   @@index([userId])
 }
 
-// Peak Blooms Models
 model Address {
   id             String   @id @default(cuid())
   userId         String?
@@ -93,6 +91,7 @@ model Address {
   state          String
   zip            String
   country        String   @default("US")
+  email          String
   phone          String   @default("")
   isDefault      Boolean  @default(false)
   createdAt      DateTime @default(now())
@@ -183,8 +182,6 @@ model Order {
   userId            String
   status            OrderStatus @default(CART)
   total             Float
-  email             String
-  phone             String?
   notes             String?
   deliveryAddressId String
   createdAt         DateTime    @default(now())

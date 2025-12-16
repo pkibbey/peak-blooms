@@ -1,6 +1,5 @@
 import Image from "next/image"
-import Link from "next/link"
-import { Button } from "@/components/ui/button"
+import NavLink from "./NavLink"
 
 // Gradient preset class mapping
 // keep as `const` so we can derive a literal union type from the keys
@@ -105,14 +104,9 @@ export default function Hero({
             <h1 className="text-4xl md:text-5xl font-extrabold text-white font-serif">{title}</h1>
             <p className="mt-3 text-lg text-white/80">{subtitle}</p>
             {ctaText && ctaLink && (
-              <Button
-                className="mt-6"
-                render={
-                  <Link prefetch={false} href={ctaLink} className="inline-flex items-center gap-1">
-                    {ctaText}
-                  </Link>
-                }
-              />
+              <NavLink className="mt-6" href={ctaLink} variant="default">
+                {ctaText}
+              </NavLink>
             )}
           </div>
         </div>

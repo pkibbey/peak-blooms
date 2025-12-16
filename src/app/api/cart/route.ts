@@ -86,7 +86,7 @@ export async function POST(request: NextRequest) {
       if (!cartWithItems) {
         return NextResponse.json({ error: "Failed to get cart" }, { status: 500 })
       }
-      cart = { ...cartWithItems, phone: cartWithItems.phone ?? null }
+      cart = cartWithItems
     }
 
     if (!cart) {

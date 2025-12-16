@@ -76,6 +76,20 @@ export default function AddressFields({ fieldPrefix = "", disabled = false }: Ad
 
       <FormField
         control={control}
+        name={fieldName("email")}
+        render={({ field }) => (
+          <FormItem>
+            <FormLabel>Email *</FormLabel>
+            <FormControl>
+              <Input {...field} type="email" placeholder="your@email.com" disabled={disabled} />
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
+
+      <FormField
+        control={control}
         name={fieldName("phone")}
         render={({ field }) => (
           <FormItem>

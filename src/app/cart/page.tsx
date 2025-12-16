@@ -40,8 +40,6 @@ export default async function CartPage() {
         <Cart
           initialCart={{
             id: cart.id,
-            email: cart.email,
-            phone: cart.phone,
             orderNumber: cart.orderNumber,
             status: cart.status,
             notes: cart.notes,

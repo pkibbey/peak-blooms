@@ -156,6 +156,7 @@ export const AddressScalarFieldEnum = {
   state: 'state',
   zip: 'zip',
   country: 'country',
+  email: 'email',
   phone: 'phone',
   isDefault: 'isDefault',
   createdAt: 'createdAt'
@@ -237,8 +238,6 @@ export const OrderScalarFieldEnum = {
   userId: 'userId',
   status: 'status',
   total: 'total',
-  email: 'email',
-  phone: 'phone',
   notes: 'notes',
   deliveryAddressId: 'deliveryAddressId',
   createdAt: 'createdAt',

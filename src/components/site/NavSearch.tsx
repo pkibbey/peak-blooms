@@ -61,7 +61,7 @@ export default function NavSearch() {
             placeholder="Search products..."
             value={searchValue}
             onChange={(e) => setSearchValue(e.target.value)}
-            className="pe-8"
+            className="bg-background/50 pe-8"
           />
           <AutocompleteClear className="absolute right-2 top-1/2 -translate-y-1/2" />
         </div>

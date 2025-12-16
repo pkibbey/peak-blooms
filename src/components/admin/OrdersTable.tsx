@@ -24,9 +24,11 @@ interface Order {
   orderNumber: string
   status: OrderStatus
   total: number
-  email: string
   createdAt: Date
   user: OrderUser
+  deliveryAddress: {
+    email: string
+  }
   _count: {
     items: number
   }
@@ -163,7 +165,9 @@ export default function OrdersTable({ orders, currentStatus, sort, order }: Orde
                     <TableCell>
                       <div>
                         <p className="font-medium">{order.user.name || "—"}</p>
-                        <p className="text-sm text-muted-foreground">{order.email}</p>
+                        <p className="text-sm text-muted-foreground">
+                          {order.deliveryAddress.email}
+                        </p>
                       </div>
                     </TableCell>
                     <TableCell className="hidden md:table-cell text-muted-foreground">

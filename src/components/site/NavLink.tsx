@@ -9,15 +9,23 @@ type NavLinkProps = LinkProps & {
   children: React.ReactNode
   className?: string
   icon?: React.ReactNode
+  variant?: "outline" | "ghost" | "default"
 }
 
-export default function NavLink({ href, children, className, icon, ...props }: NavLinkProps) {
+export default function NavLink({
+  variant = "ghost",
+  href,
+  children,
+  className,
+  icon,
+  ...props
+}: NavLinkProps) {
   const pathname = usePathname()
   const active = typeof href === "string" && pathname === href
 
   return (
     <Button
-      variant="ghost"
+      variant={variant}
       className={cn(
         active
           ? "bg-secondary text-secondary-foreground hover:bg-secondary/80 hover:text-secondary-foreground"

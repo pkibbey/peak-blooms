@@ -85,6 +85,8 @@ export async function POST(request: Request) {
           state: "",
           zip: "",
           country: "US",
+          email: email || customer.email || "",
+          phone: phone || "",
         },
       })
 
@@ -125,8 +127,6 @@ export async function POST(request: Request) {
         userId: userId,
         status: "CART",
         total: Math.round(totalPrice * 100) / 100,
-        email: email || customer.email,
-        phone: phone,
         notes: notes || null,
         deliveryAddressId: finalDeliveryAddressId,
         items: {

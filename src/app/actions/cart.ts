@@ -23,7 +23,6 @@ export interface CartResponse {
   items: CartItemResponse[]
   total: number
   status: string
-  email: string
 }
 
 /**
@@ -112,7 +111,6 @@ export async function addToCartAction(
       })),
       total,
       status: updatedCart.status,
-      email: updatedCart.email,
     }
   } catch (error) {
     console.error("addToCartAction error:", error)
@@ -182,7 +180,6 @@ export async function updateCartItemAction(
       })),
       total,
       status: updatedCart.status,
-      email: updatedCart.email,
     }
   } catch (error) {
     console.error("updateCartItemAction error:", error)
@@ -219,7 +216,6 @@ export async function clearCartAction(): Promise<CartResponse> {
       items: [],
       total: 0,
       status: updatedCart.status,
-      email: updatedCart.email,
     }
   } catch (error) {
     console.error("clearCartAction error:", error)
