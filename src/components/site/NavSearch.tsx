@@ -2,7 +2,8 @@
 
 import Image from "next/image"
 import Link from "next/link"
-import { useEffect, useState } from "react"
+import React, { useTransition } from "react"
+import { searchProducts } from "@/app/actions/search"
 import {
   Autocomplete,
   AutocompleteClear,
@@ -27,33 +28,28 @@ interface ProductHit {
 }
 
 export default function NavSearch() {
-  const [searchValue, setSearchValue] = useState("")
-  const [searchResults, setSearchResults] = useState<ProductHit[]>([])
-  const [isLoading, setIsLoading] = useState(false)
+  const [searchValue, setSearchValue] = React.useState("")
+  const [searchResults, setSearchResults] = React.useState<ProductHit[]>([])
+  const [isPending, startTransition] = useTransition()
 
-  const fetchResults = useDebouncedCallback(async (q: unknown) => {
+  const fetchResults = useDebouncedCallback((q: unknown) => {
     const term = typeof q === "string" ? q.trim() : ""
     if (!term) {
       setSearchResults([])
-      setIsLoading(false)
       return
     }
 
-    setIsLoading(true)
-    try {
-      const res = await fetch(`/api/products?search=${encodeURIComponent(term)}`, {
-        cache: "no-store",
-      })
-      const json = await res.json()
-      setSearchResults(json.products ?? [])
-    } catch {
-      setSearchResults([])
-    } finally {
-      setIsLoading(false)
-    }
+    startTransition(async () => {
+      try {
+        const result = await searchProducts(term)
+        setSearchResults(result.products)
+      } catch {
+        setSearchResults([])
+      }
+    })
   }, 300)
 
-  useEffect(() => {
+  React.useEffect(() => {
     fetchResults(searchValue)
   }, [searchValue, fetchResults])
 
@@ -73,11 +69,11 @@ export default function NavSearch() {
         <AutocompletePositioner sideOffset={6}>
           <AutocompletePopup className="p-0">
             <AutocompleteStatus className="text-center">
-              {isLoading ? "Loading..." : null}
+              {isPending ? "Loading..." : null}
             </AutocompleteStatus>
             <AutocompleteEmpty>No products found</AutocompleteEmpty>
             <AutocompleteList className="not-empty:p-0">
-              {(result: Product) => (
+              {(result: ProductHit) => (
                 <AutocompleteItem key={result.id} value={result.id} className="p-0">
                   <Link
                     href={`/shop/${result.slug}`}

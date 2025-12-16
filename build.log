@@ -1,0 +1,22 @@
+
+> peak-blooms@0.1.0 build
+> next build
+
+   ▲ Next.js 16.0.10 (Turbopack)
+   - Environments: .env.local
+
+   Creating an optimized production build ...
+ ✓ Compiled successfully in 3.3s
+   Running TypeScript ...
+   Collecting page data using 7 workers ...
+   Generating static pages using 7 workers (0/59) ...
+   Generating static pages using 7 workers (14/59) 
+   Generating static pages using 7 workers (29/59) 
+   Generating static pages using 7 workers (44/59) 
+Error occurred prerendering page "/". Read more: https://nextjs.org/docs/messages/prerender-error
+Error: Element type is invalid: expected a string (for built-in components) or a class/function (for composite components) but got: undefined.
+    at ignore-listed frames {
+  digest: '1620082780'
+}
+Export encountered an error on /page: /, exiting the build.
+ ⨯ Next.js build worker exited with code: 1 and signal: null

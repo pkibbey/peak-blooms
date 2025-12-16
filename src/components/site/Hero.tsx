@@ -1,6 +1,5 @@
 import Image from "next/image"
 import Link from "next/link"
-import type { ReactNode } from "react"
 import { Button } from "@/components/ui/button"
 
 // Gradient preset class mapping
@@ -19,7 +18,6 @@ export type GradientPreset = keyof typeof GRADIENT_CLASS_MAP
 interface HeroProps {
   title: string
   subtitle: string
-  cta?: ReactNode
   ctaText?: string | null
   ctaLink?: string | null
   backgroundImage?: string | null
@@ -30,7 +28,6 @@ interface HeroProps {
 export default function Hero({
   title,
   subtitle,
-  cta,
   ctaText,
   ctaLink,
   backgroundImage,
@@ -41,24 +38,6 @@ export default function Hero({
   const gradientClass = gradientPreset
     ? GRADIENT_CLASS_MAP[gradientPreset] || "bg-hero-gradient-slate-green"
     : "bg-hero-gradient-slate-green"
-
-  // Render CTA: use provided ReactNode or build from ctaText/ctaLink
-  const renderCta = () => {
-    if (cta) return cta
-    if (ctaText && ctaLink) {
-      return (
-        <Button
-          nativeButton={false}
-          render={
-            <Link prefetch={false} href={ctaLink} className="inline-flex items-center gap-1">
-              {ctaText}
-            </Link>
-          }
-        />
-      )
-    }
-    return null
-  }
 
   const alignment = textPosition ?? "left"
 
@@ -125,7 +104,16 @@ export default function Hero({
           >
             <h1 className="text-4xl md:text-5xl font-extrabold text-white font-serif">{title}</h1>
             <p className="mt-3 text-lg text-white/80">{subtitle}</p>
-            {renderCta() && <div className="mt-6">{renderCta()}</div>}
+            {ctaText && ctaLink && (
+              <Button
+                className="mt-6"
+                render={
+                  <Link prefetch={false} href={ctaLink} className="inline-flex items-center gap-1">
+                    {ctaText}
+                  </Link>
+                }
+              />
+            )}
           </div>
         </div>
       </div>

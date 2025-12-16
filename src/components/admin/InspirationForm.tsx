@@ -3,9 +3,14 @@
 import { zodResolver } from "@hookform/resolvers/zod"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
-import { useState } from "react"
+import { useState, useTransition } from "react"
 import { useForm } from "react-hook-form"
 import { toast } from "sonner"
+import {
+  createInspirationAction,
+  deleteInspirationAction,
+  updateInspirationAction,
+} from "@/app/actions/inspirations"
 import { ImageUpload } from "@/components/admin/ImageUpload"
 import ProductMultiSelect from "@/components/admin/ProductMultiSelect"
 import SlugInput from "@/components/admin/SlugInput"
@@ -55,10 +60,10 @@ interface InspirationFormProps {
 export default function InspirationForm({ products, inspiration }: InspirationFormProps) {
   const router = useRouter()
   const isEditing = !!inspiration
+  const [isPending, startTransition] = useTransition()
 
   // Track original image URL to clean up old blob when image changes
   const [originalImage] = useState(inspiration?.image || "")
-  const [isSubmitting, setIsSubmitting] = useState(false)
   const [isDeleting, setIsDeleting] = useState(false)
 
   // Product selection state (managed outside react-hook-form for ProductMultiSelect compatibility)
@@ -86,45 +91,38 @@ export default function InspirationForm({ products, inspiration }: InspirationFo
   })
 
   const onSubmit = async (data: InspirationFormData) => {
-    setIsSubmitting(true)
-
-    try {
-      const url = isEditing ? `/api/inspirations/${inspiration.id}` : "/api/inspirations"
-      const method = isEditing ? "PUT" : "POST"
-
-      const response = await fetch(url, {
-        method,
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          ...data,
-          productSelections: productSelections,
-        }),
-      })
-
-      if (response.ok) {
-        toast.success(
-          isEditing ? "Inspiration updated successfully" : "Inspiration created successfully"
-        )
+    startTransition(async () => {
+      try {
+        if (isEditing) {
+          await updateInspirationAction(inspiration.id, {
+            ...data,
+            productSelections: productSelections,
+          })
+          toast.success("Inspiration updated successfully")
+        } else {
+          await createInspirationAction({
+            ...data,
+            productSelections: productSelections,
+          })
+          toast.success("Inspiration created successfully")
+        }
         router.push("/admin/inspirations")
         router.refresh()
-      } else {
-        const responseData = await response.json()
-        form.setError("root", { message: responseData.error || "Failed to save inspiration" })
+      } catch (err) {
+        const message = err instanceof Error ? err.message : "Failed to save inspiration"
+        form.setError("root", { message })
       }
-    } catch (err) {
-      form.setError("root", { message: "An error occurred. Please try again." })
-      console.error(err)
-    } finally {
-      setIsSubmitting(false)
-    }
+    })
   }
 
   const handleDelete = async () => {
-    const productCount = inspiration?.products?.length || 0
+    if (!inspiration) return
+
+    const productCount = inspiration.products?.length || 0
     const warningMessage =
       productCount > 0
-        ? `Are you sure you want to delete "${inspiration?.name}"? This inspiration has ${productCount} product${productCount !== 1 ? "s" : ""} associated. This action cannot be undone.`
-        : `Are you sure you want to delete "${inspiration?.name}"? This action cannot be undone.`
+        ? `Are you sure you want to delete "${inspiration.name}"? This inspiration has ${productCount} product${productCount !== 1 ? "s" : ""} associated. This action cannot be undone.`
+        : `Are you sure you want to delete "${inspiration.name}"? This action cannot be undone.`
 
     if (!window.confirm(warningMessage)) {
       return
@@ -132,21 +130,13 @@ export default function InspirationForm({ products, inspiration }: InspirationFo
 
     setIsDeleting(true)
     try {
-      const response = await fetch(`/api/inspirations/${inspiration?.id}`, {
-        method: "DELETE",
-      })
-
-      if (response.ok) {
-        toast.success("Inspiration deleted successfully")
-        router.push("/admin/inspirations")
-        router.refresh()
-      } else {
-        form.setError("root", { message: "Failed to delete inspiration. Please try again." })
-      }
+      await deleteInspirationAction(inspiration.id)
+      toast.success("Inspiration deleted successfully")
+      router.push("/admin/inspirations")
+      router.refresh()
     } catch (err) {
-      form.setError("root", { message: "An error occurred. Please try again." })
-      console.error(err)
-    } finally {
+      const message = err instanceof Error ? err.message : "Failed to delete inspiration"
+      form.setError("root", { message })
       setIsDeleting(false)
     }
   }
@@ -273,8 +263,8 @@ export default function InspirationForm({ products, inspiration }: InspirationFo
         {/* Actions */}
         <div className="flex gap-4 justify-between">
           <div className="flex gap-4">
-            <Button type="submit" disabled={isSubmitting}>
-              {isSubmitting ? "Saving..." : "Save Inspiration"}
+            <Button type="submit" disabled={isPending}>
+              {isPending ? "Saving..." : "Save Inspiration"}
             </Button>
             <Button
               variant="outline"
