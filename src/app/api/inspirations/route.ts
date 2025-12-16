@@ -88,7 +88,7 @@ export async function POST(request: NextRequest) {
       subtitle,
       image,
       excerpt,
-      inspirationText,
+      text,
       productSelections, // Array of { productId, quantity }
     } = validationResult.data
 
@@ -105,7 +105,7 @@ export async function POST(request: NextRequest) {
         subtitle,
         image,
         excerpt,
-        inspirationText,
+        text,
         ...(selections.length > 0 && {
           products: {
             create: selections.map((sel: ProductSelection) => ({

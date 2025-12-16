@@ -185,7 +185,7 @@ export const InspirationScalarFieldEnum = {
   subtitle: 'subtitle',
   image: 'image',
   excerpt: 'excerpt',
-  inspirationText: 'inspirationText',
+  text: 'text',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const

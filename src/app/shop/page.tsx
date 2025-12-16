@@ -193,9 +193,9 @@ export default async function ShopPage({ searchParams }: ShopPageProps) {
                       </TableRow>
                     </TableHeader>
                     <TableBody>
-                      {/* {products.map((product) => (
+                      {products.map((product) => (
                         <ShopProductTableRow key={product.slug} product={product} user={user} />
-                      ))} */}
+                      ))}
                     </TableBody>
                   </Table>
                 </div>
@@ -214,9 +214,9 @@ export default async function ShopPage({ searchParams }: ShopPageProps) {
             ) : (
               <>
                 <div className="grid grid-cols-2 gap-4 sm:gap-6 md:grid-cols-3 mb-8">
-                  {/* {products.map((product) => (
+                  {products.map((product) => (
                     <ProductItem key={product.slug} product={product} user={user} layout="grid" />
-                  ))} */}
+                  ))}
                 </div>
 
                 {/* Pagination */}

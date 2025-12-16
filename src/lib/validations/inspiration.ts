@@ -13,7 +13,7 @@ export const inspirationSchema = z.object({
   subtitle: z.string().min(1, "Subtitle is required"),
   image: z.string().min(1, "Image is required"),
   excerpt: z.string().min(1, "Excerpt is required"),
-  inspirationText: z.string().min(1, "Inspiration text is required"),
+  text: z.string().min(1, "Inspiration text is required"),
   productSelections: z.array(productSelectionSchema),
 })
 

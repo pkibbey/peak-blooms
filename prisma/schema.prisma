@@ -121,7 +121,7 @@ model Inspiration {
   subtitle        String
   image           String
   excerpt         String
-  inspirationText String
+  text            String
   createdAt       DateTime             @default(now())
   updatedAt       DateTime             @updatedAt
   products        InspirationProduct[]

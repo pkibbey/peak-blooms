@@ -23,7 +23,7 @@ export async function createInspirationAction(
         subtitle: data.subtitle,
         image: data.image,
         excerpt: data.excerpt,
-        inspirationText: data.inspirationText,
+        text: data.text,
         products: {
           create: data.productSelections.map((ps) => ({
             productId: ps.productId,
@@ -61,7 +61,7 @@ export async function updateInspirationAction(
         subtitle: data.subtitle,
         image: data.image,
         excerpt: data.excerpt,
-        inspirationText: data.inspirationText,
+        text: data.text,
         products: {
           deleteMany: {},
           create: data.productSelections.map((ps) => ({

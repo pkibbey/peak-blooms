@@ -95,7 +95,7 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
       subtitle,
       image,
       excerpt,
-      inspirationText,
+      text,
       productSelections, // Array of { productId, productVariantId, quantity }
     } = validationResult.data
 
@@ -116,7 +116,7 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
     if (subtitle !== undefined) updateData.subtitle = subtitle
     if (image !== undefined) updateData.image = image
     if (excerpt !== undefined) updateData.excerpt = excerpt
-    if (inspirationText !== undefined) updateData.inspirationText = inspirationText
+    if (text !== undefined) updateData.text = text
 
     // Handle product associations
     if (productSelections !== undefined) {

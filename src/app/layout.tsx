@@ -5,7 +5,6 @@ import "./globals.css"
 import Footer from "@/components/site/Footer"
 import Nav from "@/components/site/Nav"
 import { NewsletterBanner } from "@/components/site/NewsletterBanner"
-import { getCurrentUser, getOrCreateCart } from "@/lib/current-user"
 
 const raleway = Raleway({ subsets: ["latin"], variable: "--font-sans" })
 

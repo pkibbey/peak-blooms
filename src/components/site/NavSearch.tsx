@@ -15,7 +15,6 @@ import {
   AutocompletePositioner,
   AutocompleteStatus,
 } from "@/components/ui/autocomplete"
-import type { Product } from "@/generated/client"
 import { useDebouncedCallback } from "@/lib/useDebouncedCallback"
 import { formatPrice } from "@/lib/utils"
 

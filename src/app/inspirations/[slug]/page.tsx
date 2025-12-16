@@ -74,7 +74,7 @@ export default async function InspirationDetailPage({ params }: InspirationDetai
               The Story
             </h2>
             <p className="text-base md:text-lg leading-relaxed text-gray-700 whitespace-pre-line">
-              {inspiration.inspirationText}
+              {inspiration.text}
             </p>
           </div>
         </div>

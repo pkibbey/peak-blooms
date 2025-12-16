@@ -49,7 +49,7 @@ interface InspirationFormProps {
     subtitle: string
     image: string
     excerpt: string
-    inspirationText: string
+    text: string
     products: Array<{
       productId: string
       quantity: number
@@ -85,7 +85,7 @@ export default function InspirationForm({ products, inspiration }: InspirationFo
       subtitle: inspiration?.subtitle || "",
       image: inspiration?.image || "",
       excerpt: inspiration?.excerpt || "",
-      inspirationText: inspiration?.inspirationText || "",
+      text: inspiration?.text || "",
       productSelections: productSelections,
     },
   })
@@ -229,7 +229,7 @@ export default function InspirationForm({ products, inspiration }: InspirationFo
         {/* Inspiration Text */}
         <FormField
           control={form.control}
-          name="inspirationText"
+          name="text"
           render={({ field }) => (
             <FormItem>
               <FormLabel>Full Inspiration Text *</FormLabel>
