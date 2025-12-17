@@ -1,25 +1,21 @@
 ## 🛠️ Website To-Do List
 
-Introduce market price warnings in cart and checkout flows.
-
 ## Meeting notes
-Get new products in there
-What do we do about market price stuff?
-Provide the customer with vauge information about delivery
-Ask the user to choose how they want to recieve a notification, or just give them one option
-Add in the stem length selector for roses
-Talk about box lot user journey
-Fix type system as much as possible - use generated types (example: import type { OrderGetPayload } from "@/generated/models")
-add automatic lint and typescript checks
+- Fix type system as much as possible - use generated types (example: import type { OrderGetPayload } from "@/generated/models")
+- replace all api calls with server based actions - we probably don't need as many api calls as we think
+- Add unit tests and e2e tests to ensure complete site functionality
 
 ### 🌟 Next Steps
+
+- Get new products in there
+- Add in the stem length selector for roses
+- Talk about box lot user journey
 
 - Setup domain
 - Create subdomains
 - Create splash screen for www.
 - Upload test site to dev.
 - Configure email server
-- Add unit tests and e2e tests to ensure complete site functionality
 - Plan site launch
 - Maintenence and updates performed on feature branches, tested on dev, and then released
 

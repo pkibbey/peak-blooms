@@ -5,12 +5,12 @@ import BackLink from "@/components/site/BackLink"
 import { CancelOrderButton } from "@/components/site/CancelOrderButton"
 import { OrderItemsCard } from "@/components/site/OrderItemsCard"
 import { type OrderStatus, OrderStatusBadge } from "@/components/site/OrderStatusBadge"
+import { OrderTimeline } from "@/components/site/OrderTimeline"
 import { Button } from "@/components/ui/button"
 import { IconCheckCircle } from "@/components/ui/icons"
-import { getCurrentUser } from "@/lib/current-user"
 import { calculateCartTotal } from "@/lib/cart-utils"
+import { getCurrentUser } from "@/lib/current-user"
 import { db } from "@/lib/db"
-import { formatDate } from "@/lib/utils"
 
 interface OrderDetailPageProps {
   params: Promise<{ id: string }>
@@ -54,30 +54,36 @@ export default async function OrderDetailPage({ params }: OrderDetailPageProps) 
     <>
       <BackLink href="/account/order-history" label="Order History" />
       {/* Order Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
         <div>
           <div className="flex items-center gap-3 mb-2">
             <h1 className="heading-1">Order {order.orderNumber}</h1>
             <OrderStatusBadge status={order.status as OrderStatus} className="text-sm" />
           </div>
-          <p className="text-muted-foreground">Placed on {formatDate(order.createdAt)}</p>
         </div>
       </div>
 
-      {/* Success Message for new orders */}
-      {order.status === "PENDING" && (
-        <div className="bg-green-50 border border-green-200 rounded-xs p-4 mb-8">
-          <div className="flex items-start gap-3">
-            <IconCheckCircle className="h-5 w-5 text-green-600 mt-0.5" />
-            <div>
-              <h3 className="font-semibold text-green-800">Order Placed Successfully!</h3>
-              <p className="text-sm text-green-700 mt-1">
-                Thank you for your order. We&apos;ll send you an update when your order is
-                confirmed.
-              </p>
+      {/* Order Timeline - Show for all non-cancelled orders */}
+      {order.status !== "CANCELLED" && (
+        <>
+          <OrderTimeline status={order.status as OrderStatus} createdAt={order.createdAt} />
+
+          {/* Process Message */}
+          {(order.status === "CART" || order.status === "PENDING") && (
+            <div className="bg-blue-50 border border-blue-200 rounded-xs p-4 mb-8">
+              <div className="flex items-start gap-3">
+                <IconCheckCircle className="h-5 w-5 text-blue-600 mt-0.5" />
+                <div>
+                  <h3 className="font-semibold text-blue-800">Next Steps</h3>
+                  <p className="text-sm text-blue-700 mt-1">
+                    Your order is being reviewed. We&apos;ll contact you to confirm market prices
+                    and delivery details.
+                  </p>
+                </div>
+              </div>
             </div>
-          </div>
-        </div>
+          )}
+        </>
       )}
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
