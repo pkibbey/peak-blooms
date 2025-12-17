@@ -1,6 +1,8 @@
 "use client"
 
 import { useEffect, useState } from "react"
+import { toast } from "sonner"
+import { clearMetricsAction, getMetricsAction } from "@/app/actions/metrics"
 import { Button } from "@/components/ui/button"
 import {
   Table,
@@ -19,6 +21,7 @@ interface MetricsClientProps {
 export default function MetricsClient({ types }: MetricsClientProps) {
   const [summaries, setSummaries] = useState<MetricSummary[]>([])
   const [isClearing, setIsClearing] = useState(false)
+  const [isLoading, setIsLoading] = useState(true)
 
   // Totals for the table footer
   const totalCount = summaries.reduce((sum, s) => sum + s.count, 0)
@@ -32,13 +35,11 @@ export default function MetricsClient({ types }: MetricsClientProps) {
   const handleClearMetrics = async () => {
     try {
       setIsClearing(true)
-      const response = await fetch("/api/admin/metrics", {
-        method: "DELETE",
-      })
-      if (response.ok) {
-        setSummaries([])
-      }
+      await clearMetricsAction()
+      setSummaries([])
+      toast.success("Metrics cleared")
     } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Failed to clear metrics")
       console.error("Failed to clear metrics:", error)
     } finally {
       setIsClearing(false)
@@ -76,16 +77,17 @@ export default function MetricsClient({ types }: MetricsClientProps) {
       setSummaries(Array.from(summaryMap.values()).sort((a, b) => a.name.localeCompare(b.name)))
     }
 
-    // Fetch metrics from API
+    // Fetch metrics from server action
     const fetchMetrics = async () => {
       try {
-        const response = await fetch("/api/admin/metrics")
-        if (response.ok) {
-          const data = await response.json()
-          calculateSummaries(data)
-        }
+        setIsLoading(true)
+        const data = await getMetricsAction()
+        calculateSummaries(data)
       } catch (error) {
+        toast.error(error instanceof Error ? error.message : "Failed to fetch metrics")
         console.error("Failed to fetch metrics:", error)
+      } finally {
+        setIsLoading(false)
       }
     }
 
@@ -95,12 +97,20 @@ export default function MetricsClient({ types }: MetricsClientProps) {
   return (
     <div className="space-y-6">
       <div className="flex gap-3">
-        <Button onClick={handleClearMetrics} disabled={isClearing} variant="outline-destructive">
+        <Button
+          onClick={handleClearMetrics}
+          disabled={isClearing || isLoading}
+          variant="outline-destructive"
+        >
           {isClearing ? "Clearing..." : "Clear Metrics"}
         </Button>
       </div>
 
-      {summaries.length === 0 ? (
+      {isLoading ? (
+        <div className="text-center py-8">
+          <p className="text-muted-foreground">Loading metrics...</p>
+        </div>
+      ) : summaries.length === 0 ? (
         <div className="text-center py-8">
           <p className="text-muted-foreground">No metrics recorded yet.</p>
           <p className="text-sm text-muted-foreground mt-2">

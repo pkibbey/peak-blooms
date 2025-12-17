@@ -2,6 +2,7 @@
 
 import { useState } from "react"
 import { toast } from "sonner"
+import { updateOrderItemPriceAction } from "@/app/actions/orders"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import type { OrderGetPayload } from "@/generated/models"
@@ -48,18 +49,7 @@ export function AdminOrderPriceEditor({ order, onPriceUpdated }: AdminOrderPrice
 
     setIsSaving(true)
     try {
-      const response = await fetch(`/api/admin/orders/${orderId}/items/${itemId}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ price: newPrice }),
-      })
-
-      if (!response.ok) {
-        const error = await response.json()
-        throw new Error(error.error || "Failed to update price")
-      }
-
-      const result = await response.json()
+      const result = await updateOrderItemPriceAction(orderId, itemId, newPrice)
 
       // Update local state
       setItemPrices((prev) => ({ ...prev, [itemId]: newPrice }))

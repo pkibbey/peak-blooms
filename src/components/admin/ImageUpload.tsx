@@ -5,6 +5,7 @@ import { CloudUpload, LoaderCircle, X } from "lucide-react"
 import Image from "next/image"
 import { useRef, useState } from "react"
 import { toast } from "sonner"
+import { deleteBlobAction } from "@/app/actions/blob"
 import { Button } from "@/components/ui/button"
 import { Label } from "@/components/ui/label"
 import { cn } from "@/lib/utils"
@@ -48,11 +49,7 @@ export function ImageUpload({
     if (!oldUrl.includes("blob.vercel-storage.com")) return
 
     try {
-      await fetch("/api/upload/delete", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ url: oldUrl }),
-      })
+      await deleteBlobAction(oldUrl)
     } catch (error) {
       // Silently fail - old blob cleanup is not critical
       console.error("Failed to delete old blob:", error)

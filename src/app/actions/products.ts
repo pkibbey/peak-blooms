@@ -117,3 +117,33 @@ export async function toggleProductFeaturedAction(id: string, featured: boolean)
     throw new Error(error instanceof Error ? error.message : "Failed to update product")
   }
 }
+
+/**
+ * Server action to get product count with optional filters
+ * Used for pagination calculations
+ */
+export async function getProductCountAction(params?: {
+  boxlotOnly?: boolean
+  query?: string
+}): Promise<number> {
+  try {
+    // Build the where clause dynamically
+    const where: { deletedAt: null; productType?: string; OR?: Array<any> } = { deletedAt: null }
+
+    if (params?.boxlotOnly) {
+      where.productType = "BOXLOT"
+    }
+
+    if (params?.query) {
+      where.OR = [
+        { name: { contains: params.query, mode: "insensitive" } },
+        { description: { contains: params.query, mode: "insensitive" } },
+      ]
+    }
+
+    const count = await db.product.count({ where: where as any })
+    return count
+  } catch (error) {
+    throw new Error(error instanceof Error ? error.message : "Failed to get product count")
+  }
+}

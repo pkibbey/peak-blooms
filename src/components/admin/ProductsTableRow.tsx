@@ -5,6 +5,7 @@ import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { useState } from "react"
 import { toast } from "sonner"
+import { toggleProductFeaturedAction } from "@/app/actions/products"
 import { ColorsMiniDisplay } from "@/components/ui/ColorsMiniDisplay"
 import { Checkbox } from "@/components/ui/checkbox"
 import { TableCell, TableRow } from "@/components/ui/table"
@@ -95,17 +96,7 @@ export default function ProductsTableRow({ product }: ProductRowProps) {
               setFeatured(value)
 
               try {
-                const res = await fetch(`/api/products/${product.id}`, {
-                  method: "PUT",
-                  headers: { "Content-Type": "application/json" },
-                  body: JSON.stringify({ featured: value }),
-                })
-
-                if (!res.ok) {
-                  const body = await res.json().catch(() => ({}))
-                  throw new Error(body?.error || "Failed to update product")
-                }
-
+                await toggleProductFeaturedAction(product.id, value)
                 toast.success(`${value ? "Marked featured" : "Removed featured"} — ${product.name}`)
                 router.refresh()
               } catch (err) {

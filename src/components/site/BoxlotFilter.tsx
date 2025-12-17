@@ -2,6 +2,7 @@
 
 import { useRouter, useSearchParams } from "next/navigation"
 import { useState } from "react"
+import { getProductCountAction } from "@/app/actions/products"
 import { IconPackage } from "@/components/ui/icons"
 import { Label } from "@/components/ui/label"
 import { Switch } from "@/components/ui/switch"
@@ -28,20 +29,8 @@ export function BoxlotFilter() {
     // we should clamp the page to the highest available page for the new filter.
     setIsCounting(true)
     try {
-      // Ask the API for a light-weight count by requesting a single item.
-      const q = new URLSearchParams(params.toString())
-      q.set("limit", "1")
-      q.set("offset", "0")
-
-      const res = await fetch(`/api/products?${q.toString()}`, { cache: "no-store" })
-      if (!res.ok) {
-        // If the count failed, fall back to the simple push (don't block UX)
-        router.push(`/shop?${params.toString()}`, { scroll: false })
-        return
-      }
-
-      const data = await res.json()
-      const total = Number(data?.total ?? 0)
+      // Ask for a light-weight count with the new filter
+      const total = await getProductCountAction({ boxlotOnly: checked })
       const maxPage = Math.max(1, Math.ceil(total / ITEMS_PER_PAGE))
 
       const currentPage = Number(searchParams.get("page") ?? 1)

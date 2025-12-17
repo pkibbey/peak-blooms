@@ -4,7 +4,7 @@ import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { useEffect } from "react"
 import { Button } from "@/components/ui/button"
-import { useSession } from "@/lib/auth-client"
+import { authClient, useSession } from "@/lib/auth-client"
 
 export default function SignUpPage() {
   const router = useRouter()
@@ -19,9 +19,10 @@ export default function SignUpPage() {
 
   const handleGoogleSignUp = async () => {
     try {
-      const baseURL = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"
-      const redirectUrl = `${baseURL}/api/auth/signin/google`
-      window.location.href = redirectUrl
+      await authClient.signIn.social({
+        provider: "google",
+        callbackURL: "/",
+      })
     } catch (error) {
       console.error("[SignUp] Error during Google sign-up:", error)
     }

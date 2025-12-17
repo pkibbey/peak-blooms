@@ -15,26 +15,22 @@ const pool = new Pool({ connectionString })
 const adapter = new PrismaPg(pool)
 const prisma = new PrismaClient({ adapter })
 
-// Helper function to post metrics to the API
+// Helper function to capture metrics directly to database
 async function captureMetric(type: MetricType, name: string, duration: number): Promise<void> {
   // Skip metrics if they are not enabled
   if (process.env.ENABLE_METRICS !== "true") return
 
   try {
-    // Use localhost:3000 for local development
-    const response = await fetch("http://localhost:3000/api/admin/metrics", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
+    // Write metric directly to database
+    await prisma.metric.create({
+      data: {
+        type,
+        name,
+        duration,
       },
-      body: JSON.stringify({ type, name, duration }),
     })
-
-    if (!response.ok) {
-      console.warn(`⚠️  Failed to post metric "${name}": ${response.status} ${response.statusText}`)
-    }
   } catch (_error) {
-    // Silently fail - don't block seed script if metrics API is unavailable
+    // Silently fail - don't block seed script if metrics can't be saved
   }
 }
 

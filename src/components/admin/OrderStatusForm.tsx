@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation"
 import { useState } from "react"
 import { toast } from "sonner"
+import { updateOrderStatusAction } from "@/app/actions/orders"
 import { Button } from "@/components/ui/button"
 import { Label } from "@/components/ui/label"
 import {
@@ -44,17 +45,10 @@ export default function OrderStatusForm({ orderId, currentStatus }: OrderStatusF
     setIsSubmitting(true)
 
     try {
-      const response = await fetch(`/api/admin/orders/${orderId}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ status }),
-      })
-
-      if (!response.ok) {
-        const data = await response.json()
-        throw new Error(data.error || "Failed to update order status")
-      }
-
+      await updateOrderStatusAction(
+        orderId,
+        status as "CART" | "PENDING" | "CONFIRMED" | "OUT_FOR_DELIVERY" | "DELIVERED" | "CANCELLED"
+      )
       toast.success("Order status updated")
       router.refresh()
     } catch (error) {

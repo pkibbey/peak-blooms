@@ -259,3 +259,283 @@ export async function createOrderAction(data: CreateOrderInput) {
     throw new Error(error instanceof Error ? error.message : "Failed to create order")
   }
 }
+
+/**
+ * Server action to update order status (admin only)
+ */
+export async function updateOrderStatusAction(
+  orderId: string,
+  status: "CART" | "PENDING" | "CONFIRMED" | "OUT_FOR_DELIVERY" | "DELIVERED" | "CANCELLED"
+) {
+  try {
+    const user = await getCurrentUser()
+
+    if (!user || user.role !== "ADMIN") {
+      throw new Error("Unauthorized")
+    }
+
+    const validStatuses = [
+      "CART",
+      "PENDING",
+      "CONFIRMED",
+      "OUT_FOR_DELIVERY",
+      "DELIVERED",
+      "CANCELLED",
+    ]
+    if (!validStatuses.includes(status)) {
+      throw new Error("Invalid status")
+    }
+
+    // Fetch the order
+    const order = await db.order.findUnique({
+      where: { id: orderId },
+    })
+
+    if (!order) {
+      throw new Error("Order not found")
+    }
+
+    // Update the order status
+    const updatedOrder = await db.order.update({
+      where: { id: orderId },
+      data: { status },
+    })
+
+    revalidatePath("/admin/orders")
+    revalidatePath(`/admin/orders/${orderId}`)
+
+    return {
+      message: "Order status updated successfully",
+      order: updatedOrder,
+    }
+  } catch (error) {
+    throw new Error(error instanceof Error ? error.message : "Failed to update order status")
+  }
+}
+
+/**
+ * Server action to update order item price (admin only)
+ */
+export async function updateOrderItemPriceAction(orderId: string, itemId: string, price: number) {
+  try {
+    const user = await getCurrentUser()
+
+    if (!user || user.role !== "ADMIN") {
+      throw new Error("Unauthorized")
+    }
+
+    if (price === undefined || price === null) {
+      throw new Error("Price is required")
+    }
+
+    if (typeof price !== "number" || price < 0) {
+      throw new Error("Price must be a non-negative number")
+    }
+
+    // Fetch the order item
+    const orderItem = await db.orderItem.findFirst({
+      where: { id: itemId, orderId },
+    })
+
+    if (!orderItem) {
+      throw new Error("Order item not found")
+    }
+
+    // Update the order item price
+    await db.orderItem.update({
+      where: { id: itemId },
+      data: { price },
+    })
+
+    // Fetch all items in the order to calculate total for response
+    const allItems = await db.orderItem.findMany({
+      where: { orderId },
+    })
+
+    // Calculate order total (for informational response only)
+    const newOrderTotal = allItems.reduce((sum, item) => {
+      // Skip null (market-priced) items that haven't been set
+      if (item.price === null) return sum
+      return sum + (item.price ?? 0) * item.quantity
+    }, 0)
+
+    revalidatePath("/admin/orders")
+    revalidatePath(`/admin/orders/${orderId}`)
+
+    return {
+      message: "Price updated successfully",
+      newOrderTotal: Math.round(newOrderTotal * 100) / 100,
+    }
+  } catch (error) {
+    throw new Error(error instanceof Error ? error.message : "Failed to update price")
+  }
+}
+
+/**
+ * Server action to create a new order for a customer (admin only)
+ */
+export async function createAdminOrderAction(data: {
+  userId: string
+  items: Array<{ productId: string; quantity: number }>
+  email?: string
+  phone?: string
+  notes?: string
+  deliveryAddressId?: string
+}) {
+  try {
+    const user = await getCurrentUser()
+
+    if (!user || user.role !== "ADMIN") {
+      throw new Error("Unauthorized")
+    }
+
+    const { userId, items, notes, deliveryAddressId } = data
+
+    if (!userId || !items || !Array.isArray(items) || items.length === 0) {
+      throw new Error("userId and items array are required")
+    }
+
+    // Verify customer exists
+    const customer = await db.user.findUnique({
+      where: { id: userId },
+    })
+
+    if (!customer) {
+      throw new Error("Customer not found")
+    }
+
+    // Generate order number
+    const lastOrder = await db.order.findFirst({
+      orderBy: { orderNumber: "desc" },
+      select: { orderNumber: true },
+    })
+
+    let nextNumber = 1
+    if (lastOrder?.orderNumber) {
+      const match = lastOrder.orderNumber.match(/PB-(\d+)/)
+      if (match) {
+        nextNumber = parseInt(match[1], 10) + 1
+      }
+    }
+
+    const orderNumber = `PB-${nextNumber.toString().padStart(5, "0")}`
+
+    // Determine delivery address
+    let finalDeliveryAddressId: string
+
+    if (deliveryAddressId) {
+      // Use existing address (verify it belongs to the customer)
+      const address = await db.address.findFirst({
+        where: {
+          id: deliveryAddressId,
+          userId: customer.id,
+        },
+      })
+
+      if (!address) {
+        throw new Error("Invalid delivery address")
+      }
+
+      finalDeliveryAddressId = deliveryAddressId
+    } else {
+      // Get customer's first address
+      const address = await db.address.findFirst({
+        where: { userId: customer.id },
+        orderBy: { createdAt: "asc" },
+      })
+
+      if (!address) {
+        throw new Error("Customer has no delivery address")
+      }
+
+      finalDeliveryAddressId = address.id
+    }
+
+    // Fetch the customer's cart order or create a new one
+    let order = await db.order.findFirst({
+      where: {
+        userId: customer.id,
+        status: "CART",
+      },
+      include: {
+        items: true,
+      },
+    })
+
+    if (!order) {
+      // Create a new CART order
+      order = await db.order.create({
+        data: {
+          userId: customer.id,
+          orderNumber,
+          status: "CART",
+          deliveryAddressId: finalDeliveryAddressId,
+          notes: notes || null,
+        },
+        include: {
+          items: true,
+        },
+      })
+    }
+
+    // Add items to the order
+    for (const item of items) {
+      const product = await db.product.findUnique({
+        where: { id: item.productId },
+      })
+
+      if (!product) {
+        throw new Error(`Product not found: ${item.productId}`)
+      }
+
+      // Check if item already exists in order
+      const existingItem = order.items.find((i) => i.productId === item.productId)
+
+      if (existingItem) {
+        // Update quantity
+        await db.orderItem.update({
+          where: { id: existingItem.id },
+          data: { quantity: existingItem.quantity + item.quantity },
+        })
+      } else {
+        // Create new item with price adjusted for customer's multiplier
+        const adjustedPrice =
+          product.price === null ? null : adjustPrice(product.price, customer.priceMultiplier)
+
+        await db.orderItem.create({
+          data: {
+            orderId: order.id,
+            productId: item.productId,
+            quantity: item.quantity,
+            price: adjustedPrice,
+            productNameSnapshot: product.name,
+            productImageSnapshot: product.image,
+          },
+        })
+      }
+    }
+
+    // Update order with new email/phone if provided
+    const updatedOrder = await db.order.update({
+      where: { id: order.id },
+      data: {
+        deliveryAddressId: finalDeliveryAddressId,
+        notes: notes || order.notes,
+      },
+      include: {
+        items: {
+          include: {
+            product: true,
+          },
+        },
+        deliveryAddress: true,
+      },
+    })
+
+    revalidatePath("/admin/orders")
+    return updatedOrder
+  } catch (error) {
+    console.error("createAdminOrderAction error:", error)
+    throw new Error(error instanceof Error ? error.message : "Failed to create order")
+  }
+}

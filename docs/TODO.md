@@ -2,7 +2,6 @@
 
 ## Meeting notes
 - Fix type system as much as possible - use generated types (example: import type { OrderGetPayload } from "@/generated/models")
-- replace all api calls with server based actions - we probably don't need as many api calls as we think
 - Add unit tests and e2e tests to ensure complete site functionality
 
 ### 🌟 Next Steps
@@ -10,7 +9,6 @@
 - Get new products in there
 - Add in the stem length selector for roses
 - Talk about box lot user journey
-
 - Setup domain
 - Create subdomains
 - Create splash screen for www.
