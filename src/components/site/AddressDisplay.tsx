@@ -1,17 +1,7 @@
-interface Address {
-  firstName: string
-  lastName: string
-  company?: string | null
-  street1: string
-  street2?: string | null
-  city: string
-  state: string
-  zip: string
-  country: string
-}
+import type { AddressModel } from "@/generated/models"
 
 interface AddressDisplayProps {
-  address: Address
+  address: AddressModel
   className?: string
 }
 

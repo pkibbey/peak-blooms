@@ -1,7 +1,7 @@
 import { cache } from "react"
 import { getSession } from "./auth"
 import { db } from "./db"
-import type { SessionUser } from "./types/prisma"
+import type { SessionUser } from "./types/users"
 import { adjustPrice } from "./utils"
 
 /**

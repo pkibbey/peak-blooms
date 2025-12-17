@@ -3,7 +3,7 @@
 import { getCurrentUser } from "@/lib/current-user"
 import { getProducts } from "@/lib/data"
 
-export interface SearchProductsResult {
+interface SearchProductsResult {
   products: Array<{
     id: string
     name: string

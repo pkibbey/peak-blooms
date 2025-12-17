@@ -4,7 +4,7 @@
  */
 
 import { db } from "@/lib/db"
-import type { InspirationWithCount, InspirationWithProducts } from "@/lib/types/prisma"
+import type { InspirationWithCount, InspirationWithProducts } from "@/lib/types/inspirations"
 import { adjustPrice } from "@/lib/utils"
 import { withTiming } from "./logger"
 

@@ -22,7 +22,7 @@ export function calculateCartTotal(
 /**
  * Check if a cart contains any market-priced items
  */
-export function hasMarketPriceItems(
+function hasMarketPriceItems(
   cartItems: Array<{
     product?: { price: number | null } | null
     quantity: number

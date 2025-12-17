@@ -26,7 +26,6 @@ export {
 // Products
 export {
   getFeaturedProducts,
-  getProductById,
   getProducts,
   getProductWithInspirations,
   getShopFilterOptions,

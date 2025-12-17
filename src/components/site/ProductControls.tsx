@@ -5,17 +5,12 @@ import { useState } from "react"
 import AddToCartButton from "@/components/site/AddToCartButton"
 import { Button } from "@/components/ui/button"
 import { QuantityStepper } from "@/components/ui/QuantityStepper"
-import type { SessionUser } from "@/lib/types/prisma"
+import type { ProductModel } from "@/generated/models"
+import type { SessionUser } from "@/lib/types/users"
 import { cn, formatPrice } from "@/lib/utils"
 
-interface Product {
-  id: string
-  name: string
-  price: number | null
-}
-
 interface ProductControlsProps {
-  product: Product
+  product: ProductModel
   user?: SessionUser | null
   mode?: "card" | "detail"
 }

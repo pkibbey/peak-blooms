@@ -7,41 +7,6 @@ import { db } from "@/lib/db"
 import { isValidPriceMultiplier } from "@/lib/utils"
 
 /**
- * Get all users with their admin-relevant fields
- * Admin only
- */
-export async function listUsersAction() {
-  try {
-    const headersList = await headers()
-    const session = await auth.api.getSession({
-      headers: headersList,
-    })
-
-    if (!session || (session.user.role as string) !== "ADMIN") {
-      throw new Error("Unauthorized")
-    }
-
-    const users = await db.user.findMany({
-      select: {
-        id: true,
-        email: true,
-        name: true,
-        role: true,
-        approved: true,
-        priceMultiplier: true,
-        createdAt: true,
-      },
-      orderBy: [{ approved: "asc" }, { createdAt: "desc" }],
-    })
-
-    return users
-  } catch (error) {
-    console.error("listUsersAction error:", error)
-    throw new Error(error instanceof Error ? error.message : "Failed to fetch users")
-  }
-}
-
-/**
  * Approve a user (admin only)
  */
 export async function approveUserAction(userId: string) {

@@ -4,15 +4,7 @@ import { useState } from "react"
 import { ProductMultiSelectItem } from "@/components/admin/ProductMultiSelectItem"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-
-interface Product {
-  id: string
-  name: string
-  price: number | null
-  collection?: {
-    name: string
-  }
-}
+import type { ProductModel } from "@/generated/models"
 
 interface ProductSelection {
   productId: string
@@ -20,7 +12,7 @@ interface ProductSelection {
 }
 
 interface ProductMultiSelectProps {
-  products: Product[]
+  products: ProductModel[]
   selectedIds: string[]
   onChange: (selectedIds: string[]) => void
   // New props for variant selection
@@ -39,10 +31,8 @@ export default function ProductMultiSelect({
 }: ProductMultiSelectProps) {
   const [searchTerm, setSearchTerm] = useState("")
 
-  const filteredProducts = products.filter(
-    (product) =>
-      product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      product.collection?.name.toLowerCase().includes(searchTerm.toLowerCase())
+  const filteredProducts = products.filter((product) =>
+    product.name.toLowerCase().includes(searchTerm.toLowerCase())
   )
 
   const handleToggle = (productId: string) => {

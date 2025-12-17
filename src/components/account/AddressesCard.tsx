@@ -1,8 +1,8 @@
-import type { Address } from "@/components/site/AddressCard"
 import AddressManager from "@/components/site/AddressManager"
+import type { AddressModel } from "@/generated/models"
 
 interface AddressesCardProps {
-  addresses: Address[]
+  addresses: AddressModel[]
 }
 
 export default function AddressesCard({ addresses }: AddressesCardProps) {

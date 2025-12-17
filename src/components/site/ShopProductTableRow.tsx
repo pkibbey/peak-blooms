@@ -3,7 +3,7 @@ import Link from "next/link"
 import { ColorsMiniDisplay } from "@/components/ui/ColorsMiniDisplay"
 import { TableCell, TableRow } from "@/components/ui/table"
 import type { ProductModel } from "@/generated/models"
-import type { SessionUser } from "@/lib/types/prisma"
+import type { SessionUser } from "@/lib/types/users"
 import { formatPrice } from "@/lib/utils"
 
 interface ShopProductTableRowProps {

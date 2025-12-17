@@ -6,7 +6,7 @@ import { db } from "@/lib/db"
 import { adjustPrice } from "@/lib/utils"
 import { type CreateOrderInput, createOrderSchema } from "@/lib/validations/checkout"
 
-export interface CancelOrderResponse {
+interface CancelOrderResponse {
   success: boolean
   message: string
   order?: {
@@ -374,7 +374,7 @@ export async function updateOrderItemPriceAction(orderId: string, itemId: string
 /**
  * Server action to create a new order for a customer (admin only)
  */
-export async function createAdminOrderAction(data: {
+async function createAdminOrderAction(data: {
   userId: string
   items: Array<{ productId: string; quantity: number }>
   email?: string

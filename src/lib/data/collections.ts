@@ -4,8 +4,8 @@
  */
 
 import { db } from "@/lib/db"
-import type { CollectionBasicWithCount, CollectionWithProducts } from "@/lib/types/prisma"
 import { adjustPrice } from "@/lib/utils"
+import type { CollectionBasicWithCount, CollectionWithProducts } from "../types/collections"
 import { withTiming } from "./logger"
 
 /**

@@ -25,23 +25,15 @@ import {
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
+import type { ProductModel } from "@/generated/models"
 import {
   type InspirationFormData,
   inspirationSchema,
   type ProductSelection,
 } from "@/lib/validations/inspiration"
 
-interface Product {
-  id: string
-  name: string
-  price: number | null
-  collection?: {
-    name: string
-  }
-}
-
 interface InspirationFormProps {
-  products: Product[]
+  products: ProductModel[]
   inspiration?: {
     id: string
     name: string

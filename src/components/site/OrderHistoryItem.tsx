@@ -2,8 +2,8 @@ import Image from "next/image"
 import Link from "next/link"
 import { type OrderStatus, OrderStatusBadge } from "@/components/site/OrderStatusBadge"
 import ReorderButton from "@/components/site/ReorderButton"
-import type { OrderItemModel, OrderModel, ProductModel } from "@/generated/models"
 import { calculateCartTotal } from "@/lib/cart-utils"
+import type { OrderWithItems } from "@/lib/types/orders"
 import { formatDate, formatPrice } from "@/lib/utils"
 
 /**
@@ -12,9 +12,7 @@ import { formatDate, formatPrice } from "@/lib/utils"
  * Product can be null if it was deleted after the order was placed
  */
 interface OrderHistoryItemProps {
-  order: Omit<OrderModel, "userId" | "deliveryAddressId"> & {
-    items: (Omit<OrderItemModel, "orderId" | "productId"> & { product: ProductModel | null })[]
-  }
+  order: OrderWithItems
 }
 
 export default function OrderHistoryItem({ order }: OrderHistoryItemProps) {
@@ -66,14 +64,7 @@ export default function OrderHistoryItem({ order }: OrderHistoryItemProps) {
 
       <div className="flex items-center justify-between">
         <p className="text-sm font-medium">{formatPrice(calculateCartTotal(order.items))}</p>
-        <ReorderButton
-          orderNumber={order.orderNumber}
-          orderStatus={order.status}
-          items={order.items.map((item) => ({
-            productId: item.product?.id ?? "",
-            quantity: item.quantity,
-          }))}
-        />
+        <ReorderButton order={order} />
       </div>
     </div>
   )

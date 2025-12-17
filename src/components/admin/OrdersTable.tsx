@@ -1,5 +1,5 @@
 import Link from "next/link"
-import { type OrderStatus, OrderStatusBadge } from "@/components/site/OrderStatusBadge"
+import { OrderStatusBadge } from "@/components/site/OrderStatusBadge"
 import { IconEye } from "@/components/ui/icons"
 import { SortableTableHead } from "@/components/ui/SortableTableHead"
 import {
@@ -10,40 +10,21 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
+import type { OrderModel } from "@/generated/models"
 import { calculateCartTotal } from "@/lib/cart-utils"
 import { formatDate, formatPrice } from "@/lib/utils"
 import NavLink from "../site/NavLink"
 
-interface OrderUser {
-  id: string
-  email: string | null
-  name: string | null
-}
-
-interface OrderItem {
-  product: {
-    price: number | null
-  } | null
-  quantity: number
-}
-
-interface Order {
-  id: string
-  orderNumber: string
-  status: OrderStatus
-  items: OrderItem[]
-  createdAt: Date
-  user: OrderUser
-  deliveryAddress: {
-    email: string
-  }
-  _count: {
-    items: number
-  }
+// Display type for orders with necessary relations
+type DisplayOrder = OrderModel & {
+  user: { email: string | null; name: string | null }
+  items: Array<{ product: { price: number | null } | null; quantity: number; price: number | null }>
+  deliveryAddress: { email: string }
+  _count: { items: number }
 }
 
 interface OrdersTableProps {
-  orders: Order[]
+  orders: DisplayOrder[]
   currentStatus: string
   sort?: string | null
   order?: "asc" | "desc" | null

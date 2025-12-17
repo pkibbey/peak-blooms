@@ -1,20 +1,10 @@
 import { Checkbox } from "@/components/ui/checkbox"
 import { Label } from "@/components/ui/label"
 import { QuantityStepper } from "@/components/ui/QuantityStepper"
-
-interface Product {
-  id: string
-  name: string
-  price: number | null
-  productCollections?: Array<{
-    collection: {
-      name: string
-    }
-  }>
-}
+import type { ProductModel } from "@/generated/models"
 
 interface ProductMultiSelectItemProps {
-  product: Product
+  product: ProductModel
   isSelected: boolean
   selectedQuantity: number
   disabled: boolean
@@ -45,11 +35,6 @@ export function ProductMultiSelectItem({
         />
         <div className="min-w-0 flex-1">
           <p className="truncate font-medium">{product.name}</p>
-          {product.productCollections && product.productCollections.length > 0 && (
-            <p className="truncate text-xs text-muted-foreground">
-              {product.productCollections[0].collection.name}
-            </p>
-          )}
         </div>
       </Label>
 

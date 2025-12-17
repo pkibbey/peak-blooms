@@ -3,23 +3,24 @@
 import { useRouter } from "next/navigation"
 import { useState } from "react"
 import { toast } from "sonner"
-import AddressCard, { type Address } from "@/components/site/AddressCard"
+import { createAddressAction, updateAddressAction } from "@/app/actions/user-actions"
+import AddressCard from "@/components/site/AddressCard"
 import AddressForm, { validateAddress } from "@/components/site/AddressForm"
 import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
 import { IconPlus, IconX } from "@/components/ui/icons"
 import { Label } from "@/components/ui/label"
-import { createAddressAction, updateAddressAction } from "@/app/actions/user-actions"
+import type { AddressModel } from "@/generated/models"
 import { type AddressFormData, emptyAddress } from "@/lib/validations/address"
 
 interface AddressManagerProps {
-  addresses: Address[]
+  addresses: AddressModel[]
 }
 
 export default function AddressManager({ addresses }: AddressManagerProps) {
   const router = useRouter()
   const [isAdding, setIsAdding] = useState(false)
-  const [isEditing, setIsEditing] = useState<Address | null>(null)
+  const [isEditing, setIsEditing] = useState<AddressModel | null>(null)
   const [formData, setFormData] = useState<AddressFormData>(emptyAddress)
   const [setAsDefault, setSetAsDefault] = useState(false)
   const [isSaving, setIsSaving] = useState(false)
@@ -32,7 +33,7 @@ export default function AddressManager({ addresses }: AddressManagerProps) {
     setIsAdding(true)
   }
 
-  const handleEdit = (address: Address) => {
+  const handleEdit = (address: AddressModel) => {
     setIsEditing(address)
     setFormData({
       firstName: address.firstName,

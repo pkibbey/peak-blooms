@@ -1,26 +1,10 @@
 import { SortableTableHead } from "@/components/ui/SortableTableHead"
 import { Table, TableBody, TableHead, TableHeader, TableRow } from "@/components/ui/table"
+import type { ProductWithCollections } from "@/lib/types/products"
 import ProductsTableRow from "./ProductsTableRow"
 
-interface Product {
-  id: string
-  name: string
-  slug: string
-  featured: boolean
-  image: string | null
-  price: number | null
-  productCollections: {
-    collection: {
-      id: string
-      name: string
-    }
-  }[]
-  description?: string | null
-  colors?: string[] | null
-}
-
 interface ProductsTableProps {
-  products: Product[]
+  products: ProductWithCollections[]
   sort?: string | null
   order?: "asc" | "desc" | null
   headerUrl: string

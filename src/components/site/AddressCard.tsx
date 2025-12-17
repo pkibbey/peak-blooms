@@ -7,26 +7,11 @@ import { deleteAddressAction, updateAddressAction } from "@/app/actions/user-act
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { IconEdit, IconStar, IconTrash } from "@/components/ui/icons"
-
-export interface Address {
-  id: string
-  firstName: string
-  lastName: string
-  company: string | null
-  street1: string
-  street2: string | null
-  city: string
-  state: string
-  zip: string
-  country: string
-  email: string
-  phone: string
-  isDefault: boolean
-}
+import type { AddressModel } from "@/generated/models"
 
 interface AddressCardProps {
-  address: Address
-  onEdit: (address: Address) => void
+  address: AddressModel
+  onEdit: (address: AddressModel) => void
 }
 
 export default function AddressCard({ address, onEdit }: AddressCardProps) {

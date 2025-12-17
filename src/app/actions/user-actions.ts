@@ -51,7 +51,7 @@ export async function updateProfileAction(data: ProfileFormData) {
 /**
  * Get all addresses for the current user
  */
-export async function getAddressesAction() {
+async function getAddressesAction() {
   try {
     const session = await getSession()
 

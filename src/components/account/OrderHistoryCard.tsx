@@ -5,16 +5,14 @@ import Link from "next/link"
 import OrderHistoryItem from "@/components/site/OrderHistoryItem"
 import { Button } from "@/components/ui/button"
 import { IconPackage } from "@/components/ui/icons"
-import type { OrderItemModel, OrderModel, ProductModel } from "@/generated/models"
+import type { OrderWithItems } from "@/lib/types/orders"
 
 /**
  * OrderHistoryCardProps - Uses generated types with items and products
  * Omits FK and fields not needed in UI
  */
 interface OrderHistoryCardProps {
-  orders: (Omit<OrderModel, "userId" | "deliveryAddressId"> & {
-    items: (Omit<OrderItemModel, "orderId" | "productId"> & { product: ProductModel })[]
-  })[]
+  orders: OrderWithItems[]
   currentPage: number
   totalPages: number
   searchParams: Record<string, string | string[] | undefined>

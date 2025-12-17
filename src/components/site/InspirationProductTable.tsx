@@ -3,27 +3,13 @@
 import { useState } from "react"
 import AddAllToCartButton from "@/components/site/AddAllToCartButton"
 import { ProductItem } from "@/components/site/ProductItem"
-import type { ProductType } from "@/generated/enums"
-import type { SessionUser } from "@/lib/types/prisma"
+import type { ProductModel } from "@/generated/models"
+import type { SessionUser } from "@/lib/types/users"
 
-interface Product {
-  id: string
-  name: string
-  slug: string
-  image: string | null
-  price: number | null
-  quantity: number
-  description: string | null
-  createdAt: Date
-  updatedAt: Date
-  featured: boolean
-  colors: string[]
-  productType: ProductType
-  deletedAt: Date | null
-}
+type DisplayableProduct = ProductModel & { quantity: number }
 
 interface InspirationProductTableProps {
-  products: Product[]
+  products: DisplayableProduct[]
   setName: string
   user?: SessionUser | null
 }

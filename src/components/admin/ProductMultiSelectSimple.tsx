@@ -3,25 +3,10 @@
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-
-interface ProductVariant {
-  id: string
-  price: number
-  stemLength: number | null
-  quantityPerBunch: number | null
-}
-
-interface Product {
-  id: string
-  name: string
-  collection?: {
-    name: string
-  }
-  variants?: ProductVariant[]
-}
+import type { ProductModel } from "@/generated/models"
 
 interface ProductMultiSelectSimpleProps {
-  products: Product[]
+  products: ProductModel[]
   selectedIds: string[]
   onChange: (selectedIds: string[]) => void
   disabled?: boolean
@@ -35,10 +20,8 @@ export default function ProductMultiSelectSimple({
 }: ProductMultiSelectSimpleProps) {
   const [searchTerm, setSearchTerm] = useState("")
 
-  const filteredProducts = products.filter(
-    (product) =>
-      product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      product.collection?.name.toLowerCase().includes(searchTerm.toLowerCase())
+  const filteredProducts = products.filter((product) =>
+    product.name.toLowerCase().includes(searchTerm.toLowerCase())
   )
 
   const handleToggle = (productId: string) => {
@@ -121,11 +104,6 @@ export default function ProductMultiSelectSimple({
                   />
                   <div className="min-w-0 flex-1">
                     <p className="truncate font-medium">{product.name}</p>
-                    {product.collection && (
-                      <p className="truncate text-xs text-muted-foreground">
-                        {product.collection.name}
-                      </p>
-                    )}
                   </div>
                 </label>
               </li>

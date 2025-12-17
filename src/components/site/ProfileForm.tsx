@@ -4,6 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { useRouter } from "next/navigation"
 import { useForm } from "react-hook-form"
 import { toast } from "sonner"
+import { updateProfileAction } from "@/app/actions/user-actions"
 import { Button } from "@/components/ui/button"
 import {
   Form,
@@ -14,8 +15,7 @@ import {
   FormMessage,
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
-import { updateProfileAction } from "@/app/actions/user-actions"
-import type { SessionUser } from "@/lib/types/prisma"
+import type { SessionUser } from "@/lib/types/users"
 import { type ProfileFormData, profileSchema } from "@/lib/validations/auth"
 
 interface ProfileFormProps {

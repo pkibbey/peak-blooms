@@ -257,7 +257,7 @@ export async function clearCartAction() {
  * Server action to fetch user's current cart
  * Does not auto-create - returns null if cart doesn't exist
  */
-export async function getCartAction() {
+async function getCartAction() {
   try {
     const user = await getCurrentUser()
     if (!user) throw new Error("Unauthorized")

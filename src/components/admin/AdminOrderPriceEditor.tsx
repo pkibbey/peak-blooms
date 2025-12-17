@@ -5,12 +5,8 @@ import { toast } from "sonner"
 import { updateOrderItemPriceAction } from "@/app/actions/orders"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import type { OrderGetPayload } from "@/generated/models"
+import type { OrderWithItems } from "@/lib/types/orders"
 import { formatPrice } from "@/lib/utils"
-
-type OrderWithItems = OrderGetPayload<{
-  include: { items: { include: { product: true } } }
-}>
 
 interface AdminOrderPriceEditorProps {
   order: OrderWithItems

@@ -3,15 +3,16 @@
  * Centralized data fetching with automatic price multiplier application and logging
  */
 
+import type { ProductWhereInput } from "@/generated/models"
 import { db } from "@/lib/db"
-import type { GetProductsOptions, GetProductsResult } from "@/lib/types/data"
-import type {
-  ProductWhereInput,
-  ProductWithInspirations,
-  ProductWithVariantsAndCollection,
-} from "@/lib/types/prisma"
 import { adjustPrice } from "@/lib/utils"
 import { ITEMS_PER_PAGE } from "../consts"
+import type {
+  GetProductsOptions,
+  GetProductsResult,
+  ProductWithCollections,
+  ProductWithInspirations,
+} from "../types/products"
 import { withTiming } from "./logger"
 
 /**
@@ -41,10 +42,10 @@ function applyMultiplierToProducts<T extends { price: number | null; [key: strin
  * Get a single product by ID
  * Returns null if not found or if product is soft-deleted
  */
-export async function getProductById(
+async function getProductById(
   id: string,
   priceMultiplier = 1.0
-): Promise<ProductWithVariantsAndCollection | null> {
+): Promise<ProductWithCollections | null> {
   return withTiming(
     "getProductById",
     id,
@@ -64,7 +65,7 @@ export async function getProductById(
       })
 
       if (!product) return null
-      return applyMultiplierToProduct(product as ProductWithVariantsAndCollection, priceMultiplier)
+      return applyMultiplierToProduct(product as ProductWithCollections, priceMultiplier)
     },
     { logNotFound: true }
   )
@@ -158,10 +159,7 @@ export async function getProducts(
     })
 
     return {
-      products: applyMultiplierToProducts(
-        products as ProductWithVariantsAndCollection[],
-        priceMultiplier
-      ),
+      products: applyMultiplierToProducts(products as ProductWithCollections[], priceMultiplier),
       total,
       limit,
       offset,
@@ -176,7 +174,7 @@ export async function getProducts(
 export async function getFeaturedProducts(
   priceMultiplier = 1.0,
   limit?: number
-): Promise<ProductWithVariantsAndCollection[]> {
+): Promise<ProductWithCollections[]> {
   const result = await getProducts({ featured: true, limit }, priceMultiplier)
   return result.products
 }

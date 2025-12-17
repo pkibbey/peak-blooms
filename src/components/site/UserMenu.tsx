@@ -21,7 +21,7 @@ import {
   IconUser,
 } from "@/components/ui/icons"
 import { authClient, signOut } from "@/lib/auth-client"
-import type { SessionUser } from "@/lib/types/prisma"
+import type { SessionUser } from "@/lib/types/users"
 
 interface UserMenuProps {
   user: SessionUser | null

@@ -5,40 +5,41 @@ import { toast } from "sonner"
 import { batchAddToCartAction } from "@/app/actions/cart"
 import { Button } from "@/components/ui/button"
 import { IconRefresh } from "@/components/ui/icons"
-
-interface OrderItem {
-  productId: string
-  quantity: number
-}
+import type { OrderWithItems } from "@/lib/types/orders"
 
 interface ReorderButtonProps {
-  orderNumber: string
-  items: OrderItem[]
-  orderStatus: string
+  order: OrderWithItems
+  onPriceUpdated?: (newTotal: number) => void
 }
 
-export default function ReorderButton({ orderNumber, items, orderStatus }: ReorderButtonProps) {
+export default function ReorderButton({ order }: ReorderButtonProps) {
   const [isLoading, setIsLoading] = useState(false)
 
   // Can only reorder if order is NOT in PENDING, CONFIRMED, or OUT_FOR_DELIVERY status
-  const canReorder = !["PENDING", "CONFIRMED", "OUT_FOR_DELIVERY"].includes(orderStatus)
+  const canReorder = !["PENDING", "CONFIRMED", "OUT_FOR_DELIVERY"].includes(order.status)
 
   const handleReorder = async () => {
-    if (items.length === 0) {
+    if (order.items.length === 0) {
       toast.error("No items to reorder")
       return
     }
 
     setIsLoading(true)
     try {
-      const productIds = items.map((item) => item.productId)
+      const items = order.items.filter((item) => item.product?.id)
+      const productIds = items.map((item) => (item.product as NonNullable<typeof item.product>).id)
       const quantities = items.map((item) => Math.max(1, Number(item.quantity || 1)))
+
+      if (productIds.length === 0) {
+        toast.error("No available products to reorder")
+        return
+      }
 
       await batchAddToCartAction(productIds, quantities)
 
       const totalUnits = quantities.reduce((s, q) => s + q, 0)
       toast.success(
-        `Added ${totalUnits} item${totalUnits !== 1 ? "s" : ""} from order ${orderNumber} to your cart`
+        `Added ${totalUnits} item${totalUnits !== 1 ? "s" : ""} from order ${order.orderNumber} to your cart`
       )
       // Use full page navigation to ensure cart state is updated on client and server
       window.location.href = "/cart"

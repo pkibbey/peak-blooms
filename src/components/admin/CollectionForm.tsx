@@ -26,41 +26,19 @@ import {
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
+import type { CollectionModel, ProductModel } from "@/generated/models"
 import { type CollectionFormData, collectionSchema } from "@/lib/validations/collection"
 import { IconTrash } from "../ui/icons"
 
-interface ProductVariant {
-  id: string
-  price: number
-  stemLength: number | null
-  quantityPerBunch: number | null
-}
-
-interface Product {
-  id: string
-  name: string
-  collection?: {
-    name: string
-  }
-  variants?: ProductVariant[]
+// Collection type with product count and associations for form display
+type CollectionWithProductCount = CollectionModel & {
+  _count?: { productCollections: number }
+  productCollections?: Array<{ productId: string }>
 }
 
 interface CollectionFormProps {
-  collection?: {
-    id: string
-    name: string
-    slug: string
-    image: string | null
-    description: string | null
-    featured: boolean
-    _count?: {
-      productCollections: number
-    }
-    productCollections?: Array<{
-      productId: string
-    }>
-  }
-  products?: Product[]
+  collection?: CollectionWithProductCount
+  products?: ProductModel[]
 }
 
 export default function CollectionForm({ collection, products = [] }: CollectionFormProps) {

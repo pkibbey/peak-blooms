@@ -1,5 +1,5 @@
 import ProfileForm from "@/components/site/ProfileForm"
-import type { SessionUser } from "@/lib/types/prisma"
+import type { SessionUser } from "@/lib/types/users"
 
 interface ProfileCardProps {
   user: SessionUser

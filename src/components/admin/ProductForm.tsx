@@ -34,16 +34,12 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
+import type { CollectionModel } from "@/generated/models"
 import { type ProductFormData, productSchema } from "@/lib/validations/product"
 import { IconTrash } from "../ui/icons"
 
-interface Collection {
-  id: string
-  name: string
-}
-
 interface ProductFormProps {
-  collections: Collection[]
+  collections: CollectionModel[]
   product?: {
     id: string
     name: string
