@@ -10,7 +10,7 @@ import {
   IconShoppingCart,
   IconUser,
 } from "@/components/ui/icons"
-import { getCurrentUser, getOrCreateCart } from "@/lib/current-user"
+import { getCart, getCurrentUser } from "@/lib/current-user"
 import { Badge } from "../ui/badge"
 import { Button } from "../ui/button"
 import NavSearch from "./NavSearch"
@@ -28,9 +28,10 @@ export default async function Nav() {
   const isApproved = user?.approved === true
 
   // Fetch cart count for approved users (count of unique items, not total quantity)
+  // Only get the cart if it exists - don't create one just for displaying the count
   let cartCount = 0
   if (isApproved) {
-    const cart = await getOrCreateCart(user)
+    const cart = await getCart(user)
     if (cart?.items) {
       cartCount = cart.items.length
     }

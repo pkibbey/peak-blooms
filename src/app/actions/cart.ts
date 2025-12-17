@@ -1,7 +1,7 @@
 "use server"
 
 import { revalidatePath } from "next/cache"
-import { getCurrentUser, getOrCreateCart, calculateCartTotal } from "@/lib/current-user"
+import { calculateCartTotal, getCurrentUser, getOrCreateCart } from "@/lib/current-user"
 import { db } from "@/lib/db"
 
 export interface CartItemResponse {
@@ -41,6 +41,7 @@ export async function addToCartAction(
     // Get or create cart
     let cart = await db.order.findFirst({
       where: { userId: user.id, status: "CART" },
+      orderBy: { createdAt: "desc" },
       include: {
         items: {
           include: { product: true },
@@ -198,6 +199,7 @@ export async function clearCartAction(): Promise<CartResponse> {
 
     const cart = await db.order.findFirst({
       where: { userId: user.id, status: "CART" },
+      orderBy: { createdAt: "desc" },
     })
 
     if (cart) {

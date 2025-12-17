@@ -1,12 +1,13 @@
 import { type NextRequest, NextResponse } from "next/server"
-import { calculateCartTotal, getCurrentUser, getOrCreateCart } from "@/lib/current-user"
+import { calculateCartTotal, getCart, getCurrentUser, getOrCreateCart } from "@/lib/current-user"
 import { db } from "@/lib/db"
 
 /**
  * GET /api/cart
  * Get current user's shopping cart (approved users only)
  * Cart is an Order with status = 'CART'
- * Prices are automatically adjusted by user's price multiplier via getOrCreateCart()
+ * Returns 404 if cart doesn't exist (doesn't auto-create)
+ * Prices are automatically adjusted by user's price multiplier
  */
 export async function GET() {
   try {
@@ -23,8 +24,8 @@ export async function GET() {
       )
     }
 
-    // Get cart with prices already adjusted by multiplier (pass user to avoid redundant DB call)
-    const cart = await getOrCreateCart(user)
+    // Get existing cart without creating one (avoid ghost carts)
+    const cart = await getCart(user)
 
     if (!cart) {
       return NextResponse.json({ error: "Cart not found" }, { status: 404 })
@@ -72,6 +73,7 @@ export async function POST(request: NextRequest) {
     // Get or create cart (Order with status = 'CART')
     let cart = await db.order.findFirst({
       where: { userId: user.id, status: "CART" },
+      orderBy: { createdAt: "desc" },
       include: {
         items: {
           include: {
@@ -149,6 +151,7 @@ export async function DELETE() {
 
     const cart = await db.order.findFirst({
       where: { userId: user.id, status: "CART" },
+      orderBy: { createdAt: "desc" },
     })
 
     if (!cart) {

@@ -46,15 +46,18 @@ function applyPriceMultiplierToCartItems<
 }
 
 /**
- * Get the current user's shopping cart order (creates one if it doesn't exist)
+ * Get the current user's shopping cart order (if it exists)
+ * Returns null if no cart exists
  * Returns cart with prices adjusted by user's price multiplier
  * A cart is an Order with status = 'CART'
  *
  * @param user - pass the user if you already have it to avoid redundant DB call
  */
-export async function getOrCreateCart(user: SessionUser) {
-  let cart = await db.order.findFirst({
+export async function getCart(user: SessionUser) {
+  // Find the most recent CART order for this user (ordered by createdAt DESC)
+  const cart = await db.order.findFirst({
     where: { userId: user.id, status: "CART" },
+    orderBy: { createdAt: "desc" },
     include: {
       items: {
         include: {
@@ -65,6 +68,44 @@ export async function getOrCreateCart(user: SessionUser) {
   })
 
   if (!cart) {
+    return null
+  }
+
+  // Apply user's price multiplier to cart item prices
+  const multiplier = user.priceMultiplier
+  const adjustedItems = applyPriceMultiplierToCartItems(cart.items, multiplier)
+
+  return {
+    ...cart,
+    items: adjustedItems,
+  }
+}
+
+/**
+ * Get or create the current user's shopping cart order
+ * Creates a new cart only if needed (e.g., when adding first item)
+ * Returns cart with prices adjusted by user's price multiplier
+ * A cart is an Order with status = 'CART'
+ *
+ * @param user - pass the user if you already have it to avoid redundant DB call
+ */
+export async function getOrCreateCart(user: SessionUser) {
+  // Try to get existing cart
+  const cart = await getCart(user)
+
+  if (!cart) {
+    // Check if there are any other CART orders for this user (data corruption check)
+    const otherCartOrders = await db.order.findMany({
+      where: { userId: user.id, status: "CART" },
+      select: { id: true, orderNumber: true, createdAt: true },
+    })
+
+    if (otherCartOrders.length > 0) {
+      console.warn(
+        `getOrCreateCart: Found ${otherCartOrders.length} CART orders for user ${user.id}, but getCart returned null. This indicates a data consistency issue. Orders: ${JSON.stringify(otherCartOrders)}`
+      )
+    }
+
     // Ensure the user still exists in the database before creating a cart.
     // A missing user would cause a FK violation (P2003) — bail out gracefully.
     const dbUser = await db.user.findUnique({ where: { id: user.id } })
@@ -108,7 +149,7 @@ export async function getOrCreateCart(user: SessionUser) {
       },
     })
 
-    cart = await db.order.create({
+    const newCart = await db.order.create({
       data: {
         orderNumber,
         userId: user.id,
@@ -125,16 +166,18 @@ export async function getOrCreateCart(user: SessionUser) {
         },
       },
     })
+
+    // Apply user's price multiplier to cart item prices
+    const multiplier = user.priceMultiplier
+    const adjustedItems = applyPriceMultiplierToCartItems(newCart.items, multiplier)
+
+    return {
+      ...newCart,
+      items: adjustedItems,
+    }
   }
 
-  // Apply user's price multiplier to cart item prices
-  const multiplier = user.priceMultiplier
-  const adjustedItems = applyPriceMultiplierToCartItems(cart.items, multiplier)
-
-  return {
-    ...cart,
-    items: adjustedItems,
-  }
+  return cart
 }
 
 /**

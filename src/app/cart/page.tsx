@@ -2,7 +2,7 @@ import { redirect } from "next/navigation"
 import Cart from "@/components/site/Cart"
 import { DeliveryBanner } from "@/components/site/DeliveryBanner"
 import EmptyState from "@/components/site/EmptyState"
-import { calculateCartTotal, getCurrentUser, getOrCreateCart } from "@/lib/current-user"
+import { calculateCartTotal, getCart, getCurrentUser } from "@/lib/current-user"
 
 export default async function CartPage() {
   const user = await getCurrentUser()
@@ -16,8 +16,8 @@ export default async function CartPage() {
     redirect("/pending-approval")
   }
 
-  // Fetch cart data server-side
-  const cart = await getOrCreateCart(user)
+  // Fetch cart data server-side (don't create cart if it doesn't exist)
+  const cart = await getCart(user)
 
   if (!cart) {
     return (

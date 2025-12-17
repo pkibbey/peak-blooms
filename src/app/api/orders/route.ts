@@ -82,6 +82,7 @@ export async function POST(request: Request) {
     // Get user's cart (CART order)
     const cart = await db.order.findFirst({
       where: { userId: user.id, status: "CART" },
+      orderBy: { createdAt: "desc" },
       include: {
         items: {
           include: {
