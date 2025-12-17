@@ -2,6 +2,7 @@ import Link from "next/link"
 import { notFound, redirect } from "next/navigation"
 import { AddressDisplay } from "@/components/site/AddressDisplay"
 import BackLink from "@/components/site/BackLink"
+import { CancelOrderButton } from "@/components/site/CancelOrderButton"
 import { OrderItemsCard } from "@/components/site/OrderItemsCard"
 import { type OrderStatus, OrderStatusBadge } from "@/components/site/OrderStatusBadge"
 import { Button } from "@/components/ui/button"
@@ -60,15 +61,6 @@ export default async function OrderDetailPage({ params }: OrderDetailPageProps) 
           </div>
           <p className="text-muted-foreground">Placed on {formatDate(order.createdAt)}</p>
         </div>
-        <Button
-          variant="outline"
-          nativeButton={false}
-          render={
-            <Link prefetch={false} href="/account/order-history">
-              View All Orders
-            </Link>
-          }
-        />
       </div>
 
       {/* Success Message for new orders */}
@@ -129,15 +121,27 @@ export default async function OrderDetailPage({ params }: OrderDetailPageProps) 
       </div>
 
       {/* Actions */}
-      <div className="mt-8 flex gap-4">
-        <Button
-          nativeButton={false}
-          render={
-            <Link prefetch={false} href="/shop">
-              Continue Shopping
-            </Link>
-          }
-        />
+      <div className="mt-8 space-y-4">
+        <div className="flex gap-4">
+          <Button
+            nativeButton={false}
+            render={
+              <Link prefetch={false} href="/shop">
+                Continue Shopping
+              </Link>
+            }
+          />
+        </div>
+
+        {/* Cancel Order Section - Only show for PENDING orders */}
+        {order.status === "PENDING" && (
+          <div className="border-t pt-4">
+            <p className="text-sm text-muted-foreground mb-3">
+              Need to make changes? You can cancel this order and start fresh.
+            </p>
+            <CancelOrderButton orderId={order.id} orderNumber={order.orderNumber} />
+          </div>
+        )}
       </div>
     </>
   )

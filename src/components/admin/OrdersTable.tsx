@@ -1,6 +1,5 @@
 import Link from "next/link"
 import { type OrderStatus, OrderStatusBadge } from "@/components/site/OrderStatusBadge"
-import { Button } from "@/components/ui/button"
 import { IconEye } from "@/components/ui/icons"
 import { SortableTableHead } from "@/components/ui/SortableTableHead"
 import {
@@ -12,6 +11,7 @@ import {
   TableRow,
 } from "@/components/ui/table"
 import { formatDate, formatPrice } from "@/lib/utils"
+import NavLink from "../site/NavLink"
 
 interface OrderUser {
   id: string
@@ -69,24 +69,16 @@ export default function OrdersTable({ orders, currentStatus, sort, order }: Orde
           <span className="text-sm text-muted-foreground">Filter by status:</span>
           <div className="flex flex-wrap gap-1">
             {statusFilters.map((filter) => (
-              <Button
+              <NavLink
                 key={filter.value}
-                variant={currentStatus === filter.value ? "default" : "outline"}
                 size="sm"
-                nativeButton={false}
-                render={
-                  <Link
-                    prefetch={false}
-                    href={
-                      filter.value === "ALL"
-                        ? "/admin/orders"
-                        : `/admin/orders?status=${filter.value}`
-                    }
-                  >
-                    {filter.label}
-                  </Link>
+                variant={currentStatus === filter.value ? "default" : "outline"}
+                href={
+                  filter.value === "ALL" ? "/admin/orders" : `/admin/orders?status=${filter.value}`
                 }
-              />
+              >
+                {filter.label}
+              </NavLink>
             ))}
           </div>
         </div>
@@ -183,17 +175,15 @@ export default function OrdersTable({ orders, currentStatus, sort, order }: Orde
                       {formatPrice(order.total)}
                     </TableCell>
                     <TableCell className="text-right">
-                      <Button
+                      <NavLink
                         variant="outline"
                         size="sm"
-                        nativeButton={false}
-                        render={
-                          <Link prefetch={false} href={`/admin/orders/${order.id}`}>
-                            <IconEye className="h-4 w-4 mr-1" />
-                            View
-                          </Link>
-                        }
-                      />
+                        // nativeButton={false}
+                        href={`/admin/orders/${order.id}`}
+                      >
+                        <IconEye className="h-4 w-4 mr-1" />
+                        View
+                      </NavLink>
                     </TableCell>
                   </TableRow>
                 )

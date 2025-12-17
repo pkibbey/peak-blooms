@@ -1,9 +1,11 @@
 ## 🛠️ Website To-Do List
 
-Adds product snapshot fields to OrderItem for historical accuracy. Implements 'Edit Order' functionality to convert PENDING orders back to CART, and introduces market price warnings in cart and checkout flows. Updates address forms to require email, and improves type safety and UI consistency throughout.
+Adds product snapshot fields to OrderItem for historical accuracy.
+Introduces market price warnings in cart and checkout flows. 
 
+## Meeting notes
 Get new products in there
-- What do we do about market price stuff?
+What do we do about market price stuff?
 Provide the customer with vauge information about delivery
 Ask the user to choose how they want to recieve a notification, or just give them one option
 Add in the stem length selector for roses

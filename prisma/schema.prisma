@@ -136,6 +136,7 @@ model Product {
   colors       String[]             // Array of color IDs (references COLORS object in lib/colors.ts)
   featured     Boolean              @default(false)
   productType  ProductType          @default(FLOWER)
+  deletedAt    DateTime?            // Soft delete timestamp - NULL means active
   createdAt    DateTime             @default(now())
   updatedAt    DateTime             @updatedAt
   inspirations InspirationProduct[]
@@ -145,6 +146,7 @@ model Product {
   @@index([slug])
   @@index([createdAt])
   @@index([productType])
+  @@index([deletedAt])
   @@index([createdAt(sort: Desc)], map: "idx_product_createdat")
   @@index([colors], map: "idx_product_colors_gin", type: Gin)
 }
@@ -196,13 +198,15 @@ model Order {
 }
 
 model OrderItem {
-  id        String @id @default(cuid())
-  orderId   String
-  productId String
-  quantity  Int
-  price     Float
-  order     Order  @relation(fields: [orderId], references: [id], onDelete: Cascade)
-  product   Product @relation(fields: [productId], references: [id], onDelete: SetNull)
+  id                    String @id @default(cuid())
+  orderId               String
+  productId             String
+  quantity              Int
+  price                 Float
+  productNameSnapshot   String?     // Captured at order time - allows display if product is deleted
+  productImageSnapshot  String?     // Captured at order time - allows display if product is deleted
+  order                 Order  @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  product               Product @relation(fields: [productId], references: [id], onDelete: SetNull)
 
   @@index([orderId])
 }

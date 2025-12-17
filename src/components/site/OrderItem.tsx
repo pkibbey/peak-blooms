@@ -3,10 +3,11 @@ import type { OrderItemModel, ProductModel } from "@/generated/models"
 
 /**
  * OrderItemData - Omits fields not used in UI (FK references)
- * Keeps only: id, quantity, price, product
+ * Keeps only: id, quantity, price, product, and snapshot fields
+ * Prefers snapshot data over live product data for historical accuracy
  */
 type OrderItemData = Omit<OrderItemModel, "orderId" | "productId"> & {
-  product: ProductModel
+  product: ProductModel | null
 }
 
 interface OrderItemProps {
@@ -14,11 +15,25 @@ interface OrderItemProps {
 }
 
 export function OrderItem({ item }: OrderItemProps) {
+  // Use snapshot data if available (for historical accuracy), otherwise fallback to live product data
+  const productName = item.productNameSnapshot ?? item.product?.name ?? "Unknown Product"
+  const productImage = item.productImageSnapshot ?? item.product?.image ?? null
+
   return (
     <ProductItem
       product={{
-        ...item.product,
+        id: item.product?.id ?? "",
+        name: productName,
+        image: productImage,
         price: item.price,
+        slug: item.product?.slug ?? "",
+        description: item.product?.description ?? null,
+        colors: item.product?.colors ?? [],
+        featured: item.product?.featured ?? false,
+        productType: item.product?.productType ?? "FLOWER",
+        createdAt: item.product?.createdAt ?? new Date(),
+        updatedAt: item.product?.updatedAt ?? new Date(),
+        deletedAt: item.product?.deletedAt ?? null,
       }}
       quantity={item.quantity}
       imageSize="sm"

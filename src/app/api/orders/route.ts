@@ -102,6 +102,19 @@ export async function POST(request: Request) {
       return sum + adjustedPrice * item.quantity
     }, 0)
 
+    // Update order items with product snapshots before transitioning to PENDING
+    await Promise.all(
+      cart.items.map((item) =>
+        db.orderItem.update({
+          where: { id: item.id },
+          data: {
+            productNameSnapshot: item.product?.name || null,
+            productImageSnapshot: item.product?.image || null,
+          },
+        })
+      )
+    )
+
     // Handle delivery address
     let finalDeliveryAddressId: string
 

@@ -71,7 +71,7 @@ export default function UserMenu({ user }: UserMenuProps) {
         }
       />
 
-      <DropdownMenuPositioner side="left" align="start">
+      <DropdownMenuPositioner side="bottom" align="start">
         <DropdownMenuContent className="w-56">
           <div className="py-2 px-3 text-sm text-muted-foreground border-b">
             <div className="font-medium truncate">{user.name ?? user.email}</div>

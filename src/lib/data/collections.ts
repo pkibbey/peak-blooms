@@ -55,6 +55,7 @@ export async function getFeaturedCollections(): Promise<CollectionBasicWithCount
 /**
  * Get a collection by slug with its products
  * Returns null if not found
+ * Excludes soft-deleted products from the collection
  */
 export async function getCollectionBySlug(
   slug: string,
@@ -79,7 +80,16 @@ export async function getCollectionBySlug(
       })
 
       if (!collection) return null
-      return applyMultiplierToCollection(collection, priceMultiplier)
+
+      // Filter out productCollections where the product is soft-deleted
+      const filteredCollection = {
+        ...collection,
+        productCollections: collection.productCollections.filter(
+          (pc) => pc.product.deletedAt === null
+        ),
+      }
+
+      return applyMultiplierToCollection(filteredCollection, priceMultiplier)
     },
     { logNotFound: true }
   )

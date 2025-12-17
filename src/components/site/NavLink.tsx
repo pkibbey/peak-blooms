@@ -1,16 +1,17 @@
 "use client"
 
+import type { VariantProps } from "class-variance-authority"
 import Link, { type LinkProps } from "next/link"
 import { usePathname } from "next/navigation"
-import { Button } from "@/components/ui/button"
+import { Button, type buttonVariants } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 
-type NavLinkProps = LinkProps & {
-  children: React.ReactNode
-  className?: string
-  icon?: React.ReactNode
-  variant?: "outline" | "ghost" | "default"
-}
+type NavLinkProps = LinkProps &
+  VariantProps<typeof buttonVariants> & {
+    children: React.ReactNode
+    className?: string
+    icon?: React.ReactNode
+  }
 
 export default function NavLink({
   variant = "ghost",
@@ -18,6 +19,7 @@ export default function NavLink({
   children,
   className,
   icon,
+  size,
   ...props
 }: NavLinkProps) {
   const pathname = usePathname()
@@ -26,6 +28,7 @@ export default function NavLink({
   return (
     <Button
       variant={variant}
+      size={size}
       className={cn(
         active
           ? "bg-secondary text-secondary-foreground hover:bg-secondary/80 hover:text-secondary-foreground"

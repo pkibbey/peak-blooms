@@ -19,6 +19,7 @@ interface Product {
   featured: boolean
   colors: string[]
   productType: ProductType
+  deletedAt: Date | null
 }
 
 interface InspirationProductTableProps {

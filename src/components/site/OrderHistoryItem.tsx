@@ -8,10 +8,11 @@ import { formatDate, formatPrice } from "@/lib/utils"
 /**
  * OrderHistoryItemProps - Uses generated types with items and products
  * Omits FK and fields not needed in UI
+ * Product can be null if it was deleted after the order was placed
  */
 interface OrderHistoryItemProps {
   order: Omit<OrderModel, "userId" | "deliveryAddressId"> & {
-    items: (Omit<OrderItemModel, "orderId" | "productId"> & { product: ProductModel })[]
+    items: (Omit<OrderItemModel, "orderId" | "productId"> & { product: ProductModel | null })[]
   }
 }
 
@@ -34,21 +35,27 @@ export default function OrderHistoryItem({ order }: OrderHistoryItemProps) {
 
       {/* Order Items Preview */}
       <div className="flex gap-1 mb-2">
-        {order.items.slice(0, 5).map((item) => (
-          <div key={item.id} className="relative h-12 w-12 shrink-0 overflow-hidden rounded-xs">
-            {item.product.image ? (
-              <Image
-                src={item.product.image}
-                alt={item.product.name}
-                fill
-                className="object-cover"
-                sizes="48px"
-              />
-            ) : (
-              <div className="h-full w-full bg-muted" />
-            )}
-          </div>
-        ))}
+        {order.items.slice(0, 5).map((item) => {
+          // Use snapshot data if available (for historical accuracy), otherwise fallback to live product data
+          const productImage = item.productImageSnapshot ?? item.product?.image
+          const productName = item.productNameSnapshot ?? item.product?.name ?? "Unknown Product"
+
+          return (
+            <div key={item.id} className="relative h-12 w-12 shrink-0 overflow-hidden rounded-xs">
+              {productImage ? (
+                <Image
+                  src={productImage}
+                  alt={productName}
+                  fill
+                  className="object-cover"
+                  sizes="48px"
+                />
+              ) : (
+                <div className="h-full w-full bg-muted" />
+              )}
+            </div>
+          )
+        })}
         {order.items.length > 5 && (
           <div className="h-12 w-12 shrink-0 rounded-xs bg-neutral-100 flex items-center justify-center text-xs text-muted-foreground">
             +{order.items.length - 5}
@@ -62,7 +69,7 @@ export default function OrderHistoryItem({ order }: OrderHistoryItemProps) {
           orderNumber={order.orderNumber}
           orderStatus={order.status}
           items={order.items.map((item) => ({
-            productId: item.product.id,
+            productId: item.product?.id ?? "",
             quantity: item.quantity,
           }))}
         />

@@ -39,7 +39,7 @@ function applyMultiplierToProducts<T extends { price: number; [key: string]: unk
 
 /**
  * Get a single product by ID
- * Returns null if not found
+ * Returns null if not found or if product is soft-deleted
  */
 export async function getProductById(
   id: string,
@@ -49,8 +49,11 @@ export async function getProductById(
     "getProductById",
     id,
     async () => {
-      const product = await db.product.findUnique({
-        where: { id },
+      const product = await db.product.findFirst({
+        where: {
+          id,
+          deletedAt: null, // Exclude soft-deleted products
+        },
         include: {
           productCollections: {
             include: {
@@ -78,6 +81,9 @@ export async function getProducts(
   return withTiming("getProducts", options as Record<string, unknown>, async () => {
     // Build the where clause for filtering
     const where: ProductWhereInput = {}
+
+    // Always exclude soft-deleted products
+    where.deletedAt = null
 
     if (options.collectionIds && options.collectionIds.length > 0) {
       where.productCollections = {
@@ -178,7 +184,7 @@ export async function getFeaturedProducts(
 /**
  * Get a product by slug with collections and inspirations
  * Used for product detail pages
- * Returns null if not found
+ * Returns null if not found or if product is soft-deleted
  */
 export async function getProductWithInspirations(
   slug: string,
@@ -188,8 +194,11 @@ export async function getProductWithInspirations(
     "getProductWithInspirations",
     slug,
     async () => {
-      const product = await db.product.findUnique({
-        where: { slug },
+      const product = await db.product.findFirst({
+        where: {
+          slug,
+          deletedAt: null, // Exclude soft-deleted products
+        },
         include: {
           productCollections: {
             include: {
@@ -220,14 +229,16 @@ export async function getProductWithInspirations(
 /**
  * Get available filter options for the shop page
  * Returns color IDs and collections - hex values are computed via COLORS map in components
+ * Excludes soft-deleted products
  */
 export async function getShopFilterOptions(): Promise<{
   colorIds: string[]
   collections: Array<{ id: string; name: string }>
 }> {
   return withTiming("getShopFilterOptions", {}, async () => {
-    // Get all unique color IDs from products
+    // Get all unique color IDs from active (non-deleted) products
     const products = await db.product.findMany({
+      where: { deletedAt: null },
       select: { colors: true },
     })
     const colorIdsSet = new Set<string>()
