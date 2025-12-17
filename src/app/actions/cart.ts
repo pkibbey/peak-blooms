@@ -5,35 +5,30 @@ import { calculateCartTotal } from "@/lib/cart-utils"
 import { getCurrentUser, getOrCreateCart } from "@/lib/current-user"
 import { db } from "@/lib/db"
 
-export interface CartItemResponse {
-  id: string
-  orderId: string
-  productId: string
-  quantity: number
-  product: {
-    id: string
-    name: string
-    price: number | null
-    image: string | null
-  }
+// Helper to apply price multiplier (same as in current-user.ts)
+function adjustPrice(price: number, multiplier: number): number {
+  return Math.round(price * multiplier * 100) / 100
 }
 
-export interface CartResponse {
-  id: string
-  orderNumber: string
-  items: CartItemResponse[]
-  total: number
-  status: string
+function applyPriceMultiplier<
+  T extends { product?: { price: number | null; [key: string]: unknown } | null },
+>(items: T[], multiplier: number): T[] {
+  return items.map((item) => ({
+    ...item,
+    product: item.product
+      ? {
+          ...item.product,
+          price: item.product.price === null ? null : adjustPrice(item.product.price, multiplier),
+        }
+      : null,
+  }))
 }
 
 /**
  * Server action to add or update item in cart
  * Returns the full cart with updated item list
  */
-export async function addToCartAction(
-  productId: string,
-  quantity: number = 1
-): Promise<CartResponse> {
+export async function addToCartAction(productId: string, quantity: number = 1) {
   try {
     const user = await getCurrentUser()
     if (!user) throw new Error("Unauthorized")
@@ -95,26 +90,17 @@ export async function addToCartAction(
       },
     })
 
-    const total = calculateCartTotal(updatedCart.items)
+    const adjustedItems = applyPriceMultiplier(updatedCart.items, user.priceMultiplier)
+    const total = calculateCartTotal(adjustedItems)
 
     revalidatePath("/cart")
     return {
       id: updatedCart.id,
       orderNumber: updatedCart.orderNumber,
-      items: updatedCart.items.map((item) => ({
-        id: item.id,
-        orderId: item.orderId,
-        productId: item.productId,
-        quantity: item.quantity,
-        product: {
-          id: item.product.id,
-          name: item.product.name,
-          price: item.product.price !== null ? item.product.price * user.priceMultiplier : null,
-          image: item.product.image,
-        },
-      })),
-      total,
       status: updatedCart.status,
+      notes: updatedCart.notes,
+      items: adjustedItems,
+      total,
     }
   } catch (error) {
     console.error("addToCartAction error:", error)
@@ -126,10 +112,7 @@ export async function addToCartAction(
  * Server action to update cart item quantity
  * Returns the updated cart
  */
-export async function updateCartItemAction(
-  itemId: string,
-  quantity: number
-): Promise<CartResponse> {
+export async function updateCartItemAction(itemId: string, quantity: number) {
   try {
     const user = await getCurrentUser()
     if (!user) throw new Error("Unauthorized")
@@ -164,26 +147,17 @@ export async function updateCartItemAction(
       },
     })
 
-    const total = calculateCartTotal(updatedCart.items)
+    const adjustedItems = applyPriceMultiplier(updatedCart.items, user.priceMultiplier)
+    const total = calculateCartTotal(adjustedItems)
 
     revalidatePath("/cart")
     return {
       id: updatedCart.id,
       orderNumber: updatedCart.orderNumber,
-      items: updatedCart.items.map((i) => ({
-        id: i.id,
-        orderId: i.orderId,
-        productId: i.productId,
-        quantity: i.quantity,
-        product: {
-          id: i.product.id,
-          name: i.product.name,
-          price: i.product.price !== null ? i.product.price * user.priceMultiplier : null,
-          image: i.product.image,
-        },
-      })),
-      total,
       status: updatedCart.status,
+      notes: updatedCart.notes,
+      items: adjustedItems,
+      total,
     }
   } catch (error) {
     console.error("updateCartItemAction error:", error)
@@ -192,10 +166,60 @@ export async function updateCartItemAction(
 }
 
 /**
+ * Server action to remove a single item from cart
+ * Returns the updated cart
+ */
+export async function removeFromCartAction(itemId: string) {
+  try {
+    const user = await getCurrentUser()
+    if (!user) throw new Error("Unauthorized")
+
+    const item = await db.orderItem.findUniqueOrThrow({
+      where: { id: itemId },
+      include: { order: true },
+    })
+
+    // Verify ownership
+    if (item.order.userId !== user.id) {
+      throw new Error("Unauthorized")
+    }
+
+    // Delete the item
+    await db.orderItem.delete({ where: { id: itemId } })
+
+    // Fetch updated cart
+    const updatedCart = await db.order.findUniqueOrThrow({
+      where: { id: item.orderId },
+      include: {
+        items: {
+          include: { product: true },
+        },
+      },
+    })
+
+    const adjustedItems = applyPriceMultiplier(updatedCart.items, user.priceMultiplier)
+    const total = calculateCartTotal(adjustedItems)
+
+    revalidatePath("/cart")
+    return {
+      id: updatedCart.id,
+      orderNumber: updatedCart.orderNumber,
+      status: updatedCart.status,
+      notes: updatedCart.notes,
+      items: adjustedItems,
+      total,
+    }
+  } catch (error) {
+    console.error("removeFromCartAction error:", error)
+    throw new Error(error instanceof Error ? error.message : "Failed to remove item from cart")
+  }
+}
+
+/**
  * Server action to clear all items from cart
  * Returns empty cart
  */
-export async function clearCartAction(): Promise<CartResponse> {
+export async function clearCartAction() {
   try {
     const user = await getCurrentUser()
     if (!user) throw new Error("Unauthorized")
@@ -218,12 +242,144 @@ export async function clearCartAction(): Promise<CartResponse> {
     return {
       id: updatedCart.id,
       orderNumber: updatedCart.orderNumber,
+      status: updatedCart.status,
+      notes: updatedCart.notes,
       items: [],
       total: 0,
-      status: updatedCart.status,
     }
   } catch (error) {
     console.error("clearCartAction error:", error)
     throw new Error(error instanceof Error ? error.message : "Failed to clear cart")
+  }
+}
+
+/**
+ * Server action to fetch user's current cart
+ * Does not auto-create - returns null if cart doesn't exist
+ */
+export async function getCartAction() {
+  try {
+    const user = await getCurrentUser()
+    if (!user) throw new Error("Unauthorized")
+
+    if (!user.approved) throw new Error("Your account is not approved for purchases")
+
+    // Get existing cart without creating one
+    const cart = await db.order.findFirst({
+      where: { userId: user.id, status: "CART" },
+      orderBy: { createdAt: "desc" },
+      include: {
+        items: {
+          include: { product: true },
+        },
+      },
+    })
+
+    if (!cart) return null
+
+    const adjustedItems = applyPriceMultiplier(cart.items, user.priceMultiplier)
+    const total = calculateCartTotal(adjustedItems)
+
+    return {
+      id: cart.id,
+      orderNumber: cart.orderNumber,
+      status: cart.status,
+      notes: cart.notes,
+      items: adjustedItems,
+      total,
+    }
+  } catch (error) {
+    console.error("getCartAction error:", error)
+    throw new Error(error instanceof Error ? error.message : "Failed to fetch cart")
+  }
+}
+
+/**
+ * Server action to add multiple items to cart in one transaction
+ * Supports single quantity for all or per-item quantities
+ */
+export async function batchAddToCartAction(productIds: string[], quantities?: number[] | number) {
+  try {
+    const user = await getCurrentUser()
+    if (!user) throw new Error("Unauthorized")
+    if (!user.approved) throw new Error("Your account is not approved for purchases")
+
+    if (!Array.isArray(productIds) || productIds.length === 0) {
+      throw new Error("productIds must be a non-empty array")
+    }
+
+    // Determine per-item quantities
+    let resolvedQuantities: number[] = []
+    if (typeof quantities === "number") {
+      resolvedQuantities = productIds.map(() => quantities)
+    } else if (Array.isArray(quantities)) {
+      if (quantities.length !== productIds.length) {
+        throw new Error("quantities array length must match productIds")
+      }
+      resolvedQuantities = quantities.map((q) => (typeof q === "number" && q > 0 ? q : 1))
+    } else {
+      resolvedQuantities = productIds.map(() => 1)
+    }
+
+    // Get or create cart
+    const cart = await getOrCreateCart(user)
+    if (!cart) throw new Error("Failed to get or create cart")
+
+    // Transaction to add items atomically
+    await db.$transaction(async (tx) => {
+      for (let i = 0; i < productIds.length; i++) {
+        const productId = String(productIds[i])
+        const quantity = Math.max(1, Number(resolvedQuantities[i] ?? 1))
+
+        const existingItem = await tx.orderItem.findFirst({
+          where: {
+            orderId: cart.id,
+            productId,
+          },
+        })
+
+        if (existingItem) {
+          await tx.orderItem.update({
+            where: { id: existingItem.id },
+            data: { quantity },
+          })
+        } else {
+          await tx.orderItem.create({
+            data: {
+              orderId: cart.id,
+              productId,
+              quantity,
+              price: null,
+            },
+          })
+        }
+      }
+    })
+
+    // Fetch updated cart
+    const updatedCart = await db.order.findUniqueOrThrow({
+      where: { id: cart.id },
+      include: {
+        items: {
+          include: { product: true },
+        },
+      },
+    })
+
+    const adjustedItems = applyPriceMultiplier(updatedCart.items, user.priceMultiplier)
+    const total = calculateCartTotal(adjustedItems)
+
+    revalidatePath("/cart")
+    return {
+      id: updatedCart.id,
+      orderNumber: updatedCart.orderNumber,
+      status: updatedCart.status,
+      notes: updatedCart.notes,
+      items: adjustedItems,
+      total,
+    }
+  } catch (error) {
+    console.error("batchAddToCartAction error:", error)
+    throw new Error(error instanceof Error ? error.message : "Failed to add items to cart")
   }
 }

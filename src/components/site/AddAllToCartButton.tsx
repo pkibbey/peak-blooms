@@ -4,6 +4,7 @@ import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { useState } from "react"
 import { toast } from "sonner"
+import { batchAddToCartAction } from "@/app/actions/cart"
 import { Button } from "@/components/ui/button"
 import { useSession } from "@/lib/auth-client"
 import type { SessionUser } from "@/lib/types/prisma"
@@ -43,23 +44,7 @@ export default function AddAllToCartButton({
     setError(null)
 
     try {
-      type Payload = {
-        productIds: string[]
-        quantities?: number[]
-      }
-      const payload: Payload = { productIds }
-      if (Array.isArray(quantities)) payload.quantities = quantities
-
-      const response = await fetch("/api/cart/batch", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      })
-
-      if (!response.ok) {
-        const data = await response.json()
-        throw new Error(data.error || "Failed to add items to cart")
-      }
+      await batchAddToCartAction(productIds, quantities)
 
       toast.success(
         setName

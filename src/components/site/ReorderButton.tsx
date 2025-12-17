@@ -2,6 +2,7 @@
 
 import { useState } from "react"
 import { toast } from "sonner"
+import { batchAddToCartAction } from "@/app/actions/cart"
 import { Button } from "@/components/ui/button"
 import { IconRefresh } from "@/components/ui/icons"
 
@@ -33,16 +34,7 @@ export default function ReorderButton({ orderNumber, items, orderStatus }: Reord
       const productIds = items.map((item) => item.productId)
       const quantities = items.map((item) => Math.max(1, Number(item.quantity || 1)))
 
-      const response = await fetch("/api/cart/batch", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ productIds, quantities }),
-      })
-
-      if (!response.ok) {
-        const data = await response.json()
-        throw new Error(data.error || "Failed to add items to cart")
-      }
+      await batchAddToCartAction(productIds, quantities)
 
       const totalUnits = quantities.reduce((s, q) => s + q, 0)
       toast.success(

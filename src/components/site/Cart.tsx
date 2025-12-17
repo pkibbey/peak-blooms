@@ -4,6 +4,7 @@ import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { useState } from "react"
 import { toast } from "sonner"
+import { clearCartAction, removeFromCartAction, updateCartItemAction } from "@/app/actions/cart"
 import { CartItem, type CartItemData } from "@/components/site/CartItem"
 import EmptyState from "@/components/site/EmptyState"
 import { MarketPriceIndicator } from "@/components/site/MarketPriceIndicator"
@@ -34,28 +35,19 @@ export default function Cart({ initialCart }: CartProps) {
   const [updatingItems, setUpdatingItems] = useState<Set<string>>(new Set())
   const [isEmptying, setIsEmptying] = useState(false)
 
-  // Debounced API call for quantity updates
+  // Debounced server action call for quantity updates
   const debouncedQuantityUpdate = useDebouncedCallback(async (...args: readonly unknown[]) => {
     const itemId = args[0] as string
     const quantity = args[1] as number
     setUpdatingItems((prev) => new Set(prev).add(itemId))
 
     try {
-      const response = await fetch(`/api/cart/items/${itemId}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ quantity }),
-      })
-
-      if (!response.ok) {
-        throw new Error("Failed to update quantity")
-      }
-
+      const result = await updateCartItemAction(itemId, quantity)
+      setCart(result as CartData)
       router.refresh()
     } catch (error) {
       console.error("Error updating quantity:", error)
-      toast.error("Failed to update quantity")
-      refreshCart()
+      toast.error(error instanceof Error ? error.message : "Failed to update quantity")
     } finally {
       setUpdatingItems((prev) => {
         const next = new Set(prev)
@@ -64,20 +56,6 @@ export default function Cart({ initialCart }: CartProps) {
       })
     }
   }, 800)
-
-  const refreshCart = async () => {
-    try {
-      const response = await fetch("/api/cart")
-      if (!response.ok) {
-        throw new Error("Failed to fetch cart")
-      }
-      const data = await response.json()
-      setCart(data)
-    } catch (error) {
-      console.error("Error fetching cart:", error)
-      toast.error("Failed to load cart")
-    }
-  }
 
   const updateQuantity = (itemId: string, newQuantity: number) => {
     if (newQuantity < 1) return
@@ -91,7 +69,7 @@ export default function Cart({ initialCart }: CartProps) {
       return { ...prev, items: updatedItems }
     })
 
-    // Debounced API call
+    // Debounced server action call
     debouncedQuantityUpdate(itemId, newQuantity)
   }
 
@@ -106,21 +84,15 @@ export default function Cart({ initialCart }: CartProps) {
     })
 
     try {
-      const response = await fetch(`/api/cart/items/${itemId}`, {
-        method: "DELETE",
-      })
-
-      if (!response.ok) {
-        throw new Error("Failed to remove item")
-      }
-
+      const result = await removeFromCartAction(itemId)
+      setCart(result as CartData)
       toast.success(`Removed "${productName}" from cart`)
       router.refresh()
     } catch (error) {
       console.error("Error removing item:", error)
-      toast.error("Failed to remove item")
-      // Revert on error
-      refreshCart()
+      toast.error(error instanceof Error ? error.message : "Failed to remove item")
+      // Refresh to revert on error
+      router.refresh()
     } finally {
       setUpdatingItems((prev) => {
         const next = new Set(prev)
@@ -142,16 +114,13 @@ export default function Cart({ initialCart }: CartProps) {
     setCart((prev) => ({ ...prev, items: [] }))
 
     try {
-      const response = await fetch("/api/cart", { method: "DELETE" })
-      if (!response.ok) {
-        throw new Error("Failed to empty cart")
-      }
-
+      const result = await clearCartAction()
+      setCart(result as CartData)
       toast.success("Cart cleared")
       router.refresh()
     } catch (err) {
       console.error("Error clearing cart:", err)
-      toast.error("Failed to clear cart")
+      toast.error(err instanceof Error ? err.message : "Failed to clear cart")
       // revert
       setCart(previousCart)
     }
