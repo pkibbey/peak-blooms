@@ -6,7 +6,10 @@ import { useState } from "react"
 import { useForm } from "react-hook-form"
 import { toast } from "sonner"
 import AddressFields from "@/components/site/AddressFields"
+import type { CartData } from "@/components/site/Cart"
 import { CheckoutOrderItem } from "@/components/site/CheckoutOrderItem"
+import { MarketPriceIndicator } from "@/components/site/MarketPriceIndicator"
+import { MarketPriceWarning } from "@/components/site/MarketPriceWarning"
 import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
 import {
@@ -26,29 +29,9 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
-import { formatPrice } from "@/lib/utils"
+import { calculateCartTotal } from "@/lib/cart-utils"
 import { emptyAddress } from "@/lib/validations/address"
 import { type CheckoutFormData, checkoutSchema } from "@/lib/validations/checkout"
-
-interface CartProduct {
-  id: string
-  name: string
-  slug: string
-  image: string | null
-  price: number
-}
-
-interface CartItem {
-  id: string
-  quantity: number
-  product: CartProduct
-}
-
-interface CartData {
-  id?: string
-  items: CartItem[]
-  total: number
-}
 
 interface SavedAddress {
   id: string
@@ -75,6 +58,7 @@ export default function CheckoutForm({ cart, savedAddresses }: CheckoutFormProps
   const [selectedAddressId, setSelectedAddressId] = useState<string>(
     savedAddresses.length > 0 ? savedAddresses[0].id : "new"
   )
+  const total = calculateCartTotal(cart.items)
 
   const getInitialDeliveryAddress = () => {
     if (savedAddresses.length > 0) {
@@ -337,6 +321,11 @@ export default function CheckoutForm({ cart, savedAddresses }: CheckoutFormProps
           <div className="bg-background rounded-xs shadow-sm border p-6 sticky top-24">
             <h2 className="heading-3 mb-4">Order Summary</h2>
 
+            <MarketPriceWarning
+              showWarning={cart.items.some((item) => item.product?.price === null)}
+              className="mb-4"
+            />
+
             {/* Cart Items */}
             <div className="space-y-4 mb-4">
               {cart.items.map((item) => (
@@ -349,7 +338,7 @@ export default function CheckoutForm({ cart, savedAddresses }: CheckoutFormProps
                 <span className="text-muted-foreground">
                   Subtotal ({cart.items.reduce((sum, item) => sum + item.quantity, 0)} items)
                 </span>
-                <span>{formatPrice(cart.total)}</span>
+                <MarketPriceIndicator items={cart.items} total={total} />
               </div>
               <div className="flex justify-between">
                 <span className="text-muted-foreground">Delivery</span>
@@ -361,7 +350,7 @@ export default function CheckoutForm({ cart, savedAddresses }: CheckoutFormProps
 
             <div className="flex justify-between font-semibold text-lg mb-6">
               <span>Total</span>
-              <span>{formatPrice(cart.total)}</span>
+              <MarketPriceIndicator items={cart.items} total={total} size="sm" />
             </div>
 
             <Button type="submit" size="lg" className="w-full" disabled={isSubmitting}>

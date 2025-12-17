@@ -3,7 +3,7 @@ import { redirect } from "next/navigation"
 import CheckoutForm from "@/components/site/CheckoutForm"
 import { Button } from "@/components/ui/button"
 import { IconShoppingBag } from "@/components/ui/icons"
-import { calculateCartTotal, getCart, getCurrentUser } from "@/lib/current-user"
+import { getCart, getCurrentUser } from "@/lib/current-user"
 import { db } from "@/lib/db"
 
 export default async function CheckoutPage() {
@@ -26,8 +26,6 @@ export default async function CheckoutPage() {
   if (!cart || cart.items.length === 0) {
     redirect("/cart")
   }
-
-  const total = calculateCartTotal(cart.items)
 
   // Fetch user's saved addresses, with default first
   const savedAddresses = await db.address.findMany({
@@ -61,7 +59,7 @@ export default async function CheckoutPage() {
   return (
     <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 py-10">
       <h1 className="heading-1 mb-8">Checkout</h1>
-      <CheckoutForm cart={{ ...cart, total }} savedAddresses={savedAddresses} />
+      <CheckoutForm cart={cart} savedAddresses={savedAddresses} />
     </div>
   )
 }

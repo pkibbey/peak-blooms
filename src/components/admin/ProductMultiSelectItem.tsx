@@ -5,7 +5,7 @@ import { QuantityStepper } from "@/components/ui/QuantityStepper"
 interface Product {
   id: string
   name: string
-  price: number
+  price: number | null
   productCollections?: Array<{
     collection: {
       name: string

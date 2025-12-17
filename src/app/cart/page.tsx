@@ -2,7 +2,7 @@ import { redirect } from "next/navigation"
 import Cart from "@/components/site/Cart"
 import { DeliveryBanner } from "@/components/site/DeliveryBanner"
 import EmptyState from "@/components/site/EmptyState"
-import { calculateCartTotal, getCart, getCurrentUser } from "@/lib/current-user"
+import { getCart, getCurrentUser } from "@/lib/current-user"
 
 export default async function CartPage() {
   const user = await getCurrentUser()
@@ -31,8 +31,6 @@ export default async function CartPage() {
     )
   }
 
-  const total = calculateCartTotal(cart.items)
-
   return (
     <>
       <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 py-10">
@@ -44,7 +42,6 @@ export default async function CartPage() {
             status: cart.status,
             notes: cart.notes,
             items: cart.items,
-            total,
           }}
         />
       </div>

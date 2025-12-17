@@ -1,8 +1,8 @@
 import { notFound } from "next/navigation"
+import { AdminOrderPriceEditor } from "@/components/admin/AdminOrderPriceEditor"
 import OrderStatusForm from "@/components/admin/OrderStatusForm"
 import { AddressDisplay } from "@/components/site/AddressDisplay"
 import BackLink from "@/components/site/BackLink"
-import { OrderItemsCard } from "@/components/site/OrderItemsCard"
 import { type OrderStatus, OrderStatusBadge } from "@/components/site/OrderStatusBadge"
 import { getTrackedDb } from "@/lib/db"
 import { formatDate } from "@/lib/utils"
@@ -58,7 +58,7 @@ export default async function AdminOrderDetailPage({ params }: AdminOrderDetailP
         {/* Main Content */}
         <div className="lg:col-span-2 space-y-6">
           {/* Order Items */}
-          <OrderItemsCard items={order.items} total={order.total} />
+          <AdminOrderPriceEditor order={order} />
 
           {/* Order Notes */}
           {order.notes && (

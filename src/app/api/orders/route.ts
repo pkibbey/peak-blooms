@@ -96,14 +96,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Cart is empty" }, { status: 400 })
     }
 
-    // Calculate total using product pricing with price multiplier applied
-    const total = cart.items.reduce((sum: number, item) => {
-      const basePrice = item.product?.price ?? 0
-      const adjustedPrice = adjustPrice(basePrice, priceMultiplier)
-      return sum + adjustedPrice * item.quantity
-    }, 0)
-
-    // Update order items with product snapshots before transitioning to PENDING
+    // Update order items with product snapshots and capture current prices at checkout time
     await Promise.all(
       cart.items.map((item) =>
         db.orderItem.update({
@@ -111,6 +104,12 @@ export async function POST(request: Request) {
           data: {
             productNameSnapshot: item.product?.name || null,
             productImageSnapshot: item.product?.image || null,
+            // Capture current product price (or null if market-priced)
+            // Null indicates market-priced item to be set by admin later
+            price:
+              item.product?.price === null
+                ? null
+                : adjustPrice(item.product?.price ?? 0, priceMultiplier),
           },
         })
       )
@@ -162,7 +161,6 @@ export async function POST(request: Request) {
       where: { id: cart.id },
       data: {
         status: "PENDING",
-        total: Math.round(total * 100) / 100,
         notes: notes || null,
         deliveryAddressId: finalDeliveryAddressId,
       },

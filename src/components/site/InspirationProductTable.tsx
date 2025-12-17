@@ -11,7 +11,7 @@ interface Product {
   name: string
   slug: string
   image: string | null
-  price: number
+  price: number | null
   quantity: number
   description: string | null
   createdAt: Date

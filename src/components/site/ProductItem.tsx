@@ -83,7 +83,7 @@ export function ProductItem({
 
   // Stacked Layout - renders as a list item (cart/order context)
   const price = product.price
-  const lineTotal = price * quantity
+  const lineTotal = price !== null ? price * quantity : null
 
   const sizeConfig = imageSizes[imageSize]
 

@@ -6,20 +6,22 @@ import { useState } from "react"
 import { toast } from "sonner"
 import { CartItem, type CartItemData } from "@/components/site/CartItem"
 import EmptyState from "@/components/site/EmptyState"
+import { MarketPriceIndicator } from "@/components/site/MarketPriceIndicator"
+import { MarketPriceWarning } from "@/components/site/MarketPriceWarning"
 import { Button } from "@/components/ui/button"
 import { IconShoppingBag } from "@/components/ui/icons"
 import type { OrderModel } from "@/generated/models"
+import { calculateCartTotal } from "@/lib/cart-utils"
 import { useDebouncedCallback } from "@/lib/useDebouncedCallback"
-import { formatPrice } from "@/lib/utils"
 
 /**
  * CartData - Omits FK and timestamp fields not needed in UI
- * Represents an Order with status = 'CART', items (OrderItemData[]) and total
+ * Represents an Order with status = 'CART' and its items
+ * Total should be calculated from items using calculateCartTotal()
  */
-interface CartData
+export interface CartData
   extends Omit<OrderModel, "userId" | "deliveryAddressId" | "createdAt" | "updatedAt"> {
   items: CartItemData[]
-  total: number
 }
 
 interface CartProps {
@@ -86,11 +88,7 @@ export default function Cart({ initialCart }: CartProps) {
       const updatedItems = prev.items.map((item) =>
         item.id === itemId ? { ...item, quantity: newQuantity } : item
       )
-      const newTotal = updatedItems.reduce((total, item) => {
-        const price = item.product?.price ?? 0
-        return total + price * item.quantity
-      }, 0)
-      return { ...prev, items: updatedItems, total: newTotal }
+      return { ...prev, items: updatedItems }
     })
 
     // Debounced API call
@@ -104,11 +102,7 @@ export default function Cart({ initialCart }: CartProps) {
     setCart((prev) => {
       if (!prev) return prev
       const updatedItems = prev.items.filter((item) => item.id !== itemId)
-      const newTotal = updatedItems.reduce((total, item) => {
-        const price = item.product?.price ?? 0
-        return total + price * item.quantity
-      }, 0)
-      return { ...prev, items: updatedItems, total: newTotal }
+      return { ...prev, items: updatedItems }
     })
 
     try {
@@ -145,7 +139,7 @@ export default function Cart({ initialCart }: CartProps) {
     const previousCart = cart
     setIsEmptying(true)
     // Optimistic UI: clear locally first
-    setCart((prev) => ({ ...prev, items: [], total: 0 }))
+    setCart((prev) => ({ ...prev, items: [] }))
 
     try {
       const response = await fetch("/api/cart", { method: "DELETE" })
@@ -184,6 +178,8 @@ export default function Cart({ initialCart }: CartProps) {
     )
   }
 
+  const total = calculateCartTotal(cart.items)
+
   return (
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
       {/* Cart Items */}
@@ -204,12 +200,17 @@ export default function Cart({ initialCart }: CartProps) {
         <div className="bg-background rounded-xs shadow-sm border p-6 sticky top-24">
           <h2 className="heading-3 mb-4 font-serif">Order Summary</h2>
 
+          <MarketPriceWarning
+            showWarning={cart.items.some((item) => item.product?.price === null)}
+            className="mb-4"
+          />
+
           <div className="space-y-2 text-sm">
             <div className="flex justify-between">
               <span className="text-muted-foreground">
                 Subtotal ({cart.items.reduce((sum, item) => sum + item.quantity, 0)} items)
               </span>
-              <span>{formatPrice(cart.total)}</span>
+              <MarketPriceIndicator items={cart.items} total={total} />
             </div>
             <div className="flex justify-between">
               <span className="text-muted-foreground">Delivery</span>
@@ -221,7 +222,9 @@ export default function Cart({ initialCart }: CartProps) {
           <div className="bg-neutral-50 rounded-xs p-4 mt-4">
             <div className="flex justify-between items-center">
               <span className="font-semibold">Total:</span>
-              <span className="text-lg font-bold text-primary">{formatPrice(cart.total)}</span>
+              <span className="text-lg font-bold text-primary">
+                <MarketPriceIndicator items={cart.items} total={total} />
+              </span>
             </div>
           </div>
 
@@ -229,7 +232,7 @@ export default function Cart({ initialCart }: CartProps) {
 
           <div className="flex justify-between font-semibold text-lg mb-6">
             <span>Total</span>
-            <span>{formatPrice(cart.total)}</span>
+            <MarketPriceIndicator items={cart.items} total={total} size="sm" />
           </div>
 
           <Button

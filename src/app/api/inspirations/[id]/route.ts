@@ -43,14 +43,14 @@ export async function GET(_request: NextRequest, { params }: { params: Promise<{
       return NextResponse.json({ error: "Inspiration not found" }, { status: 404 })
     }
 
-    // Apply price multiplier to product prices
+    // Apply price multiplier to product prices (null prices remain null)
     const adjustedInspiration = {
       ...inspiration,
       products: inspiration.products.map((p) => ({
         ...p,
         product: {
           ...p.product,
-          price: adjustPrice(p.product.price, priceMultiplier),
+          price: p.product.price === null ? null : adjustPrice(p.product.price, priceMultiplier),
         },
       })),
     }

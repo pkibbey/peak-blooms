@@ -75,7 +75,6 @@ export async function PATCH(request: Request) {
         where: { id: order.id },
         data: {
           status: "CART",
-          total: 0, // Will be recalculated when checking out
         },
         include: {
           items: {

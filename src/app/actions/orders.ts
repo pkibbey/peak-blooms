@@ -80,7 +80,6 @@ export async function cancelOrderAction(
         where: { id: order.id },
         data: {
           status: "CART",
-          total: 0, // Will be recalculated when checking out
         },
       })
 

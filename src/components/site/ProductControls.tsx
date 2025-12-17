@@ -11,7 +11,7 @@ import { cn, formatPrice } from "@/lib/utils"
 interface Product {
   id: string
   name: string
-  price: number
+  price: number | null
 }
 
 interface ProductControlsProps {

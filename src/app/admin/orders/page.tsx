@@ -1,6 +1,7 @@
 import OrdersTable from "@/components/admin/OrdersTable"
 import BackLink from "@/components/site/BackLink"
 import { OrderStatus } from "@/generated/enums"
+import { calculateCartTotal } from "@/lib/cart-utils"
 import { getTrackedDb } from "@/lib/db"
 
 interface AdminOrdersPageProps {
@@ -35,6 +36,15 @@ export default async function AdminOrdersPage({ searchParams }: AdminOrdersPageP
           email: true,
         },
       },
+      items: {
+        include: {
+          product: {
+            select: {
+              price: true,
+            },
+          },
+        },
+      },
       _count: {
         select: {
           items: true,
@@ -58,7 +68,9 @@ export default async function AdminOrdersPage({ searchParams }: AdminOrdersPageP
     })
   } else if (sort === "total") {
     orders.sort((a, b) => {
-      return sortOrder === "desc" ? b.total - a.total : a.total - b.total
+      const totalA = calculateCartTotal(a.items)
+      const totalB = calculateCartTotal(b.items)
+      return sortOrder === "desc" ? totalB - totalA : totalA - totalB
     })
   } else if (sort === "items") {
     orders.sort((a, b) => {

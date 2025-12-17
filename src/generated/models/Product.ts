@@ -223,7 +223,7 @@ export type ProductGroupByOutputType = {
   slug: string
   description: string | null
   image: string | null
-  price: number
+  price: number | null
   colors: string[]
   featured: boolean
   productType: $Enums.ProductType
@@ -261,7 +261,7 @@ export type ProductWhereInput = {
   slug?: Prisma.StringFilter<"Product"> | string
   description?: Prisma.StringNullableFilter<"Product"> | string | null
   image?: Prisma.StringNullableFilter<"Product"> | string | null
-  price?: Prisma.FloatFilter<"Product"> | number
+  price?: Prisma.FloatNullableFilter<"Product"> | number | null
   colors?: Prisma.StringNullableListFilter<"Product">
   featured?: Prisma.BoolFilter<"Product"> | boolean
   productType?: Prisma.EnumProductTypeFilter<"Product"> | $Enums.ProductType
@@ -279,7 +279,7 @@ export type ProductOrderByWithRelationInput = {
   slug?: Prisma.SortOrder
   description?: Prisma.SortOrderInput | Prisma.SortOrder
   image?: Prisma.SortOrderInput | Prisma.SortOrder
-  price?: Prisma.SortOrder
+  price?: Prisma.SortOrderInput | Prisma.SortOrder
   colors?: Prisma.SortOrder
   featured?: Prisma.SortOrder
   productType?: Prisma.SortOrder
@@ -300,7 +300,7 @@ export type ProductWhereUniqueInput = Prisma.AtLeast<{
   name?: Prisma.StringFilter<"Product"> | string
   description?: Prisma.StringNullableFilter<"Product"> | string | null
   image?: Prisma.StringNullableFilter<"Product"> | string | null
-  price?: Prisma.FloatFilter<"Product"> | number
+  price?: Prisma.FloatNullableFilter<"Product"> | number | null
   colors?: Prisma.StringNullableListFilter<"Product">
   featured?: Prisma.BoolFilter<"Product"> | boolean
   productType?: Prisma.EnumProductTypeFilter<"Product"> | $Enums.ProductType
@@ -318,7 +318,7 @@ export type ProductOrderByWithAggregationInput = {
   slug?: Prisma.SortOrder
   description?: Prisma.SortOrderInput | Prisma.SortOrder
   image?: Prisma.SortOrderInput | Prisma.SortOrder
-  price?: Prisma.SortOrder
+  price?: Prisma.SortOrderInput | Prisma.SortOrder
   colors?: Prisma.SortOrder
   featured?: Prisma.SortOrder
   productType?: Prisma.SortOrder
@@ -341,7 +341,7 @@ export type ProductScalarWhereWithAggregatesInput = {
   slug?: Prisma.StringWithAggregatesFilter<"Product"> | string
   description?: Prisma.StringNullableWithAggregatesFilter<"Product"> | string | null
   image?: Prisma.StringNullableWithAggregatesFilter<"Product"> | string | null
-  price?: Prisma.FloatWithAggregatesFilter<"Product"> | number
+  price?: Prisma.FloatNullableWithAggregatesFilter<"Product"> | number | null
   colors?: Prisma.StringNullableListFilter<"Product">
   featured?: Prisma.BoolWithAggregatesFilter<"Product"> | boolean
   productType?: Prisma.EnumProductTypeWithAggregatesFilter<"Product"> | $Enums.ProductType
@@ -356,7 +356,7 @@ export type ProductCreateInput = {
   slug: string
   description?: string | null
   image?: string | null
-  price: number
+  price?: number | null
   colors?: Prisma.ProductCreatecolorsInput | string[]
   featured?: boolean
   productType?: $Enums.ProductType
@@ -374,7 +374,7 @@ export type ProductUncheckedCreateInput = {
   slug: string
   description?: string | null
   image?: string | null
-  price: number
+  price?: number | null
   colors?: Prisma.ProductCreatecolorsInput | string[]
   featured?: boolean
   productType?: $Enums.ProductType
@@ -392,7 +392,7 @@ export type ProductUpdateInput = {
   slug?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  price?: Prisma.FloatFieldUpdateOperationsInput | number
+  price?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   colors?: Prisma.ProductUpdatecolorsInput | string[]
   featured?: Prisma.BoolFieldUpdateOperationsInput | boolean
   productType?: Prisma.EnumProductTypeFieldUpdateOperationsInput | $Enums.ProductType
@@ -410,7 +410,7 @@ export type ProductUncheckedUpdateInput = {
   slug?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  price?: Prisma.FloatFieldUpdateOperationsInput | number
+  price?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   colors?: Prisma.ProductUpdatecolorsInput | string[]
   featured?: Prisma.BoolFieldUpdateOperationsInput | boolean
   productType?: Prisma.EnumProductTypeFieldUpdateOperationsInput | $Enums.ProductType
@@ -428,7 +428,7 @@ export type ProductCreateManyInput = {
   slug: string
   description?: string | null
   image?: string | null
-  price: number
+  price?: number | null
   colors?: Prisma.ProductCreatecolorsInput | string[]
   featured?: boolean
   productType?: $Enums.ProductType
@@ -443,7 +443,7 @@ export type ProductUpdateManyMutationInput = {
   slug?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  price?: Prisma.FloatFieldUpdateOperationsInput | number
+  price?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   colors?: Prisma.ProductUpdatecolorsInput | string[]
   featured?: Prisma.BoolFieldUpdateOperationsInput | boolean
   productType?: Prisma.EnumProductTypeFieldUpdateOperationsInput | $Enums.ProductType
@@ -458,7 +458,7 @@ export type ProductUncheckedUpdateManyInput = {
   slug?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  price?: Prisma.FloatFieldUpdateOperationsInput | number
+  price?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   colors?: Prisma.ProductUpdatecolorsInput | string[]
   featured?: Prisma.BoolFieldUpdateOperationsInput | boolean
   productType?: Prisma.EnumProductTypeFieldUpdateOperationsInput | $Enums.ProductType
@@ -535,6 +535,14 @@ export type ProductCreatecolorsInput = {
   set: string[]
 }
 
+export type NullableFloatFieldUpdateOperationsInput = {
+  set?: number | null
+  increment?: number
+  decrement?: number
+  multiply?: number
+  divide?: number
+}
+
 export type ProductUpdatecolorsInput = {
   set?: string[]
   push?: string | string[]
@@ -592,7 +600,7 @@ export type ProductCreateWithoutProductCollectionsInput = {
   slug: string
   description?: string | null
   image?: string | null
-  price: number
+  price?: number | null
   colors?: Prisma.ProductCreatecolorsInput | string[]
   featured?: boolean
   productType?: $Enums.ProductType
@@ -609,7 +617,7 @@ export type ProductUncheckedCreateWithoutProductCollectionsInput = {
   slug: string
   description?: string | null
   image?: string | null
-  price: number
+  price?: number | null
   colors?: Prisma.ProductCreatecolorsInput | string[]
   featured?: boolean
   productType?: $Enums.ProductType
@@ -642,7 +650,7 @@ export type ProductUpdateWithoutProductCollectionsInput = {
   slug?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  price?: Prisma.FloatFieldUpdateOperationsInput | number
+  price?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   colors?: Prisma.ProductUpdatecolorsInput | string[]
   featured?: Prisma.BoolFieldUpdateOperationsInput | boolean
   productType?: Prisma.EnumProductTypeFieldUpdateOperationsInput | $Enums.ProductType
@@ -659,7 +667,7 @@ export type ProductUncheckedUpdateWithoutProductCollectionsInput = {
   slug?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  price?: Prisma.FloatFieldUpdateOperationsInput | number
+  price?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   colors?: Prisma.ProductUpdatecolorsInput | string[]
   featured?: Prisma.BoolFieldUpdateOperationsInput | boolean
   productType?: Prisma.EnumProductTypeFieldUpdateOperationsInput | $Enums.ProductType
@@ -676,7 +684,7 @@ export type ProductCreateWithoutInspirationsInput = {
   slug: string
   description?: string | null
   image?: string | null
-  price: number
+  price?: number | null
   colors?: Prisma.ProductCreatecolorsInput | string[]
   featured?: boolean
   productType?: $Enums.ProductType
@@ -693,7 +701,7 @@ export type ProductUncheckedCreateWithoutInspirationsInput = {
   slug: string
   description?: string | null
   image?: string | null
-  price: number
+  price?: number | null
   colors?: Prisma.ProductCreatecolorsInput | string[]
   featured?: boolean
   productType?: $Enums.ProductType
@@ -726,7 +734,7 @@ export type ProductUpdateWithoutInspirationsInput = {
   slug?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  price?: Prisma.FloatFieldUpdateOperationsInput | number
+  price?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   colors?: Prisma.ProductUpdatecolorsInput | string[]
   featured?: Prisma.BoolFieldUpdateOperationsInput | boolean
   productType?: Prisma.EnumProductTypeFieldUpdateOperationsInput | $Enums.ProductType
@@ -743,7 +751,7 @@ export type ProductUncheckedUpdateWithoutInspirationsInput = {
   slug?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  price?: Prisma.FloatFieldUpdateOperationsInput | number
+  price?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   colors?: Prisma.ProductUpdatecolorsInput | string[]
   featured?: Prisma.BoolFieldUpdateOperationsInput | boolean
   productType?: Prisma.EnumProductTypeFieldUpdateOperationsInput | $Enums.ProductType
@@ -760,7 +768,7 @@ export type ProductCreateWithoutOrderItemsInput = {
   slug: string
   description?: string | null
   image?: string | null
-  price: number
+  price?: number | null
   colors?: Prisma.ProductCreatecolorsInput | string[]
   featured?: boolean
   productType?: $Enums.ProductType
@@ -777,7 +785,7 @@ export type ProductUncheckedCreateWithoutOrderItemsInput = {
   slug: string
   description?: string | null
   image?: string | null
-  price: number
+  price?: number | null
   colors?: Prisma.ProductCreatecolorsInput | string[]
   featured?: boolean
   productType?: $Enums.ProductType
@@ -810,7 +818,7 @@ export type ProductUpdateWithoutOrderItemsInput = {
   slug?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  price?: Prisma.FloatFieldUpdateOperationsInput | number
+  price?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   colors?: Prisma.ProductUpdatecolorsInput | string[]
   featured?: Prisma.BoolFieldUpdateOperationsInput | boolean
   productType?: Prisma.EnumProductTypeFieldUpdateOperationsInput | $Enums.ProductType
@@ -827,7 +835,7 @@ export type ProductUncheckedUpdateWithoutOrderItemsInput = {
   slug?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  price?: Prisma.FloatFieldUpdateOperationsInput | number
+  price?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   colors?: Prisma.ProductUpdatecolorsInput | string[]
   featured?: Prisma.BoolFieldUpdateOperationsInput | boolean
   productType?: Prisma.EnumProductTypeFieldUpdateOperationsInput | $Enums.ProductType
@@ -974,7 +982,7 @@ export type $ProductPayload<ExtArgs extends runtime.Types.Extensions.InternalArg
     slug: string
     description: string | null
     image: string | null
-    price: number
+    price: number | null
     colors: string[]
     featured: boolean
     productType: $Enums.ProductType

@@ -1,7 +1,8 @@
 "use server"
 
 import { revalidatePath } from "next/cache"
-import { calculateCartTotal, getCurrentUser, getOrCreateCart } from "@/lib/current-user"
+import { calculateCartTotal } from "@/lib/cart-utils"
+import { getCurrentUser, getOrCreateCart } from "@/lib/current-user"
 import { db } from "@/lib/db"
 
 export interface CartItemResponse {
@@ -12,7 +13,7 @@ export interface CartItemResponse {
   product: {
     id: string
     name: string
-    price: number
+    price: number | null
     image: string | null
   }
 }
@@ -55,6 +56,8 @@ export async function addToCartAction(
       cart = cartWithItems
     }
 
+    if (!cart) throw new Error("Failed to get or create cart")
+
     // Check if product exists
     const product = await db.product.findUnique({
       where: { id: productId },
@@ -77,7 +80,7 @@ export async function addToCartAction(
           orderId: cart.id,
           productId,
           quantity,
-          price: 0,
+          price: null,
         },
       })
     }
@@ -106,7 +109,7 @@ export async function addToCartAction(
         product: {
           id: item.product.id,
           name: item.product.name,
-          price: item.product.price * user.priceMultiplier,
+          price: item.product.price !== null ? item.product.price * user.priceMultiplier : null,
           image: item.product.image,
         },
       })),
@@ -175,7 +178,7 @@ export async function updateCartItemAction(
         product: {
           id: i.product.id,
           name: i.product.name,
-          price: i.product.price * user.priceMultiplier,
+          price: i.product.price !== null ? i.product.price * user.priceMultiplier : null,
           image: i.product.image,
         },
       })),

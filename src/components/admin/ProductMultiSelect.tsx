@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input"
 interface Product {
   id: string
   name: string
-  price: number
+  price: number | null
   collection?: {
     name: string
   }

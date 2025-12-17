@@ -94,8 +94,6 @@ export async function POST(request: Request) {
     }
 
     // Validate and create order items
-    let totalPrice = 0
-
     // Get all products at once for efficiency
     const productIds = items.map((item: { productId: string }) => item.productId)
     const products = await db.product.findMany({
@@ -110,8 +108,15 @@ export async function POST(request: Request) {
         throw new Error(`Product ${item.productId} not found`)
       }
 
+      if (product.price === null) {
+        return {
+          productId: item.productId,
+          quantity: item.quantity,
+          price: null,
+        }
+      }
+
       const price = adjustPrice(product.price, customer.priceMultiplier ?? 1.0)
-      totalPrice += price * item.quantity
 
       return {
         productId: item.productId,
@@ -126,7 +131,6 @@ export async function POST(request: Request) {
         orderNumber,
         userId: userId,
         status: "CART",
-        total: Math.round(totalPrice * 100) / 100,
         notes: notes || null,
         deliveryAddressId: finalDeliveryAddressId,
         items: {

@@ -1,7 +1,6 @@
 ## 🛠️ Website To-Do List
 
-Adds product snapshot fields to OrderItem for historical accuracy.
-Introduces market price warnings in cart and checkout flows. 
+Introduce market price warnings in cart and checkout flows.
 
 ## Meeting notes
 Get new products in there
@@ -10,7 +9,7 @@ Provide the customer with vauge information about delivery
 Ask the user to choose how they want to recieve a notification, or just give them one option
 Add in the stem length selector for roses
 Talk about box lot user journey
-Fix type system as much as possible - use generated types
+Fix type system as much as possible - use generated types (example: import type { OrderGetPayload } from "@/generated/models")
 add automatic lint and typescript checks
 
 ### 🌟 Next Steps

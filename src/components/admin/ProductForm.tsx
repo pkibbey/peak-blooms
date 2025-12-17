@@ -45,7 +45,7 @@ interface ProductFormProps {
     slug: string
     description: string | null
     image: string | null
-    price: number
+    price: number | null
     colors?: string[] | null
     collectionIds: string[]
     productType?: "FLOWER" | "FILLER" | "ROSE"

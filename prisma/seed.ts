@@ -403,15 +403,11 @@ async function main() {
         const order1Date = new Date()
         order1Date.setDate(order1Date.getDate() - 30)
 
-        const order1Total =
-          (productA ? productA.price * 2 : 0) + (productB ? productB.price * 1 : 0)
-
         const order1 = await tx.order.create({
           data: {
             orderNumber: `ORD-${Date.now()}-1`,
             userId: approvedCustomer.id,
             status: "DELIVERED",
-            total: order1Total,
             createdAt: order1Date,
             deliveryAddressId: deliveryAddress1.id,
             items: {
@@ -443,17 +439,11 @@ async function main() {
         const order2Date = new Date()
         order2Date.setDate(order2Date.getDate() - 5)
 
-        const order2Total =
-          (productA ? productA.price * 1 : 0) +
-          (productB ? productB.price * 2 : 0) +
-          (productC ? productC.price * 1 : 0)
-
         const order2 = await tx.order.create({
           data: {
             orderNumber: `ORD-${Date.now()}-2`,
             userId: approvedCustomer.id,
             status: "CONFIRMED",
-            total: order2Total,
             createdAt: order2Date,
             deliveryAddressId: deliveryAddress2.id,
             items: {

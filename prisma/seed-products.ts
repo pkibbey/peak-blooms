@@ -39,9 +39,9 @@ async function captureMetric(type: MetricType, name: string, duration: number): 
 }
 
 // Helper function to parse price strings from CSV
-function parsePrice(priceString: string): number {
-  if (!priceString || priceString.includes("N/A")) return 0
-  if (priceString.includes("Market Price")) return 0
+function parsePrice(priceString: string): number | null {
+  if (!priceString || priceString.includes("N/A")) return null
+  if (priceString.includes("Market Price")) return null
 
   // Remove "US$" prefix and "per stem" suffix, handle whitespace
   const cleaned = priceString.replace(/US\$|per stem/gi, "").trim()
@@ -68,7 +68,7 @@ function getQuantity(priceString: string): number {
 // Helper function to read and parse CSV file
 function readProductsFromCSV(): Array<{
   name: string
-  price: number
+  price: number | null
   type: "FLOWER" | "FILLER" | "ROSE"
   quantity: number
   description: string
@@ -89,7 +89,7 @@ function readProductsFromCSV(): Array<{
 
   const products: Array<{
     name: string
-    price: number
+    price: number | null
     type: "FLOWER" | "FILLER" | "ROSE"
     quantity: number
     description: string

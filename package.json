@@ -57,7 +57,7 @@
     "@types/react-dom": "^19.2.3",
     "babel-plugin-react-compiler": "1.0.0",
     "dotenv-cli": "^11.0.0",
-    "knip": "^5.74.0",
+    "knip": "^5.75.1",
     "tailwindcss": "^4.1.18",
     "ts-node": "^10.9.2",
     "tsx": "^4.21.0",

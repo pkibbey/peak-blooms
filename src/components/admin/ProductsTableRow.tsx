@@ -17,7 +17,7 @@ interface ProductRowProps {
     slug: string
     featured: boolean
     image: string | null
-    price: number
+    price: number | null
     productCollections: {
       collection: {
         id: string

@@ -10,6 +10,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
+import { calculateCartTotal } from "@/lib/cart-utils"
 import { formatDate, formatPrice } from "@/lib/utils"
 import NavLink from "../site/NavLink"
 
@@ -19,11 +20,18 @@ interface OrderUser {
   name: string | null
 }
 
+interface OrderItem {
+  product: {
+    price: number | null
+  } | null
+  quantity: number
+}
+
 interface Order {
   id: string
   orderNumber: string
   status: OrderStatus
-  total: number
+  items: OrderItem[]
   createdAt: Date
   user: OrderUser
   deliveryAddress: {
@@ -172,7 +180,7 @@ export default function OrdersTable({ orders, currentStatus, sort, order }: Orde
                       <OrderStatusBadge status={order.status} />
                     </TableCell>
                     <TableCell className="text-right font-medium">
-                      {formatPrice(order.total)}
+                      {formatPrice(calculateCartTotal(order.items))}
                     </TableCell>
                     <TableCell className="text-right">
                       <NavLink

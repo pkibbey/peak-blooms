@@ -39,14 +39,14 @@ export async function GET() {
       },
     })
 
-    // Apply price multiplier to product prices
+    // Apply price multiplier to product prices (null prices remain null)
     const adjustedInspirations = inspirations.map((inspiration) => ({
       ...inspiration,
       products: inspiration.products.map((p) => ({
         ...p,
         product: {
           ...p.product,
-          price: adjustPrice(p.product.price, priceMultiplier),
+          price: p.product.price === null ? null : adjustPrice(p.product.price, priceMultiplier),
         },
       })),
     }))

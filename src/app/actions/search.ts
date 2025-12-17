@@ -9,7 +9,7 @@ export interface SearchProductsResult {
     name: string
     slug: string
     image: string | null
-    price: number
+    price: number | null
   }>
 }
 

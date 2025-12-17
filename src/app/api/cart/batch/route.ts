@@ -80,7 +80,7 @@ export async function POST(request: NextRequest) {
               orderId: cart.id as string,
               productId,
               quantity,
-              price: 0, // Will be calculated at checkout
+              price: null, // Market-priced item
             },
             include: { product: true },
           })

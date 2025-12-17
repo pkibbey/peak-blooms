@@ -1,5 +1,5 @@
 import { type NextRequest, NextResponse } from "next/server"
-import { calculateCartTotal, getCart, getCurrentUser, getOrCreateCart } from "@/lib/current-user"
+import { getCart, getCurrentUser, getOrCreateCart } from "@/lib/current-user"
 import { db } from "@/lib/db"
 
 /**
@@ -8,6 +8,7 @@ import { db } from "@/lib/db"
  * Cart is an Order with status = 'CART'
  * Returns 404 if cart doesn't exist (doesn't auto-create)
  * Prices are automatically adjusted by user's price multiplier
+ * Total should be calculated client-side using calculateCartTotal()
  */
 export async function GET() {
   try {
@@ -31,12 +32,7 @@ export async function GET() {
       return NextResponse.json({ error: "Cart not found" }, { status: 404 })
     }
 
-    const total = calculateCartTotal(cart.items)
-
-    return NextResponse.json({
-      ...cart,
-      total,
-    })
+    return NextResponse.json(cart)
   } catch (error) {
     console.error("GET /api/cart error:", error)
     return NextResponse.json({ error: "Failed to fetch cart" }, { status: 500 })
@@ -117,7 +113,7 @@ export async function POST(request: NextRequest) {
           orderId: cart.id,
           productId,
           quantity,
-          price: 0, // Will be calculated at checkout
+          price: null, // Market-priced item
         },
         include: { product: true },
       })

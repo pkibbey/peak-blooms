@@ -32,14 +32,14 @@ export const getCurrentUser = cache(async (): Promise<SessionUser | null> => {
  * Apply price multiplier to cart items
  */
 function applyPriceMultiplierToCartItems<
-  T extends { product?: { price: number; [key: string]: unknown } | null },
+  T extends { product?: { price: number | null; [key: string]: unknown } | null },
 >(items: T[], multiplier: number): T[] {
   return items.map((item) => ({
     ...item,
     product: item.product
       ? {
           ...item.product,
-          price: adjustPrice(item.product.price, multiplier),
+          price: item.product.price === null ? null : adjustPrice(item.product.price, multiplier),
         }
       : null,
   }))
@@ -154,7 +154,6 @@ export async function getOrCreateCart(user: SessionUser) {
         orderNumber,
         userId: user.id,
         status: "CART",
-        total: 0,
         notes: null,
         deliveryAddressId: tempAddress.id,
       },
@@ -178,22 +177,4 @@ export async function getOrCreateCart(user: SessionUser) {
   }
 
   return cart
-}
-
-/**
- * Calculate cart total (product pricing)
- * Note: Assumes prices have already been adjusted by multiplier
- */
-export function calculateCartTotal(
-  cartItems: Array<{
-    product?: { price: number } | null
-    quantity: number
-  }>
-) {
-  const total = cartItems.reduce((sum, item) => {
-    const price = item.product?.price ?? 0
-    return sum + price * item.quantity
-  }, 0)
-  // Round to 2 decimal places
-  return Math.round(total * 100) / 100
 }

@@ -7,7 +7,7 @@ interface CartProduct {
   name: string
   slug: string
   image: string | null
-  price: number
+  price: number | null
 }
 
 interface CartItemData {
@@ -22,7 +22,7 @@ interface CheckoutOrderItemProps {
 
 export function CheckoutOrderItem({ item }: CheckoutOrderItemProps) {
   const price = item.product.price
-  const lineTotal = price * item.quantity
+  const lineTotal = price === null ? null : price * item.quantity
 
   return (
     <div className="flex gap-3">

@@ -200,7 +200,7 @@ export type OrderItemGroupByOutputType = {
   orderId: string
   productId: string
   quantity: number
-  price: number
+  price: number | null
   productNameSnapshot: string | null
   productImageSnapshot: string | null
   _count: OrderItemCountAggregateOutputType | null
@@ -233,7 +233,7 @@ export type OrderItemWhereInput = {
   orderId?: Prisma.StringFilter<"OrderItem"> | string
   productId?: Prisma.StringFilter<"OrderItem"> | string
   quantity?: Prisma.IntFilter<"OrderItem"> | number
-  price?: Prisma.FloatFilter<"OrderItem"> | number
+  price?: Prisma.FloatNullableFilter<"OrderItem"> | number | null
   productNameSnapshot?: Prisma.StringNullableFilter<"OrderItem"> | string | null
   productImageSnapshot?: Prisma.StringNullableFilter<"OrderItem"> | string | null
   order?: Prisma.XOR<Prisma.OrderScalarRelationFilter, Prisma.OrderWhereInput>
@@ -245,7 +245,7 @@ export type OrderItemOrderByWithRelationInput = {
   orderId?: Prisma.SortOrder
   productId?: Prisma.SortOrder
   quantity?: Prisma.SortOrder
-  price?: Prisma.SortOrder
+  price?: Prisma.SortOrderInput | Prisma.SortOrder
   productNameSnapshot?: Prisma.SortOrderInput | Prisma.SortOrder
   productImageSnapshot?: Prisma.SortOrderInput | Prisma.SortOrder
   order?: Prisma.OrderOrderByWithRelationInput
@@ -260,7 +260,7 @@ export type OrderItemWhereUniqueInput = Prisma.AtLeast<{
   orderId?: Prisma.StringFilter<"OrderItem"> | string
   productId?: Prisma.StringFilter<"OrderItem"> | string
   quantity?: Prisma.IntFilter<"OrderItem"> | number
-  price?: Prisma.FloatFilter<"OrderItem"> | number
+  price?: Prisma.FloatNullableFilter<"OrderItem"> | number | null
   productNameSnapshot?: Prisma.StringNullableFilter<"OrderItem"> | string | null
   productImageSnapshot?: Prisma.StringNullableFilter<"OrderItem"> | string | null
   order?: Prisma.XOR<Prisma.OrderScalarRelationFilter, Prisma.OrderWhereInput>
@@ -272,7 +272,7 @@ export type OrderItemOrderByWithAggregationInput = {
   orderId?: Prisma.SortOrder
   productId?: Prisma.SortOrder
   quantity?: Prisma.SortOrder
-  price?: Prisma.SortOrder
+  price?: Prisma.SortOrderInput | Prisma.SortOrder
   productNameSnapshot?: Prisma.SortOrderInput | Prisma.SortOrder
   productImageSnapshot?: Prisma.SortOrderInput | Prisma.SortOrder
   _count?: Prisma.OrderItemCountOrderByAggregateInput
@@ -290,7 +290,7 @@ export type OrderItemScalarWhereWithAggregatesInput = {
   orderId?: Prisma.StringWithAggregatesFilter<"OrderItem"> | string
   productId?: Prisma.StringWithAggregatesFilter<"OrderItem"> | string
   quantity?: Prisma.IntWithAggregatesFilter<"OrderItem"> | number
-  price?: Prisma.FloatWithAggregatesFilter<"OrderItem"> | number
+  price?: Prisma.FloatNullableWithAggregatesFilter<"OrderItem"> | number | null
   productNameSnapshot?: Prisma.StringNullableWithAggregatesFilter<"OrderItem"> | string | null
   productImageSnapshot?: Prisma.StringNullableWithAggregatesFilter<"OrderItem"> | string | null
 }
@@ -298,7 +298,7 @@ export type OrderItemScalarWhereWithAggregatesInput = {
 export type OrderItemCreateInput = {
   id?: string
   quantity: number
-  price: number
+  price?: number | null
   productNameSnapshot?: string | null
   productImageSnapshot?: string | null
   order: Prisma.OrderCreateNestedOneWithoutItemsInput
@@ -310,7 +310,7 @@ export type OrderItemUncheckedCreateInput = {
   orderId: string
   productId: string
   quantity: number
-  price: number
+  price?: number | null
   productNameSnapshot?: string | null
   productImageSnapshot?: string | null
 }
@@ -318,7 +318,7 @@ export type OrderItemUncheckedCreateInput = {
 export type OrderItemUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   quantity?: Prisma.IntFieldUpdateOperationsInput | number
-  price?: Prisma.FloatFieldUpdateOperationsInput | number
+  price?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   productNameSnapshot?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   productImageSnapshot?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   order?: Prisma.OrderUpdateOneRequiredWithoutItemsNestedInput
@@ -330,7 +330,7 @@ export type OrderItemUncheckedUpdateInput = {
   orderId?: Prisma.StringFieldUpdateOperationsInput | string
   productId?: Prisma.StringFieldUpdateOperationsInput | string
   quantity?: Prisma.IntFieldUpdateOperationsInput | number
-  price?: Prisma.FloatFieldUpdateOperationsInput | number
+  price?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   productNameSnapshot?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   productImageSnapshot?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
@@ -340,7 +340,7 @@ export type OrderItemCreateManyInput = {
   orderId: string
   productId: string
   quantity: number
-  price: number
+  price?: number | null
   productNameSnapshot?: string | null
   productImageSnapshot?: string | null
 }
@@ -348,7 +348,7 @@ export type OrderItemCreateManyInput = {
 export type OrderItemUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   quantity?: Prisma.IntFieldUpdateOperationsInput | number
-  price?: Prisma.FloatFieldUpdateOperationsInput | number
+  price?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   productNameSnapshot?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   productImageSnapshot?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
@@ -358,7 +358,7 @@ export type OrderItemUncheckedUpdateManyInput = {
   orderId?: Prisma.StringFieldUpdateOperationsInput | string
   productId?: Prisma.StringFieldUpdateOperationsInput | string
   quantity?: Prisma.IntFieldUpdateOperationsInput | number
-  price?: Prisma.FloatFieldUpdateOperationsInput | number
+  price?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   productNameSnapshot?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   productImageSnapshot?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
@@ -500,7 +500,7 @@ export type OrderItemUncheckedUpdateManyWithoutOrderNestedInput = {
 export type OrderItemCreateWithoutProductInput = {
   id?: string
   quantity: number
-  price: number
+  price?: number | null
   productNameSnapshot?: string | null
   productImageSnapshot?: string | null
   order: Prisma.OrderCreateNestedOneWithoutItemsInput
@@ -510,7 +510,7 @@ export type OrderItemUncheckedCreateWithoutProductInput = {
   id?: string
   orderId: string
   quantity: number
-  price: number
+  price?: number | null
   productNameSnapshot?: string | null
   productImageSnapshot?: string | null
 }
@@ -549,7 +549,7 @@ export type OrderItemScalarWhereInput = {
   orderId?: Prisma.StringFilter<"OrderItem"> | string
   productId?: Prisma.StringFilter<"OrderItem"> | string
   quantity?: Prisma.IntFilter<"OrderItem"> | number
-  price?: Prisma.FloatFilter<"OrderItem"> | number
+  price?: Prisma.FloatNullableFilter<"OrderItem"> | number | null
   productNameSnapshot?: Prisma.StringNullableFilter<"OrderItem"> | string | null
   productImageSnapshot?: Prisma.StringNullableFilter<"OrderItem"> | string | null
 }
@@ -557,7 +557,7 @@ export type OrderItemScalarWhereInput = {
 export type OrderItemCreateWithoutOrderInput = {
   id?: string
   quantity: number
-  price: number
+  price?: number | null
   productNameSnapshot?: string | null
   productImageSnapshot?: string | null
   product: Prisma.ProductCreateNestedOneWithoutOrderItemsInput
@@ -567,7 +567,7 @@ export type OrderItemUncheckedCreateWithoutOrderInput = {
   id?: string
   productId: string
   quantity: number
-  price: number
+  price?: number | null
   productNameSnapshot?: string | null
   productImageSnapshot?: string | null
 }
@@ -602,7 +602,7 @@ export type OrderItemCreateManyProductInput = {
   id?: string
   orderId: string
   quantity: number
-  price: number
+  price?: number | null
   productNameSnapshot?: string | null
   productImageSnapshot?: string | null
 }
@@ -610,7 +610,7 @@ export type OrderItemCreateManyProductInput = {
 export type OrderItemUpdateWithoutProductInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   quantity?: Prisma.IntFieldUpdateOperationsInput | number
-  price?: Prisma.FloatFieldUpdateOperationsInput | number
+  price?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   productNameSnapshot?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   productImageSnapshot?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   order?: Prisma.OrderUpdateOneRequiredWithoutItemsNestedInput
@@ -620,7 +620,7 @@ export type OrderItemUncheckedUpdateWithoutProductInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   orderId?: Prisma.StringFieldUpdateOperationsInput | string
   quantity?: Prisma.IntFieldUpdateOperationsInput | number
-  price?: Prisma.FloatFieldUpdateOperationsInput | number
+  price?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   productNameSnapshot?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   productImageSnapshot?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
@@ -629,7 +629,7 @@ export type OrderItemUncheckedUpdateManyWithoutProductInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   orderId?: Prisma.StringFieldUpdateOperationsInput | string
   quantity?: Prisma.IntFieldUpdateOperationsInput | number
-  price?: Prisma.FloatFieldUpdateOperationsInput | number
+  price?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   productNameSnapshot?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   productImageSnapshot?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
@@ -638,7 +638,7 @@ export type OrderItemCreateManyOrderInput = {
   id?: string
   productId: string
   quantity: number
-  price: number
+  price?: number | null
   productNameSnapshot?: string | null
   productImageSnapshot?: string | null
 }
@@ -646,7 +646,7 @@ export type OrderItemCreateManyOrderInput = {
 export type OrderItemUpdateWithoutOrderInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   quantity?: Prisma.IntFieldUpdateOperationsInput | number
-  price?: Prisma.FloatFieldUpdateOperationsInput | number
+  price?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   productNameSnapshot?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   productImageSnapshot?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   product?: Prisma.ProductUpdateOneRequiredWithoutOrderItemsNestedInput
@@ -656,7 +656,7 @@ export type OrderItemUncheckedUpdateWithoutOrderInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   productId?: Prisma.StringFieldUpdateOperationsInput | string
   quantity?: Prisma.IntFieldUpdateOperationsInput | number
-  price?: Prisma.FloatFieldUpdateOperationsInput | number
+  price?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   productNameSnapshot?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   productImageSnapshot?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
@@ -665,7 +665,7 @@ export type OrderItemUncheckedUpdateManyWithoutOrderInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   productId?: Prisma.StringFieldUpdateOperationsInput | string
   quantity?: Prisma.IntFieldUpdateOperationsInput | number
-  price?: Prisma.FloatFieldUpdateOperationsInput | number
+  price?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   productNameSnapshot?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   productImageSnapshot?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
@@ -743,7 +743,7 @@ export type $OrderItemPayload<ExtArgs extends runtime.Types.Extensions.InternalA
     orderId: string
     productId: string
     quantity: number
-    price: number
+    price: number | null
     productNameSnapshot: string | null
     productImageSnapshot: string | null
   }, ExtArgs["result"]["orderItem"]>

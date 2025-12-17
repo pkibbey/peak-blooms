@@ -3,6 +3,7 @@ import Link from "next/link"
 import { type OrderStatus, OrderStatusBadge } from "@/components/site/OrderStatusBadge"
 import ReorderButton from "@/components/site/ReorderButton"
 import type { OrderItemModel, OrderModel, ProductModel } from "@/generated/models"
+import { calculateCartTotal } from "@/lib/cart-utils"
 import { formatDate, formatPrice } from "@/lib/utils"
 
 /**
@@ -64,7 +65,7 @@ export default function OrderHistoryItem({ order }: OrderHistoryItemProps) {
       </div>
 
       <div className="flex items-center justify-between">
-        <p className="text-sm font-medium">{formatPrice(order.total)}</p>
+        <p className="text-sm font-medium">{formatPrice(calculateCartTotal(order.items))}</p>
         <ReorderButton
           orderNumber={order.orderNumber}
           orderStatus={order.status}

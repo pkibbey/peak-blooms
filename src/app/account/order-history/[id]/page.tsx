@@ -8,6 +8,7 @@ import { type OrderStatus, OrderStatusBadge } from "@/components/site/OrderStatu
 import { Button } from "@/components/ui/button"
 import { IconCheckCircle } from "@/components/ui/icons"
 import { getCurrentUser } from "@/lib/current-user"
+import { calculateCartTotal } from "@/lib/cart-utils"
 import { db } from "@/lib/db"
 import { formatDate } from "@/lib/utils"
 
@@ -82,7 +83,7 @@ export default async function OrderDetailPage({ params }: OrderDetailPageProps) 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Order Items */}
         <div className="lg:col-span-2 space-y-4">
-          <OrderItemsCard items={order.items} total={order.total} />
+          <OrderItemsCard items={order.items} total={calculateCartTotal(order.items)} />
 
           {/* Order Notes */}
           {order.notes && (

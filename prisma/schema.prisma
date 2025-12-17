@@ -132,7 +132,7 @@ model Product {
   slug         String               @unique
   description  String?
   image        String?
-  price        Float
+  price        Float?               // NULL indicates market price (determined at checkout/delivery)
   colors       String[]             // Array of color IDs (references COLORS object in lib/colors.ts)
   featured     Boolean              @default(false)
   productType  ProductType          @default(FLOWER)
@@ -183,7 +183,6 @@ model Order {
   orderNumber       String      @unique
   userId            String
   status            OrderStatus @default(CART)
-  total             Float
   notes             String?
   deliveryAddressId String
   createdAt         DateTime    @default(now())
@@ -202,7 +201,7 @@ model OrderItem {
   orderId               String
   productId             String
   quantity              Int
-  price                 Float
+  price                 Float?      // NULL indicates market price - to be set by admin or at delivery
   productNameSnapshot   String?     // Captured at order time - allows display if product is deleted
   productImageSnapshot  String?     // Captured at order time - allows display if product is deleted
   order                 Order  @relation(fields: [orderId], references: [id], onDelete: Cascade)
