@@ -2,9 +2,11 @@
 
 import { zodResolver } from "@hookform/resolvers/zod"
 import Link from "next/link"
+import { useRouter } from "next/navigation"
 import { useState } from "react"
 import { useForm } from "react-hook-form"
 import { toast } from "sonner"
+import { createOrderAction } from "@/app/actions/orders"
 import AddressFields from "@/components/site/AddressFields"
 import type { CartData } from "@/components/site/Cart"
 import { CheckoutOrderItem } from "@/components/site/CheckoutOrderItem"
@@ -54,6 +56,7 @@ interface CheckoutFormProps {
 }
 
 export default function CheckoutForm({ cart, savedAddresses }: CheckoutFormProps) {
+  const router = useRouter()
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [selectedAddressId, setSelectedAddressId] = useState<string>(
     savedAddresses.length > 0 ? savedAddresses[0].id : "new"
@@ -177,28 +180,18 @@ export default function CheckoutForm({ cart, savedAddresses }: CheckoutFormProps
         shouldSaveAddress = !isDuplicate
       }
 
-      const response = await fetch("/api/orders", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          deliveryAddressId: selectedAddressId !== "new" ? selectedAddressId : null,
-          deliveryAddress: selectedAddressId === "new" ? data.deliveryAddress : null,
-          saveDeliveryAddress: shouldSaveAddress,
-          notes: data.notes?.trim() || null,
-        }),
+      await createOrderAction({
+        deliveryAddressId: selectedAddressId !== "new" ? selectedAddressId : null,
+        deliveryAddress: selectedAddressId === "new" ? data.deliveryAddress : null,
+        saveDeliveryAddress: shouldSaveAddress,
+        notes: data.notes?.trim() || null,
       })
 
-      if (!response.ok) {
-        const responseData = await response.json()
-        throw new Error(responseData.error || "Failed to place order")
-      }
-
-      const order = await response.json()
       toast.success("Order placed successfully!")
 
       // Refresh the entire page to update cart and all server components
       // This ensures the cart badge is cleared and order history is updated
-      window.location.href = `/account/order-history/${order.id}`
+      router.push("/account/order-history")
     } catch (err) {
       console.error("Checkout error:", err)
       form.setError("root", {

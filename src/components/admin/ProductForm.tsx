@@ -6,6 +6,11 @@ import { useRouter } from "next/navigation"
 import { useState } from "react"
 import { useForm } from "react-hook-form"
 import { toast } from "sonner"
+import {
+  createProductAction,
+  deleteProductAction,
+  updateProductAction,
+} from "@/app/actions/products"
 import { ImageUpload } from "@/components/admin/ImageUpload"
 import SlugInput from "@/components/admin/SlugInput"
 import { ColorSelector } from "@/components/site/ColorSelector"
@@ -81,28 +86,25 @@ export default function ProductForm({ collections, product }: ProductFormProps) 
     setIsSubmitting(true)
 
     try {
-      const url = isEditing ? `/api/products/${product.id}` : "/api/products"
-      const method = isEditing ? "PUT" : "POST"
-
-      const response = await fetch(url, {
-        method,
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          ...data,
-          price: Number.parseFloat(data.price),
-        }),
-      })
-
-      if (response.ok) {
-        toast.success(isEditing ? "Product updated successfully" : "Product created successfully")
-        router.push("/admin/products")
-        router.refresh()
-      } else {
-        const responseData = await response.json()
-        form.setError("root", { message: responseData.error || "Failed to save product" })
+      const formData = {
+        ...data,
+        collectionIds: data.collectionIds || [],
       }
+
+      if (isEditing) {
+        await updateProductAction(product.id, formData)
+        toast.success("Product updated successfully")
+      } else {
+        await createProductAction(formData)
+        toast.success("Product created successfully")
+      }
+
+      router.push("/admin/products")
+      router.refresh()
     } catch (err) {
-      form.setError("root", { message: "An error occurred. Please try again." })
+      const errorMessage =
+        err instanceof Error ? err.message : "An error occurred. Please try again."
+      form.setError("root", { message: errorMessage })
       console.error(err)
     } finally {
       setIsSubmitting(false)
@@ -110,9 +112,11 @@ export default function ProductForm({ collections, product }: ProductFormProps) 
   }
 
   const handleDelete = async () => {
+    if (!product) return
+
     if (
       !window.confirm(
-        `Are you sure you want to delete "${product?.name}"? This action cannot be undone.`
+        `Are you sure you want to delete "${product.name}"? This action cannot be undone.`
       )
     ) {
       return
@@ -120,19 +124,14 @@ export default function ProductForm({ collections, product }: ProductFormProps) 
 
     setIsDeleting(true)
     try {
-      const response = await fetch(`/api/products/${product?.id}`, {
-        method: "DELETE",
-      })
-
-      if (response.ok) {
-        toast.success("Product deleted successfully")
-        router.push("/admin/products")
-        router.refresh()
-      } else {
-        form.setError("root", { message: "Failed to delete product. Please try again." })
-      }
+      await deleteProductAction(product.id)
+      toast.success("Product deleted successfully")
+      router.push("/admin/products")
+      router.refresh()
     } catch (err) {
-      form.setError("root", { message: "An error occurred. Please try again." })
+      const errorMessage =
+        err instanceof Error ? err.message : "Failed to delete product. Please try again."
+      form.setError("root", { message: errorMessage })
       console.error(err)
     } finally {
       setIsDeleting(false)

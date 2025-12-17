@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation"
 import { useState } from "react"
 import { toast } from "sonner"
+import { deleteAddressAction, updateAddressAction } from "@/app/actions/user-actions"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { IconEdit, IconStar, IconTrash } from "@/components/ui/icons"
@@ -38,15 +39,7 @@ export default function AddressCard({ address, onEdit }: AddressCardProps) {
 
     setIsDeleting(true)
     try {
-      const response = await fetch(`/api/users/addresses/${address.id}`, {
-        method: "DELETE",
-      })
-
-      if (!response.ok) {
-        const data = await response.json()
-        throw new Error(data.error || "Failed to delete address")
-      }
-
+      await deleteAddressAction(address.id)
       toast.success("Address deleted")
       router.refresh()
     } catch (error) {
@@ -61,17 +54,7 @@ export default function AddressCard({ address, onEdit }: AddressCardProps) {
 
     setIsSettingDefault(true)
     try {
-      const response = await fetch(`/api/users/addresses/${address.id}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ isDefault: true }),
-      })
-
-      if (!response.ok) {
-        const data = await response.json()
-        throw new Error(data.error || "Failed to set default address")
-      }
-
+      await updateAddressAction(address.id, { isDefault: true })
       toast.success("Default address updated")
       router.refresh()
     } catch (error) {

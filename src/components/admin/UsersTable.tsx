@@ -3,6 +3,11 @@
 import { useRouter } from "next/navigation"
 import { useState } from "react"
 import { toast } from "sonner"
+import {
+  approveUserAction,
+  unapproveUserAction,
+  updateUserPriceMultiplierAction,
+} from "@/app/actions/admin-users"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { SortableTableHead } from "@/components/ui/SortableTableHead"
@@ -58,46 +63,27 @@ export default function UsersTable({ users, sort, order }: UsersTableProps) {
 
     setLoadingId(userId)
     try {
-      const response = await fetch(`/api/admin/users/${userId}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ priceMultiplier: numValue }),
-      })
-
-      if (response.ok) {
-        toast.success("Price multiplier updated")
-        setEditingId(null)
-        router.refresh()
-      } else {
-        const data = await response.json()
-        toast.error(data.error || "Failed to update price multiplier")
-      }
+      await updateUserPriceMultiplierAction(userId, numValue)
+      toast.success("Price multiplier updated")
+      setEditingId(null)
+      router.refresh()
     } catch (error) {
       console.error("Error updating multiplier:", error)
-      toast.error("Failed to update price multiplier")
+      toast.error(error instanceof Error ? error.message : "Failed to update price multiplier")
     } finally {
-      setLoadingId(userId)
+      setLoadingId(null)
     }
   }
 
   const handleApprove = async (userId: string) => {
     setLoadingId(userId)
     try {
-      const response = await fetch(`/api/admin/users/${userId}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ approved: true }),
-      })
-
-      if (response.ok) {
-        toast.success("User approved")
-        router.refresh()
-      } else {
-        toast.error("Failed to approve user")
-      }
+      await approveUserAction(userId)
+      toast.success("User approved")
+      router.refresh()
     } catch (error) {
       console.error("Error approving user:", error)
-      toast.error("Failed to approve user")
+      toast.error(error instanceof Error ? error.message : "Failed to approve user")
     } finally {
       setLoadingId(null)
     }
@@ -106,21 +92,12 @@ export default function UsersTable({ users, sort, order }: UsersTableProps) {
   const handleUnapprove = async (userId: string) => {
     setLoadingId(userId)
     try {
-      const response = await fetch(`/api/admin/users/${userId}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ approved: false }),
-      })
-
-      if (response.ok) {
-        toast.success("User access revoked")
-        router.refresh()
-      } else {
-        toast.error("Failed to unapprove user")
-      }
+      await unapproveUserAction(userId)
+      toast.success("User access revoked")
+      router.refresh()
     } catch (error) {
       console.error("Error unapproving user:", error)
-      toast.error("Failed to unapprove user")
+      toast.error(error instanceof Error ? error.message : "Failed to unapprove user")
     } finally {
       setLoadingId(null)
     }

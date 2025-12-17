@@ -23,6 +23,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
+import { createUserAction } from "@/app/actions/admin-users"
 
 interface UsersFormValues {
   email: string
@@ -52,31 +53,21 @@ export function UsersForm() {
     setIsSubmitting(true)
 
     try {
-      const response = await fetch("/api/admin/users/create", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(values),
-      })
-
-      if (!response.ok) {
-        const error = await response.json()
-        if (error.error === "Email already exists") {
-          form.setError("email", {
-            message: "This email address is already in use",
-          })
-        } else {
-          toast.error(error.error || "Failed to create user")
-        }
-        setIsSubmitting(false)
-        return
-      }
-
+      await createUserAction(values)
       toast.success("User created successfully")
       router.push("/admin/users")
       router.refresh()
     } catch (error) {
-      toast.error("Failed to create user")
+      const errorMessage = error instanceof Error ? error.message : "Failed to create user"
+      if (errorMessage === "Email already exists") {
+        form.setError("email", {
+          message: "This email address is already in use",
+        })
+      } else {
+        toast.error(errorMessage)
+      }
       console.error(error)
+    } finally {
       setIsSubmitting(false)
     }
   }

@@ -14,6 +14,7 @@ import {
   FormMessage,
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
+import { updateProfileAction } from "@/app/actions/user-actions"
 import type { SessionUser } from "@/lib/types/prisma"
 import { type ProfileFormData, profileSchema } from "@/lib/validations/auth"
 
@@ -33,21 +34,13 @@ export default function ProfileForm({ user }: ProfileFormProps) {
 
   const onSubmit = async (data: ProfileFormData) => {
     try {
-      const response = await fetch("/api/users/profile", {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
-      })
-
-      if (response.ok) {
-        toast.success("Profile updated successfully")
-        router.refresh()
-      } else {
-        const responseData = await response.json()
-        form.setError("root", { message: responseData.error || "Failed to update profile" })
-      }
+      await updateProfileAction(data)
+      toast.success("Profile updated successfully")
+      router.refresh()
     } catch (err) {
-      form.setError("root", { message: "An error occurred. Please try again." })
+      const errorMessage =
+        err instanceof Error ? err.message : "An error occurred. Please try again."
+      form.setError("root", { message: errorMessage })
       console.error(err)
     }
   }

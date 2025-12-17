@@ -3,6 +3,8 @@
 import { revalidatePath } from "next/cache"
 import { getCurrentUser } from "@/lib/current-user"
 import { db } from "@/lib/db"
+import { adjustPrice } from "@/lib/utils"
+import { type CreateOrderInput, createOrderSchema } from "@/lib/validations/checkout"
 
 export interface CancelOrderResponse {
   success: boolean
@@ -124,5 +126,136 @@ export async function cancelOrderAction(
       message: "Failed to cancel order",
       error: error instanceof Error ? error.message : "Unknown error occurred",
     }
+  }
+}
+
+/**
+ * Create/finalize an order - transition from CART to PENDING with checkout data
+ * Approved users only
+ */
+export async function createOrderAction(data: CreateOrderInput) {
+  try {
+    const user = await getCurrentUser()
+
+    if (!user) {
+      throw new Error("Unauthorized")
+    }
+
+    if (!user.approved) {
+      throw new Error("Your account is not approved for purchases")
+    }
+
+    const priceMultiplier = user.priceMultiplier
+
+    // Validate request data
+    const validationResult = createOrderSchema.safeParse(data)
+
+    if (!validationResult.success) {
+      const firstError = validationResult.error.issues[0]
+      throw new Error(firstError?.message || "Invalid request data")
+    }
+
+    const { deliveryAddressId, deliveryAddress, saveDeliveryAddress, notes } = validationResult.data
+
+    // Get user's cart (CART order)
+    const cart = await db.order.findFirst({
+      where: { userId: user.id, status: "CART" },
+      orderBy: { createdAt: "desc" },
+      include: {
+        items: {
+          include: {
+            product: true,
+          },
+        },
+      },
+    })
+
+    if (!cart || cart.items.length === 0) {
+      throw new Error("Cart is empty")
+    }
+
+    // Update order items with product snapshots and capture current prices at checkout time
+    await Promise.all(
+      cart.items.map((item) =>
+        db.orderItem.update({
+          where: { id: item.id },
+          data: {
+            productNameSnapshot: item.product?.name || null,
+            productImageSnapshot: item.product?.image || null,
+            // Capture current product price (or null if market-priced)
+            // Null indicates market-priced item to be set by admin later
+            price:
+              item.product?.price === null
+                ? null
+                : adjustPrice(item.product?.price ?? 0, priceMultiplier),
+          },
+        })
+      )
+    )
+
+    // Handle delivery address
+    let finalDeliveryAddressId: string
+
+    if (deliveryAddressId) {
+      // Using existing address - verify it belongs to user
+      const existingAddress = await db.address.findFirst({
+        where: {
+          id: deliveryAddressId,
+          userId: user.id,
+        },
+      })
+
+      if (!existingAddress) {
+        throw new Error("Invalid delivery address")
+      }
+
+      finalDeliveryAddressId = deliveryAddressId
+    } else if (deliveryAddress) {
+      // Creating new address
+      const newAddress = await db.address.create({
+        data: {
+          userId: saveDeliveryAddress ? user.id : null,
+          firstName: deliveryAddress.firstName,
+          lastName: deliveryAddress.lastName,
+          company: deliveryAddress.company || "",
+          street1: deliveryAddress.street1,
+          street2: deliveryAddress.street2 || "",
+          city: deliveryAddress.city,
+          state: deliveryAddress.state,
+          zip: deliveryAddress.zip,
+          country: deliveryAddress.country || "US",
+          email: deliveryAddress.email,
+          phone: deliveryAddress.phone,
+        },
+      })
+
+      finalDeliveryAddressId = newAddress.id
+    } else {
+      throw new Error("Delivery address is required")
+    }
+
+    // Transition the order from CART to PENDING
+    const order = await db.order.update({
+      where: { id: cart.id },
+      data: {
+        status: "PENDING",
+        notes: notes || null,
+        deliveryAddressId: finalDeliveryAddressId,
+      },
+      include: {
+        items: {
+          include: {
+            product: true,
+          },
+        },
+        deliveryAddress: true,
+      },
+    })
+
+    revalidatePath("/account/order-history")
+    return order
+  } catch (error) {
+    console.error("createOrderAction error:", error)
+    throw new Error(error instanceof Error ? error.message : "Failed to create order")
   }
 }

@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
 import { IconPlus, IconX } from "@/components/ui/icons"
 import { Label } from "@/components/ui/label"
+import { createAddressAction, updateAddressAction } from "@/app/actions/user-actions"
 import { type AddressFormData, emptyAddress } from "@/lib/validations/address"
 
 interface AddressManagerProps {
@@ -70,21 +71,16 @@ export default function AddressManager({ addresses }: AddressManagerProps) {
 
     setIsSaving(true)
     try {
-      const url = isEditing ? `/api/users/addresses/${isEditing.id}` : "/api/users/addresses"
-      const method = isEditing ? "PATCH" : "POST"
-
-      const response = await fetch(url, {
-        method,
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
+      if (isEditing) {
+        await updateAddressAction(isEditing.id, {
           ...formData,
           isDefault: setAsDefault,
-        }),
-      })
-
-      if (!response.ok) {
-        const data = await response.json()
-        throw new Error(data.error || "Failed to save address")
+        })
+      } else {
+        await createAddressAction({
+          ...formData,
+          isDefault: setAsDefault,
+        })
       }
 
       toast.success(isEditing ? "Address updated" : "Address added")

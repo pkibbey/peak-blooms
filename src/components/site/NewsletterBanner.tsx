@@ -4,6 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { useEffect, useState } from "react"
 import { useForm } from "react-hook-form"
 import { toast } from "sonner"
+import { subscribeToNewsletterAction } from "@/app/actions/newsletter"
 import { Button } from "@/components/ui/button"
 import { Form, FormControl, FormField, FormItem, FormMessage } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
@@ -45,25 +46,14 @@ export function NewsletterBanner() {
   const onSubmit = async (data: NewsletterSubscribeFormData) => {
     setIsSubmitting(true)
     try {
-      const response = await fetch("/api/newsletter/subscribe", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(data),
-      })
+      await subscribeToNewsletterAction(data.email)
+      form.reset()
+      toast.success("Thanks for signing up for our newsletter!")
 
-      if (response.ok) {
-        form.reset()
-        toast.success("Thanks for signing up for our newsletter!")
-
-        // Auto-dismiss after 3 seconds
-        setTimeout(() => {
-          handleDismiss()
-        }, 3000)
-      } else {
-        toast.error("Something went wrong. Please try again.")
-      }
+      // Auto-dismiss after 3 seconds
+      setTimeout(() => {
+        handleDismiss()
+      }, 3000)
     } catch (error) {
       console.error("Newsletter subscribe error:", error)
       toast.error("Something went wrong. Please try again.")

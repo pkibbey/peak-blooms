@@ -6,6 +6,11 @@ import { useRouter } from "next/navigation"
 import { useState } from "react"
 import { useForm } from "react-hook-form"
 import { toast } from "sonner"
+import {
+  createCollectionAction,
+  deleteCollectionAction,
+  updateCollectionAction,
+} from "@/app/actions/collections"
 import { ImageUpload } from "@/components/admin/ImageUpload"
 import ProductMultiSelectSimple from "@/components/admin/ProductMultiSelectSimple"
 import SlugInput from "@/components/admin/SlugInput"
@@ -87,30 +92,25 @@ export default function CollectionForm({ collection, products = [] }: Collection
     setIsSubmitting(true)
 
     try {
-      const url = isEditing ? `/api/collections/${collection.id}` : "/api/collections"
-      const method = isEditing ? "PUT" : "POST"
-
-      const response = await fetch(url, {
-        method,
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          ...data,
-          productIds: selectedProductIds,
-        }),
-      })
-
-      if (response.ok) {
-        toast.success(
-          isEditing ? "Collection updated successfully" : "Collection created successfully"
-        )
-        router.push("/admin/collections")
-        router.refresh()
-      } else {
-        const responseData = await response.json()
-        form.setError("root", { message: responseData.error || "Failed to save collection" })
+      const formData = {
+        ...data,
+        productIds: selectedProductIds,
       }
+
+      if (isEditing) {
+        await updateCollectionAction(collection.id, formData)
+        toast.success("Collection updated successfully")
+      } else {
+        await createCollectionAction(formData)
+        toast.success("Collection created successfully")
+      }
+
+      router.push("/admin/collections")
+      router.refresh()
     } catch (err) {
-      form.setError("root", { message: "An error occurred. Please try again." })
+      const errorMessage =
+        err instanceof Error ? err.message : "An error occurred. Please try again."
+      form.setError("root", { message: errorMessage })
       console.error(err)
     } finally {
       setIsSubmitting(false)
@@ -118,13 +118,14 @@ export default function CollectionForm({ collection, products = [] }: Collection
   }
 
   const handleDelete = async () => {
-    const productCount = collection?._count?.productCollections || 0
+    if (!collection) return
+    const productCount = collection._count?.productCollections || 0
     const warningMessage =
       productCount > 0
-        ? `Are you sure you want to delete "${collection?.name}"? This will remove the collection association from ${productCount} product${
+        ? `Are you sure you want to delete "${collection.name}"? This will remove the collection association from ${productCount} product${
             productCount !== 1 ? "s" : ""
           } — products will remain but won't be assigned to this collection. This action cannot be undone.`
-        : `Are you sure you want to delete "${collection?.name}"? This action cannot be undone.`
+        : `Are you sure you want to delete "${collection.name}"? This action cannot be undone.`
 
     if (!window.confirm(warningMessage)) {
       return
@@ -132,19 +133,14 @@ export default function CollectionForm({ collection, products = [] }: Collection
 
     setIsDeleting(true)
     try {
-      const response = await fetch(`/api/collections/${collection?.id}`, {
-        method: "DELETE",
-      })
-
-      if (response.ok) {
-        toast.success("Collection deleted successfully")
-        router.push("/admin/collections")
-        router.refresh()
-      } else {
-        form.setError("root", { message: "Failed to delete collection. Please try again." })
-      }
+      await deleteCollectionAction(collection.id)
+      toast.success("Collection deleted successfully")
+      router.push("/admin/collections")
+      router.refresh()
     } catch (err) {
-      form.setError("root", { message: "An error occurred. Please try again." })
+      const errorMessage =
+        err instanceof Error ? err.message : "Failed to delete collection. Please try again."
+      form.setError("root", { message: errorMessage })
       console.error(err)
     } finally {
       setIsDeleting(false)
