@@ -1,27 +1,38 @@
 "use server"
 
 import { revalidatePath } from "next/cache"
-import { calculateCartTotal } from "@/lib/cart-utils"
-import { getCurrentUser, getOrCreateCart } from "@/lib/current-user"
+import { applyPriceMultiplierToItems, calculateCartTotal } from "@/lib/cart-utils"
+import { getCurrentUser } from "@/lib/current-user"
 import { db } from "@/lib/db"
+import type { SessionUser } from "@/lib/types/users"
 
-// Helper to apply price multiplier (same as in current-user.ts)
-function adjustPrice(price: number, multiplier: number): number {
-  return Math.round(price * multiplier * 100) / 100
-}
+/**
+ * Create a new shopping cart order for the user
+ * Returns cart with prices adjusted by user's price multiplier
+ * A cart is an Order with status = 'CART'
+ */
+async function createCart(user: SessionUser) {
+  const newCart = await db.order.create({
+    data: {
+      userId: user.id,
+      status: "CART",
+    },
+    include: {
+      items: {
+        include: {
+          product: true,
+        },
+      },
+    },
+  })
 
-function applyPriceMultiplier<
-  T extends { product?: { price: number | null; [key: string]: unknown } | null },
->(items: T[], multiplier: number): T[] {
-  return items.map((item) => ({
-    ...item,
-    product: item.product
-      ? {
-          ...item.product,
-          price: item.product.price === null ? null : adjustPrice(item.product.price, multiplier),
-        }
-      : null,
-  }))
+  const multiplier = user.priceMultiplier
+  const adjustedItems = applyPriceMultiplierToItems(newCart.items, multiplier)
+
+  return {
+    ...newCart,
+    items: adjustedItems,
+  }
 }
 
 /**
@@ -46,12 +57,9 @@ export async function addToCartAction(productId: string, quantity: number = 1) {
     })
 
     if (!cart) {
-      const cartWithItems = await getOrCreateCart(user)
-      if (!cartWithItems) throw new Error("Failed to get cart")
-      cart = cartWithItems
+      cart = await createCart(user)
+      if (!cart) throw new Error("Failed to create cart")
     }
-
-    if (!cart) throw new Error("Failed to get or create cart")
 
     // Check if product exists
     const product = await db.product.findUnique({
@@ -90,7 +98,7 @@ export async function addToCartAction(productId: string, quantity: number = 1) {
       },
     })
 
-    const adjustedItems = applyPriceMultiplier(updatedCart.items, user.priceMultiplier)
+    const adjustedItems = applyPriceMultiplierToItems(updatedCart.items, user.priceMultiplier)
     const total = calculateCartTotal(adjustedItems)
 
     revalidatePath("/cart")
@@ -147,7 +155,7 @@ export async function updateCartItemAction(itemId: string, quantity: number) {
       },
     })
 
-    const adjustedItems = applyPriceMultiplier(updatedCart.items, user.priceMultiplier)
+    const adjustedItems = applyPriceMultiplierToItems(updatedCart.items, user.priceMultiplier)
     const total = calculateCartTotal(adjustedItems)
 
     revalidatePath("/cart")
@@ -197,7 +205,7 @@ export async function removeFromCartAction(itemId: string) {
       },
     })
 
-    const adjustedItems = applyPriceMultiplier(updatedCart.items, user.priceMultiplier)
+    const adjustedItems = applyPriceMultiplierToItems(updatedCart.items, user.priceMultiplier)
     const total = calculateCartTotal(adjustedItems)
 
     revalidatePath("/cart")
@@ -227,6 +235,11 @@ export async function clearCartAction() {
     const cart = await db.order.findFirst({
       where: { userId: user.id, status: "CART" },
       orderBy: { createdAt: "desc" },
+      include: {
+        items: {
+          include: { product: true },
+        },
+      },
     })
 
     if (cart) {
@@ -235,8 +248,11 @@ export async function clearCartAction() {
       })
     }
 
-    const updatedCart = cart || (await getOrCreateCart(user))
-    if (!updatedCart) throw new Error("Failed to get cart")
+    let updatedCart = cart
+    if (!updatedCart) {
+      updatedCart = await createCart(user)
+      if (!updatedCart) throw new Error("Failed to create cart")
+    }
 
     revalidatePath("/cart")
     return {
@@ -257,7 +273,7 @@ export async function clearCartAction() {
  * Server action to fetch user's current cart
  * Does not auto-create - returns null if cart doesn't exist
  */
-async function getCartAction() {
+export async function getCartAction() {
   try {
     const user = await getCurrentUser()
     if (!user) throw new Error("Unauthorized")
@@ -277,7 +293,7 @@ async function getCartAction() {
 
     if (!cart) return null
 
-    const adjustedItems = applyPriceMultiplier(cart.items, user.priceMultiplier)
+    const adjustedItems = applyPriceMultiplierToItems(cart.items, user.priceMultiplier)
     const total = calculateCartTotal(adjustedItems)
 
     return {
@@ -302,8 +318,8 @@ export async function batchAddToCartAction(productIds: string[], quantities?: nu
   try {
     const user = await getCurrentUser()
     if (!user) throw new Error("Unauthorized")
-    if (!user.approved) throw new Error("Your account is not approved for purchases")
 
+    // Validate inputs first, before checking approval
     if (!Array.isArray(productIds) || productIds.length === 0) {
       throw new Error("productIds must be a non-empty array")
     }
@@ -321,9 +337,24 @@ export async function batchAddToCartAction(productIds: string[], quantities?: nu
       resolvedQuantities = productIds.map(() => 1)
     }
 
+    // Check approval after validation
+    if (!user.approved) throw new Error("Your account is not approved for purchases")
+
     // Get or create cart
-    const cart = await getOrCreateCart(user)
-    if (!cart) throw new Error("Failed to get or create cart")
+    let cart = await db.order.findFirst({
+      where: { userId: user.id, status: "CART" },
+      orderBy: { createdAt: "desc" },
+      include: {
+        items: {
+          include: { product: true },
+        },
+      },
+    })
+
+    if (!cart) {
+      cart = await createCart(user)
+      if (!cart) throw new Error("Failed to create cart")
+    }
 
     // Transaction to add items atomically
     await db.$transaction(async (tx) => {
@@ -366,7 +397,7 @@ export async function batchAddToCartAction(productIds: string[], quantities?: nu
       },
     })
 
-    const adjustedItems = applyPriceMultiplier(updatedCart.items, user.priceMultiplier)
+    const adjustedItems = applyPriceMultiplierToItems(updatedCart.items, user.priceMultiplier)
     const total = calculateCartTotal(adjustedItems)
 
     revalidatePath("/cart")

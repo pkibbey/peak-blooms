@@ -19,14 +19,24 @@ export function calculateCartTotal(
   return Math.round(total * 100) / 100
 }
 
-/**
- * Check if a cart contains any market-priced items
- */
-function hasMarketPriceItems(
-  cartItems: Array<{
-    product?: { price: number | null } | null
-    quantity: number
-  }>
-): boolean {
-  return cartItems.some((item) => item.product?.price === null)
+// Helper to apply price multiplier
+function adjustPriceMultiplier(price: number, multiplier: number): number {
+  return Math.round(price * multiplier * 100) / 100
+}
+
+export function applyPriceMultiplierToItems<
+  T extends { product?: { price: number | null; [key: string]: unknown } | null },
+>(items: T[], multiplier: number): T[] {
+  return items.map((item) => ({
+    ...item,
+    product: item.product
+      ? {
+          ...item.product,
+          price:
+            item.product.price === null
+              ? null
+              : adjustPriceMultiplier(item.product.price, multiplier),
+        }
+      : null,
+  }))
 }

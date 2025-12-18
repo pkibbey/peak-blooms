@@ -1,5 +1,6 @@
 import { OrderItem } from "@/components/site/OrderItem"
 import type { OrderItemModel, ProductModel } from "@/generated/models"
+import { calculateCartTotal } from "@/lib/cart-utils"
 import { formatPrice } from "@/lib/utils"
 
 /**
@@ -8,10 +9,11 @@ import { formatPrice } from "@/lib/utils"
  */
 interface OrderItemsCardProps {
   items: (Omit<OrderItemModel, "orderId" | "productId"> & { product: ProductModel })[]
-  total: number
 }
 
-export function OrderItemsCard({ items, total }: OrderItemsCardProps) {
+export function OrderItemsCard({ items }: OrderItemsCardProps) {
+  const total = calculateCartTotal(items)
+
   return (
     <div className="bg-background rounded-xs shadow-sm border p-6">
       <h2 className="heading-3 mb-4">Order Items</h2>

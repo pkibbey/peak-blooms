@@ -1,6 +1,7 @@
 "use server"
 
 import { revalidatePath } from "next/cache"
+import type { Order } from "@/generated/client"
 import { getCurrentUser } from "@/lib/current-user"
 import { db } from "@/lib/db"
 import { adjustPrice } from "@/lib/utils"
@@ -9,11 +10,7 @@ import { type CreateOrderInput, createOrderSchema } from "@/lib/validations/chec
 interface CancelOrderResponse {
   success: boolean
   message: string
-  order?: {
-    id: string
-    orderNumber: string
-    status: string
-  }
+  order?: Order
   error?: string
 }
 
@@ -91,11 +88,7 @@ export async function cancelOrderAction(
       return {
         success: true,
         message: "Order converted back to cart",
-        order: {
-          id: updatedOrder.id,
-          orderNumber: updatedOrder.orderNumber,
-          status: updatedOrder.status,
-        },
+        order: updatedOrder,
       }
     } else {
       // Simply transition to CANCELLED
@@ -112,11 +105,7 @@ export async function cancelOrderAction(
       return {
         success: true,
         message: "Order cancelled successfully",
-        order: {
-          id: cancelledOrder.id,
-          orderNumber: cancelledOrder.orderNumber,
-          status: cancelledOrder.status,
-        },
+        order: cancelledOrder,
       }
     }
   } catch (error) {
@@ -368,174 +357,5 @@ export async function updateOrderItemPriceAction(orderId: string, itemId: string
     }
   } catch (error) {
     throw new Error(error instanceof Error ? error.message : "Failed to update price")
-  }
-}
-
-/**
- * Server action to create a new order for a customer (admin only)
- */
-async function createAdminOrderAction(data: {
-  userId: string
-  items: Array<{ productId: string; quantity: number }>
-  email?: string
-  phone?: string
-  notes?: string
-  deliveryAddressId?: string
-}) {
-  try {
-    const user = await getCurrentUser()
-
-    if (!user || user.role !== "ADMIN") {
-      throw new Error("Unauthorized")
-    }
-
-    const { userId, items, notes, deliveryAddressId } = data
-
-    if (!userId || !items || !Array.isArray(items) || items.length === 0) {
-      throw new Error("userId and items array are required")
-    }
-
-    // Verify customer exists
-    const customer = await db.user.findUnique({
-      where: { id: userId },
-    })
-
-    if (!customer) {
-      throw new Error("Customer not found")
-    }
-
-    // Generate order number
-    const lastOrder = await db.order.findFirst({
-      orderBy: { orderNumber: "desc" },
-      select: { orderNumber: true },
-    })
-
-    let nextNumber = 1
-    if (lastOrder?.orderNumber) {
-      const match = lastOrder.orderNumber.match(/PB-(\d+)/)
-      if (match) {
-        nextNumber = parseInt(match[1], 10) + 1
-      }
-    }
-
-    const orderNumber = `PB-${nextNumber.toString().padStart(5, "0")}`
-
-    // Determine delivery address
-    let finalDeliveryAddressId: string
-
-    if (deliveryAddressId) {
-      // Use existing address (verify it belongs to the customer)
-      const address = await db.address.findFirst({
-        where: {
-          id: deliveryAddressId,
-          userId: customer.id,
-        },
-      })
-
-      if (!address) {
-        throw new Error("Invalid delivery address")
-      }
-
-      finalDeliveryAddressId = deliveryAddressId
-    } else {
-      // Get customer's first address
-      const address = await db.address.findFirst({
-        where: { userId: customer.id },
-        orderBy: { createdAt: "asc" },
-      })
-
-      if (!address) {
-        throw new Error("Customer has no delivery address")
-      }
-
-      finalDeliveryAddressId = address.id
-    }
-
-    // Fetch the customer's cart order or create a new one
-    let order = await db.order.findFirst({
-      where: {
-        userId: customer.id,
-        status: "CART",
-      },
-      include: {
-        items: true,
-      },
-    })
-
-    if (!order) {
-      // Create a new CART order
-      order = await db.order.create({
-        data: {
-          userId: customer.id,
-          orderNumber,
-          status: "CART",
-          deliveryAddressId: finalDeliveryAddressId,
-          notes: notes || null,
-        },
-        include: {
-          items: true,
-        },
-      })
-    }
-
-    // Add items to the order
-    for (const item of items) {
-      const product = await db.product.findUnique({
-        where: { id: item.productId },
-      })
-
-      if (!product) {
-        throw new Error(`Product not found: ${item.productId}`)
-      }
-
-      // Check if item already exists in order
-      const existingItem = order.items.find((i) => i.productId === item.productId)
-
-      if (existingItem) {
-        // Update quantity
-        await db.orderItem.update({
-          where: { id: existingItem.id },
-          data: { quantity: existingItem.quantity + item.quantity },
-        })
-      } else {
-        // Create new item with price adjusted for customer's multiplier
-        const adjustedPrice =
-          product.price === null ? null : adjustPrice(product.price, customer.priceMultiplier)
-
-        await db.orderItem.create({
-          data: {
-            orderId: order.id,
-            productId: item.productId,
-            quantity: item.quantity,
-            price: adjustedPrice,
-            productNameSnapshot: product.name,
-            productImageSnapshot: product.image,
-          },
-        })
-      }
-    }
-
-    // Update order with new email/phone if provided
-    const updatedOrder = await db.order.update({
-      where: { id: order.id },
-      data: {
-        deliveryAddressId: finalDeliveryAddressId,
-        notes: notes || order.notes,
-      },
-      include: {
-        items: {
-          include: {
-            product: true,
-          },
-        },
-        deliveryAddress: true,
-      },
-    })
-
-    revalidatePath("/admin/orders")
-    return updatedOrder
-  } catch (error) {
-    console.error("createAdminOrderAction error:", error)
-    throw new Error(error instanceof Error ? error.message : "Failed to create order")
   }
 }

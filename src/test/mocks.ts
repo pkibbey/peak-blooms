@@ -26,6 +26,7 @@ export function createMockPrismaClient() {
       create: vi.fn(),
       update: vi.fn(),
       delete: vi.fn(),
+      count: vi.fn(),
     },
     collection: {
       findUnique: vi.fn(),
@@ -37,9 +38,21 @@ export function createMockPrismaClient() {
     order: {
       findUnique: vi.fn(),
       findMany: vi.fn(),
+      findFirst: vi.fn(),
+      findUniqueOrThrow: vi.fn(),
       create: vi.fn(),
       update: vi.fn(),
       delete: vi.fn(),
+    },
+    orderItem: {
+      findUnique: vi.fn(),
+      findMany: vi.fn(),
+      findFirst: vi.fn(),
+      findUniqueOrThrow: vi.fn(),
+      create: vi.fn(),
+      update: vi.fn(),
+      delete: vi.fn(),
+      deleteMany: vi.fn(),
     },
     account: {
       findUnique: vi.fn(),
@@ -48,6 +61,14 @@ export function createMockPrismaClient() {
       update: vi.fn(),
       delete: vi.fn(),
     },
+    address: {
+      findUnique: vi.fn(),
+      findMany: vi.fn(),
+      create: vi.fn(),
+      update: vi.fn(),
+      delete: vi.fn(),
+    },
+    $transaction: vi.fn(),
   }
 }
 

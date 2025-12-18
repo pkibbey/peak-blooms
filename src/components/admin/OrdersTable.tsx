@@ -10,21 +10,13 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
-import type { OrderModel } from "@/generated/models"
 import { calculateCartTotal } from "@/lib/cart-utils"
+import type { OrdersWithCount } from "@/lib/types/orders"
 import { formatDate, formatPrice } from "@/lib/utils"
 import NavLink from "../site/NavLink"
 
-// Display type for orders with necessary relations
-type DisplayOrder = OrderModel & {
-  user: { email: string | null; name: string | null }
-  items: Array<{ product: { price: number | null } | null; quantity: number; price: number | null }>
-  deliveryAddress: { email: string }
-  _count: { items: number }
-}
-
 interface OrdersTableProps {
-  orders: DisplayOrder[]
+  orders: OrdersWithCount[]
   currentStatus: string
   sort?: string | null
   order?: "asc" | "desc" | null
@@ -146,9 +138,11 @@ export default function OrdersTable({ orders, currentStatus, sort, order }: Orde
                     <TableCell>
                       <div>
                         <p className="font-medium">{order.user.name || "—"}</p>
-                        <p className="text-sm text-muted-foreground">
-                          {order.deliveryAddress.email}
-                        </p>
+                        {order.deliveryAddress && (
+                          <p className="text-sm text-muted-foreground">
+                            {order.deliveryAddress.email}
+                          </p>
+                        )}
                       </div>
                     </TableCell>
                     <TableCell className="hidden md:table-cell text-muted-foreground">

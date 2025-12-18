@@ -1,8 +1,6 @@
 import ActivityFeed from "@/components/admin/ActivityFeed"
 import QuickActions from "@/components/admin/QuickActions"
-import { calculateCartTotal } from "@/lib/cart-utils"
 import { getTrackedDb } from "@/lib/db"
-import { formatPrice } from "@/lib/utils"
 
 export default async function AdminDashboard() {
   const db = getTrackedDb(true)
@@ -33,7 +31,7 @@ export default async function AdminDashboard() {
       id: o.id,
       type: "order",
       title: `Order ${o.orderNumber} placed`,
-      subtitle: `${o.user?.name ?? o.user?.email ?? "Unknown"} — ${formatPrice(calculateCartTotal(o.items))}`,
+      subtitle: `${o.user?.name ?? o.user?.email ?? "Unknown"}`,
       createdAt: o.createdAt.toISOString(),
       href: `/admin/orders/${o.id}`,
     })),

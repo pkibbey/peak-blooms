@@ -87,27 +87,31 @@ export default async function AdminOrderDetailPage({ params }: AdminOrderDetailP
           </div>
 
           {/* Contact Information */}
-          <div className="bg-background rounded-xs shadow-sm border p-6">
-            <h2 className="heading-3 mb-4">Contact</h2>
-            <div className="text-sm space-y-2">
-              <p>
-                <span className="text-muted-foreground">Email:</span>{" "}
-                <span className="font-medium">{order.deliveryAddress.email}</span>
-              </p>
-              {order.deliveryAddress.phone && (
+          {order.deliveryAddress && (
+            <div className="bg-background rounded-xs shadow-sm border p-6">
+              <h2 className="heading-3 mb-4">Contact</h2>
+              <div className="text-sm space-y-2">
                 <p>
-                  <span className="text-muted-foreground">Phone:</span>{" "}
-                  <span className="font-medium">{order.deliveryAddress.phone}</span>
+                  <span className="text-muted-foreground">Email:</span>{" "}
+                  <span className="font-medium">{order.deliveryAddress.email}</span>
                 </p>
-              )}
+                {order.deliveryAddress.phone && (
+                  <p>
+                    <span className="text-muted-foreground">Phone:</span>{" "}
+                    <span className="font-medium">{order.deliveryAddress.phone}</span>
+                  </p>
+                )}
+              </div>
             </div>
-          </div>
+          )}
 
           {/* Delivery Address */}
-          <div className="bg-background rounded-xs shadow-sm border p-6">
-            <h2 className="heading-3 mb-4 flex items-center gap-2">Delivery Address</h2>
-            <AddressDisplay address={order.deliveryAddress} />
-          </div>
+          {order.deliveryAddress && (
+            <div className="bg-background rounded-xs shadow-sm border p-6">
+              <h2 className="heading-3 mb-4 flex items-center gap-2">Delivery Address</h2>
+              <AddressDisplay address={order.deliveryAddress} />
+            </div>
+          )}
         </div>
       </div>
     </>

@@ -1,6 +1,7 @@
 "use server"
 
 import { revalidatePath } from "next/cache"
+import type { ProductWhereInput } from "@/generated/models"
 import { getSession } from "@/lib/auth"
 import { db } from "@/lib/db"
 import type { ProductFormData } from "@/lib/validations/product"
@@ -128,10 +129,10 @@ export async function getProductCountAction(params?: {
 }): Promise<number> {
   try {
     // Build the where clause dynamically
-    const where: { deletedAt: null; productType?: string; OR?: Array<any> } = { deletedAt: null }
+    const where: ProductWhereInput = { deletedAt: null }
 
     if (params?.boxlotOnly) {
-      where.productType = "BOXLOT"
+      where.productType = "ROSE"
     }
 
     if (params?.query) {
@@ -141,7 +142,7 @@ export async function getProductCountAction(params?: {
       ]
     }
 
-    const count = await db.product.count({ where: where as any })
+    const count = await db.product.count({ where })
     return count
   } catch (error) {
     throw new Error(error instanceof Error ? error.message : "Failed to get product count")

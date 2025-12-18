@@ -3,8 +3,9 @@ import { redirect } from "next/navigation"
 import CheckoutForm from "@/components/site/CheckoutForm"
 import { Button } from "@/components/ui/button"
 import { IconShoppingBag } from "@/components/ui/icons"
-import { getCart, getCurrentUser } from "@/lib/current-user"
+import { getCurrentUser } from "@/lib/current-user"
 import { db } from "@/lib/db"
+import { getCartAction } from "../actions/cart"
 
 export default async function CheckoutPage() {
   const user = await getCurrentUser()
@@ -20,7 +21,7 @@ export default async function CheckoutPage() {
   }
 
   // Fetch cart data (don't create - redirect if doesn't exist)
-  const cart = await getCart(user)
+  const cart = await getCartAction()
 
   // Redirect to cart if empty
   if (!cart || cart.items.length === 0) {

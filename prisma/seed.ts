@@ -401,7 +401,6 @@ async function main() {
 
         const order1 = await tx.order.create({
           data: {
-            orderNumber: `ORD-${Date.now()}-1`,
             userId: approvedCustomer.id,
             status: "DELIVERED",
             createdAt: order1Date,
@@ -437,7 +436,6 @@ async function main() {
 
         const order2 = await tx.order.create({
           data: {
-            orderNumber: `ORD-${Date.now()}-2`,
             userId: approvedCustomer.id,
             status: "CONFIRMED",
             createdAt: order2Date,

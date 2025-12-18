@@ -39,39 +39,6 @@ function applyMultiplierToProducts<T extends { price: number | null; [key: strin
 }
 
 /**
- * Get a single product by ID
- * Returns null if not found or if product is soft-deleted
- */
-async function getProductById(
-  id: string,
-  priceMultiplier = 1.0
-): Promise<ProductWithCollections | null> {
-  return withTiming(
-    "getProductById",
-    id,
-    async () => {
-      const product = await db.product.findFirst({
-        where: {
-          id,
-          deletedAt: null, // Exclude soft-deleted products
-        },
-        include: {
-          productCollections: {
-            include: {
-              collection: true,
-            },
-          },
-        },
-      })
-
-      if (!product) return null
-      return applyMultiplierToProduct(product as ProductWithCollections, priceMultiplier)
-    },
-    { logNotFound: true }
-  )
-}
-
-/**
  * Get multiple products with optional filters and pagination
  * Prices are automatically adjusted by the provided multiplier
  */

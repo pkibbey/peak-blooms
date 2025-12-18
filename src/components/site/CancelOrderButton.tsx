@@ -6,13 +6,13 @@ import { toast } from "sonner"
 import { cancelOrderAction } from "@/app/actions/orders"
 import { Button } from "@/components/ui/button"
 import { IconRefresh, IconTrash } from "@/components/ui/icons"
+import type { Order } from "@/generated/client"
 
 interface CancelOrderButtonProps {
-  orderId: string
-  orderNumber: string
+  order: Order
 }
 
-export function CancelOrderButton({ orderId, orderNumber }: CancelOrderButtonProps) {
+export function CancelOrderButton({ order }: CancelOrderButtonProps) {
   const router = useRouter()
   const [isLoading, setIsLoading] = useState(false)
   const [showOptions, setShowOptions] = useState(false)
@@ -20,7 +20,7 @@ export function CancelOrderButton({ orderId, orderNumber }: CancelOrderButtonPro
   const handleCancel = async (convertToCart: boolean) => {
     setIsLoading(true)
     try {
-      const result = await cancelOrderAction(orderId, convertToCart)
+      const result = await cancelOrderAction(order.id, convertToCart)
 
       if (result.success) {
         toast.success(result.message)
@@ -60,7 +60,7 @@ export function CancelOrderButton({ orderId, orderNumber }: CancelOrderButtonPro
 
   return (
     <div className="flex flex-col gap-2 p-4 bg-red-50 border border-red-200 rounded-xs">
-      <p className="text-sm font-medium text-red-900">Cancel Order {orderNumber}?</p>
+      <p className="text-sm font-medium text-red-900">Cancel Order #{order.orderNumber}?</p>
       <p className="text-xs text-red-700">Choose what you'd like to do:</p>
       <div className="flex gap-2 mt-2">
         <Button

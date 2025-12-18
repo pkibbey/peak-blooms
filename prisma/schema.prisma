@@ -180,14 +180,14 @@ model InspirationProduct {
 
 model Order {
   id                String      @id @default(cuid())
-  orderNumber       String      @unique
+  orderNumber       Int         @unique @default(autoincrement())
   userId            String
   status            OrderStatus @default(CART)
   notes             String?
-  deliveryAddressId String
+  deliveryAddressId String?
   createdAt         DateTime    @default(now())
   updatedAt         DateTime    @updatedAt
-  deliveryAddress   Address     @relation("DeliveryAddress", fields: [deliveryAddressId], references: [id])
+  deliveryAddress   Address?    @relation("DeliveryAddress", fields: [deliveryAddressId], references: [id])
   user              User        @relation(fields: [userId], references: [id], onDelete: Cascade)
   items             OrderItem[]
 

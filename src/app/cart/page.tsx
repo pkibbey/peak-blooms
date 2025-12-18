@@ -2,7 +2,8 @@ import { redirect } from "next/navigation"
 import Cart from "@/components/site/Cart"
 import { DeliveryBanner } from "@/components/site/DeliveryBanner"
 import EmptyState from "@/components/site/EmptyState"
-import { getCart, getCurrentUser } from "@/lib/current-user"
+import { getCurrentUser } from "@/lib/current-user"
+import { getCartAction } from "../actions/cart"
 
 export default async function CartPage() {
   const user = await getCurrentUser()
@@ -16,8 +17,8 @@ export default async function CartPage() {
     redirect("/pending-approval")
   }
 
-  // Fetch cart data server-side (don't create cart if it doesn't exist)
-  const cart = await getCart(user)
+  // Fetch cart data server-side
+  const cart = await getCartAction()
 
   if (!cart) {
     return (
@@ -35,15 +36,7 @@ export default async function CartPage() {
     <>
       <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 py-10">
         <h1 className="heading-1 mb-8">Shopping Cart</h1>
-        <Cart
-          initialCart={{
-            id: cart.id,
-            orderNumber: cart.orderNumber,
-            status: cart.status,
-            notes: cart.notes,
-            items: cart.items,
-          }}
-        />
+        <Cart initialCart={cart} />
       </div>
       <DeliveryBanner />
     </>
