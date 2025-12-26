@@ -4,7 +4,8 @@
     "src/app/layout.{ts,tsx,js,jsx}",
     "src/app/**/page.{ts,tsx,js,jsx}",
     "src/app/**/route.{ts,tsx,js,jsx}",
-    "src/app/api/**/route.{ts,tsx,js,jsx}"
+    "src/app/api/**/route.{ts,tsx,js,jsx}",
+    "src/generated/**"
   ],
   "project": ["src/**/*.{ts,tsx,js,jsx}"],
   "paths": {

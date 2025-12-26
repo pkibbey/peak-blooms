@@ -71,17 +71,3 @@ export function createMockPrismaClient() {
     $transaction: vi.fn(),
   }
 }
-
-/**
- * Create a mock fetch response for API testing
- * Example usage:
- *   global.fetch = vi.fn(() => createMockFetchResponse({ data: [] }))
- */
-export function createMockFetchResponse(data: unknown, status = 200) {
-  return Promise.resolve(
-    new Response(JSON.stringify(data), {
-      status,
-      headers: { "Content-Type": "application/json" },
-    })
-  )
-}
