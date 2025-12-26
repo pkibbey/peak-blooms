@@ -48,6 +48,7 @@ import {
   addToCartAction,
   batchAddToCartAction,
   clearCartAction,
+  getCartAction,
   removeFromCartAction,
   updateCartItemAction,
 } from "./cart"
@@ -758,10 +759,112 @@ describe("Cart Actions", () => {
           items: [item1],
         })
       )
-
       const result = await batchAddToCartAction(["product-1"])
-
       expect(result.items[0].quantity).toBe(1)
+    })
+
+    it("should handle mixed valid and invalid quantities in array", async () => {
+      const item1 = { id: "item-1", orderId: mockCart.id, productId: mockProduct1.id, quantity: 1 }
+      vi.mocked(getCurrentUser).mockResolvedValueOnce(mockOrder(mockUser))
+      vi.mocked(db.order.findFirst).mockResolvedValueOnce(mockOrder(mockCart))
+      vi.mocked(db.$transaction).mockImplementationOnce(async (fn) => {
+        return fn({
+          orderItem: {
+            findFirst: vi.fn().mockResolvedValueOnce(null),
+            create: vi.fn().mockResolvedValueOnce(item1),
+            update: vi.fn(),
+          },
+        } as any)
+      })
+      vi.mocked(db.order.findUniqueOrThrow).mockResolvedValueOnce(
+        mockOrder({ ...mockCart, items: [item1] })
+      )
+
+      // @ts-expect-error - testing runtime behavior with invalid types
+      const result = await batchAddToCartAction(["product-1"], ["invalid"])
+      expect(result.items[0].quantity).toBe(1)
+    })
+
+    it("should fallback to default error message", async () => {
+      vi.mocked(getCurrentUser).mockRejectedValueOnce("String Error")
+      await expect(batchAddToCartAction(["p1"])).rejects.toThrow("Failed to add items to cart")
+    })
+
+    it("should handle non-Error exception", async () => {
+      vi.mocked(getCurrentUser).mockResolvedValueOnce(mockUser)
+      vi.mocked(db.order.findFirst).mockRejectedValueOnce("String error")
+
+      await expect(batchAddToCartAction(["product-1"])).rejects.toThrow()
+    })
+
+    it("should create cart if it doesn't exist", async () => {
+      const item1 = {
+        id: "item-1",
+        orderId: mockCart.id,
+        productId: mockProduct1.id,
+        quantity: 1,
+        price: null,
+        productNameSnapshot: "Roses",
+        productImageSnapshot: "roses.jpg",
+      }
+
+      vi.mocked(getCurrentUser).mockResolvedValueOnce(mockUser)
+      vi.mocked(db.order.findFirst).mockResolvedValueOnce(null)
+      vi.mocked(db.order.create).mockResolvedValueOnce(mockOrder({ ...mockCart, items: [] }))
+      vi.mocked(db.$transaction).mockImplementationOnce(async (fn) => {
+        return fn({
+          orderItem: {
+            findFirst: vi.fn().mockResolvedValueOnce(null),
+            create: vi.fn().mockResolvedValueOnce(item1),
+            update: vi.fn(),
+          },
+          // biome-ignore lint/suspicious/noExplicitAny: Intentional for test mocks
+        } as any)
+      })
+      vi.mocked(db.order.findUniqueOrThrow).mockResolvedValueOnce(
+        mockOrder({
+          ...mockCart,
+          items: [item1],
+        })
+      )
+
+      const result = await batchAddToCartAction(["product-1"], 1)
+      expect(result.items).toHaveLength(1)
+    })
+  })
+
+  describe("getCartAction", () => {
+    const mockUser = {
+      id: "user-1",
+      email: "test@example.com",
+      approved: true,
+      priceMultiplier: 1.0,
+    }
+    const mockCart = { id: "cart-1", userId: mockUser.id, items: [] }
+
+    it("should return null if no cart exists", async () => {
+      vi.mocked(getCurrentUser).mockResolvedValueOnce(mockOrder(mockUser))
+      vi.mocked(db.order.findFirst).mockResolvedValue(null)
+      const result = await getCartAction()
+      expect(result).toBeNull()
+    })
+
+    it("should return cart if it exists", async () => {
+      vi.mocked(getCurrentUser).mockResolvedValueOnce(mockOrder(mockUser))
+      vi.mocked(db.order.findFirst).mockResolvedValue(mockOrder(mockCart))
+      const result = await getCartAction()
+      expect(result?.id).toBe(mockCart.id)
+    })
+
+    it("should throw error if user not approved", async () => {
+      vi.mocked(getCurrentUser).mockResolvedValueOnce(mockOrder({ ...mockUser, approved: false }))
+      await expect(getCartAction()).rejects.toThrow("Your account is not approved for purchases")
+    })
+
+    it("should handle non-Error exception", async () => {
+      vi.mocked(getCurrentUser).mockRejectedValueOnce("String error")
+
+      await expect(getCartAction()).rejects.toThrow()
     })
   })
 })

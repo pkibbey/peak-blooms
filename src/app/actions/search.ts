@@ -44,8 +44,7 @@ export async function searchProducts(searchTerm: string): Promise<SearchProducts
     }))
 
     return { products }
-  } catch (error) {
-    console.error("searchProducts error:", error)
+  } catch {
     return { products: [] }
   }
 }

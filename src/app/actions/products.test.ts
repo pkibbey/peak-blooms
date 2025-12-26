@@ -169,6 +169,25 @@ describe("Product Actions", () => {
       })
     })
 
+    it("should handle non-Error exception during create", async () => {
+      vi.mocked(getSession).mockResolvedValueOnce(mockAdminSession)
+      vi.mocked(db.product.create).mockRejectedValueOnce("String error")
+
+      const data = {
+        name: "Roses",
+        slug: "roses",
+        description: "Red roses",
+        image: "roses.jpg",
+        price: "49.99",
+        colors: ["red"],
+        productType: "FLOWER" as const,
+        featured: false,
+        collectionIds: [],
+      }
+
+      await expect(createProductAction(data)).rejects.toThrow()
+    })
+
     it("should create product with collection associations", async () => {
       vi.mocked(getSession).mockResolvedValueOnce(mockAdminSession)
       vi.mocked(db.product.create).mockResolvedValueOnce(mockProduct)
@@ -265,6 +284,69 @@ describe("Product Actions", () => {
       })
     })
 
+    it("should handle update without collection changes", async () => {
+      const updatedProduct = { ...mockProduct, name: "Tulips" }
+
+      vi.mocked(getSession).mockResolvedValueOnce(mockAdminSession)
+      vi.mocked(db.product.update).mockResolvedValueOnce(updatedProduct)
+
+      const data = {
+        name: "Tulips",
+        slug: "tulips",
+        description: "Beautiful red roses",
+        image: "roses.jpg",
+        price: "49.99",
+        colors: ["red"],
+        collectionIds: ["collection-1"],
+        productType: "FLOWER" as const,
+        featured: false,
+      }
+
+      const result = await updateProductAction("product-1", data)
+
+      expect(result.success).toBe(true)
+      expect(db.product.update).toHaveBeenCalledWith({
+        where: { id: "product-1" },
+        data: {
+          name: "Tulips",
+          slug: "tulips",
+          description: "Beautiful red roses",
+          image: "roses.jpg",
+          price: 49.99,
+          colors: ["red"],
+          productType: "FLOWER",
+          featured: false,
+          productCollections: {
+            create: [
+              {
+                collectionId: "collection-1",
+              },
+            ],
+            deleteMany: {},
+          },
+        },
+      })
+    })
+
+    it("should handle non-Error exception during update", async () => {
+      vi.mocked(getSession).mockResolvedValueOnce(mockAdminSession)
+      vi.mocked(db.product.update).mockRejectedValueOnce("String error")
+
+      const data = {
+        name: "Tulips",
+        slug: "tulips",
+        description: "Beautiful red roses",
+        image: "roses.jpg",
+        price: "49.99",
+        colors: ["red"],
+        collectionIds: ["collection-1"],
+        productType: "FLOWER" as const,
+        featured: false,
+      }
+
+      await expect(updateProductAction("product-1", data)).rejects.toThrow()
+    })
+
     it("should update product collections if provided", async () => {
       vi.mocked(getSession).mockResolvedValueOnce(mockAdminSession)
       vi.mocked(db.product.update).mockResolvedValueOnce(mockProduct)
@@ -345,6 +427,19 @@ describe("Product Actions", () => {
         where: { id: "product-1" },
       })
     })
+
+    it("should throw error if user not authenticated for delete", async () => {
+      vi.mocked(getSession).mockResolvedValueOnce(null)
+
+      await expect(deleteProductAction("product-1")).rejects.toThrow("Unauthorized")
+    })
+
+    it("should handle non-Error exception during delete", async () => {
+      vi.mocked(getSession).mockResolvedValueOnce(mockAdminSession)
+      vi.mocked(db.product.delete).mockRejectedValueOnce("String error")
+
+      await expect(deleteProductAction("product-1")).rejects.toThrow()
+    })
   })
 
   describe("toggleProductFeaturedAction", () => {
@@ -393,6 +488,13 @@ describe("Product Actions", () => {
 
       await expect(toggleProductFeaturedAction("product-1", true)).rejects.toThrow("Unauthorized")
     })
+
+    it("should handle non-Error exception during toggle", async () => {
+      vi.mocked(getSession).mockResolvedValueOnce(mockAdminSession)
+      vi.mocked(db.product.update).mockRejectedValueOnce("String error")
+
+      await expect(toggleProductFeaturedAction("product-1", true)).rejects.toThrow()
+    })
   })
 
   describe("getProductCountAction", () => {
@@ -407,14 +509,14 @@ describe("Product Actions", () => {
       })
     })
 
-    it.skip("should filter by boxlot only", async () => {
+    it("should filter by boxlot only", async () => {
       vi.mocked(db.product.count).mockResolvedValueOnce(5)
 
       const result = await getProductCountAction({ boxlotOnly: true })
 
       expect(result).toBe(5)
       expect(db.product.count).toHaveBeenCalledWith({
-        where: { deletedAt: null, productType: "BOXLOT" },
+        where: { deletedAt: null, productType: "ROSE" },
       })
     })
 
@@ -434,6 +536,12 @@ describe("Product Actions", () => {
 
       expect(result).toBe(1)
       expect(db.product.count).toHaveBeenCalled()
+    })
+
+    it("should handle non-Error exception during count", async () => {
+      vi.mocked(db.product.count).mockRejectedValueOnce("String error")
+
+      await expect(getProductCountAction()).rejects.toThrow()
     })
   })
 })

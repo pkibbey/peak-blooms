@@ -42,7 +42,6 @@ export async function approveUserAction(userId: string) {
     revalidatePath("/admin/users")
     return user
   } catch (error) {
-    console.error("approveUserAction error:", error)
     throw new Error(error instanceof Error ? error.message : "Failed to approve user")
   }
 }
@@ -83,7 +82,6 @@ export async function unapproveUserAction(userId: string) {
     revalidatePath("/admin/users")
     return user
   } catch (error) {
-    console.error("unapproveUserAction error:", error)
     throw new Error(error instanceof Error ? error.message : "Failed to unapprove user")
   }
 }
@@ -128,7 +126,6 @@ export async function updateUserPriceMultiplierAction(userId: string, multiplier
     revalidatePath("/admin/users")
     return user
   } catch (error) {
-    console.error("updateUserPriceMultiplierAction error:", error)
     throw new Error(error instanceof Error ? error.message : "Failed to update price multiplier")
   }
 }
@@ -189,7 +186,6 @@ export async function createUserAction(data: {
     revalidatePath("/admin/users")
     return user
   } catch (error) {
-    console.error("createUserAction error:", error)
     throw new Error(error instanceof Error ? error.message : "Failed to create user")
   }
 }

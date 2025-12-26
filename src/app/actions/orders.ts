@@ -109,7 +109,6 @@ export async function cancelOrderAction(
       }
     }
   } catch (error) {
-    console.error("cancelOrderAction error:", error)
     return {
       success: false,
       message: "Failed to cancel order",
@@ -244,7 +243,6 @@ export async function createOrderAction(data: CreateOrderInput) {
     revalidatePath("/account/order-history")
     return order
   } catch (error) {
-    console.error("createOrderAction error:", error)
     throw new Error(error instanceof Error ? error.message : "Failed to create order")
   }
 }

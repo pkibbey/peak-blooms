@@ -25,9 +25,8 @@ export async function captureMetric(
         duration,
       },
     })
-  } catch (error) {
+  } catch (_error) {
     // Silently fail if metrics can't be saved - don't break the app
-    console.error("Failed to capture metric:", error)
   }
 }
 

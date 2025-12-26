@@ -11,7 +11,7 @@ import type { SessionUser } from "@/lib/types/users"
  * Returns cart with prices adjusted by user's price multiplier
  * A cart is an Order with status = 'CART'
  */
-async function createCart(user: SessionUser) {
+export async function createCart(user: SessionUser) {
   const newCart = await db.order.create({
     data: {
       userId: user.id,
@@ -111,7 +111,6 @@ export async function addToCartAction(productId: string, quantity: number = 1) {
       total,
     }
   } catch (error) {
-    console.error("addToCartAction error:", error)
     throw new Error(error instanceof Error ? error.message : "Failed to add to cart")
   }
 }
@@ -168,7 +167,6 @@ export async function updateCartItemAction(itemId: string, quantity: number) {
       total,
     }
   } catch (error) {
-    console.error("updateCartItemAction error:", error)
     throw new Error(error instanceof Error ? error.message : "Failed to update cart item")
   }
 }
@@ -218,7 +216,6 @@ export async function removeFromCartAction(itemId: string) {
       total,
     }
   } catch (error) {
-    console.error("removeFromCartAction error:", error)
     throw new Error(error instanceof Error ? error.message : "Failed to remove item from cart")
   }
 }
@@ -264,7 +261,6 @@ export async function clearCartAction() {
       total: 0,
     }
   } catch (error) {
-    console.error("clearCartAction error:", error)
     throw new Error(error instanceof Error ? error.message : "Failed to clear cart")
   }
 }
@@ -305,7 +301,6 @@ export async function getCartAction() {
       total,
     }
   } catch (error) {
-    console.error("getCartAction error:", error)
     throw new Error(error instanceof Error ? error.message : "Failed to fetch cart")
   }
 }
@@ -410,7 +405,6 @@ export async function batchAddToCartAction(productIds: string[], quantities?: nu
       total,
     }
   } catch (error) {
-    console.error("batchAddToCartAction error:", error)
     throw new Error(error instanceof Error ? error.message : "Failed to add items to cart")
   }
 }

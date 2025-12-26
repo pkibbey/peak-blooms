@@ -43,7 +43,6 @@ export async function updateProfileAction(data: ProfileFormData) {
     revalidatePath("/account")
     return user
   } catch (error) {
-    console.error("updateProfileAction error:", error)
     throw new Error(error instanceof Error ? error.message : "Failed to update profile")
   }
 }
@@ -66,7 +65,6 @@ async function getAddressesAction() {
 
     return addresses
   } catch (error) {
-    console.error("getAddressesAction error:", error)
     throw new Error(error instanceof Error ? error.message : "Failed to fetch addresses")
   }
 }
@@ -117,7 +115,6 @@ export async function createAddressAction(data: AddressFormData & { isDefault?: 
     revalidatePath("/account")
     return address
   } catch (error) {
-    console.error("createAddressAction error:", error)
     throw new Error(error instanceof Error ? error.message : "Failed to create address")
   }
 }
@@ -185,7 +182,6 @@ export async function updateAddressAction(
     revalidatePath("/account")
     return address
   } catch (error) {
-    console.error("updateAddressAction error:", error)
     throw new Error(error instanceof Error ? error.message : "Failed to update address")
   }
 }
@@ -217,7 +213,6 @@ export async function deleteAddressAction(addressId: string) {
     revalidatePath("/account")
     return { success: true }
   } catch (error) {
-    console.error("deleteAddressAction error:", error)
     throw new Error(error instanceof Error ? error.message : "Failed to delete address")
   }
 }

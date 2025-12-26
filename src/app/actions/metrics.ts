@@ -23,7 +23,11 @@ export async function getMetricsAction(): Promise<Metric[]> {
 /**
  * Server action to record a new metric (admin only)
  */
-async function recordMetricAction(type: MetricType, name: string, duration: number): Promise<void> {
+export async function recordMetricAction(
+  type: MetricType,
+  name: string,
+  duration: number
+): Promise<void> {
   try {
     const session = await getSession()
     if (!session?.user || session.user.role !== "ADMIN") {

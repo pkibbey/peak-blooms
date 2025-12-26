@@ -36,7 +36,6 @@ export async function createInspirationAction(
     revalidatePath("/admin/inspirations")
     return { success: true, id: inspiration.id }
   } catch (error) {
-    console.error("createInspirationAction error:", error)
     throw new Error(error instanceof Error ? error.message : "Failed to create inspiration")
   }
 }
@@ -75,7 +74,6 @@ export async function updateInspirationAction(
     revalidatePath("/admin/inspirations")
     return { success: true, id: inspiration.id }
   } catch (error) {
-    console.error("updateInspirationAction error:", error)
     throw new Error(error instanceof Error ? error.message : "Failed to update inspiration")
   }
 }
@@ -94,7 +92,6 @@ export async function deleteInspirationAction(id: string) {
     revalidatePath("/admin/inspirations")
     return { success: true }
   } catch (error) {
-    console.error("deleteInspirationAction error:", error)
     throw new Error(error instanceof Error ? error.message : "Failed to delete inspiration")
   }
 }

@@ -27,14 +27,12 @@ export async function deleteBlobAction(url: string): Promise<{ success: boolean 
     })
 
     if (!response.ok) {
-      console.error("Failed to delete blob:", response.statusText)
       // Don't throw - blob cleanup is not critical
       return { success: false }
     }
 
     return { success: true }
-  } catch (error) {
-    console.error("deleteBlobAction error:", error)
+  } catch {
     // Don't throw - blob cleanup is not critical
     return { success: false }
   }

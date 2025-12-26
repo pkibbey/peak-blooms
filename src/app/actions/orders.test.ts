@@ -24,7 +24,12 @@ vi.mock("next/cache", () => ({
 import { getCurrentUser } from "@/lib/current-user"
 import { db } from "@/lib/db"
 // Now import the modules
-import { cancelOrderAction, updateOrderItemPriceAction, updateOrderStatusAction } from "./orders"
+import {
+  cancelOrderAction,
+  createOrderAction,
+  updateOrderItemPriceAction,
+  updateOrderStatusAction,
+} from "./orders"
 
 describe("Order Actions", () => {
   beforeEach(() => {
@@ -76,11 +81,35 @@ describe("Order Actions", () => {
       expect(result.error).toContain("does not exist")
     })
 
-    it("should return error if order is not PENDING", async () => {
+    it("should return error if order is CART", async () => {
       const cartOrder = { ...mockOrder, status: "CART" as OrderStatus }
 
       vi.mocked(getCurrentUser).mockResolvedValueOnce(mockUser)
       vi.mocked(db.order.findFirst).mockResolvedValueOnce(cartOrder)
+
+      const result = await cancelOrderAction("order-1")
+
+      expect(result.success).toBe(false)
+      expect(result.error).toContain("Only PENDING orders can be cancelled")
+    })
+
+    it("should return error if order is CONFIRMED", async () => {
+      const confirmedOrder = { ...mockOrder, status: "CONFIRMED" as OrderStatus }
+
+      vi.mocked(getCurrentUser).mockResolvedValueOnce(mockUser)
+      vi.mocked(db.order.findFirst).mockResolvedValueOnce(confirmedOrder)
+
+      const result = await cancelOrderAction("order-1")
+
+      expect(result.success).toBe(false)
+      expect(result.error).toContain("Only PENDING orders can be cancelled")
+    })
+
+    it("should return error if order is already CANCELLED", async () => {
+      const cancelledOrder = { ...mockOrder, status: "CANCELLED" as OrderStatus }
+
+      vi.mocked(getCurrentUser).mockResolvedValueOnce(mockUser)
+      vi.mocked(db.order.findFirst).mockResolvedValueOnce(cancelledOrder)
 
       const result = await cancelOrderAction("order-1")
 
@@ -119,6 +148,16 @@ describe("Order Actions", () => {
       expect(result.success).toBe(true)
       expect(result.message).toContain("converted back to cart")
       expect(result.order?.status).toBe("CART")
+    })
+
+    it("should handle non-Error exception in cancelOrderAction", async () => {
+      vi.mocked(getCurrentUser).mockRejectedValueOnce("String error")
+
+      const result = await cancelOrderAction("order-1", false)
+
+      expect(result.success).toBe(false)
+      expect(result.message).toContain("Failed to cancel order")
+      expect(result.error).toContain("Unknown error occurred")
     })
   })
 
@@ -202,6 +241,22 @@ describe("Order Actions", () => {
       const result = await updateOrderStatusAction("order-1", "CANCELLED")
 
       expect(result.order.status).toBe("CANCELLED")
+    })
+
+    it("should throw error on database update failure", async () => {
+      vi.mocked(getCurrentUser).mockResolvedValueOnce(mockAdminUser)
+      vi.mocked(db.order.findUnique).mockResolvedValueOnce(mockOrder)
+      vi.mocked(db.order.update).mockRejectedValueOnce(new Error("Update failed"))
+
+      await expect(updateOrderStatusAction("order-1", "CONFIRMED")).rejects.toThrow("Update failed")
+    })
+
+    it("should handle non-Error exception in updateOrderStatusAction", async () => {
+      vi.mocked(getCurrentUser).mockResolvedValueOnce(mockAdminUser)
+      vi.mocked(db.order.findUnique).mockResolvedValueOnce(mockOrder)
+      vi.mocked(db.order.update).mockRejectedValueOnce("String error")
+
+      await expect(updateOrderStatusAction("order-1", "CONFIRMED")).rejects.toThrow()
     })
   })
 
@@ -306,6 +361,455 @@ describe("Order Actions", () => {
 
       // (49.99 * 2) + (39.99 * 1) = 99.98 + 39.99 = 139.97
       expect(result.newOrderTotal).toBe(139.97)
+    })
+
+    it("should throw error on database update failure for order item", async () => {
+      const mockItem = {
+        id: "item-1",
+        orderId: "order-1",
+        productId: "product-1",
+        quantity: 2,
+        price: null,
+      }
+
+      vi.mocked(getCurrentUser).mockResolvedValueOnce(mockAdminUser)
+      vi.mocked(db.orderItem.findFirst).mockResolvedValueOnce(mockItem as never)
+      vi.mocked(db.orderItem.update).mockRejectedValueOnce(new Error("Update failed"))
+
+      await expect(updateOrderItemPriceAction("order-1", "item-1", 49.99)).rejects.toThrow(
+        "Update failed"
+      )
+    })
+
+    it("should handle non-Error exception in updateOrderItemPriceAction", async () => {
+      vi.mocked(getCurrentUser).mockResolvedValueOnce(mockAdminUser)
+
+      await expect(
+        updateOrderItemPriceAction("order-1", "item-1", "invalid" as never)
+      ).rejects.toThrow()
+    })
+  })
+
+  describe("createOrderAction", () => {
+    const validOrderData = {
+      deliveryAddressId: "address-1",
+      deliveryAddress: null,
+      saveDeliveryAddress: false,
+      notes: null,
+    }
+
+    it("should throw error if user is not authenticated", async () => {
+      vi.mocked(getCurrentUser).mockResolvedValueOnce(null)
+
+      await expect(createOrderAction(validOrderData)).rejects.toThrow("Unauthorized")
+    })
+
+    it("should throw error if user is not approved", async () => {
+      const unapprovedUser = { ...mockUser, approved: false }
+      vi.mocked(getCurrentUser).mockResolvedValueOnce(unapprovedUser)
+
+      await expect(createOrderAction(validOrderData)).rejects.toThrow(
+        "Your account is not approved for purchases"
+      )
+    })
+
+    it("should throw error if cart is empty (no cart found)", async () => {
+      vi.mocked(getCurrentUser).mockResolvedValueOnce(mockUser)
+      vi.mocked(db.order.findFirst).mockResolvedValueOnce(null)
+
+      await expect(createOrderAction(validOrderData)).rejects.toThrow("Cart is empty")
+    })
+
+    it("should throw error if cart has no items", async () => {
+      const emptyCart = { ...mockOrder, items: [] }
+      vi.mocked(getCurrentUser).mockResolvedValueOnce(mockUser)
+      vi.mocked(db.order.findFirst).mockResolvedValueOnce(emptyCart)
+
+      await expect(createOrderAction(validOrderData)).rejects.toThrow("Cart is empty")
+    })
+
+    it("should throw error if delivery address ID provided but not found", async () => {
+      const cartWithItems = {
+        ...mockOrder,
+        items: [
+          {
+            id: "item-1",
+            productId: "product-1",
+            quantity: 1,
+            product: { name: "Roses", image: "roses.jpg", price: 49.99 },
+          },
+        ],
+      }
+      vi.mocked(getCurrentUser).mockResolvedValueOnce(mockUser)
+      vi.mocked(db.order.findFirst).mockResolvedValueOnce(cartWithItems as never)
+      vi.mocked(db.address.findFirst).mockResolvedValueOnce(null)
+
+      await expect(createOrderAction(validOrderData)).rejects.toThrow("Invalid delivery address")
+    })
+
+    it("should throw error if neither delivery address ID nor new address provided", async () => {
+      const cartWithItems = {
+        ...mockOrder,
+        items: [
+          {
+            id: "item-1",
+            productId: "product-1",
+            quantity: 1,
+            product: { name: "Roses", image: "roses.jpg", price: 49.99 },
+          },
+        ],
+      }
+      vi.mocked(getCurrentUser).mockResolvedValueOnce(mockUser)
+      vi.mocked(db.order.findFirst).mockResolvedValueOnce(cartWithItems as never)
+
+      const invalidData = {
+        deliveryAddressId: null,
+        deliveryAddress: null,
+        saveDeliveryAddress: false,
+        notes: null,
+      }
+
+      await expect(createOrderAction(invalidData)).rejects.toThrow("Delivery address is required")
+    })
+
+    it("should successfully create order with existing delivery address", async () => {
+      const cartWithItems = {
+        ...mockOrder,
+        id: "cart-1",
+        items: [
+          {
+            id: "item-1",
+            productId: "product-1",
+            quantity: 2,
+            product: { name: "Roses", image: "roses.jpg", price: 49.99 },
+          },
+        ],
+      }
+
+      const existingAddress = { id: "address-1", userId: mockUser.id }
+
+      vi.mocked(getCurrentUser).mockResolvedValueOnce(mockUser)
+      vi.mocked(db.order.findFirst).mockResolvedValueOnce(cartWithItems as never)
+      vi.mocked(db.address.findFirst).mockResolvedValueOnce(existingAddress as never)
+      vi.mocked(db.orderItem.update).mockResolvedValue({} as never)
+      vi.mocked(db.order.update).mockResolvedValueOnce({
+        ...cartWithItems,
+        status: "PENDING" as OrderStatus,
+        deliveryAddressId: "address-1",
+        deliveryAddress: existingAddress,
+      } as never)
+
+      const result = await createOrderAction(validOrderData)
+
+      expect(result.status).toBe("PENDING")
+      expect(result.deliveryAddressId).toBe("address-1")
+    })
+
+    it("should create order with new unsaved delivery address", async () => {
+      const cartWithItems = {
+        ...mockOrder,
+        id: "cart-1",
+        items: [
+          {
+            id: "item-1",
+            productId: "product-1",
+            quantity: 1,
+            product: {
+              id: "prod-1",
+              name: "Roses",
+              image: "roses.jpg",
+              price: 49.99,
+              type: "ROSE",
+              collectionId: null,
+              deletedAt: null,
+            },
+          },
+        ],
+      }
+
+      const newAddress = {
+        firstName: "John",
+        lastName: "Doe",
+        company: "Co",
+        street1: "123 St",
+        street2: "",
+        city: "City",
+        state: "CA",
+        zip: "12345",
+        country: "US",
+        email: "john@test.com",
+        phone: "+1-206-555-0100",
+      }
+
+      vi.mocked(getCurrentUser).mockResolvedValueOnce(mockUser)
+      vi.mocked(db.order.findFirst).mockResolvedValueOnce(cartWithItems as never)
+      vi.mocked(db.address.create).mockResolvedValueOnce({
+        id: "address-new",
+        userId: null,
+        ...newAddress,
+      } as never)
+      vi.mocked(db.orderItem.update).mockResolvedValue({} as never)
+      vi.mocked(db.order.update).mockResolvedValueOnce({
+        ...cartWithItems,
+        status: "PENDING" as OrderStatus,
+        deliveryAddressId: "address-new",
+      } as never)
+
+      const dataWithNewAddress = {
+        deliveryAddressId: null,
+        deliveryAddress: newAddress,
+        saveDeliveryAddress: false,
+        notes: null,
+      }
+
+      const result = await createOrderAction(dataWithNewAddress)
+
+      expect(result.status).toBe("PENDING")
+      expect(vi.mocked(db.address.create)).toHaveBeenCalledWith({
+        data: expect.objectContaining({
+          userId: null,
+          firstName: "John",
+        }),
+      })
+    })
+
+    it("should save new address to user when saveDeliveryAddress is true", async () => {
+      const cartWithItems = {
+        ...mockOrder,
+        id: "cart-1",
+        items: [
+          {
+            id: "item-1",
+            productId: "product-1",
+            quantity: 1,
+            product: {
+              id: "prod-1",
+              name: "Roses",
+              image: "roses.jpg",
+              price: 49.99,
+              type: "ROSE",
+              collectionId: null,
+              deletedAt: null,
+            },
+          },
+        ],
+      }
+
+      const newAddress = {
+        firstName: "Jane",
+        lastName: "Smith",
+        company: "Company",
+        street1: "456 Ave",
+        street2: "Suite 100",
+        city: "Town",
+        state: "CA",
+        zip: "54321",
+        country: "US",
+        email: "jane@test.com",
+        phone: "+1-206-555-0123",
+      }
+
+      vi.mocked(getCurrentUser).mockResolvedValueOnce(mockUser)
+      vi.mocked(db.order.findFirst).mockResolvedValueOnce(cartWithItems as never)
+      vi.mocked(db.address.create).mockResolvedValueOnce({
+        id: "address-new",
+        userId: mockUser.id,
+        ...newAddress,
+      } as never)
+      vi.mocked(db.orderItem.update).mockResolvedValue({} as never)
+      vi.mocked(db.order.update).mockResolvedValueOnce({
+        ...cartWithItems,
+        status: "PENDING" as OrderStatus,
+        deliveryAddressId: "address-new",
+      } as never)
+
+      const dataWithSavedAddress = {
+        deliveryAddressId: null,
+        deliveryAddress: newAddress,
+        saveDeliveryAddress: true,
+        notes: null,
+      }
+
+      await createOrderAction(dataWithSavedAddress)
+
+      expect(vi.mocked(db.address.create)).toHaveBeenCalledWith({
+        data: expect.objectContaining({
+          userId: mockUser.id,
+        }),
+      })
+    })
+
+    it("should apply user price multiplier to cart items", async () => {
+      const testCartItems = [
+        {
+          id: "item-1",
+          productId: "product-1",
+          quantity: 1,
+          product: {
+            id: "prod-1",
+            name: "Roses",
+            image: "roses.jpg",
+            price: 100.0,
+            type: "ROSE",
+            collectionId: null,
+            deletedAt: null,
+          },
+        },
+      ]
+
+      const testCart = {
+        id: "cart-1",
+        userId: mockUser.id,
+        orderNumber: 1,
+        status: "CART" as OrderStatus,
+        notes: null,
+        deliveryAddressId: "address-1",
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        items: testCartItems,
+      }
+
+      const userWithMultiplier = { ...mockUser, priceMultiplier: 1.5 }
+      const existingAddress = { id: "address-1", userId: mockUser.id }
+
+      vi.mocked(getCurrentUser).mockResolvedValueOnce(userWithMultiplier)
+      vi.mocked(db.order.findFirst).mockResolvedValueOnce(testCart as never)
+      vi.mocked(db.address.findFirst).mockResolvedValueOnce(existingAddress as never)
+      vi.mocked(db.orderItem.update).mockResolvedValue({} as never)
+      vi.mocked(db.order.update).mockResolvedValueOnce({
+        ...testCart,
+        status: "PENDING" as OrderStatus,
+      } as never)
+
+      await createOrderAction(validOrderData)
+
+      expect(vi.mocked(db.orderItem.update)).toHaveBeenCalledWith(
+        expect.objectContaining({
+          data: expect.objectContaining({
+            price: 150.0,
+          }),
+        })
+      )
+    })
+
+    it("should handle market-priced items (null price) without multiplier", async () => {
+      const cartWithItems = {
+        ...mockOrder,
+        id: "cart-1",
+        items: [
+          {
+            id: "item-1",
+            productId: "product-1",
+            quantity: 1,
+            product: { name: "Market Item", image: "market.jpg", price: null },
+          },
+        ],
+      }
+
+      const existingAddress = { id: "address-1", userId: mockUser.id }
+
+      vi.mocked(getCurrentUser).mockResolvedValueOnce(mockUser)
+      vi.mocked(db.order.findFirst).mockResolvedValueOnce(cartWithItems as never)
+      vi.mocked(db.address.findFirst).mockResolvedValueOnce(existingAddress as never)
+      vi.mocked(db.orderItem.update).mockResolvedValue({} as never)
+      vi.mocked(db.order.update).mockResolvedValueOnce({
+        ...cartWithItems,
+        status: "PENDING" as OrderStatus,
+      } as never)
+
+      await createOrderAction(validOrderData)
+
+      expect(vi.mocked(db.orderItem.update)).toHaveBeenCalledWith(
+        expect.objectContaining({
+          data: expect.objectContaining({
+            price: null,
+          }),
+        })
+      )
+    })
+
+    it("should include notes in the created order", async () => {
+      const cartWithItems = {
+        ...mockOrder,
+        id: "cart-1",
+        items: [
+          {
+            id: "item-1",
+            productId: "product-1",
+            quantity: 1,
+            product: { name: "Roses", image: "roses.jpg", price: 49.99 },
+          },
+        ],
+      }
+
+      const existingAddress = { id: "address-1", userId: mockUser.id }
+
+      vi.mocked(getCurrentUser).mockResolvedValueOnce(mockUser)
+      vi.mocked(db.order.findFirst).mockResolvedValueOnce(cartWithItems as never)
+      vi.mocked(db.address.findFirst).mockResolvedValueOnce(existingAddress as never)
+      vi.mocked(db.orderItem.update).mockResolvedValue({} as never)
+      vi.mocked(db.order.update).mockResolvedValueOnce({
+        ...cartWithItems,
+        status: "PENDING" as OrderStatus,
+        notes: "Handle with care",
+      } as never)
+
+      const dataWithNotes = {
+        deliveryAddressId: "address-1",
+        deliveryAddress: null,
+        saveDeliveryAddress: false,
+        notes: "Handle with care",
+      }
+
+      await createOrderAction(dataWithNotes)
+
+      expect(vi.mocked(db.order.update)).toHaveBeenCalledWith(
+        expect.objectContaining({
+          data: expect.objectContaining({
+            notes: "Handle with care",
+          }),
+        })
+      )
+    })
+
+    it("should handle error when database operation fails", async () => {
+      const cartWithItems = {
+        ...mockOrder,
+        id: "cart-1",
+        items: [
+          {
+            id: "item-1",
+            productId: "product-1",
+            quantity: 1,
+            product: { name: "Roses", image: "roses.jpg", price: 49.99 },
+          },
+        ],
+      }
+
+      vi.mocked(getCurrentUser).mockResolvedValueOnce(mockUser)
+      vi.mocked(db.order.findFirst).mockResolvedValueOnce(cartWithItems as never)
+      vi.mocked(db.address.findFirst).mockRejectedValueOnce(new Error("DB Error"))
+
+      await expect(createOrderAction(validOrderData)).rejects.toThrow("DB Error")
+    })
+
+    it("should handle non-Error exception in createOrderAction", async () => {
+      vi.mocked(getCurrentUser).mockRejectedValueOnce("String error")
+
+      await expect(createOrderAction(validOrderData)).rejects.toThrow()
+    })
+
+    it("should throw error on invalid validation data", async () => {
+      vi.mocked(getCurrentUser).mockResolvedValueOnce(mockUser)
+
+      const invalidData = {
+        deliveryAddressId: null,
+        deliveryAddress: null,
+        saveDeliveryAddress: false,
+        notes: null,
+      }
+
+      await expect(createOrderAction(invalidData)).rejects.toThrow()
     })
   })
 })

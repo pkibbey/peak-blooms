@@ -19,7 +19,7 @@ export const getCurrentUser = cache(async (): Promise<SessionUser | null> => {
   return {
     id: session.user.id,
     email: session.user.email,
-    name: session.user.name ?? null,
+    name: session.user.name || undefined,
     role: (session.user.role as "CUSTOMER" | "ADMIN") ?? "CUSTOMER",
     approved: (session.user.approved as boolean) ?? false,
     priceMultiplier: (session.user.priceMultiplier as number) ?? 1.0,

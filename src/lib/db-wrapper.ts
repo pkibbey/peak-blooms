@@ -62,9 +62,7 @@ export function createTrackedDb(
                     const duration = performance.now() - startTime
                     const operationName = `${String(prop)}.${String(method)}`
                     // Fire and forget - don't await to avoid slowing down queries
-                    captureMetric(metricType as MetricType, operationName, duration).catch((err) =>
-                      console.error("Failed to capture metric:", err)
-                    )
+                    captureMetric(metricType as MetricType, operationName, duration)
                   }
 
                   return result
@@ -74,9 +72,7 @@ export function createTrackedDb(
                     const duration = performance.now() - startTime
                     const operationName = `${String(prop)}.${String(method)} (error)`
                     // Fire and forget
-                    captureMetric(metricType as MetricType, operationName, duration).catch((err) =>
-                      console.error("Failed to capture metric:", err)
-                    )
+                    captureMetric(metricType as MetricType, operationName, duration)
                   }
                   throw error
                 }

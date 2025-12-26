@@ -30,7 +30,6 @@ export async function createCollectionAction(data: CollectionFormData & { produc
     revalidatePath("/admin/collections")
     return { success: true, id: collection.id }
   } catch (error) {
-    console.error("createCollectionAction error:", error)
     throw new Error(error instanceof Error ? error.message : "Failed to create collection")
   }
 }
@@ -68,7 +67,6 @@ export async function updateCollectionAction(
     revalidatePath("/admin/collections")
     return { success: true, id: collection.id }
   } catch (error) {
-    console.error("updateCollectionAction error:", error)
     throw new Error(error instanceof Error ? error.message : "Failed to update collection")
   }
 }
@@ -87,7 +85,6 @@ export async function deleteCollectionAction(id: string) {
     revalidatePath("/admin/collections")
     return { success: true }
   } catch (error) {
-    console.error("deleteCollectionAction error:", error)
     throw new Error(error instanceof Error ? error.message : "Failed to delete collection")
   }
 }
@@ -107,7 +104,6 @@ export async function toggleCollectionFeaturedAction(id: string, featured: boole
     revalidatePath("/admin/collections")
     return { success: true, featured: collection.featured }
   } catch (error) {
-    console.error("toggleCollectionFeaturedAction error:", error)
     throw new Error(error instanceof Error ? error.message : "Failed to update collection")
   }
 }

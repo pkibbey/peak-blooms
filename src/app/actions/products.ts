@@ -34,7 +34,6 @@ export async function createProductAction(data: ProductFormData & { collectionId
     revalidatePath("/admin/products")
     return { success: true, id: product.id }
   } catch (error) {
-    console.error("createProductAction error:", error)
     throw new Error(error instanceof Error ? error.message : "Failed to create product")
   }
 }
@@ -75,7 +74,6 @@ export async function updateProductAction(
     revalidatePath("/admin/products")
     return { success: true, id: product.id }
   } catch (error) {
-    console.error("updateProductAction error:", error)
     throw new Error(error instanceof Error ? error.message : "Failed to update product")
   }
 }
@@ -94,7 +92,6 @@ export async function deleteProductAction(id: string) {
     revalidatePath("/admin/products")
     return { success: true }
   } catch (error) {
-    console.error("deleteProductAction error:", error)
     throw new Error(error instanceof Error ? error.message : "Failed to delete product")
   }
 }
@@ -114,7 +111,6 @@ export async function toggleProductFeaturedAction(id: string, featured: boolean)
     revalidatePath("/admin/products")
     return { success: true, featured: product.featured }
   } catch (error) {
-    console.error("toggleProductFeaturedAction error:", error)
     throw new Error(error instanceof Error ? error.message : "Failed to update product")
   }
 }

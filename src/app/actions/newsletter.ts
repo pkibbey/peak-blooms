@@ -38,8 +38,7 @@ export async function subscribeToNewsletterAction(email: string) {
 
     revalidatePath("/")
     return { success: true, userId: user.id }
-  } catch (error) {
-    console.error("subscribeToNewsletterAction error:", error)
+  } catch {
     // Silently fail on error to not leak information
     return { success: true }
   }
