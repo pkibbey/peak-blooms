@@ -1,9 +1,8 @@
-import { XIcon } from "lucide-react"
 import { Autocomplete as AutocompletePrimitive } from "@base-ui/react/autocomplete"
-
-import { cn } from "@/lib/utils"
+import { XIcon } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
+import { cn } from "@/lib/utils"
 
 const Autocomplete = AutocompletePrimitive.Root
 

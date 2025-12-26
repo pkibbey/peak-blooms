@@ -37,7 +37,7 @@ export default async function OrderHistoryPage() {
       </div>
 
       {orders.length > 0 ? (
-        <div className="space-y-4">
+        <div className="space-y-1">
           {orders.map((order) => (
             <OrderHistoryItem key={order.id} order={order} />
           ))}

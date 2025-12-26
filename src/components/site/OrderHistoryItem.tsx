@@ -1,3 +1,4 @@
+import { ChevronRight } from "lucide-react"
 import Image from "next/image"
 import Link from "next/link"
 import { type OrderStatus, OrderStatusBadge } from "@/components/site/OrderStatusBadge"
@@ -16,55 +17,79 @@ interface OrderHistoryItemProps {
 }
 
 export default function OrderHistoryItem({ order }: OrderHistoryItemProps) {
+  const total = calculateCartTotal(order.items)
+
   return (
-    <div className="border-b last:border-b-0 pb-4 last:pb-0">
-      <div className="flex items-start justify-between gap-2 mb-2">
-        <div>
+    <div className="group relative flex flex-col sm:flex-row sm:items-center justify-between gap-4 py-3 border-b last:border-b-0 transition-all hover:bg-muted/40 px-3 -mx-3 rounded-xl">
+      <div className="flex flex-1 items-center gap-4 min-w-0">
+        {/* Order Identifier & Date */}
+        <div className="flex flex-col min-w-[120px]">
           <Link
             prefetch={false}
             href={`/account/order-history/${order.id}`}
-            className="font-medium hover:underline"
+            className="font-semibold text-sm hover:underline truncate"
           >
             {order.orderNumber}
           </Link>
-          <p className="text-xs text-muted-foreground">{formatDate(order.createdAt)}</p>
+          <span className="text-[10px] uppercase tracking-wider text-muted-foreground font-medium">
+            {formatDate(order.createdAt)}
+          </span>
         </div>
-        <OrderStatusBadge status={order.status as OrderStatus} className="text-xs" />
-      </div>
 
-      {/* Order Items Preview */}
-      <div className="flex gap-1 mb-2">
-        {order.items.slice(0, 5).map((item) => {
-          // Use snapshot data if available (for historical accuracy), otherwise fallback to live product data
-          const productImage = item.productImageSnapshot ?? item.product?.image
-          const productName = item.productNameSnapshot ?? item.product?.name ?? "Unknown Product"
+        {/* Item Previews - Overlapping style */}
+        <div className="hidden md:flex -space-x-4 overflow-hidden py-1">
+          {order.items.slice(0, 4).map((item) => {
+            const productImage = item.productImageSnapshot ?? item.product?.image
+            const productName = item.productNameSnapshot ?? item.product?.name ?? "Unknown Product"
 
-          return (
-            <div key={item.id} className="relative h-12 w-12 shrink-0 overflow-hidden rounded-xs">
-              {productImage ? (
-                <Image
-                  src={productImage}
-                  alt={productName}
-                  fill
-                  className="object-cover"
-                  sizes="48px"
-                />
-              ) : (
-                <div className="h-full w-full bg-muted" />
-              )}
+            return (
+              <div
+                key={item.id}
+                className="relative h-9 w-9 shrink-0 overflow-hidden rounded-full border-2 border-background bg-muted shadow-sm transition-transform group-hover:translate-x-1 first:group-hover:translate-x-0"
+              >
+                {productImage ? (
+                  <Image
+                    src={productImage}
+                    alt={productName}
+                    fill
+                    className="object-cover"
+                    sizes="36px"
+                  />
+                ) : (
+                  <div className="h-full w-full bg-muted" />
+                )}
+              </div>
+            )
+          })}
+          {order.items.length > 4 && (
+            <div className="relative h-9 w-9 shrink-0 rounded-full border-2 border-background bg-secondary flex items-center justify-center text-[10px] font-bold text-secondary-foreground shadow-sm transition-transform group-hover:translate-x-1">
+              +{order.items.length - 4}
             </div>
-          )
-        })}
-        {order.items.length > 5 && (
-          <div className="h-12 w-12 shrink-0 rounded-xs bg-neutral-100 flex items-center justify-center text-xs text-muted-foreground">
-            +{order.items.length - 5}
-          </div>
-        )}
+          )}
+        </div>
       </div>
 
-      <div className="flex items-center justify-between">
-        <p className="text-sm font-medium">{formatPrice(calculateCartTotal(order.items))}</p>
-        <ReorderButton order={order} />
+      <div className="flex items-center justify-between sm:justify-end gap-4 sm:gap-8 shrink-0">
+        {/* Status & Total */}
+        <div className="flex flex-col items-end gap-1">
+          <p className="text-sm font-bold tabular-nums">{formatPrice(total)}</p>
+          <OrderStatusBadge
+            status={order.status as OrderStatus}
+            className="text-[10px] px-2 h-5 font-bold uppercase tracking-tight"
+          />
+        </div>
+
+        {/* Actions */}
+        <div className="flex items-center gap-2">
+          <ReorderButton order={order} />
+          <Link
+            prefetch={false}
+            href={`/account/order-history/${order.id}`}
+            className="text-muted-foreground hover:text-foreground p-1 transition-colors sm:block hidden"
+          >
+            <ChevronRight className="h-5 w-5" />
+          </Link>
+        </div>
       </div>
     </div>
   )

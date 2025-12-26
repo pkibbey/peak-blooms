@@ -1,4 +1,5 @@
 import { type ClassValue, clsx } from "clsx"
+import { format, isValid, parseISO } from "date-fns"
 import { twMerge } from "tailwind-merge"
 
 export function cn(...inputs: ClassValue[]) {
@@ -55,7 +56,19 @@ export function formatPrice(price: number | null): string {
  * Format a date in medium style (e.g., "Nov 27, 2025")
  */
 export function formatDate(date: Date | string): string {
-  return new Intl.DateTimeFormat("en-US", {
-    dateStyle: "medium",
-  }).format(new Date(date))
+  if (!date) return ""
+
+  let dateObj: Date
+  if (typeof date === "string") {
+    dateObj = parseISO(date)
+    if (!isValid(dateObj)) {
+      dateObj = new Date(date)
+    }
+  } else {
+    dateObj = date
+  }
+
+  if (!isValid(dateObj)) return ""
+
+  return format(dateObj, "MMM d, yyyy")
 }
