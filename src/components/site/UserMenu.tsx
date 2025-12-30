@@ -120,7 +120,7 @@ export default function UserMenu({ user }: UserMenuProps) {
           <DropdownMenuSeparator />
 
           <DropdownMenuItem
-            onSelect={async () => {
+            onClick={async () => {
               await signOut({
                 fetchOptions: {
                   onSuccess: () => {
