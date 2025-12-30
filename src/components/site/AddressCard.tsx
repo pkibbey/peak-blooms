@@ -24,7 +24,7 @@ export default function AddressCard({ address, onEdit }: AddressCardProps) {
 
     setIsDeleting(true)
     try {
-      await deleteAddressAction(address.id)
+      await deleteAddressAction({ addressId: address.id })
       toast.success("Address deleted")
       router.refresh()
     } catch (error) {

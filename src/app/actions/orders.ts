@@ -1,11 +1,21 @@
 "use server"
 
 import { revalidatePath } from "next/cache"
+import { ZodError } from "zod"
 import type { Order } from "@/generated/client"
 import { getCurrentUser } from "@/lib/current-user"
 import { db } from "@/lib/db"
 import { adjustPrice } from "@/lib/utils"
-import { type CreateOrderInput, createOrderSchema } from "@/lib/validations/checkout"
+import {
+  type CancelOrderInput,
+  type CreateOrderInput,
+  cancelOrderSchema,
+  createOrderSchema,
+  type UpdateOrderItemPriceInput,
+  type UpdateOrderStatusInput,
+  updateOrderItemPriceSchema,
+  updateOrderStatusSchema,
+} from "@/lib/validations/checkout"
 
 interface CancelOrderResponse {
   success: boolean
@@ -18,11 +28,9 @@ interface CancelOrderResponse {
  * Server action to cancel a PENDING order
  * Can optionally convert it back to CART status
  */
-export async function cancelOrderAction(
-  orderId: string,
-  convertToCart: boolean = false
-): Promise<CancelOrderResponse> {
+export async function cancelOrderAction(input: CancelOrderInput): Promise<CancelOrderResponse> {
   try {
+    const { orderId, convertToCart } = cancelOrderSchema.parse(input)
     const user = await getCurrentUser()
     if (!user) {
       return {
@@ -136,14 +144,8 @@ export async function createOrderAction(data: CreateOrderInput) {
     const priceMultiplier = user.priceMultiplier
 
     // Validate request data
-    const validationResult = createOrderSchema.safeParse(data)
-
-    if (!validationResult.success) {
-      const firstError = validationResult.error.issues[0]
-      throw new Error(firstError?.message || "Invalid request data")
-    }
-
-    const { deliveryAddressId, deliveryAddress, saveDeliveryAddress, notes } = validationResult.data
+    const { deliveryAddressId, deliveryAddress, saveDeliveryAddress, notes } =
+      createOrderSchema.parse(data)
 
     // Get user's cart (CART order)
     const cart = await db.order.findFirst({
@@ -243,18 +245,22 @@ export async function createOrderAction(data: CreateOrderInput) {
     revalidatePath("/account/order-history")
     return order
   } catch (error) {
-    throw new Error(error instanceof Error ? error.message : "Failed to create order")
+    if (error instanceof ZodError) {
+      throw new Error("Invalid order data")
+    }
+    if (error instanceof Error) {
+      throw error
+    }
+    throw new Error("Failed to create order")
   }
 }
 
 /**
  * Server action to update order status (admin only)
  */
-export async function updateOrderStatusAction(
-  orderId: string,
-  status: "CART" | "PENDING" | "CONFIRMED" | "OUT_FOR_DELIVERY" | "DELIVERED" | "CANCELLED"
-) {
+export async function updateOrderStatusAction(input: UpdateOrderStatusInput) {
   try {
+    const { orderId, status } = updateOrderStatusSchema.parse(input)
     const user = await getCurrentUser()
 
     if (!user || user.role !== "ADMIN") {
@@ -296,27 +302,26 @@ export async function updateOrderStatusAction(
       order: updatedOrder,
     }
   } catch (error) {
-    throw new Error(error instanceof Error ? error.message : "Failed to update order status")
+    if (error instanceof ZodError) {
+      throw new Error("Invalid status")
+    }
+    if (error instanceof Error) {
+      throw error
+    }
+    throw new Error("Failed to update order status")
   }
 }
 
 /**
  * Server action to update order item price (admin only)
  */
-export async function updateOrderItemPriceAction(orderId: string, itemId: string, price: number) {
+export async function updateOrderItemPriceAction(input: UpdateOrderItemPriceInput) {
   try {
+    const { orderId, itemId, price } = updateOrderItemPriceSchema.parse(input)
     const user = await getCurrentUser()
 
     if (!user || user.role !== "ADMIN") {
       throw new Error("Unauthorized")
-    }
-
-    if (price === undefined || price === null) {
-      throw new Error("Price is required")
-    }
-
-    if (typeof price !== "number" || price < 0) {
-      throw new Error("Price must be a non-negative number")
     }
 
     // Fetch the order item
@@ -354,6 +359,12 @@ export async function updateOrderItemPriceAction(orderId: string, itemId: string
       newOrderTotal: Math.round(newOrderTotal * 100) / 100,
     }
   } catch (error) {
-    throw new Error(error instanceof Error ? error.message : "Failed to update price")
+    if (error instanceof ZodError) {
+      throw new Error("Invalid price data")
+    }
+    if (error instanceof Error) {
+      throw error
+    }
+    throw new Error("Failed to update price")
   }
 }

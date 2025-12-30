@@ -43,8 +43,7 @@ describe("Blob Actions", () => {
     it("should return success false if user not authenticated", async () => {
       vi.mocked(getSession).mockResolvedValueOnce(null)
 
-      const result = await deleteBlobAction("https://blob.vercel-storage.com/file-123")
-
+      const result = await deleteBlobAction({ url: "https://blob.vercel-storage.com/file-123" })
       expect(result).toEqual({ success: false })
     })
 
@@ -57,7 +56,7 @@ describe("Blob Actions", () => {
         },
       })
 
-      const result = await deleteBlobAction("https://blob.vercel-storage.com/file-123")
+      const result = await deleteBlobAction({ url: "https://blob.vercel-storage.com/file-123" })
 
       expect(result).toEqual({ success: false })
     })
@@ -65,7 +64,7 @@ describe("Blob Actions", () => {
     it("should return success for non-blob URLs", async () => {
       vi.mocked(getSession).mockResolvedValueOnce(mockAdminSession)
 
-      const result = await deleteBlobAction("https://example.com/file.jpg")
+      const result = await deleteBlobAction({ url: "https://example.com/file.jpg" })
 
       expect(result).toEqual({ success: true })
     })
@@ -77,7 +76,7 @@ describe("Blob Actions", () => {
         ok: false,
       })
 
-      const result = await deleteBlobAction("https://blob.vercel-storage.com/file-123")
+      const result = await deleteBlobAction({ url: "https://blob.vercel-storage.com/file-123" })
 
       expect(result).toEqual({ success: false })
     })
@@ -89,7 +88,7 @@ describe("Blob Actions", () => {
         ok: true,
       })
 
-      const result = await deleteBlobAction("https://blob.vercel-storage.com/file-123")
+      const result = await deleteBlobAction({ url: "https://blob.vercel-storage.com/file-123" })
 
       expect(result).toEqual({ success: true })
       expect(global.fetch).toHaveBeenCalledWith("https://blob.vercel-storage.com/delete", {
@@ -107,7 +106,7 @@ describe("Blob Actions", () => {
 
       global.fetch = vi.fn().mockRejectedValueOnce(new Error("Network error"))
 
-      const result = await deleteBlobAction("https://blob.vercel-storage.com/file-123")
+      const result = await deleteBlobAction({ url: "https://blob.vercel-storage.com/file-123" })
 
       expect(result).toEqual({ success: false })
     })

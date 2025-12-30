@@ -41,7 +41,7 @@ describe("Auth Module", () => {
   const mockSessionHeaders = new Headers([["cookie", "session-token=abc123"]])
 
   const now = new Date()
-  const mockSession = {
+  const _mockSession = {
     session: {
       id: "session-1",
       createdAt: now,

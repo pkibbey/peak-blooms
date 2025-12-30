@@ -4,9 +4,21 @@ import { revalidatePath } from "next/cache"
 import type { ProductWhereInput } from "@/generated/models"
 import { getSession } from "@/lib/auth"
 import { db } from "@/lib/db"
-import type { ProductFormData } from "@/lib/validations/product"
+import {
+  type CreateProductFormData,
+  createProductFormSchema,
+  type DeleteProductInput,
+  deleteProductSchema,
+  type GetProductCountInput,
+  getProductCountSchema,
+  type ToggleProductFeaturedInput,
+  toggleProductFeaturedSchema,
+  type UpdateProductInput,
+  updateProductSchema,
+} from "@/lib/validations/product"
 
-export async function createProductAction(data: ProductFormData & { collectionIds?: string[] }) {
+export async function createProductAction(data: CreateProductFormData) {
+  const validatedData = createProductFormSchema.parse(data)
   try {
     const session = await getSession()
     if (!session?.user || session.user.role !== "ADMIN") {
@@ -15,16 +27,16 @@ export async function createProductAction(data: ProductFormData & { collectionId
 
     const product = await db.product.create({
       data: {
-        name: data.name,
-        slug: data.slug,
-        description: data.description,
-        image: data.image,
-        price: parseFloat(data.price),
-        colors: data.colors,
-        productType: data.productType,
-        featured: data.featured,
+        name: validatedData.name,
+        slug: validatedData.slug,
+        description: validatedData.description,
+        image: validatedData.image,
+        price: parseFloat(validatedData.price),
+        colors: validatedData.colors || [],
+        productType: validatedData.productType,
+        featured: validatedData.featured,
         productCollections: {
-          create: (data.collectionIds || []).map((collectionId) => ({
+          create: (validatedData.collectionIds || []).map((collectionId) => ({
             collectionId,
           })),
         },
@@ -38,10 +50,8 @@ export async function createProductAction(data: ProductFormData & { collectionId
   }
 }
 
-export async function updateProductAction(
-  id: string,
-  data: ProductFormData & { collectionIds?: string[] }
-) {
+export async function updateProductAction(input: UpdateProductInput) {
+  const { id, ...data } = updateProductSchema.parse(input)
   try {
     const session = await getSession()
     if (!session?.user || session.user.role !== "ADMIN") {
@@ -55,12 +65,12 @@ export async function updateProductAction(
         slug: data.slug,
         description: data.description,
         image: data.image,
-        price: parseFloat(data.price),
-        colors: data.colors,
+        price: data.price,
+        colors: data.colors || [],
         productType: data.productType,
         featured: data.featured,
         productCollections:
-          data.collectionIds !== undefined
+          data.collectionIds !== null
             ? {
                 deleteMany: {},
                 create: data.collectionIds.map((collectionId) => ({
@@ -78,7 +88,8 @@ export async function updateProductAction(
   }
 }
 
-export async function deleteProductAction(id: string) {
+export async function deleteProductAction(input: DeleteProductInput) {
+  const { id } = deleteProductSchema.parse(input)
   try {
     const session = await getSession()
     if (!session?.user || session.user.role !== "ADMIN") {
@@ -96,7 +107,8 @@ export async function deleteProductAction(id: string) {
   }
 }
 
-export async function toggleProductFeaturedAction(id: string, featured: boolean) {
+export async function toggleProductFeaturedAction(input: ToggleProductFeaturedInput) {
+  const { id, featured } = toggleProductFeaturedSchema.parse(input)
   try {
     const session = await getSession()
     if (!session?.user || session.user.role !== "ADMIN") {
@@ -119,10 +131,8 @@ export async function toggleProductFeaturedAction(id: string, featured: boolean)
  * Server action to get product count with optional filters
  * Used for pagination calculations
  */
-export async function getProductCountAction(params?: {
-  boxlotOnly?: boolean
-  query?: string
-}): Promise<number> {
+export async function getProductCountAction(input?: GetProductCountInput): Promise<number> {
+  const params = input ? getProductCountSchema.parse(input) : {}
   try {
     // Build the where clause dynamically
     const where: ProductWhereInput = { deletedAt: null }

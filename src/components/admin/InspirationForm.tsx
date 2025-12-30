@@ -86,7 +86,8 @@ export default function InspirationForm({ products, inspiration }: InspirationFo
     startTransition(async () => {
       try {
         if (isEditing) {
-          await updateInspirationAction(inspiration.id, {
+          await updateInspirationAction({
+            id: inspiration.id,
             ...data,
             productSelections: productSelections,
           })
@@ -122,7 +123,7 @@ export default function InspirationForm({ products, inspiration }: InspirationFo
 
     setIsDeleting(true)
     try {
-      await deleteInspirationAction(inspiration.id)
+      await deleteInspirationAction({ id: inspiration.id })
       toast.success("Inspiration deleted successfully")
       router.push("/admin/inspirations")
       router.refresh()

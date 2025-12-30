@@ -11,7 +11,8 @@ vi.mock("@/lib/utils", () => ({
 }))
 
 vi.mock("./logger", () => ({
-  withTiming: vi.fn(async (name: string, input: any, fn: () => Promise<any>) => fn()),
+  // biome-ignore lint/suspicious/noExplicitAny: Mock function with generic parameters
+  withTiming: vi.fn(async (_name: string, _input: any, fn: () => Promise<any>) => fn()),
 }))
 
 import { db } from "@/lib/db"
@@ -327,6 +328,7 @@ describe("Products Data Access Layer", () => {
         { colors: ["red", "white"] },
         { colors: ["white", "pink"] },
         { colors: ["red"] },
+        // biome-ignore lint/suspicious/noExplicitAny: Mock data with partial product structure for testing
       ] as any
 
       vi.mocked(db.product.findMany).mockResolvedValueOnce(mockProducts)

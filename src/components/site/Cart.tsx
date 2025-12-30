@@ -42,7 +42,7 @@ export default function Cart({ initialCart }: CartProps) {
     setUpdatingItems((prev) => new Set(prev).add(itemId))
 
     try {
-      const result = await updateCartItemAction(itemId, quantity)
+      const result = await updateCartItemAction({ itemId, quantity })
       setCart(result as CartData)
       router.refresh()
     } catch (error) {
@@ -84,7 +84,7 @@ export default function Cart({ initialCart }: CartProps) {
     })
 
     try {
-      const result = await removeFromCartAction(itemId)
+      const result = await removeFromCartAction({ itemId })
       setCart(result as CartData)
       toast.success(`Removed "${productName}" from cart`)
       router.refresh()

@@ -44,7 +44,7 @@ export default function AddAllToCartButton({
     setError(null)
 
     try {
-      await batchAddToCartAction(productIds, quantities)
+      await batchAddToCartAction({ productIds, quantities: quantities ?? [] })
 
       toast.success(
         setName

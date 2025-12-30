@@ -1,12 +1,15 @@
 "use server"
 
 import { getSession } from "@/lib/auth"
+import { type DeleteBlobInput, deleteBlobSchema } from "@/lib/validations/blob"
 
 /**
  * Server action to delete a blob file from Vercel Blob storage (admin only)
  */
-export async function deleteBlobAction(url: string): Promise<{ success: boolean }> {
+export async function deleteBlobAction(input: DeleteBlobInput): Promise<{ success: boolean }> {
   try {
+    const { url } = deleteBlobSchema.parse(input)
+
     const session = await getSession()
     if (!session?.user || session.user.role !== "ADMIN") {
       throw new Error("Unauthorized")

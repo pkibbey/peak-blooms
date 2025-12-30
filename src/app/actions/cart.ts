@@ -1,10 +1,21 @@
 "use server"
 
 import { revalidatePath } from "next/cache"
+import { ZodError } from "zod"
 import { applyPriceMultiplierToItems, calculateCartTotal } from "@/lib/cart-utils"
 import { getCurrentUser } from "@/lib/current-user"
 import { db } from "@/lib/db"
 import type { SessionUser } from "@/lib/types/users"
+import {
+  type AddToCartInput,
+  addToCartSchema,
+  type BatchAddToCartInput,
+  batchAddToCartSchema,
+  type RemoveFromCartInput,
+  removeFromCartSchema,
+  type UpdateCartItemInput,
+  updateCartItemSchema,
+} from "@/lib/validations/checkout"
 
 /**
  * Create a new shopping cart order for the user
@@ -39,8 +50,9 @@ export async function createCart(user: SessionUser) {
  * Server action to add or update item in cart
  * Returns the full cart with updated item list
  */
-export async function addToCartAction(productId: string, quantity: number = 1) {
+export async function addToCartAction(input: AddToCartInput) {
   try {
+    const { productId, quantity } = addToCartSchema.parse(input)
     const user = await getCurrentUser()
     if (!user) throw new Error("Unauthorized")
     if (!user.approved) throw new Error("Your account is not approved for purchases")
@@ -111,7 +123,20 @@ export async function addToCartAction(productId: string, quantity: number = 1) {
       total,
     }
   } catch (error) {
-    throw new Error(error instanceof Error ? error.message : "Failed to add to cart")
+    if (error instanceof ZodError) {
+      const field = error.issues[0]?.path[0]
+      if (field === "productId") {
+        throw new Error("Product not found")
+      }
+      if (field === "itemId") {
+        throw new Error("Order item not found")
+      }
+      throw new Error("Invalid product data")
+    }
+    if (error instanceof Error) {
+      throw error
+    }
+    throw new Error("Failed to add to cart")
   }
 }
 
@@ -119,8 +144,9 @@ export async function addToCartAction(productId: string, quantity: number = 1) {
  * Server action to update cart item quantity
  * Returns the updated cart
  */
-export async function updateCartItemAction(itemId: string, quantity: number) {
+export async function updateCartItemAction(input: UpdateCartItemInput) {
   try {
+    const { itemId, quantity } = updateCartItemSchema.parse(input)
     const user = await getCurrentUser()
     if (!user) throw new Error("Unauthorized")
 
@@ -167,7 +193,13 @@ export async function updateCartItemAction(itemId: string, quantity: number) {
       total,
     }
   } catch (error) {
-    throw new Error(error instanceof Error ? error.message : "Failed to update cart item")
+    if (error instanceof ZodError) {
+      throw new Error("Invalid cart item data")
+    }
+    if (error instanceof Error) {
+      throw error
+    }
+    throw new Error("Failed to update cart item")
   }
 }
 
@@ -175,8 +207,9 @@ export async function updateCartItemAction(itemId: string, quantity: number) {
  * Server action to remove a single item from cart
  * Returns the updated cart
  */
-export async function removeFromCartAction(itemId: string) {
+export async function removeFromCartAction(input: RemoveFromCartInput) {
   try {
+    const { itemId } = removeFromCartSchema.parse(input)
     const user = await getCurrentUser()
     if (!user) throw new Error("Unauthorized")
 
@@ -216,7 +249,13 @@ export async function removeFromCartAction(itemId: string) {
       total,
     }
   } catch (error) {
-    throw new Error(error instanceof Error ? error.message : "Failed to remove item from cart")
+    if (error instanceof ZodError) {
+      throw new Error("Invalid cart item data")
+    }
+    if (error instanceof Error) {
+      throw error
+    }
+    throw new Error("Failed to remove item from cart")
   }
 }
 
@@ -309,28 +348,11 @@ export async function getCartAction() {
  * Server action to add multiple items to cart in one transaction
  * Supports single quantity for all or per-item quantities
  */
-export async function batchAddToCartAction(productIds: string[], quantities?: number[] | number) {
+export async function batchAddToCartAction(input: BatchAddToCartInput) {
   try {
+    const { productIds, quantities } = batchAddToCartSchema.parse(input)
     const user = await getCurrentUser()
     if (!user) throw new Error("Unauthorized")
-
-    // Validate inputs first, before checking approval
-    if (!Array.isArray(productIds) || productIds.length === 0) {
-      throw new Error("productIds must be a non-empty array")
-    }
-
-    // Determine per-item quantities
-    let resolvedQuantities: number[] = []
-    if (typeof quantities === "number") {
-      resolvedQuantities = productIds.map(() => quantities)
-    } else if (Array.isArray(quantities)) {
-      if (quantities.length !== productIds.length) {
-        throw new Error("quantities array length must match productIds")
-      }
-      resolvedQuantities = quantities.map((q) => (typeof q === "number" && q > 0 ? q : 1))
-    } else {
-      resolvedQuantities = productIds.map(() => 1)
-    }
 
     // Check approval after validation
     if (!user.approved) throw new Error("Your account is not approved for purchases")
@@ -349,6 +371,16 @@ export async function batchAddToCartAction(productIds: string[], quantities?: nu
     if (!cart) {
       cart = await createCart(user)
       if (!cart) throw new Error("Failed to create cart")
+    }
+
+    // Determine per-item quantities
+    let resolvedQuantities: number[] = []
+    if (typeof quantities === "number") {
+      resolvedQuantities = productIds.map(() => quantities)
+    } else if (Array.isArray(quantities)) {
+      resolvedQuantities = quantities.map((q) => (typeof q === "number" && q > 0 ? q : 1))
+    } else {
+      resolvedQuantities = productIds.map(() => 1)
     }
 
     // Transaction to add items atomically
@@ -405,6 +437,12 @@ export async function batchAddToCartAction(productIds: string[], quantities?: nu
       total,
     }
   } catch (error) {
-    throw new Error(error instanceof Error ? error.message : "Failed to add items to cart")
+    if (error instanceof ZodError) {
+      throw new Error("Invalid product data")
+    }
+    if (error instanceof Error) {
+      throw error
+    }
+    throw new Error("Failed to add items to cart")
   }
 }

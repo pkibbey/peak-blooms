@@ -113,7 +113,9 @@ describe("Metrics Actions", () => {
     it("should throw error if user not authenticated", async () => {
       vi.mocked(getSession).mockResolvedValueOnce(null)
 
-      await expect(recordMetricAction("QUERY", "test", 100)).rejects.toThrow("Unauthorized")
+      await expect(
+        recordMetricAction({ type: "QUERY", name: "test", duration: 100 })
+      ).rejects.toThrow("Unauthorized")
     })
 
     it("should throw error if user is not admin", async () => {
@@ -125,45 +127,49 @@ describe("Metrics Actions", () => {
         },
       })
 
-      await expect(recordMetricAction("QUERY", "test", 100)).rejects.toThrow("Unauthorized")
+      await expect(
+        recordMetricAction({ type: "QUERY", name: "test", duration: 100 })
+      ).rejects.toThrow("Unauthorized")
     })
 
     it("should throw error if type is invalid", async () => {
       vi.mocked(getSession).mockResolvedValueOnce(mockAdminSession)
 
-      await expect(recordMetricAction("" as unknown as "QUERY", "test", 100)).rejects.toThrow(
-        "Invalid metric data"
-      )
+      await expect(
+        recordMetricAction({ type: "" as unknown as "QUERY", name: "test", duration: 100 })
+      ).rejects.toThrow("Invalid metric data")
     })
 
     it("should throw error if name is invalid", async () => {
       vi.mocked(getSession).mockResolvedValueOnce(mockAdminSession)
 
-      await expect(recordMetricAction("QUERY", "", 100)).rejects.toThrow("Invalid metric data")
+      await expect(recordMetricAction({ type: "QUERY", name: "", duration: 100 })).rejects.toThrow(
+        "Invalid metric data"
+      )
     })
 
     it("should throw error if duration is invalid", async () => {
       vi.mocked(getSession).mockResolvedValueOnce(mockAdminSession)
 
       // Test with null which should fail the number check
-      await expect(recordMetricAction("QUERY", "test", null as unknown as number)).rejects.toThrow(
-        "Invalid metric data"
-      )
+      await expect(
+        recordMetricAction({ type: "QUERY", name: "test", duration: null as unknown as number })
+      ).rejects.toThrow("Invalid metric data")
     })
 
     it("should throw error if duration is not a number", async () => {
       vi.mocked(getSession).mockResolvedValueOnce(mockAdminSession)
 
-      await expect(recordMetricAction("QUERY", "test", "100" as unknown as number)).rejects.toThrow(
-        "Invalid metric data"
-      )
+      await expect(
+        recordMetricAction({ type: "QUERY", name: "test", duration: "100" as unknown as number })
+      ).rejects.toThrow("Invalid metric data")
     })
 
     it("should successfully record metric with valid data", async () => {
       vi.mocked(getSession).mockResolvedValueOnce(mockAdminSession)
       vi.mocked(captureMetric).mockResolvedValueOnce(undefined)
 
-      await recordMetricAction("QUERY", "get_products", 150)
+      await recordMetricAction({ type: "QUERY", name: "get_products", duration: 150 })
 
       expect(captureMetric).toHaveBeenCalledWith("QUERY", "get_products", 150)
     })
@@ -172,15 +178,17 @@ describe("Metrics Actions", () => {
       vi.mocked(getSession).mockResolvedValueOnce(mockAdminSession)
       vi.mocked(captureMetric).mockRejectedValueOnce(new Error("Database error"))
 
-      await expect(recordMetricAction("QUERY", "test", 100)).rejects.toThrow("Database error")
+      await expect(
+        recordMetricAction({ type: "QUERY", name: "test", duration: 100 })
+      ).rejects.toThrow("Database error")
     })
 
     it("should handle non-Error objects in catch", async () => {
       vi.mocked(getSession).mockRejectedValueOnce("String error")
 
-      await expect(recordMetricAction("QUERY", "test", 100)).rejects.toThrow(
-        "Failed to record metric"
-      )
+      await expect(
+        recordMetricAction({ type: "QUERY", name: "test", duration: 100 })
+      ).rejects.toThrow("Failed to record metric")
     })
   })
 

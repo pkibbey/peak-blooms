@@ -88,10 +88,15 @@ export default function ProductForm({ collections, product }: ProductFormProps) 
       }
 
       if (isEditing) {
-        await updateProductAction(product.id, formData)
+        await updateProductAction({
+          id: product.id,
+          ...formData,
+          colors: formData.colors || null,
+          price: parseFloat(formData.price) || null,
+        })
         toast.success("Product updated successfully")
       } else {
-        await createProductAction(formData)
+        await createProductAction({ ...formData, colors: formData.colors || null })
         toast.success("Product created successfully")
       }
 
@@ -120,7 +125,7 @@ export default function ProductForm({ collections, product }: ProductFormProps) 
 
     setIsDeleting(true)
     try {
-      await deleteProductAction(product.id)
+      await deleteProductAction({ id: product.id })
       toast.success("Product deleted successfully")
       router.push("/admin/products")
       router.refresh()

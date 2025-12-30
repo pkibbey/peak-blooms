@@ -9,3 +9,28 @@ export const collectionSchema = z.object({
 })
 
 export type CollectionFormData = z.infer<typeof collectionSchema>
+// Collection operation schemas for API requests
+export const createCollectionSchema = collectionSchema.extend({
+  productIds: z.array(z.string().uuid()).optional().default([]),
+})
+
+export type CreateCollectionInput = z.infer<typeof createCollectionSchema>
+
+export const updateCollectionSchema = createCollectionSchema.extend({
+  id: z.string().uuid("Invalid collection ID"),
+})
+
+export type UpdateCollectionInput = z.infer<typeof updateCollectionSchema>
+
+export const deleteCollectionSchema = z.object({
+  id: z.string().uuid("Invalid collection ID"),
+})
+
+export type DeleteCollectionInput = z.infer<typeof deleteCollectionSchema>
+
+export const toggleCollectionFeaturedSchema = z.object({
+  id: z.string().uuid("Invalid collection ID"),
+  featured: z.boolean(),
+})
+
+export type ToggleCollectionFeaturedInput = z.infer<typeof toggleCollectionFeaturedSchema>

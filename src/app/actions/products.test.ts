@@ -57,7 +57,7 @@ describe("Product Actions", () => {
   }
 
   const mockProduct = {
-    id: "product-1",
+    id: "550e8400-e29b-41d4-a716-446655440001",
     name: "Roses",
     slug: "roses",
     description: "Beautiful red roses",
@@ -151,7 +151,7 @@ describe("Product Actions", () => {
       const result = await createProductAction(data)
 
       expect(result.success).toBe(true)
-      expect(result.id).toBe("product-1")
+      expect(result.id).toBe("550e8400-e29b-41d4-a716-446655440001")
       expect(db.product.create).toHaveBeenCalledWith({
         data: {
           name: "Roses",
@@ -234,14 +234,16 @@ describe("Product Actions", () => {
         slug: "updated",
         description: "Updated description",
         image: "image.jpg",
-        price: "59.99",
+        price: 59.99,
         colors: ["red"],
         productType: "FLOWER" as const,
         featured: false,
         collectionIds: [],
       }
 
-      await expect(updateProductAction("product-1", data)).rejects.toThrow("Unauthorized")
+      await expect(
+        updateProductAction({ id: "550e8400-e29b-41d4-a716-446655440001", ...data })
+      ).rejects.toThrow("Unauthorized")
     })
 
     it("should update product", async () => {
@@ -255,18 +257,21 @@ describe("Product Actions", () => {
         slug: "tulips",
         description: "Beautiful red roses",
         image: "roses.jpg",
-        price: "49.99",
+        price: 49.99,
         colors: ["red"],
         productType: "FLOWER" as const,
         featured: false,
         collectionIds: [],
       }
 
-      const result = await updateProductAction("product-1", data)
+      const result = await updateProductAction({
+        id: "550e8400-e29b-41d4-a716-446655440001",
+        ...data,
+      })
 
       expect(result.success).toBe(true)
       expect(db.product.update).toHaveBeenCalledWith({
-        where: { id: "product-1" },
+        where: { id: "550e8400-e29b-41d4-a716-446655440001" },
         data: {
           name: "Tulips",
           slug: "tulips",
@@ -295,18 +300,21 @@ describe("Product Actions", () => {
         slug: "tulips",
         description: "Beautiful red roses",
         image: "roses.jpg",
-        price: "49.99",
+        price: 49.99,
         colors: ["red"],
         collectionIds: ["collection-1"],
         productType: "FLOWER" as const,
         featured: false,
       }
 
-      const result = await updateProductAction("product-1", data)
+      const result = await updateProductAction({
+        id: "550e8400-e29b-41d4-a716-446655440001",
+        ...data,
+      })
 
       expect(result.success).toBe(true)
       expect(db.product.update).toHaveBeenCalledWith({
-        where: { id: "product-1" },
+        where: { id: "550e8400-e29b-41d4-a716-446655440001" },
         data: {
           name: "Tulips",
           slug: "tulips",
@@ -337,14 +345,16 @@ describe("Product Actions", () => {
         slug: "tulips",
         description: "Beautiful red roses",
         image: "roses.jpg",
-        price: "49.99",
+        price: 49.99,
         colors: ["red"],
         collectionIds: ["collection-1"],
         productType: "FLOWER" as const,
         featured: false,
       }
 
-      await expect(updateProductAction("product-1", data)).rejects.toThrow()
+      await expect(
+        updateProductAction({ id: "550e8400-e29b-41d4-a716-446655440001", ...data })
+      ).rejects.toThrow()
     })
 
     it("should update product collections if provided", async () => {
@@ -356,17 +366,17 @@ describe("Product Actions", () => {
         slug: "roses",
         description: "Red roses",
         image: "roses.jpg",
-        price: "49.99",
+        price: 49.99,
         colors: ["red"],
         productType: "FLOWER" as const,
         featured: false,
         collectionIds: ["collection-1"],
       }
 
-      await updateProductAction("product-1", data)
+      await updateProductAction({ id: "550e8400-e29b-41d4-a716-446655440001", ...data })
 
       expect(db.product.update).toHaveBeenCalledWith({
-        where: { id: "product-1" },
+        where: { id: "550e8400-e29b-41d4-a716-446655440001" },
         data: {
           name: "Roses",
           slug: "roses",
@@ -413,32 +423,38 @@ describe("Product Actions", () => {
         },
       })
 
-      await expect(deleteProductAction("product-1")).rejects.toThrow("Unauthorized")
+      await expect(
+        deleteProductAction({ id: "550e8400-e29b-41d4-a716-446655440001" })
+      ).rejects.toThrow("Unauthorized")
     })
 
     it("should delete product", async () => {
       vi.mocked(getSession).mockResolvedValueOnce(mockAdminSession)
       vi.mocked(db.product.delete).mockResolvedValueOnce(mockProduct)
 
-      const result = await deleteProductAction("product-1")
+      const result = await deleteProductAction({ id: "550e8400-e29b-41d4-a716-446655440001" })
 
       expect(result.success).toBe(true)
       expect(db.product.delete).toHaveBeenCalledWith({
-        where: { id: "product-1" },
+        where: { id: "550e8400-e29b-41d4-a716-446655440001" },
       })
     })
 
     it("should throw error if user not authenticated for delete", async () => {
       vi.mocked(getSession).mockResolvedValueOnce(null)
 
-      await expect(deleteProductAction("product-1")).rejects.toThrow("Unauthorized")
+      await expect(
+        deleteProductAction({ id: "550e8400-e29b-41d4-a716-446655440001" })
+      ).rejects.toThrow("Unauthorized")
     })
 
     it("should handle non-Error exception during delete", async () => {
       vi.mocked(getSession).mockResolvedValueOnce(mockAdminSession)
       vi.mocked(db.product.delete).mockRejectedValueOnce("String error")
 
-      await expect(deleteProductAction("product-1")).rejects.toThrow()
+      await expect(
+        deleteProductAction({ id: "550e8400-e29b-41d4-a716-446655440001" })
+      ).rejects.toThrow()
     })
   })
 
@@ -449,12 +465,15 @@ describe("Product Actions", () => {
       vi.mocked(getSession).mockResolvedValueOnce(mockAdminSession)
       vi.mocked(db.product.update).mockResolvedValueOnce(featuredProduct)
 
-      const result = await toggleProductFeaturedAction("product-1", true)
+      const result = await toggleProductFeaturedAction({
+        id: "550e8400-e29b-41d4-a716-446655440001",
+        featured: true,
+      })
 
       expect(result.success).toBe(true)
       expect(result.featured).toBe(true)
       expect(db.product.update).toHaveBeenCalledWith({
-        where: { id: "product-1" },
+        where: { id: "550e8400-e29b-41d4-a716-446655440001" },
         data: { featured: true },
       })
     })
@@ -486,14 +505,18 @@ describe("Product Actions", () => {
         },
       })
 
-      await expect(toggleProductFeaturedAction("product-1", true)).rejects.toThrow("Unauthorized")
+      await expect(
+        toggleProductFeaturedAction({ id: "550e8400-e29b-41d4-a716-446655440001", featured: true })
+      ).rejects.toThrow("Unauthorized")
     })
 
     it("should handle non-Error exception during toggle", async () => {
       vi.mocked(getSession).mockResolvedValueOnce(mockAdminSession)
       vi.mocked(db.product.update).mockRejectedValueOnce("String error")
 
-      await expect(toggleProductFeaturedAction("product-1", true)).rejects.toThrow()
+      await expect(
+        toggleProductFeaturedAction({ id: "550e8400-e29b-41d4-a716-446655440001", featured: true })
+      ).rejects.toThrow()
     })
   })
 

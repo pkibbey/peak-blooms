@@ -55,6 +55,7 @@ describe("Current User", () => {
     it("should return null when session has no user", async () => {
       vi.mocked(getSession).mockResolvedValueOnce({
         session: mockSession.session,
+        // biome-ignore lint/suspicious/noExplicitAny: Intentionally testing null user case
         user: null as any,
       })
 

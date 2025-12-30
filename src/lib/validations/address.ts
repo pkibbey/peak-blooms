@@ -17,6 +17,12 @@ export const addressSchema = z.object({
 
 export type AddressFormData = z.infer<typeof addressSchema>
 
+export const deleteAddressSchema = z.object({
+  addressId: z.string().uuid("Invalid address ID"),
+})
+
+export type DeleteAddressInput = z.infer<typeof deleteAddressSchema>
+
 export const emptyAddress: AddressFormData = {
   firstName: "",
   lastName: "",

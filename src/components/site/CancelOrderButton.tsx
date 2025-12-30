@@ -20,7 +20,7 @@ export function CancelOrderButton({ order }: CancelOrderButtonProps) {
   const handleCancel = async (convertToCart: boolean) => {
     setIsLoading(true)
     try {
-      const result = await cancelOrderAction(order.id, convertToCart)
+      const result = await cancelOrderAction({ orderId: order.id, convertToCart })
 
       if (result.success) {
         toast.success(result.message)

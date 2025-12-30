@@ -45,10 +45,16 @@ export default function OrderStatusForm({ orderId, currentStatus }: OrderStatusF
     setIsSubmitting(true)
 
     try {
-      await updateOrderStatusAction(
+      await updateOrderStatusAction({
         orderId,
-        status as "CART" | "PENDING" | "CONFIRMED" | "OUT_FOR_DELIVERY" | "DELIVERED" | "CANCELLED"
-      )
+        status: status as
+          | "CART"
+          | "PENDING"
+          | "CONFIRMED"
+          | "OUT_FOR_DELIVERY"
+          | "DELIVERED"
+          | "CANCELLED",
+      })
       toast.success("Order status updated")
       router.refresh()
     } catch (error) {

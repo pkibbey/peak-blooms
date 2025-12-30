@@ -1,5 +1,6 @@
 "use client"
 
+import { useEffect, useRef, useState } from "react"
 import type { OrderStatus } from "@/components/site/OrderStatusBadge"
 import {
   IconCheckCircle,
@@ -25,9 +26,40 @@ interface OrderTimelineProps {
 
 export function OrderTimeline({ status, createdAt }: OrderTimelineProps) {
   const currentStepIndex = TIMELINE_STEPS.findIndex((step) => step.status === status)
+  const containerRef = useRef<HTMLDivElement>(null)
+  const [selectedIndex, setSelectedIndex] = useState<number>(currentStepIndex)
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Check if the timeline container is focused or in focus area
+      if (!containerRef.current?.contains(document.activeElement)) {
+        return
+      }
+
+      let newIndex: number | null = null
+
+      if (e.key === "ArrowLeft" || e.key === "ArrowUp") {
+        e.preventDefault()
+        newIndex = Math.max(0, selectedIndex - 1)
+      } else if (e.key === "ArrowRight" || e.key === "ArrowDown") {
+        e.preventDefault()
+        newIndex = Math.min(TIMELINE_STEPS.length - 1, selectedIndex + 1)
+      }
+
+      if (newIndex !== null) {
+        setSelectedIndex(newIndex)
+      }
+    }
+
+    const container = containerRef.current
+    if (container) {
+      container.addEventListener("keydown", handleKeyDown)
+      return () => container.removeEventListener("keydown", handleKeyDown)
+    }
+  }, [selectedIndex])
 
   return (
-    <div className="mb-8">
+    <div className="mb-8" ref={containerRef}>
       {/* Desktop: Horizontal Timeline */}
       <div className="hidden sm:block">
         <div className="relative flex justify-between items-start mb-8">
@@ -48,17 +80,20 @@ export function OrderTimeline({ status, createdAt }: OrderTimelineProps) {
           {TIMELINE_STEPS.map((step, index) => {
             const isCompleted = index < currentStepIndex
             const isCurrent = index === currentStepIndex
+            const isSelected = index === selectedIndex
             const StepIcon = step.icon
 
             return (
               <div key={step.status} className="flex flex-col items-center relative z-10 flex-1">
                 {/* Step Circle */}
                 <div
-                  className={`flex items-center justify-center h-10 w-10 rounded-full mb-3 transition-all ${
+                  className={`flex items-center justify-center h-10 w-10 rounded-full mb-3 transition-all cursor-pointer ${
                     isCompleted || isCurrent
                       ? "bg-[rgb(112,139,108)] text-white"
                       : "bg-white border-2 border-gray-200 text-gray-400"
-                  }`}
+                  } ${isSelected ? "ring-2 ring-offset-2 ring-[rgb(112,139,108)]" : ""}`}
+                  onClick={() => setSelectedIndex(index)}
+                  onKeyUp={() => setSelectedIndex(index)}
                 >
                   <StepIcon className="h-5 w-5" />
                 </div>
@@ -82,6 +117,7 @@ export function OrderTimeline({ status, createdAt }: OrderTimelineProps) {
         {TIMELINE_STEPS.map((step, index) => {
           const isCompleted = index < currentStepIndex
           const isCurrent = index === currentStepIndex
+          const isSelected = index === selectedIndex
           const isLast = index === TIMELINE_STEPS.length - 1
           const StepIcon = step.icon
 
@@ -98,11 +134,13 @@ export function OrderTimeline({ status, createdAt }: OrderTimelineProps) {
 
               {/* Step Circle */}
               <div
-                className={`flex items-center justify-center h-9 w-9 rounded-full flex-shrink-0 transition-all relative z-10 ${
+                className={`flex items-center justify-center h-9 w-9 rounded-full flex-shrink-0 transition-all relative z-10 cursor-pointer ${
                   isCompleted || isCurrent
                     ? "bg-[rgb(112,139,108)] text-white"
                     : "bg-white border-2 border-gray-200 text-gray-400"
-                }`}
+                } ${isSelected ? "ring-2 ring-offset-2 ring-[rgb(112,139,108)]" : ""}`}
+                onClick={() => setSelectedIndex(index)}
+                onKeyUp={() => setSelectedIndex(index)}
               >
                 <StepIcon className="h-4 w-4" />
               </div>

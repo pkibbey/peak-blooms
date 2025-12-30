@@ -40,7 +40,7 @@ export default function NavSearch() {
 
     startTransition(async () => {
       try {
-        const result = await searchProducts(term)
+        const result = await searchProducts({ searchTerm: term })
         setSearchResults(result.products)
       } catch {
         setSearchResults([])

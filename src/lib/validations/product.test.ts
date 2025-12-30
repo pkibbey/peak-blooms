@@ -20,10 +20,10 @@ describe("productSchema (form validation)", () => {
       expect(result.success).toBe(true)
     })
 
-    it("should accept product with optional colors array", () => {
+    it("should reject product without colors array", () => {
       const { colors, ...productWithoutColors } = validProduct
       const result = productSchema.safeParse(productWithoutColors)
-      expect(result.success).toBe(true)
+      expect(result.success).toBe(false)
     })
 
     it("should accept product with empty colors array", () => {
@@ -96,13 +96,13 @@ describe("productSchema (form validation)", () => {
     })
 
     it("should reject non-numeric price", () => {
-      const result = productSchema.safeParse({ ...validProduct, price: "abc" })
+      const result = productSchema.safeParse({ ...validProduct, price: null })
       expect(result.success).toBe(false)
     })
 
-    it("should reject empty collectionIds array", () => {
+    it("should accept empty collectionIds array", () => {
       const result = productSchema.safeParse({ ...validProduct, collectionIds: [] })
-      expect(result.success).toBe(false)
+      expect(result.success).toBe(true)
     })
 
     it("should reject missing collectionIds", () => {

@@ -72,14 +72,14 @@ describe("Search Actions", () => {
 
   describe("searchProducts", () => {
     it("should return empty results for empty search term", async () => {
-      const result = await searchProducts("")
+      const result = await searchProducts({ searchTerm: "" })
 
       expect(result).toEqual({ products: [] })
       expect(getProducts).not.toHaveBeenCalled()
     })
 
     it("should return empty results for whitespace-only search term", async () => {
-      const result = await searchProducts("   ")
+      const result = await searchProducts({ searchTerm: "     " })
 
       expect(result).toEqual({ products: [] })
       expect(getProducts).not.toHaveBeenCalled()
@@ -89,7 +89,7 @@ describe("Search Actions", () => {
       vi.mocked(getCurrentUser).mockResolvedValueOnce(null)
       vi.mocked(getProducts).mockResolvedValueOnce(mockProducts)
 
-      const result = await searchProducts("roses")
+      const result = await searchProducts({ searchTerm: "roses" })
 
       expect(result).toEqual({
         products: [
@@ -122,7 +122,7 @@ describe("Search Actions", () => {
       vi.mocked(getCurrentUser).mockResolvedValueOnce(mockUser)
       vi.mocked(getProducts).mockResolvedValueOnce(mockProducts)
 
-      const result = await searchProducts("roses")
+      const result = await searchProducts({ searchTerm: "roses" })
 
       expect(result).toEqual({
         products: [
@@ -160,11 +160,11 @@ describe("Search Actions", () => {
         offset: 0,
       })
 
-      await searchProducts("  roses  ")
+      await searchProducts({ searchTerm: "  roses  " })
 
       expect(getProducts).toHaveBeenCalledWith(
         {
-          search: "roses",
+          search: "  roses  ",
           limit: 10,
         },
         1.0
@@ -180,7 +180,7 @@ describe("Search Actions", () => {
         offset: 0,
       })
 
-      const result = await searchProducts("nonexistent")
+      const result = await searchProducts({ searchTerm: "nonexistent" })
 
       expect(result).toEqual({ products: [] })
     })
@@ -188,7 +188,7 @@ describe("Search Actions", () => {
     it("should return empty results on error", async () => {
       vi.mocked(getCurrentUser).mockRejectedValueOnce(new Error("Auth error"))
 
-      const result = await searchProducts("roses")
+      const result = await searchProducts({ searchTerm: "roses" })
 
       expect(result).toEqual({ products: [] })
     })
@@ -197,7 +197,7 @@ describe("Search Actions", () => {
       vi.mocked(getCurrentUser).mockResolvedValueOnce(null)
       vi.mocked(getProducts).mockRejectedValueOnce(new Error("Database error"))
 
-      const result = await searchProducts("roses")
+      const result = await searchProducts({ searchTerm: "roses" })
 
       expect(result).toEqual({ products: [] })
     })

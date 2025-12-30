@@ -4,13 +4,24 @@ import { revalidatePath } from "next/cache"
 import { headers } from "next/headers"
 import { auth, invalidateUserSessions } from "@/lib/auth"
 import { db } from "@/lib/db"
-import { isValidPriceMultiplier } from "@/lib/utils"
+import {
+  type ApproveUserInput,
+  approveUserSchema,
+  type CreateUserInput,
+  createUserSchema,
+  type UnapproveUserInput,
+  type UpdateUserPriceMultiplierInput,
+  unapproveUserSchema,
+  updateUserPriceMultiplierSchema,
+} from "@/lib/validations/auth"
 
 /**
  * Approve a user (admin only)
  */
-export async function approveUserAction(userId: string) {
+export async function approveUserAction(input: ApproveUserInput) {
   try {
+    const { userId } = approveUserSchema.parse(input)
+
     const headersList = await headers()
     const session = await auth.api.getSession({
       headers: headersList,
@@ -49,8 +60,10 @@ export async function approveUserAction(userId: string) {
 /**
  * Unapprove/revoke a user (admin only)
  */
-export async function unapproveUserAction(userId: string) {
+export async function unapproveUserAction(input: UnapproveUserInput) {
   try {
+    const { userId } = unapproveUserSchema.parse(input)
+
     const headersList = await headers()
     const session = await auth.api.getSession({
       headers: headersList,
@@ -89,8 +102,10 @@ export async function unapproveUserAction(userId: string) {
 /**
  * Update user's price multiplier (admin only)
  */
-export async function updateUserPriceMultiplierAction(userId: string, multiplier: number) {
+export async function updateUserPriceMultiplierAction(input: UpdateUserPriceMultiplierInput) {
   try {
+    const { userId, multiplier } = updateUserPriceMultiplierSchema.parse(input)
+
     const headersList = await headers()
     const session = await auth.api.getSession({
       headers: headersList,
@@ -98,10 +113,6 @@ export async function updateUserPriceMultiplierAction(userId: string, multiplier
 
     if (!session || (session.user.role as string) !== "ADMIN") {
       throw new Error("Unauthorized")
-    }
-
-    if (!isValidPriceMultiplier(multiplier)) {
-      throw new Error("Price multiplier must be between 0.5 and 2.0")
     }
 
     const user = await db.user.update({
@@ -133,15 +144,10 @@ export async function updateUserPriceMultiplierAction(userId: string, multiplier
 /**
  * Create a new user (admin only)
  */
-export async function createUserAction(data: {
-  email: string
-  name: string
-  phone: string
-  role: "CUSTOMER" | "ADMIN" | "SUBSCRIBER"
-  priceMultiplier: number
-  approved: boolean
-}) {
+export async function createUserAction(input: CreateUserInput) {
   try {
+    const data = createUserSchema.parse(input)
+
     const headersList = await headers()
     const session = await auth.api.getSession({
       headers: headersList,
@@ -158,10 +164,6 @@ export async function createUserAction(data: {
 
     if (existingUser) {
       throw new Error("Email already exists")
-    }
-
-    if (!isValidPriceMultiplier(data.priceMultiplier)) {
-      throw new Error("Price multiplier must be between 0.5 and 2.0")
     }
 
     const user = await db.user.create({

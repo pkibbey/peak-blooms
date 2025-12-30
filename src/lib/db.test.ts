@@ -25,6 +25,7 @@ describe("Database Module", () => {
   beforeEach(() => {
     vi.clearAllMocks()
     // Clear the global cache
+    // biome-ignore lint/suspicious/noExplicitAny: globalThis type is not fully typed in all environments
     const globalForPrisma = globalThis as any
     if (globalForPrisma.prisma) {
       delete globalForPrisma.prisma
@@ -37,7 +38,7 @@ describe("Database Module", () => {
       const { getTrackedDb } = await import("./db")
       const { createTrackedDb } = await import("./db-wrapper")
 
-      const trackedDb = getTrackedDb(true)
+      const _trackedDb = getTrackedDb(true)
 
       expect(createTrackedDb).toHaveBeenCalledWith(expect.any(Object), "ADMIN_QUERY")
     })
@@ -46,7 +47,7 @@ describe("Database Module", () => {
       const { getTrackedDb } = await import("./db")
       const { createTrackedDb } = await import("./db-wrapper")
 
-      const trackedDb = getTrackedDb(false)
+      const _trackedDb = getTrackedDb(false)
 
       expect(createTrackedDb).toHaveBeenCalledWith(expect.any(Object), "USER_QUERY")
     })

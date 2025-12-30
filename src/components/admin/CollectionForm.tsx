@@ -76,7 +76,7 @@ export default function CollectionForm({ collection, products = [] }: Collection
       }
 
       if (isEditing) {
-        await updateCollectionAction(collection.id, formData)
+        await updateCollectionAction({ id: collection.id, ...formData })
         toast.success("Collection updated successfully")
       } else {
         await createCollectionAction(formData)
@@ -111,7 +111,7 @@ export default function CollectionForm({ collection, products = [] }: Collection
 
     setIsDeleting(true)
     try {
-      await deleteCollectionAction(collection.id)
+      await deleteCollectionAction({ id: collection.id })
       toast.success("Collection deleted successfully")
       router.push("/admin/collections")
       router.refresh()

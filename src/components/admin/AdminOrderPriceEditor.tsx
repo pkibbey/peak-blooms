@@ -45,7 +45,7 @@ export function AdminOrderPriceEditor({ order, onPriceUpdated }: AdminOrderPrice
 
     setIsSaving(true)
     try {
-      const result = await updateOrderItemPriceAction(orderId, itemId, newPrice)
+      const result = await updateOrderItemPriceAction({ orderId, itemId, price: newPrice })
 
       // Update local state
       setItemPrices((prev) => ({ ...prev, [itemId]: newPrice }))

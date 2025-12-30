@@ -3,7 +3,12 @@
 import { revalidatePath } from "next/cache"
 import { getSession } from "@/lib/auth"
 import { db } from "@/lib/db"
-import { type AddressFormData, addressSchema } from "@/lib/validations/address"
+import {
+  type AddressFormData,
+  addressSchema,
+  type DeleteAddressInput,
+  deleteAddressSchema,
+} from "@/lib/validations/address"
 import { type ProfileFormData, profileSchema } from "@/lib/validations/auth"
 
 /**
@@ -50,7 +55,7 @@ export async function updateProfileAction(data: ProfileFormData) {
 /**
  * Get all addresses for the current user
  */
-async function getAddressesAction() {
+async function _getAddressesAction() {
   try {
     const session = await getSession()
 
@@ -189,7 +194,8 @@ export async function updateAddressAction(
 /**
  * Delete an address for the current user
  */
-export async function deleteAddressAction(addressId: string) {
+export async function deleteAddressAction(input: DeleteAddressInput) {
+  const { addressId } = deleteAddressSchema.parse(input)
   try {
     const session = await getSession()
 

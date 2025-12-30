@@ -35,7 +35,7 @@ export default function ReorderButton({ order }: ReorderButtonProps) {
         return
       }
 
-      await batchAddToCartAction(productIds, quantities)
+      await batchAddToCartAction({ productIds, quantities })
 
       const totalUnits = quantities.reduce((s, q) => s + q, 0)
       toast.success(

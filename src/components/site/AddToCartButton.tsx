@@ -1,7 +1,7 @@
 "use client"
 
 import { useRouter } from "next/navigation"
-import { useTransition, useState } from "react"
+import { useState, useTransition } from "react"
 import { toast } from "sonner"
 import { addToCartAction } from "@/app/actions/cart"
 import { Button } from "@/components/ui/button"
@@ -39,7 +39,7 @@ export default function AddToCartButton({
         const raw = Number(quantity)
         const qty = Number.isNaN(raw) ? 1 : Math.max(1, Math.floor(raw))
 
-        await addToCartAction(productId, qty)
+        await addToCartAction({ productId, quantity: qty })
 
         // Show success message — reflect the quantity when > 1
         if (qty > 1) {

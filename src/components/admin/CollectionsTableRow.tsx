@@ -79,7 +79,7 @@ export default function CollectionsTableRow({ collection }: { collection: Collec
 
               startTransition(async () => {
                 try {
-                  await toggleCollectionFeaturedAction(collection.id, value)
+                  await toggleCollectionFeaturedAction({ id: collection.id, featured: value })
                   toast.success(
                     `${value ? "Marked featured" : "Removed featured"} — ${collection.name}`
                   )

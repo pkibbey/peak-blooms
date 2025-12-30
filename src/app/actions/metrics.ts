@@ -1,8 +1,10 @@
 "use server"
 
+import { ZodError } from "zod"
 import { getSession } from "@/lib/auth"
 import { captureMetric, clearMetrics, getAllMetrics } from "@/lib/metrics"
-import type { Metric, MetricType } from "@/lib/types/metrics"
+import type { Metric } from "@/lib/types/metrics"
+import { type RecordMetricInput, recordMetricSchema } from "@/lib/validations/metrics"
 
 /**
  * Server action to get all recorded metrics (admin only)
@@ -16,31 +18,34 @@ export async function getMetricsAction(): Promise<Metric[]> {
 
     return await getAllMetrics()
   } catch (error) {
-    throw new Error(error instanceof Error ? error.message : "Failed to fetch metrics")
+    if (error instanceof Error) {
+      throw error
+    }
+    throw new Error("Failed to fetch metrics")
   }
 }
 
 /**
  * Server action to record a new metric (admin only)
  */
-export async function recordMetricAction(
-  type: MetricType,
-  name: string,
-  duration: number
-): Promise<void> {
+export async function recordMetricAction(input: RecordMetricInput): Promise<void> {
   try {
     const session = await getSession()
     if (!session?.user || session.user.role !== "ADMIN") {
       throw new Error("Unauthorized")
     }
 
-    if (!type || !name || typeof duration !== "number") {
-      throw new Error("Invalid metric data")
-    }
-
+    const { type, name, duration } = recordMetricSchema.parse(input)
     await captureMetric(type, name, duration)
   } catch (error) {
-    throw new Error(error instanceof Error ? error.message : "Failed to record metric")
+    // Check if it's a Zod validation error
+    if (error instanceof ZodError) {
+      throw new Error("Invalid metric data")
+    }
+    if (error instanceof Error) {
+      throw error
+    }
+    throw new Error("Failed to record metric")
   }
 }
 
@@ -57,6 +62,9 @@ export async function clearMetricsAction(): Promise<{ success: boolean; message:
     await clearMetrics()
     return { success: true, message: "All metrics cleared" }
   } catch (error) {
-    throw new Error(error instanceof Error ? error.message : "Failed to clear metrics")
+    if (error instanceof Error) {
+      throw error
+    }
+    throw new Error("Failed to clear metrics")
   }
 }

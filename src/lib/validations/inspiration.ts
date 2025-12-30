@@ -18,3 +18,19 @@ export const inspirationSchema = z.object({
 })
 
 export type InspirationFormData = z.infer<typeof inspirationSchema>
+// Inspiration operation schemas for API requests
+export const createInspirationSchema = inspirationSchema
+
+export type CreateInspirationInput = z.infer<typeof createInspirationSchema>
+
+export const updateInspirationSchema = inspirationSchema.extend({
+  id: z.string().uuid("Invalid inspiration ID"),
+})
+
+export type UpdateInspirationInput = z.infer<typeof updateInspirationSchema>
+
+export const deleteInspirationSchema = z.object({
+  id: z.string().uuid("Invalid inspiration ID"),
+})
+
+export type DeleteInspirationInput = z.infer<typeof deleteInspirationSchema>

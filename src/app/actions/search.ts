@@ -2,6 +2,7 @@
 
 import { getCurrentUser } from "@/lib/current-user"
 import { getProducts } from "@/lib/data"
+import { type SearchProductsInput, searchProductsSchema } from "@/lib/validations/search"
 
 interface SearchProductsResult {
   products: Array<{
@@ -17,8 +18,11 @@ interface SearchProductsResult {
  * Server action for searching products with debouncing on client
  * Returns search results with user's price multiplier applied
  */
-export async function searchProducts(searchTerm: string): Promise<SearchProductsResult> {
+export async function searchProducts(input: SearchProductsInput): Promise<SearchProductsResult> {
   try {
+    const { searchTerm } = searchProductsSchema.parse(input)
+
+    // Return empty results if search term is whitespace-only
     if (!searchTerm.trim()) {
       return { products: [] }
     }
@@ -28,7 +32,7 @@ export async function searchProducts(searchTerm: string): Promise<SearchProducts
 
     const result = await getProducts(
       {
-        search: searchTerm.trim(),
+        search: searchTerm,
         limit: 10,
       },
       multiplier

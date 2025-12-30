@@ -11,10 +11,8 @@ export const productSchema = z.object({
     .refine((val) => !Number.isNaN(Number.parseFloat(val)) && Number.parseFloat(val) >= 0, {
       message: "Price must be a valid positive number",
     }),
-  // Colors array: zero or more color IDs (e.g. ["pink", "rose", "greenery"]). Use empty array instead of single string.
-  // Color IDs reference the COLORS object in lib/colors.ts
-  colors: z.array(z.string()).optional(),
-  collectionIds: z.array(z.string()).min(1, "At least one collection is required"),
+  colors: z.array(z.string()).nullable(),
+  collectionIds: z.array(z.string()).nullable(),
   productType: z.enum(["FLOWER", "FILLER", "ROSE"]),
   featured: z.boolean(),
 })
@@ -22,17 +20,62 @@ export const productSchema = z.object({
 export type ProductFormData = z.infer<typeof productSchema>
 
 // Schema for API request (parsed values)
-const createProductSchema = z.object({
+export const createProductSchema = z.object({
   name: z.string().min(1, "Product name is required"),
   slug: z.string().min(1, "Slug is required"),
   description: z.string().nullable(),
   image: z.string().nullable(),
-  price: z.number().min(0, "Price must be a positive number"),
-  // API input: allow null or an array of valid color IDs (reference lib/colors.ts COLORS object)
+  price: z.number().min(0, "Price must be a positive number").nullable(),
   colors: z.array(z.string()).nullable(),
-  collectionIds: z.array(z.string()).min(1, "At least one collection is required"),
+  collectionIds: z.array(z.string()).nullable(),
   productType: z.enum(["FLOWER", "FILLER", "ROSE"]).default("FLOWER"),
   featured: z.boolean().default(false),
 })
 
 export type CreateProductInput = z.infer<typeof createProductSchema>
+// Product operation schemas for API requests
+export const updateProductSchema = createProductSchema.extend({
+  id: z.string().uuid("Invalid product ID"),
+})
+
+export type UpdateProductInput = z.infer<typeof updateProductSchema>
+
+export const deleteProductSchema = z.object({
+  id: z.string().uuid("Invalid product ID"),
+})
+
+export type DeleteProductInput = z.infer<typeof deleteProductSchema>
+
+export const toggleProductFeaturedSchema = z.object({
+  id: z.string().uuid("Invalid product ID"),
+  featured: z.boolean(),
+})
+
+export type ToggleProductFeaturedInput = z.infer<typeof toggleProductFeaturedSchema>
+
+export const getProductCountSchema = z.object({
+  boxlotOnly: z.boolean().optional(),
+  query: z.string().max(255).optional(),
+})
+
+export type GetProductCountInput = z.infer<typeof getProductCountSchema>
+
+// Schema for creating a product from form data (with string price)
+export const createProductFormSchema = z.object({
+  name: z.string().min(1, "Product name is required"),
+  slug: z.string().min(1, "Slug is required"),
+  description: z.string().nullable(),
+  image: z.string().nullable(),
+  price: z
+    .string()
+    .min(1, "Price is required")
+    .refine((val) => !Number.isNaN(Number.parseFloat(val)) && Number.parseFloat(val) >= 0, {
+      message: "Price must be a valid positive number",
+    }),
+  colors: z.array(z.string()).nullable(),
+  collectionIds: z.array(z.string()).nullable(),
+  productType: z.enum(["FLOWER", "FILLER", "ROSE"]).default("FLOWER"),
+  featured: z.boolean().default(false),
+})
+
+export type CreateProductFormData = z.infer<typeof createProductFormSchema>

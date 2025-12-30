@@ -63,7 +63,7 @@ export default function UsersTable({ users, sort, order }: UsersTableProps) {
 
     setLoadingId(userId)
     try {
-      await updateUserPriceMultiplierAction(userId, numValue)
+      await updateUserPriceMultiplierAction({ userId, multiplier: numValue })
       toast.success("Price multiplier updated")
       setEditingId(null)
       router.refresh()
@@ -78,7 +78,7 @@ export default function UsersTable({ users, sort, order }: UsersTableProps) {
   const handleApprove = async (userId: string) => {
     setLoadingId(userId)
     try {
-      await approveUserAction(userId)
+      await approveUserAction({ userId })
       toast.success("User approved")
       router.refresh()
     } catch (error) {
@@ -92,7 +92,7 @@ export default function UsersTable({ users, sort, order }: UsersTableProps) {
   const handleUnapprove = async (userId: string) => {
     setLoadingId(userId)
     try {
-      await unapproveUserAction(userId)
+      await unapproveUserAction({ userId })
       toast.success("User access revoked")
       router.refresh()
     } catch (error) {
