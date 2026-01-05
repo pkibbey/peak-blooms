@@ -22,7 +22,7 @@ import {
  * Returns cart with prices adjusted by user's price multiplier
  * A cart is an Order with status = 'CART'
  */
-export async function createCart(user: SessionUser) {
+async function createCart(user: SessionUser) {
   const newCart = await db.order.create({
     data: {
       userId: user.id,

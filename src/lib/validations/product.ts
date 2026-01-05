@@ -20,7 +20,7 @@ export const productSchema = z.object({
 export type ProductFormData = z.infer<typeof productSchema>
 
 // Schema for API request (parsed values)
-export const createProductSchema = z.object({
+const createProductSchema = z.object({
   name: z.string().min(1, "Product name is required"),
   slug: z.string().min(1, "Slug is required"),
   description: z.string().nullable(),
