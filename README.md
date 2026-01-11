@@ -1,4 +1,8 @@
-# Peak Blooms
+<p align="center">
+  <img src="/public/logos/peakblooms.png" alt="Peak Blooms" width="400" />
+</p>
+
+<h1 align="center">Peak Blooms</h1>
 
 A modern e-commerce storefront for curated floral collections and gifts. The app provides product collections, product detail pages, a shopping cart, and order workflows backed by Prisma and Postgres.
 
