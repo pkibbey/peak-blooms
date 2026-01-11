@@ -15,11 +15,11 @@ export default function Footer() {
               className="inline-flex items-center gap-3 text-lg font-semibold mb-3"
             >
               <Image
-                src="/logos/peakblooms.png"
+                src="/logos/logo-light.png"
                 alt="Peak Blooms logo"
-                width={384}
-                height={44}
-                className="h-12 w-[209px]"
+                width={1274}
+                height={441}
+                className="h-20 w-auto"
               />
             </Link>
 

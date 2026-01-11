@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="/public/logos/peakblooms.png" alt="Peak Blooms" width="400" />
+  <img src="./public/logos/logo-dark.png" alt="Peak Blooms" width="400" />
 </p>
 
 <h1 align="center">Peak Blooms</h1>
