@@ -2,20 +2,13 @@ import Image from "next/image"
 import Link from "next/link"
 import { getCartAction } from "@/app/actions/cart"
 import NavLink from "@/components/site/NavLink"
-import SignOutButton from "@/components/site/SignOutButton"
 // import UserMenu from "@/components/site/UserMenu"
-import {
-  IconMenu,
-  IconSearch,
-  IconSettings,
-  IconShoppingCart,
-  IconUser,
-} from "@/components/ui/icons"
+import { IconSearch, IconShoppingCart } from "@/components/ui/icons"
 import { getCurrentUser } from "@/lib/current-user"
 import { Badge } from "../ui/badge"
 import { Button } from "../ui/button"
+import MobileNav from "./MobileNav"
 import NavSearch from "./NavSearch"
-import SignInWithGoogle from "./SignInWithGoogle"
 import UserMenu from "./UserMenu"
 
 const links = [
@@ -97,60 +90,12 @@ export default async function Nav() {
             {/* Consolidated user/account/admin menu */}
             <UserMenu user={user} />
 
-            <Button size="icon" className="md:hidden" variant="default">
-              {<IconMenu aria-hidden="true" />}
-            </Button>
+            <MobileNav user={user} isApproved={isApproved} links={links} cartCount={cartCount} />
           </div>
         </div>
 
-        {/* Mobile menu */}
-
-        <div className="md:hidden mt-2 pb-4 border-t border-t-border">
-          <div className="flex flex-col gap-1 py-2">
-            {links.map((l) => (
-              <NavLink key={l.href} href={l.href} className="px-4 py-2">
-                {l.label}
-              </NavLink>
-            ))}
-            {isApproved && (
-              <Button
-                variant="ghost"
-                nativeButton={false}
-                render={
-                  <Link
-                    prefetch={false}
-                    href="/cart"
-                    className="inline-flex items-center gap-2 px-4 py-2"
-                  >
-                    <IconShoppingCart aria-hidden="true" />
-                    <span>Cart</span>
-                    {cartCount > 0 && <Badge variant="default">{cartCount}</Badge>}
-                  </Link>
-                }
-              />
-            )}
-            {user ? (
-              <>
-                <NavLink href="/account" icon={<IconUser />} className="px-4 py-2">
-                  Account
-                </NavLink>
-                {user.role === "ADMIN" && (
-                  <NavLink href="/admin" icon={<IconSettings />} className="px-4 py-2">
-                    Admin Dashboard
-                  </NavLink>
-                )}
-                <SignOutButton />
-              </>
-            ) : (
-              <>
-                <SignInWithGoogle />
-                <NavLink href="/auth/signup" className="px-4 py-2">
-                  Sign Up
-                </NavLink>
-              </>
-            )}
-          </div>
-        </div>
+        {/* Mobile menu handled by MobileNav */}
+        <div id="mobile-nav-root" className="md:hidden" />
       </div>
     </header>
   )
