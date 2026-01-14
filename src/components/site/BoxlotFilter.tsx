@@ -40,7 +40,7 @@ export function BoxlotFilter() {
 
       router.push(`/shop?${params.toString()}`, { scroll: false })
     } catch {
-      // network or unexpected error — don't block toggle, fallback to pushing new params
+      // network or unexpected error - don't block toggle, fallback to pushing new params
       router.push(`/shop?${params.toString()}`, { scroll: false })
     } finally {
       setIsCounting(false)

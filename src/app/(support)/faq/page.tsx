@@ -82,7 +82,9 @@ export default function FAQPage() {
   return (
     <div className="space-y-8">
       <div>
-        <h1 className="text-4xl font-semibold mb-2">Frequently Asked Questions</h1>
+        <h1 className="text-4xl md:text-5xl font-semibold font-serif mb-2">
+          Frequently Asked Questions
+        </h1>
         <p className="text-lg text-muted-foreground">
           Common questions about ordering, our service, and Peak Blooms.
         </p>
@@ -90,15 +92,15 @@ export default function FAQPage() {
 
       <div className="space-y-6">
         {faqs.map((faq) => (
-          <div key={faq.question} className="border-b border-border pb-6 last:border-b-0">
-            <h3 className="text-lg font-semibold mb-2 text-[#1F332E]">{faq.question}</h3>
+          <section key={faq.question} className="space-y-3">
+            <h2 className="text-2xl font-semibold font-serif">{faq.question}</h2>
             <p className="text-base text-foreground leading-relaxed">{faq.answer}</p>
-          </div>
+          </section>
         ))}
       </div>
 
-      <div className="mt-10 border-t border-border pt-8 bg-[#FAF7F0] p-6 rounded-sm">
-        <h2 className="text-lg font-semibold mb-2">Didn't find your answer?</h2>
+      <section className="space-y-4 border-t border-border pt-8">
+        <h2 className="text-2xl font-semibold font-serif">Didn't find your answer?</h2>
         <p className="text-base text-foreground">
           Reach out to our team at{" "}
           <a href="mailto:hello@peakblooms.com" className="text-[#B45F68] hover:underline">
@@ -110,7 +112,7 @@ export default function FAQPage() {
           </a>
           . We're here to help!
         </p>
-      </div>
+      </section>
     </div>
   )
 }

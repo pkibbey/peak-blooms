@@ -27,7 +27,7 @@ The site aims for a clean, professional, modern, and high-quality aesthetic that
 
 ## Color Mode (Theme)
 
-This site intentionally uses a single, default light theme and will never offer a dark theme option. All design tokens, component styles, and layout choices should assume a consistent light appearance (white backgrounds, dark grey text, muted greys for borders) so photography and brand colors remain consistent across devices. Do not add a color-mode toggle or dark-mode-specific styles — the product's visual identity is intentionally single-theme and optimized for a bright, light-first experience.
+This site intentionally uses a single, default light theme and will never offer a dark theme option. All design tokens, component styles, and layout choices should assume a consistent light appearance (white backgrounds, dark grey text, muted greys for borders) so photography and brand colors remain consistent across devices. Do not add a color-mode toggle or dark-mode-specific styles - the product's visual identity is intentionally single-theme and optimized for a bright, light-first experience.
 
 ## UI Components
 
@@ -68,6 +68,6 @@ We use a small, consistent icon system across the UI to improve affordance and v
 
 Example usage:
 
-  - `src/components/site/Nav.tsx` — icons appear left of labels and the mobile menu toggle uses `Menu`/`X` icons.
-  - `src/app/page.tsx` — primary CTA `Shop bouquets` includes a `ShoppingBag` icon to reinforce the action.
+  - `src/components/site/Nav.tsx` - icons appear left of labels and the mobile menu toggle uses `Menu`/`X` icons.
+  - `src/app/page.tsx` - primary CTA `Shop bouquets` includes a `ShoppingBag` icon to reinforce the action.
 

@@ -3,21 +3,21 @@ import type { Metadata } from "next"
 export const metadata: Metadata = {
   title: "About Peak Blooms",
   description:
-    "Learn about Peak Blooms — our mission, values, and commitment to premium wholesale flowers.",
+    "Learn about Peak Blooms - our mission, values, and commitment to premium wholesale flowers.",
 }
 
 export default function AboutPage() {
   return (
     <div className="space-y-8">
       <div>
-        <h1 className="text-4xl font-semibold mb-2">About Peak Blooms</h1>
+        <h1 className="text-4xl md:text-5xl font-semibold font-serif mb-2">About Peak Blooms</h1>
         <p className="text-lg text-muted-foreground">
           Sourcing premium wholesale flowers for independent florist businesses
         </p>
       </div>
 
       <section className="space-y-4">
-        <h2 className="text-2xl font-semibold">Our Mission</h2>
+        <h2 className="text-2xl font-semibold font-serif">Our Mission</h2>
         <p className="text-base text-foreground leading-relaxed">
           Peak Blooms exists to empower independent florists with access to the highest-quality,
           freshest seasonal flowers at competitive wholesale prices. We believe that small,
@@ -27,30 +27,30 @@ export default function AboutPage() {
       </section>
 
       <section className="space-y-4">
-        <h2 className="text-2xl font-semibold">Our Values</h2>
+        <h2 className="text-2xl font-semibold font-serif">Our Values</h2>
         <ul className="space-y-3 text-base text-foreground">
-          <li className="flex gap-3">
-            <span className="font-semibold text-[#1F332E] min-w-fit">Transparency</span>
+          <li className="grid md:grid-cols-[110px_auto] gap-3">
+            <span className="font-semibold text-[#1F332E]">Transparency</span>
             <span>
               We believe in clear pricing, honest product descriptions, and straightforward
               communication every step of the way.
             </span>
           </li>
-          <li className="flex gap-3">
-            <span className="font-semibold text-[#1F332E] min-w-fit">Quality</span>
+          <li className="grid md:grid-cols-[110px_auto] gap-3">
+            <span className="font-semibold text-[#1F332E]">Quality</span>
             <span>
               Every bouquet, stem, and arrangement meets our high standards for freshness, beauty,
               and longevity.
             </span>
           </li>
-          <li className="flex gap-3">
-            <span className="font-semibold text-[#1F332E] min-w-fit">Partnership</span>
+          <li className="grid md:grid-cols-[110px_auto] gap-3">
+            <span className="font-semibold text-[#1F332E]">Partnership</span>
             <span>
               We're not just a supplier—we're a partner invested in your success and growth.
             </span>
           </li>
-          <li className="flex gap-3">
-            <span className="font-semibold text-[#1F332E] min-w-fit">Seasonality</span>
+          <li className="grid md:grid-cols-[110px_auto] gap-3">
+            <span className="font-semibold text-[#1F332E]">Seasonality</span>
             <span>
               We celebrate what's fresh and in-season, supporting local growers and sustainable
               practices.
@@ -60,14 +60,14 @@ export default function AboutPage() {
       </section>
 
       <section className="space-y-4">
-        <h2 className="text-2xl font-semibold">How We're Different</h2>
+        <h2 className="text-2xl font-semibold font-serif">How We're Different</h2>
         <p className="text-base text-foreground leading-relaxed">
           Unlike larger wholesale suppliers, Peak Blooms treats every customer as a partner. We
           don't just sell flowers—we invest in your success. Our approach centers on three
           commitments that matter:
         </p>
         <ul className="space-y-3 text-base text-foreground">
-          <li className="flex gap-3">
+          <li className="grid md:grid-cols-[170px_auto] gap-3">
             <span className="font-semibold text-[#1F332E] min-w-fit">
               Exceptional Customer Service
             </span>
@@ -76,14 +76,14 @@ export default function AboutPage() {
               with your business in mind.
             </span>
           </li>
-          <li className="flex gap-3">
+          <li className="grid md:grid-cols-[170px_auto] gap-3">
             <span className="font-semibold text-[#1F332E] min-w-fit">Sustainable Sourcing</span>
             <span>
               Partnering with growers and suppliers who share our values, supporting seasonal
               flowers and local agriculture whenever possible.
             </span>
           </li>
-          <li className="flex gap-3">
+          <li className="grid md:grid-cols-[170px_auto] gap-3">
             <span className="font-semibold text-[#1F332E] min-w-fit">Timely Deliveries</span>
             <span>
               Reliable, fast local delivery that keeps flowers at peak freshness, so you can focus
@@ -94,7 +94,7 @@ export default function AboutPage() {
       </section>
 
       <section className="space-y-4">
-        <h2 className="text-2xl font-semibold">Our Experience</h2>
+        <h2 className="text-2xl font-semibold font-serif">Our Experience</h2>
         <p className="text-base text-foreground leading-relaxed">
           With years of experience in wholesale floral sourcing, Peak Blooms understands the unique
           challenges facing independent florists. From managing seasonal availability to minimizing
@@ -108,7 +108,7 @@ export default function AboutPage() {
       </section>
 
       <section className="space-y-4">
-        <h2 className="text-2xl font-semibold">Why Choose Peak Blooms</h2>
+        <h2 className="text-2xl font-semibold font-serif">Why Choose Peak Blooms</h2>
         <ul className="space-y-2 text-base text-foreground list-disc list-inside">
           <li>Curated selections of seasonal and specialty flowers</li>
           <li>Competitive wholesale pricing without hidden fees</li>

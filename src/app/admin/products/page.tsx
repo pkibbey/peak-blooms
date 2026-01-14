@@ -5,7 +5,7 @@ import BackLink from "@/components/site/BackLink"
 import { Button } from "@/components/ui/button"
 import { ITEMS_PER_PAGE } from "@/lib/consts"
 
-// no direct db usage here — use DAL
+// no direct db usage here - use DAL
 
 interface AdminProductsPageProps {
   searchParams: Promise<Record<string, string | string[] | undefined>>

@@ -97,7 +97,7 @@ export default function ProductsTableRow({ product }: ProductRowProps) {
 
               try {
                 await toggleProductFeaturedAction({ id: product.id, featured: value })
-                toast.success(`${value ? "Marked featured" : "Removed featured"} — ${product.name}`)
+                toast.success(`${value ? "Marked featured" : "Removed featured"} - ${product.name}`)
                 router.refresh()
               } catch (err) {
                 setFeatured(previous)

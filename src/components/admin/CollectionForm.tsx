@@ -102,7 +102,7 @@ export default function CollectionForm({ collection, products = [] }: Collection
       productCount > 0
         ? `Are you sure you want to delete "${collection.name}"? This will remove the collection association from ${productCount} product${
             productCount !== 1 ? "s" : ""
-          } — products will remain but won't be assigned to this collection. This action cannot be undone.`
+          } - products will remain but won't be assigned to this collection. This action cannot be undone.`
         : `Are you sure you want to delete "${collection.name}"? This action cannot be undone.`
 
     if (!window.confirm(warningMessage)) {

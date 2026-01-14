@@ -133,7 +133,7 @@ function readProductsFromCSV(): Array<{
 
   console.log(`✅ Parsed ${products.length} products from CSV (${lines.length} lines)`)
   if (products.length === 0) {
-    console.warn("⚠️  No products were parsed from the CSV — check the file format and header row.")
+    console.warn("⚠️  No products were parsed from the CSV - check the file format and header row.")
   }
 
   return products
@@ -200,7 +200,7 @@ async function seedProducts() {
       const start_readCSV = performance.now()
       const csvProducts = readProductsFromCSV()
       await captureMetric(MetricType.SEED, "read products CSV", performance.now() - start_readCSV)
-      console.log(`📦 Found ${csvProducts.length} CSV products — starting bulk upsert...`)
+      console.log(`📦 Found ${csvProducts.length} CSV products - starting bulk upsert...`)
 
       // Process products in batches with optimized queries
       let productsCreated = 0

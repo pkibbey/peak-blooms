@@ -81,7 +81,7 @@ export default function CollectionsTableRow({ collection }: { collection: Collec
                 try {
                   await toggleCollectionFeaturedAction({ id: collection.id, featured: value })
                   toast.success(
-                    `${value ? "Marked featured" : "Removed featured"} — ${collection.name}`
+                    `${value ? "Marked featured" : "Removed featured"} - ${collection.name}`
                   )
                   router.refresh()
                 } catch (err) {

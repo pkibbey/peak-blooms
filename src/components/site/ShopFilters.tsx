@@ -109,7 +109,7 @@ export function ShopFilters({
     [searchParams, router]
   )
 
-  // Handle color changes — apply instantly
+  // Handle color changes - apply instantly
   const handleColorsChange = useCallback(
     (colors: string[]) => {
       setSelectedColors(colors)
@@ -126,7 +126,7 @@ export function ShopFilters({
     [selectedCollectionIds, stemLengthMin, stemLengthMax, priceMin, priceMax, navigateWithFilters]
   )
 
-  // Handle collection toggle — add/remove from selection
+  // Handle collection toggle - add/remove from selection
   const toggleCollection = useCallback(
     (collectionId: string) => {
       const newCollectionIds = selectedCollectionIds.includes(collectionId)

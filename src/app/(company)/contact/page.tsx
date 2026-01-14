@@ -11,7 +11,7 @@ export default function ContactPage() {
   return (
     <div className="space-y-8">
       <div>
-        <h1 className="text-4xl font-semibold mb-2">Get in Touch</h1>
+        <h1 className="text-4xl md:text-5xl font-semibold font-serif mb-2">Get in Touch</h1>
         <p className="text-lg text-muted-foreground">
           Have questions or need assistance? We're here to help.
         </p>
@@ -19,7 +19,7 @@ export default function ContactPage() {
 
       <section className="space-y-6">
         <div>
-          <h2 className="text-2xl font-semibold mb-4">How to Reach Us</h2>
+          <h2 className="text-2xl font-semibold font-serif mb-4">How to Reach Us</h2>
           <p className="text-base text-foreground leading-relaxed mb-6">
             Whether you're a new florist interested in partnering with Peak Blooms, or an existing
             customer with a question about an order, we're happy to help. Reach out to us through
@@ -79,29 +79,29 @@ export default function ContactPage() {
       </section>
 
       <section className="space-y-4 border-t border-border pt-8">
-        <h2 className="text-2xl font-semibold">What We're Here For</h2>
-        <ul className="space-y-2 text-base text-foreground">
-          <li className="flex gap-3">
-            <span className="font-semibold text-[#1F332E] min-w-fit">General Questions</span>
+        <h2 className="text-2xl font-semibold font-serif">What We're Here For</h2>
+        <ul className="space-y-3 text-base text-foreground">
+          <li className="grid md:grid-cols-[160px_auto] gap-3">
+            <span className="font-semibold text-[#1F332E]">General Questions</span>
             <span>Information about our products, pricing, or how Peak Blooms works</span>
           </li>
-          <li className="flex gap-3">
-            <span className="font-semibold text-[#1F332E] min-w-fit">Order Support</span>
+          <li className="grid md:grid-cols-[160px_auto] gap-3">
+            <span className="font-semibold text-[#1F332E]">Order Support</span>
             <span>Help with tracking, delivery windows, or order modifications</span>
           </li>
-          <li className="flex gap-3">
-            <span className="font-semibold text-[#1F332E] min-w-fit">Account Issues</span>
+          <li className="grid md:grid-cols-[160px_auto] gap-3">
+            <span className="font-semibold text-[#1F332E]">Account Issues</span>
             <span>Password resets, account access, or technical difficulties</span>
           </li>
-          <li className="flex gap-3">
-            <span className="font-semibold text-[#1F332E] min-w-fit">Partnership Inquiry</span>
+          <li className="grid md:grid-cols-[160px_auto] gap-3">
+            <span className="font-semibold text-[#1F332E]">Partnership Inquiry</span>
             <span>
               If you're a grower, distributor, or complementary business interested in working with
               Peak Blooms
             </span>
           </li>
-          <li className="flex gap-3">
-            <span className="font-semibold text-[#1F332E] min-w-fit">Feedback</span>
+          <li className="grid md:grid-cols-[160px_auto] gap-3">
+            <span className="font-semibold text-[#1F332E]">Feedback</span>
             <span>Ideas, suggestions, or concerns about our service and platform</span>
           </li>
         </ul>

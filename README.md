@@ -61,31 +61,31 @@ npm run db:studio:dev
 
 Other useful scripts:
 
-- `npm run build` — build for production
-- `npm run start` — start the production server
-- `npm run lint` — run Biome lint
-- `npm run format` — run Biome format
-- `npm run test` — run Vitest tests
+- `npm run build` - build for production
+- `npm run start` - start the production server
+- `npm run lint` - run Biome lint
+- `npm run format` - run Biome format
+- `npm run test` - run Vitest tests
 
 ## Project Structure
 
-- **`app/`** — Next.js app routes, layouts and server actions.
-- **`src/components/`** — UI components used across pages (product cards, forms, cart components).
-- **`public/`** — Static assets: product images, hero images, collection images and logos.
-- **`prisma/`** — Prisma schema, migrations, and seed scripts (`schema.prisma`, `seed.ts`, `seed-products.ts`).
-- **`scripts/`** — Utility scripts (schema generation, postinstall hooks, image fetchers).
-- **`package.json`** — npm scripts and dependency list (used for dev/build tasks).
+- **`app/`** - Next.js app routes, layouts and server actions.
+- **`src/components/`** - UI components used across pages (product cards, forms, cart components).
+- **`public/`** - Static assets: product images, hero images, collection images and logos.
+- **`prisma/`** - Prisma schema, migrations, and seed scripts (`schema.prisma`, `seed.ts`, `seed-products.ts`).
+- **`scripts/`** - Utility scripts (schema generation, postinstall hooks, image fetchers).
+- **`package.json`** - npm scripts and dependency list (used for dev/build tasks).
 
 Look for domain logic in `src/app` and `src/components` for UI behaviour and `prisma/` for DB models.
 
 ## Tech Stack
 
-- **Next.js ^16** — App framework and server rendering
-- **React 19** — UI library
-- **TypeScript** — Types and developer tooling
-- **Prisma 7 & Postgres** — ORM and relational database
-- **Tailwind CSS** — Utility-first styling
-- **Biome** — Linting & formatting
-- **Vitest** — Unit and integration tests
+- **Next.js ^16** - App framework and server rendering
+- **React 19** - UI library
+- **TypeScript** - Types and developer tooling
+- **Prisma 7 & Postgres** - ORM and relational database
+- **Tailwind CSS** - Utility-first styling
+- **Biome** - Linting & formatting
+- **Vitest** - Unit and integration tests
 
 For exact dependency versions, see `package.json`.

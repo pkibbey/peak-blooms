@@ -64,7 +64,7 @@ export default function ProductsTable({ products, sort, order, headerUrl }: Prod
           ))}
         </TableBody>
       </Table>
-      {/* (no global sr-only entry — per-row sr-only is provided inside the colors cell) */}
+      {/* (no global sr-only entry - per-row sr-only is provided inside the colors cell) */}
     </div>
   )
 }

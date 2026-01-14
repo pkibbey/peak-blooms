@@ -4,12 +4,12 @@ This document describes the new reusable heading utilities added to `src/app/glo
 
 ## Classes added
 
-- `heading-1` — largest (page titles)
-- `heading-2` — section titles
-- `heading-3` — subsection titles
-- `heading-4` — smaller headings
-- `heading-5` — compact headings
-- `heading-6` — smallest heading style
+- `heading-1` - largest (page titles)
+- `heading-2` - section titles
+- `heading-3` - subsection titles
+- `heading-4` - smaller headings
+- `heading-5` - compact headings
+- `heading-6` - smallest heading style
 
 Each class is responsive and uses the project's `font-serif` utility for a refined heading style. They provide consistent font-size, line-height, letter-spacing and weight across the app.
 

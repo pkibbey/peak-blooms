@@ -1,15 +1,15 @@
 
-# Language & Style Guide — Peak Blooms
+# Language & Style Guide - Peak Blooms
 
 This guide explains how to write for Peak Blooms' website: tone, voice, phrasing, and practical examples. Use this as the single source for site-wide language decisions so copy remains consistent, mission-aligned, and effective for our primary audience: florists, retailers, and event planners.
 
 ## Core voice principles
 
-- Professional, not formal — expert without being cold. Think: a seasoned trade partner who knows floristry.
-- Warm and supportive — approachable guidance for busy professionals.
-- B2B-focused — write for business customers who make buying and design decisions, not general consumers.
-- Clear and direct — avoid marketing fluff and make the value obvious.
-- Specific, verifiable claims — prefer "highest quality" and "freshest flowers" over subjective superlatives like "best".
+- Professional, not formal - expert without being cold. Think: a seasoned trade partner who knows floristry.
+- Warm and supportive - approachable guidance for busy professionals.
+- B2B-focused - write for business customers who make buying and design decisions, not general consumers.
+- Clear and direct - avoid marketing fluff and make the value obvious.
+- Specific, verifiable claims - prefer "highest quality" and "freshest flowers" over subjective superlatives like "best".
 
 ## Key themes & priority phrases
 
@@ -29,18 +29,18 @@ Use these phrases consistently when they apply:
 - Use active voice for clarity and energy. Prefer "We partner with growers" over "We are partnered with growers."
 - Use consistent capitalization for product/feature names (e.g., "Featured Collections", "Boxlot Center").
 
-## Tone examples — do and don't
+## Tone examples - do and don't
 
 - Hero / Headline
   - Do: "Premium wholesale flowers for creative professionals"
-  - Don't: "Fresh flowers for everyone — perfect for gifts"
+  - Don't: "Fresh flowers for everyone - perfect for gifts"
 
 - Subhead / Support line
   - Do: "Competitive wholesale pricing, sustainable sourcing, and reliable local delivery—designed for florists and event pros."
-  - Don't: "Low prices, big savings — great deals for anyone."
+  - Don't: "Low prices, big savings - great deals for anyone."
 
 - Product descriptions
-  - Do: "Carefully selected stems at peak freshness — ideal for high-volume events and retail displays."
+  - Do: "Carefully selected stems at peak freshness - ideal for high-volume events and retail displays."
   - Don't: "These flowers are simply gorgeous and the best choice for any use."
 
 - CTA language
@@ -51,8 +51,8 @@ Use these phrases consistently when they apply:
 
 - Homepage / hero banners: Speak to partnership and outcomes. Use headings that identify the audience: "for florists, retailers, and event planners." Keep CTAs oriented to professional needs (catalogs, boxlots, wholesale pricing).
 - Shop & product lists: Highlight wholesale benefits and quality. Include delivery and availability details where relevant.
-- Collections & Featured Collections: Emphasize seasonality, curation, and partnerships with growers — explain why selection changes.
-- Inspirations: Position as professional design references and training resources — not just pretty images.
+- Collections & Featured Collections: Emphasize seasonality, curation, and partnerships with growers - explain why selection changes.
+- Inspirations: Position as professional design references and training resources - not just pretty images.
 - About / Footer: Summarize trust-building promises (service, sourcing, delivery) succinctly and consistently.
 
 ## Accessibility and SEO notes

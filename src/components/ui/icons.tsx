@@ -198,4 +198,4 @@ export function IconSearch(props: React.ComponentProps<typeof Search>) {
   )
 }
 
-// intentionally no default export — use named icon exports
+// intentionally no default export - use named icon exports

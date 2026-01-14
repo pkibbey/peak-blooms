@@ -9,14 +9,14 @@ export default function ReturnsPage() {
   return (
     <div className="space-y-8">
       <div>
-        <h1 className="text-4xl font-semibold mb-2">Returns & Refunds</h1>
+        <h1 className="text-4xl md:text-5xl font-semibold font-serif mb-2">Returns & Refunds</h1>
         <p className="text-lg text-muted-foreground">
           We stand behind the quality of every flower. Here's our returns policy.
         </p>
       </div>
 
       <section className="space-y-4">
-        <h2 className="text-2xl font-semibold">Our Quality Promise</h2>
+        <h2 className="text-2xl font-semibold font-serif">Our Quality Promise</h2>
         <p className="text-base text-foreground leading-relaxed">
           Peak Blooms is committed to delivering the freshest, highest-quality flowers every time.
           We take pride in our sourcing, preparation, and packaging. If you receive flowers that
@@ -25,35 +25,35 @@ export default function ReturnsPage() {
       </section>
 
       <section className="space-y-4">
-        <h2 className="text-2xl font-semibold">What Qualifies for Return or Refund</h2>
+        <h2 className="text-2xl font-semibold font-serif">What Qualifies for Return or Refund</h2>
         <p className="text-base text-foreground leading-relaxed">
           The following qualify for a return, replacement, or refund:
         </p>
-        <ul className="space-y-2 text-base text-foreground">
-          <li className="flex gap-3">
-            <span className="font-semibold text-[#1F332E] min-w-fit">Damaged Flowers</span>
+        <ul className="space-y-3 text-base text-foreground">
+          <li className="grid md:grid-cols-[170px_auto] gap-3">
+            <span className="font-semibold text-[#1F332E]">Damaged Flowers</span>
             <span>Flowers that arrive with broken stems, crushed petals, or visible damage.</span>
           </li>
-          <li className="flex gap-3">
-            <span className="font-semibold text-[#1F332E] min-w-fit">Poor Quality</span>
+          <li className="grid md:grid-cols-[170px_auto] gap-3">
+            <span className="font-semibold text-[#1F332E]">Poor Quality</span>
             <span>
               Flowers that are discolored, wilting, or otherwise don't meet freshness standards upon
               arrival.
             </span>
           </li>
-          <li className="flex gap-3">
-            <span className="font-semibold text-[#1F332E] min-w-fit">Wrong Items</span>
+          <li className="grid md:grid-cols-[170px_auto] gap-3">
+            <span className="font-semibold text-[#1F332E]">Wrong Items</span>
             <span>If you received flowers different from what you ordered.</span>
           </li>
-          <li className="flex gap-3">
-            <span className="font-semibold text-[#1F332E] min-w-fit">Insufficient Quantity</span>
+          <li className="grid md:grid-cols-[170px_auto] gap-3">
+            <span className="font-semibold text-[#1F332E]">Insufficient Quantity</span>
             <span>If your order was incomplete or under-counted.</span>
           </li>
         </ul>
       </section>
 
       <section className="space-y-4">
-        <h2 className="text-2xl font-semibold">How to Request a Return or Refund</h2>
+        <h2 className="text-2xl font-semibold font-serif">How to Request a Return or Refund</h2>
         <p className="text-base text-foreground leading-relaxed">
           If you're not satisfied with your order, contact us within{" "}
           <strong>24 hours of delivery</strong> with:
@@ -78,28 +78,28 @@ export default function ReturnsPage() {
       </section>
 
       <section className="space-y-4">
-        <h2 className="text-2xl font-semibold">Resolution Options</h2>
+        <h2 className="text-2xl font-semibold font-serif">Resolution Options</h2>
         <p className="text-base text-foreground leading-relaxed">
           When we confirm a valid return, we'll typically offer one of the following:
         </p>
-        <ul className="space-y-2 text-base text-foreground">
-          <li className="flex gap-3">
-            <span className="font-semibold text-[#1F332E] min-w-fit">Replacement</span>
+        <ul className="space-y-3 text-base text-foreground">
+          <li className="grid md:grid-cols-[170px_auto] gap-3">
+            <span className="font-semibold text-[#1F332E]">Replacement</span>
             <span>We'll prepare and send a replacement order at no additional cost.</span>
           </li>
-          <li className="flex gap-3">
-            <span className="font-semibold text-[#1F332E] min-w-fit">Full Refund</span>
+          <li className="grid md:grid-cols-[170px_auto] gap-3">
+            <span className="font-semibold text-[#1F332E]">Full Refund</span>
             <span>We'll refund the full purchase price to your original payment method.</span>
           </li>
-          <li className="flex gap-3">
-            <span className="font-semibold text-[#1F332E] min-w-fit">Account Credit</span>
+          <li className="grid md:grid-cols-[170px_auto] gap-3">
+            <span className="font-semibold text-[#1F332E]">Account Credit</span>
             <span>We'll apply a credit to your Peak Blooms account for future orders.</span>
           </li>
         </ul>
       </section>
 
       <section className="space-y-4">
-        <h2 className="text-2xl font-semibold">What Does NOT Qualify</h2>
+        <h2 className="text-2xl font-semibold font-serif">What Does NOT Qualify</h2>
         <p className="text-base text-foreground leading-relaxed">
           The following do not qualify for return or refund:
         </p>
@@ -117,7 +117,7 @@ export default function ReturnsPage() {
       </section>
 
       <section className="space-y-4">
-        <h2 className="text-2xl font-semibold">Order Modifications & Cancellations</h2>
+        <h2 className="text-2xl font-semibold font-serif">Order Modifications & Cancellations</h2>
         <p className="text-base text-foreground leading-relaxed">
           If you need to modify or cancel an order, contact us as soon as possible. Orders placed
           before 2pm can often be modified same-day. Once flowers have been cut and packed,
@@ -131,7 +131,7 @@ export default function ReturnsPage() {
       </section>
 
       <section className="space-y-4">
-        <h2 className="text-2xl font-semibold">Refund Timeline</h2>
+        <h2 className="text-2xl font-semibold font-serif">Refund Timeline</h2>
         <p className="text-base text-foreground leading-relaxed">
           Once we've confirmed your return, refunds are processed within 3-5 business days. The
           refund will be credited to your original payment method. Depending on your bank, the
@@ -140,7 +140,7 @@ export default function ReturnsPage() {
       </section>
 
       <section className="space-y-4 border-t border-border pt-8">
-        <h2 className="text-2xl font-semibold">Have Questions?</h2>
+        <h2 className="text-2xl font-semibold font-serif">Have Questions?</h2>
         <p className="text-base text-foreground">
           If you have concerns about a past order or questions about our return policy, reach out to
           our team at{" "}

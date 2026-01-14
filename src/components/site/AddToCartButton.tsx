@@ -41,7 +41,7 @@ export default function AddToCartButton({
 
         await addToCartAction({ productId, quantity: qty })
 
-        // Show success message — reflect the quantity when > 1
+        // Show success message - reflect the quantity when > 1
         if (qty > 1) {
           toast.success(
             productName ? `Added ${qty} × "${productName}" to cart!` : `Added ${qty} items to cart!`
