@@ -52,14 +52,14 @@ describe("Metrics Actions", () => {
       type: "QUERY" as const,
       name: "get_products",
       duration: 125,
-      timestamp: now,
+      createdAt: now,
     },
     {
       id: "metric-2",
       type: "QUERY" as const,
       name: "find_user",
       duration: 45,
-      timestamp: now,
+      createdAt: now,
     },
   ]
 

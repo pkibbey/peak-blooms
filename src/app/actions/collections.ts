@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache"
 import { ZodError } from "zod"
 import { getSession } from "@/lib/auth"
 import { db } from "@/lib/db"
+import type { CollectionBasic } from "@/lib/query-types"
 import {
   type CreateCollectionInput,
   createCollectionSchema,
@@ -17,7 +18,12 @@ import {
 
 export async function createCollectionAction(
   input: CreateCollectionInput
-): Promise<{ success: boolean; id: string }> {
+): Promise<
+  Pick<
+    CollectionBasic,
+    "id" | "name" | "slug" | "image" | "description" | "featured" | "createdAt" | "updatedAt"
+  >
+> {
   try {
     const { productIds, ...data } = createCollectionSchema.parse(input)
     const session = await getSession()
@@ -33,7 +39,7 @@ export async function createCollectionAction(
         description: data.description,
         featured: data.featured,
         productCollections: {
-          create: (productIds || []).map((productId: string) => ({
+          create: productIds.map((productId: string) => ({
             productId,
           })),
         },
@@ -41,7 +47,7 @@ export async function createCollectionAction(
     })
 
     revalidatePath("/admin/collections")
-    return { success: true, id: collection.id }
+    return collection
   } catch (error) {
     if (error instanceof ZodError) {
       throw new Error("Invalid collection data")
@@ -55,7 +61,12 @@ export async function createCollectionAction(
 
 export async function updateCollectionAction(
   input: UpdateCollectionInput
-): Promise<{ success: boolean; id: string }> {
+): Promise<
+  Pick<
+    CollectionBasic,
+    "id" | "name" | "slug" | "image" | "description" | "featured" | "createdAt" | "updatedAt"
+  >
+> {
   try {
     const { id, productIds, ...data } = updateCollectionSchema.parse(input)
     const session = await getSession()
@@ -71,20 +82,17 @@ export async function updateCollectionAction(
         image: data.image,
         description: data.description,
         featured: data.featured,
-        productCollections:
-          productIds !== undefined
-            ? {
-                deleteMany: {},
-                create: productIds.map((productId: string) => ({
-                  productId,
-                })),
-              }
-            : undefined,
+        productCollections: {
+          deleteMany: {},
+          create: productIds.map((productId: string) => ({
+            productId,
+          })),
+        },
       },
     })
 
     revalidatePath("/admin/collections")
-    return { success: true, id: collection.id }
+    return collection
   } catch (error) {
     if (error instanceof ZodError) {
       throw new Error("Invalid collection data")

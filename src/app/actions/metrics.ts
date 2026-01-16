@@ -1,9 +1,9 @@
 "use server"
 
 import { ZodError } from "zod"
+import type { Metric } from "@/generated/client"
 import { getSession } from "@/lib/auth"
 import { captureMetric, clearMetrics, getAllMetrics } from "@/lib/metrics"
-import type { Metric } from "@/lib/types/metrics"
 import { type RecordMetricInput, recordMetricSchema } from "@/lib/validations/metrics"
 
 /**

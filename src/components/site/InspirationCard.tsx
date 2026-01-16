@@ -3,10 +3,10 @@ import Link from "next/link"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { IconArrowRight } from "@/components/ui/icons"
-import type { InspirationModel } from "@/generated/models"
+import type { InspirationBasic } from "@/lib/query-types"
 
 interface InspirationCardProps {
-  inspiration: InspirationModel & {
+  inspiration: InspirationBasic & {
     _count?: {
       products: number
     }

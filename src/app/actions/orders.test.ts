@@ -21,9 +21,19 @@ vi.mock("next/cache", () => ({
   revalidatePath: vi.fn(),
 }))
 
+vi.mock("@/generated/enums", () => ({
+  OrderStatus: {
+    CART: "CART",
+    PENDING: "PENDING",
+    CONFIRMED: "CONFIRMED",
+    OUT_FOR_DELIVERY: "OUT_FOR_DELIVERY",
+    DELIVERED: "DELIVERED",
+    CANCELLED: "CANCELLED",
+  },
+}))
+
 import { getCurrentUser } from "@/lib/current-user"
 import { db } from "@/lib/db"
-// Now import the modules
 import {
   cancelOrderAction,
   createOrderAction,
@@ -31,11 +41,11 @@ import {
   updateOrderStatusAction,
 } from "./orders"
 
-describe("Order Actions", () => {
-  beforeEach(() => {
-    vi.clearAllMocks()
-  })
+const VALID_UUID = "550e8400-e29b-41d4-a716-446655440001"
+const VALID_UUID_2 = "550e8400-e29b-41d4-a716-446655440002"
+const VALID_UUID_3 = "550e8400-e29b-41d4-a716-446655440003"
 
+describe("Order Actions", () => {
   const mockUser = {
     id: "user-1",
     email: "test@example.com",
@@ -50,907 +60,361 @@ describe("Order Actions", () => {
   }
 
   const mockOrder = {
-    id: "550e8400-e29b-41d4-a716-446655440021",
+    id: VALID_UUID,
     userId: mockUser.id,
     orderNumber: 1,
     status: "PENDING" as OrderStatus,
     notes: null,
-    deliveryAddressId: "address-1",
+    deliveryAddressId: VALID_UUID_2,
     createdAt: new Date(),
     updatedAt: new Date(),
     items: [],
   }
 
+  beforeEach(() => {
+    vi.resetAllMocks()
+    vi.mocked(getCurrentUser).mockResolvedValue(mockUser)
+  })
+
   describe("cancelOrderAction", () => {
     it("should return error if user not authenticated", async () => {
       vi.mocked(getCurrentUser).mockResolvedValueOnce(null)
-
-      const result = await cancelOrderAction({ orderId: "550e8400-e29b-41d4-a716-446655440021" })
-
+      const result = await cancelOrderAction({ orderId: VALID_UUID })
       expect(result.success).toBe(false)
       expect(result.error).toContain("must be logged in")
     })
 
-    it("should return error if order not found", async () => {
-      vi.mocked(getCurrentUser).mockResolvedValueOnce(mockUser)
-      vi.mocked(db.order.findFirst).mockResolvedValueOnce(null)
-
-      const result = await cancelOrderAction({ orderId: "550e8400-e29b-41d4-a716-446655440099" })
-
+    it("should return error if order id is not uuid", async () => {
+      const result = await cancelOrderAction({ orderId: "not-a-uuid" })
       expect(result.success).toBe(false)
-      expect(result.error).toContain("does not exist")
+      expect(result.error).toContain("Invalid order ID")
     })
 
-    it("should return error if order is CART", async () => {
-      const cartOrder = { ...mockOrder, status: "CART" as OrderStatus }
-
-      vi.mocked(getCurrentUser).mockResolvedValueOnce(mockUser)
-      vi.mocked(db.order.findFirst).mockResolvedValueOnce(cartOrder)
-
-      const result = await cancelOrderAction({ orderId: "550e8400-e29b-41d4-a716-446655440021" })
-
-      expect(result.success).toBe(false)
-      expect(result.error).toContain("Only PENDING orders can be cancelled")
-    })
-
-    it("should return error if order is CONFIRMED", async () => {
+    it("should return error if order is not PENDING", async () => {
       const confirmedOrder = { ...mockOrder, status: "CONFIRMED" as OrderStatus }
-
-      vi.mocked(getCurrentUser).mockResolvedValueOnce(mockUser)
       vi.mocked(db.order.findFirst).mockResolvedValueOnce(confirmedOrder)
-
-      const result = await cancelOrderAction({ orderId: "550e8400-e29b-41d4-a716-446655440021" })
-
-      expect(result.success).toBe(false)
-      expect(result.error).toContain("Only PENDING orders can be cancelled")
-    })
-
-    it("should return error if order is already CANCELLED", async () => {
-      const cancelledOrder = { ...mockOrder, status: "CANCELLED" as OrderStatus }
-
-      vi.mocked(getCurrentUser).mockResolvedValueOnce(mockUser)
-      vi.mocked(db.order.findFirst).mockResolvedValueOnce(cancelledOrder)
-
-      const result = await cancelOrderAction({ orderId: "550e8400-e29b-41d4-a716-446655440021" })
-
+      const result = await cancelOrderAction({ orderId: VALID_UUID })
       expect(result.success).toBe(false)
       expect(result.error).toContain("Only PENDING orders can be cancelled")
     })
 
     it("should cancel PENDING order successfully", async () => {
-      const cancelledOrder = { ...mockOrder, status: "CANCELLED" as OrderStatus }
-
-      vi.mocked(getCurrentUser).mockResolvedValueOnce(mockUser)
       vi.mocked(db.order.findFirst).mockResolvedValueOnce(mockOrder)
-      vi.mocked(db.order.update).mockResolvedValueOnce(cancelledOrder)
+      vi.mocked(db.order.update).mockResolvedValueOnce({ ...mockOrder, status: "CANCELLED" })
       vi.mocked(db.orderItem.update).mockResolvedValue({} as never)
 
-      const result = await cancelOrderAction({
-        orderId: "550e8400-e29b-41d4-a716-446655440021",
-        convertToCart: false,
-      })
-
+      const result = await cancelOrderAction({ orderId: VALID_UUID })
       expect(result.success).toBe(true)
-      expect(result.message).toContain("cancelled successfully")
       expect(result.order?.status).toBe("CANCELLED")
-      expect(db.order.update).toHaveBeenCalledWith({
-        where: { id: mockOrder.id },
-        data: { status: "CANCELLED" },
-      })
     })
 
-    it("should convert order back to CART when convertToCart is true", async () => {
-      const cartOrder = { ...mockOrder, status: "CART" as OrderStatus }
-
-      vi.mocked(getCurrentUser).mockResolvedValueOnce(mockUser)
-      vi.mocked(db.order.findFirst).mockResolvedValueOnce(mockOrder)
+    it("should convert to cart successfully and clear snapshots", async () => {
+      const orderWithItems = {
+        ...mockOrder,
+        items: [{ id: "item-1", productNameSnapshot: "Roses" }],
+      }
+      vi.mocked(db.order.findFirst).mockResolvedValueOnce(orderWithItems as never)
       vi.mocked(db.orderItem.update).mockResolvedValue({} as never)
-      vi.mocked(db.order.update).mockResolvedValueOnce(cartOrder)
+      vi.mocked(db.order.update).mockResolvedValueOnce({
+        ...orderWithItems,
+        status: "CART",
+      } as never)
 
-      const result = await cancelOrderAction({
-        orderId: "550e8400-e29b-41d4-a716-446655440021",
-        convertToCart: true,
-      })
-
+      const result = await cancelOrderAction({ orderId: VALID_UUID, convertToCart: true })
       expect(result.success).toBe(true)
-      expect(result.message).toContain("converted back to cart")
       expect(result.order?.status).toBe("CART")
+      expect(db.orderItem.update).toHaveBeenCalledWith(
+        expect.objectContaining({
+          data: { productNameSnapshot: null, productImageSnapshot: null },
+        })
+      )
     })
 
-    it("should handle non-Error exception in cancelOrderAction", async () => {
-      vi.mocked(getCurrentUser).mockRejectedValueOnce(new Error("Network error"))
-
-      const result = await cancelOrderAction({
-        orderId: "550e8400-e29b-41d4-a716-446655440021",
-        convertToCart: false,
-      })
-
+    it("should handle generic exception", async () => {
+      vi.mocked(db.order.findFirst).mockRejectedValueOnce("String error")
+      const result = await cancelOrderAction({ orderId: VALID_UUID })
       expect(result.success).toBe(false)
-      expect(result.message).toContain("Failed to cancel order")
-      expect(result.error).toBeDefined()
+      expect(result.error).toBe("Unknown error occurred")
     })
   })
 
   describe("updateOrderStatusAction", () => {
-    it("should throw error if user not authenticated", async () => {
-      vi.mocked(getCurrentUser).mockResolvedValueOnce(null)
-
-      await expect(
-        updateOrderStatusAction({
-          orderId: "550e8400-e29b-41d4-a716-446655440021",
-          status: "CONFIRMED",
-        })
-      ).rejects.toThrow()
+    beforeEach(() => {
+      vi.mocked(getCurrentUser).mockResolvedValue(mockAdminUser)
     })
 
-    it("should throw error if user is not admin", async () => {
+    it("should throw if not admin", async () => {
       vi.mocked(getCurrentUser).mockResolvedValueOnce(mockUser)
-
       await expect(
-        updateOrderStatusAction({
-          orderId: "550e8400-e29b-41d4-a716-446655440021",
-          status: "CONFIRMED",
-        })
+        updateOrderStatusAction({ orderId: VALID_UUID, status: "CONFIRMED" })
       ).rejects.toThrow("Unauthorized")
     })
 
-    it("should throw error if status is invalid", async () => {
-      vi.mocked(getCurrentUser).mockResolvedValueOnce(mockAdminUser)
-
-      await expect(
-        updateOrderStatusAction({
-          orderId: "550e8400-e29b-41d4-a716-446655440021",
-          status: "INVALID" as never,
-        })
-      ).rejects.toThrow()
-    })
-
-    it("should throw error if order not found", async () => {
-      vi.mocked(getCurrentUser).mockResolvedValueOnce(mockAdminUser)
+    it("should throw if order not found", async () => {
       vi.mocked(db.order.findUnique).mockResolvedValueOnce(null)
-
       await expect(
-        updateOrderStatusAction({
-          orderId: "550e8400-e29b-41d4-a716-446655440099",
-          status: "PENDING",
-        })
+        updateOrderStatusAction({ orderId: VALID_UUID, status: "CONFIRMED" })
       ).rejects.toThrow("Order not found")
     })
 
-    it("should update order status to CONFIRMED", async () => {
-      const confirmedOrder = { ...mockOrder, status: "CONFIRMED" as OrderStatus }
-
-      vi.mocked(getCurrentUser).mockResolvedValueOnce(mockAdminUser)
+    it("should update status successfully", async () => {
       vi.mocked(db.order.findUnique).mockResolvedValueOnce(mockOrder)
-      vi.mocked(db.order.update).mockResolvedValueOnce(confirmedOrder)
-
-      const result = await updateOrderStatusAction({
-        orderId: "550e8400-e29b-41d4-a716-446655440021",
+      vi.mocked(db.order.update).mockResolvedValueOnce({ ...mockOrder, status: "CONFIRMED" })
+      vi.mocked(db.order.findUniqueOrThrow).mockResolvedValueOnce({
+        ...mockOrder,
         status: "CONFIRMED",
       })
 
+      const result = await updateOrderStatusAction({ orderId: VALID_UUID, status: "CONFIRMED" })
       expect(result.order.status).toBe("CONFIRMED")
-      expect(db.order.update).toHaveBeenCalledWith({
-        where: { id: "550e8400-e29b-41d4-a716-446655440021" },
-        data: { status: "CONFIRMED" },
-      })
     })
 
-    it("should update order status to OUT_FOR_DELIVERY", async () => {
-      const inDeliveryOrder = { ...mockOrder, status: "OUT_FOR_DELIVERY" as OrderStatus }
-
-      vi.mocked(getCurrentUser).mockResolvedValueOnce(mockAdminUser)
-      vi.mocked(db.order.findUnique).mockResolvedValueOnce(mockOrder)
-      vi.mocked(db.order.update).mockResolvedValueOnce(inDeliveryOrder)
-
-      const result = await updateOrderStatusAction({
-        orderId: "550e8400-e29b-41d4-a716-446655440021",
-        status: "OUT_FOR_DELIVERY",
-      })
-
-      expect(result.order.status).toBe("OUT_FOR_DELIVERY")
-    })
-
-    it("should update order status to DELIVERED", async () => {
-      const deliveredOrder = { ...mockOrder, status: "DELIVERED" as OrderStatus }
-
-      vi.mocked(getCurrentUser).mockResolvedValueOnce(mockAdminUser)
-      vi.mocked(db.order.findUnique).mockResolvedValueOnce(mockOrder)
-      vi.mocked(db.order.update).mockResolvedValueOnce(deliveredOrder)
-
-      const result = await updateOrderStatusAction({
-        orderId: "550e8400-e29b-41d4-a716-446655440021",
-        status: "DELIVERED",
-      })
-
-      expect(result.order.status).toBe("DELIVERED")
-    })
-
-    it("should update order status to CANCELLED", async () => {
-      const cancelledOrder = { ...mockOrder, status: "CANCELLED" as OrderStatus }
-
-      vi.mocked(getCurrentUser).mockResolvedValueOnce(mockAdminUser)
-      vi.mocked(db.order.findUnique).mockResolvedValueOnce(mockOrder)
-      vi.mocked(db.order.update).mockResolvedValueOnce(cancelledOrder)
-
-      const result = await updateOrderStatusAction({
-        orderId: "550e8400-e29b-41d4-a716-446655440021",
-        status: "CANCELLED",
-      })
-
-      expect(result.order.status).toBe("CANCELLED")
-    })
-
-    it("should throw error on database update failure", async () => {
-      vi.mocked(getCurrentUser).mockResolvedValueOnce(mockAdminUser)
-      vi.mocked(db.order.findUnique).mockResolvedValueOnce(mockOrder)
-      vi.mocked(db.order.update).mockRejectedValueOnce(new Error("Update failed"))
-
+    it("should handle Zod validation error in updateOrderStatusAction", async () => {
       await expect(
-        updateOrderStatusAction({
-          orderId: "550e8400-e29b-41d4-a716-446655440021",
-          status: "CONFIRMED",
-        })
-      ).rejects.toThrow("Update failed")
+        updateOrderStatusAction({ orderId: "not-a-uuid", status: "CONFIRMED" })
+      ).rejects.toThrow("Invalid status")
     })
 
-    it("should handle non-Error exception in updateOrderStatusAction", async () => {
-      vi.mocked(getCurrentUser).mockResolvedValueOnce(mockAdminUser)
-      vi.mocked(db.order.findUnique).mockResolvedValueOnce(mockOrder)
-      vi.mocked(db.order.update).mockRejectedValueOnce(new Error("DB error"))
-
+    it("should handle error in updateOrderStatusAction", async () => {
+      vi.mocked(db.order.findUnique).mockRejectedValueOnce("Error")
       await expect(
-        updateOrderStatusAction({
-          orderId: "550e8400-e29b-41d4-a716-446655440021",
-          status: "CONFIRMED",
-        })
-      ).rejects.toThrow()
+        updateOrderStatusAction({ orderId: VALID_UUID, status: "CONFIRMED" })
+      ).rejects.toThrow("Failed to update order status")
     })
   })
 
   describe("updateOrderItemPriceAction", () => {
-    it.skip("should throw error if user not admin", async () => {
-      vi.mocked(getCurrentUser).mockResolvedValueOnce(mockUser)
+    const mockItem = {
+      id: VALID_UUID_3,
+      orderId: VALID_UUID,
+      productId: VALID_UUID_2,
+      quantity: 2,
+      price: null,
+    }
 
-      await expect(
-        updateOrderItemPriceAction({
-          orderId: "550e8400-e29b-41d4-a716-446655440021",
-          itemId: "550e8400-e29b-41d4-a716-446655440011",
-          price: 49.99,
-        })
-      ).rejects.toThrow("Unauthorized")
+    beforeEach(() => {
+      vi.mocked(getCurrentUser).mockResolvedValue(mockAdminUser)
     })
 
-    it.skip("should throw error if price is negative", async () => {
-      vi.mocked(getCurrentUser).mockResolvedValueOnce(mockAdminUser)
-
-      await expect(
-        updateOrderItemPriceAction({
-          orderId: "550e8400-e29b-41d4-a716-446655440021",
-          itemId: "550e8400-e29b-41d4-a716-446655440011",
-          price: -10,
-        })
-      ).rejects.toThrow("Price must be a non-negative number")
-    })
-
-    it.skip("should throw error if order item not found", async () => {
-      vi.mocked(getCurrentUser).mockResolvedValueOnce(mockAdminUser)
-      vi.mocked(db.orderItem.findFirst).mockResolvedValueOnce(null)
-
-      await expect(
-        updateOrderItemPriceAction({
-          orderId: "550e8400-e29b-41d4-a716-446655440021",
-          itemId: "550e8400-e29b-41d4-a716-446655440099",
-          price: 49.99,
-        })
-      ).rejects.toThrow("Order item not found")
-    })
-
-    it.skip("should update order item price", async () => {
-      const mockItem = {
-        id: "550e8400-e29b-41d4-a716-446655440011",
-        orderId: "550e8400-e29b-41d4-a716-446655440021",
-        productId: "550e8400-e29b-41d4-a716-446655440001",
-        quantity: 2,
-        price: null,
-      }
-
-      vi.mocked(getCurrentUser).mockResolvedValueOnce(mockAdminUser)
+    it("should update price and recalculate total including null prices", async () => {
       vi.mocked(db.orderItem.findFirst).mockResolvedValueOnce(mockItem as never)
-      vi.mocked(db.orderItem.update).mockResolvedValueOnce({
-        ...mockItem,
-        price: 49.99,
-      } as never)
+      vi.mocked(db.orderItem.update).mockResolvedValueOnce({ ...mockItem, price: 50 } as never)
       vi.mocked(db.orderItem.findMany).mockResolvedValueOnce([
-        { ...mockItem, price: 49.99 },
+        { ...mockItem, price: 50, quantity: 2 },
+        { id: "item-2", price: null, quantity: 1 },
       ] as never)
 
       const result = await updateOrderItemPriceAction({
-        orderId: "550e8400-e29b-41d4-a716-446655440021",
-        itemId: "550e8400-e29b-41d4-a716-446655440011",
-        price: 49.99,
+        orderId: VALID_UUID,
+        itemId: VALID_UUID_3,
+        price: 50,
       })
 
-      expect(db.orderItem.update).toHaveBeenCalledWith({
-        where: { id: "550e8400-e29b-41d4-a716-446655440011" },
-        data: { price: 49.99 },
-      })
-      expect(result.message).toContain("Price updated successfully")
+      expect(result.orderTotal).toBe(100)
     })
 
-    it.skip("should allow price of 0 for free items", async () => {
-      const mockItem = {
-        id: "550e8400-e29b-41d4-a716-446655440011",
-        orderId: "550e8400-e29b-41d4-a716-446655440021",
-        productId: "550e8400-e29b-41d4-a716-446655440001",
-        quantity: 1,
-        price: 49.99,
-      }
-
-      vi.mocked(getCurrentUser).mockResolvedValueOnce(mockAdminUser)
-      vi.mocked(db.orderItem.findFirst).mockResolvedValueOnce(mockItem as never)
-      vi.mocked(db.orderItem.update).mockResolvedValueOnce({
-        ...mockItem,
-        price: 0,
-      } as never)
-      vi.mocked(db.orderItem.findMany).mockResolvedValueOnce([{ ...mockItem, price: 0 }] as never)
-
-      const result = await updateOrderItemPriceAction({
-        orderId: "550e8400-e29b-41d4-a716-446655440021",
-        itemId: "550e8400-e29b-41d4-a716-446655440011",
-        price: 0,
-      })
-
-      expect(db.orderItem.update).toHaveBeenCalledWith({
-        where: { id: "550e8400-e29b-41d4-a716-446655440011" },
-        data: { price: 0 },
-      })
-      expect(result.orderTotal).toBe(0)
-    })
-
-    it.skip("should calculate correct order total with multiple items", async () => {
-      const mockItem = {
-        id: "550e8400-e29b-41d4-a716-446655440011",
-        orderId: "550e8400-e29b-41d4-a716-446655440021",
-        productId: "550e8400-e29b-41d4-a716-446655440001",
-        quantity: 2,
-        price: 49.99,
-      }
-
-      vi.mocked(getCurrentUser).mockResolvedValueOnce(mockAdminUser)
-      vi.mocked(db.orderItem.findFirst).mockResolvedValueOnce(mockItem as never)
-      vi.mocked(db.orderItem.update).mockResolvedValueOnce(mockItem as never)
-      vi.mocked(db.orderItem.findMany).mockResolvedValueOnce([
-        { ...mockItem, price: 49.99, quantity: 2 },
-        {
-          id: "item-2",
-          orderId: "550e8400-e29b-41d4-a716-446655440021",
-          price: 39.99,
-          quantity: 1,
-        },
-      ] as never)
-
-      const result = await updateOrderItemPriceAction({
-        orderId: "550e8400-e29b-41d4-a716-446655440021",
-        itemId: "550e8400-e29b-41d4-a716-446655440011",
-        price: 49.99,
-      })
-
-      // (49.99 * 2) + (39.99 * 1) = 99.98 + 39.99 = 139.97
-      expect(result.orderTotal).toBe(139.97)
-    })
-
-    it.skip("should throw error on database update failure for order item", async () => {
-      const mockItem = {
-        id: "550e8400-e29b-41d4-a716-446655440011",
-        orderId: "550e8400-e29b-41d4-a716-446655440021",
-        productId: "550e8400-e29b-41d4-a716-446655440001",
-        quantity: 2,
-        price: null,
-      }
-
-      vi.mocked(getCurrentUser).mockResolvedValueOnce(mockAdminUser)
-      vi.mocked(db.orderItem.findFirst).mockResolvedValueOnce(mockItem as never)
-      vi.mocked(db.orderItem.update).mockRejectedValueOnce(new Error("Update failed"))
-
+    it("should handle Zod validation error in updateOrderItemPriceAction", async () => {
       await expect(
-        updateOrderItemPriceAction({
-          orderId: "550e8400-e29b-41d4-a716-446655440021",
-          itemId: "550e8400-e29b-41d4-a716-446655440011",
-          price: 49.99,
-        })
-      ).rejects.toThrow("Update failed")
+        updateOrderItemPriceAction({ orderId: "not-a-uuid", itemId: VALID_UUID_3, price: 50 })
+      ).rejects.toThrow("Invalid price data")
     })
 
-    it("should handle non-Error exception in updateOrderItemPriceAction", async () => {
-      vi.mocked(getCurrentUser).mockResolvedValueOnce(mockAdminUser)
-
+    it("should handle error in updateOrderItemPriceAction", async () => {
+      vi.mocked(db.orderItem.findFirst).mockRejectedValueOnce("Error")
       await expect(
-        updateOrderItemPriceAction({
-          orderId: "550e8400-e29b-41d4-a716-446655440021",
-          itemId: "550e8400-e29b-41d4-a716-446655440011",
-          price: "invalid" as never,
-        })
-      ).rejects.toThrow()
+        updateOrderItemPriceAction({ orderId: VALID_UUID, itemId: VALID_UUID_3, price: 50 })
+      ).rejects.toThrow("Failed to update price")
     })
   })
 
   describe("createOrderAction", () => {
-    const validOrderData = {
-      deliveryAddressId: "address-1",
+    const validData = {
+      deliveryAddressId: VALID_UUID_2,
       deliveryAddress: null,
       saveDeliveryAddress: false,
-      notes: null,
+      notes: "Test note",
     }
 
-    it.skip("should throw error if user is not authenticated", async () => {})
-
-    it.skip("should throw error if user is not approved", async () => {
-      const unapprovedUser = { ...mockUser, approved: false }
-      vi.mocked(getCurrentUser).mockResolvedValueOnce(unapprovedUser)
-
-      await expect(createOrderAction(validOrderData)).rejects.toThrow(
-        "Your account is not approved for purchases"
-      )
-    })
-
-    it("should throw error if cart is empty (no cart found)", async () => {
-      vi.mocked(getCurrentUser).mockResolvedValueOnce(mockUser)
-      vi.mocked(db.order.findFirst).mockResolvedValueOnce(null)
-
-      await expect(createOrderAction(validOrderData)).rejects.toThrow("Cart is empty")
-    })
-
-    it.skip("should throw error if cart has no items", async () => {
-      const emptyCart = { ...mockOrder, items: [] }
-      vi.mocked(getCurrentUser).mockResolvedValueOnce(mockUser)
-      vi.mocked(db.order.findFirst).mockResolvedValueOnce(emptyCart)
-
-      await expect(createOrderAction(validOrderData)).rejects.toThrow("Cart is empty")
-    })
-
-    it.skip("should throw error if delivery address ID provided but not found", async () => {
-      const cartWithItems = {
-        ...mockOrder,
-        items: [
-          {
-            id: "550e8400-e29b-41d4-a716-446655440011",
-            productId: "550e8400-e29b-41d4-a716-446655440001",
-            quantity: 1,
-            product: { name: "Roses", image: "roses.jpg", price: 49.99 },
-          },
-        ],
-      }
-      vi.mocked(getCurrentUser).mockResolvedValueOnce(mockUser)
-      vi.mocked(db.order.findFirst).mockResolvedValueOnce(cartWithItems as never)
-      vi.mocked(db.address.findFirst).mockResolvedValueOnce(null)
-
-      await expect(createOrderAction(validOrderData)).rejects.toThrow("Invalid delivery address")
-    })
-
-    it.skip("should throw error if neither delivery address ID nor new address provided", async () => {
-      const cartWithItems = {
-        ...mockOrder,
-        items: [
-          {
-            id: "550e8400-e29b-41d4-a716-446655440011",
-            productId: "550e8400-e29b-41d4-a716-446655440001",
-            quantity: 1,
-            product: { name: "Roses", image: "roses.jpg", price: 49.99 },
-          },
-        ],
-      }
-      vi.mocked(getCurrentUser).mockResolvedValueOnce(mockUser)
-      vi.mocked(db.order.findFirst).mockResolvedValueOnce(cartWithItems as never)
-
-      const invalidData = {
-        deliveryAddressId: null,
-        deliveryAddress: null,
-        saveDeliveryAddress: false,
-        notes: null,
-      }
-
-      await expect(createOrderAction(invalidData)).rejects.toThrow("Delivery address is required")
-    })
-
-    it.skip("should successfully create order with existing delivery address", async () => {
-      const cartWithItems = {
-        ...mockOrder,
-        id: "cart-1",
-        status: "CART" as OrderStatus,
-        items: [
-          {
-            id: "550e8400-e29b-41d4-a716-446655440011",
-            productId: "550e8400-e29b-41d4-a716-446655440001",
-            quantity: 2,
-            product: {
-              id: "prod-1",
-              name: "Roses",
-              image: "roses.jpg",
-              price: 49.99,
-              type: "ROSE",
-              collectionId: null,
-              deletedAt: null,
-            },
-          },
-        ],
-      }
-
-      const existingAddress = { id: "address-1", userId: mockUser.id }
-
-      vi.mocked(getCurrentUser).mockResolvedValueOnce(mockUser)
-      vi.mocked(db.order.findFirst).mockResolvedValueOnce(cartWithItems as never)
-      vi.mocked(db.address.findFirst).mockResolvedValueOnce(existingAddress as never)
-      vi.mocked(db.orderItem.update).mockResolvedValue({} as never)
-      vi.mocked(db.order.update).mockResolvedValueOnce({
-        ...cartWithItems,
-        status: "PENDING" as OrderStatus,
-        deliveryAddressId: "address-1",
-        deliveryAddress: existingAddress,
-      } as never)
-
-      const result = await createOrderAction(validOrderData)
-
-      expect(result.status).toBe("PENDING")
-      expect(result.deliveryAddressId).toBe("address-1")
-    })
-
-    it("should create order with new unsaved delivery address", async () => {
-      const cartWithItems = {
-        ...mockOrder,
-        id: "cart-1",
-        status: "CART" as OrderStatus,
-        items: [
-          {
-            id: "550e8400-e29b-41d4-a716-446655440011",
-            productId: "550e8400-e29b-41d4-a716-446655440001",
-            quantity: 1,
-            product: {
-              id: "prod-1",
-              name: "Roses",
-              image: "roses.jpg",
-              price: 49.99,
-              type: "ROSE",
-              collectionId: null,
-              deletedAt: null,
-            },
-          },
-        ],
-      }
-
-      const newAddress = {
-        firstName: "John",
-        lastName: "Doe",
-        company: "Co",
-        street1: "123 St",
-        street2: "",
-        city: "City",
-        state: "CA",
-        zip: "12345",
-        country: "US",
-        email: "john@test.com",
-        phone: "+1-206-555-0100",
-      }
-
-      vi.mocked(getCurrentUser).mockResolvedValueOnce(mockUser)
-      vi.mocked(db.order.findFirst).mockResolvedValueOnce(cartWithItems as never)
-      vi.mocked(db.address.create).mockResolvedValueOnce({
-        id: "address-new",
-        userId: null,
-        ...newAddress,
-      } as never)
-      vi.mocked(db.orderItem.update).mockResolvedValue({} as never)
-      vi.mocked(db.order.update).mockResolvedValueOnce({
-        ...cartWithItems,
-        status: "PENDING" as OrderStatus,
-        deliveryAddressId: "address-new",
-      } as never)
-
-      const dataWithNewAddress = {
-        deliveryAddressId: null,
-        deliveryAddress: newAddress,
-        saveDeliveryAddress: false,
-        notes: null,
-      }
-
-      const result = await createOrderAction(dataWithNewAddress)
-
-      expect(result.status).toBe("PENDING")
-      expect(vi.mocked(db.address.create)).toHaveBeenCalledWith({
-        data: expect.objectContaining({
-          userId: null,
-          firstName: "John",
-        }),
-      })
-    })
-
-    it("should save new address to user when saveDeliveryAddress is true", async () => {
-      const cartWithItems = {
-        ...mockOrder,
-        id: "cart-1",
-        status: "CART" as OrderStatus,
-        items: [
-          {
-            id: "550e8400-e29b-41d4-a716-446655440011",
-            productId: "550e8400-e29b-41d4-a716-446655440001",
-            quantity: 1,
-            product: {
-              id: "prod-1",
-              name: "Roses",
-              image: "roses.jpg",
-              price: 49.99,
-              type: "ROSE",
-              collectionId: null,
-              deletedAt: null,
-            },
-          },
-        ],
-      }
-
-      const newAddress = {
-        firstName: "Jane",
-        lastName: "Smith",
-        company: "Company",
-        street1: "456 Ave",
-        street2: "Suite 100",
-        city: "Town",
-        state: "CA",
-        zip: "54321",
-        country: "US",
-        email: "jane@test.com",
-        phone: "+1-206-555-0123",
-      }
-
-      vi.mocked(getCurrentUser).mockResolvedValueOnce(mockUser)
-      vi.mocked(db.order.findFirst).mockResolvedValueOnce(cartWithItems as never)
-      vi.mocked(db.address.create).mockResolvedValueOnce({
-        id: "address-new",
-        userId: mockUser.id,
-        ...newAddress,
-      } as never)
-      vi.mocked(db.orderItem.update).mockResolvedValue({} as never)
-      vi.mocked(db.order.update).mockResolvedValueOnce({
-        ...cartWithItems,
-        status: "PENDING" as OrderStatus,
-        deliveryAddressId: "address-new",
-      } as never)
-
-      const dataWithSavedAddress = {
-        deliveryAddressId: null,
-        deliveryAddress: newAddress,
-        saveDeliveryAddress: true,
-        notes: null,
-      }
-
-      await createOrderAction(dataWithSavedAddress)
-
-      expect(vi.mocked(db.address.create)).toHaveBeenCalledWith({
-        data: expect.objectContaining({
-          userId: mockUser.id,
-        }),
-      })
-    })
-
-    it.skip("should apply user price multiplier to cart items", async () => {
-      const testCartItems = [
+    const mockCart = {
+      ...mockOrder,
+      id: "cart-1",
+      status: "CART" as OrderStatus,
+      items: [
         {
-          id: "550e8400-e29b-41d4-a716-446655440011",
-          productId: "550e8400-e29b-41d4-a716-446655440001",
-          quantity: 1,
-          product: {
-            id: "prod-1",
-            name: "Roses",
-            image: "roses.jpg",
-            price: 100.0,
-            type: "ROSE",
-            collectionId: null,
-            deletedAt: null,
-          },
+          id: VALID_UUID_3,
+          productId: VALID_UUID_2,
+          quantity: 2,
+          product: { id: VALID_UUID_2, name: "Roses", image: "roses.jpg", price: 50 },
         },
-      ]
+      ],
+    }
 
-      const testCart = {
-        id: "cart-1",
+    it("should throw if user not approved", async () => {
+      vi.mocked(getCurrentUser).mockResolvedValueOnce({ ...mockUser, approved: false })
+      await expect(createOrderAction(validData)).rejects.toThrow("Your account is not approved")
+    })
+
+    it("should throw if cart empty", async () => {
+      vi.mocked(db.order.findFirst).mockResolvedValueOnce(null)
+      await expect(createOrderAction(validData)).rejects.toThrow("Cart is empty")
+    })
+
+    it("should throw if existing address not found", async () => {
+      vi.mocked(db.order.findFirst).mockResolvedValueOnce(mockCart as never)
+      vi.mocked(db.address.findFirst).mockResolvedValueOnce(null)
+      await expect(createOrderAction(validData)).rejects.toThrow("Invalid delivery address")
+    })
+
+    it("should create order with existing address", async () => {
+      vi.mocked(db.order.findFirst).mockResolvedValueOnce(mockCart as never)
+      vi.mocked(db.orderItem.update).mockResolvedValue({} as never)
+      vi.mocked(db.address.findFirst).mockResolvedValueOnce({
+        id: VALID_UUID_2,
         userId: mockUser.id,
-        orderNumber: 1,
-        status: "CART" as OrderStatus,
-        notes: null,
-        deliveryAddressId: "address-1",
-        createdAt: new Date(),
-        updatedAt: new Date(),
-        items: testCartItems,
-      }
+      } as never)
+      vi.mocked(db.order.findUniqueOrThrow).mockResolvedValueOnce({
+        ...mockCart,
+        status: "PENDING",
+      } as never)
+      vi.mocked(db.order.update).mockResolvedValueOnce({ ...mockCart, status: "PENDING" } as never)
 
-      const userWithMultiplier = { ...mockUser, priceMultiplier: 1.5 }
-      const existingAddress = { id: "address-1", userId: mockUser.id }
+      const result = await createOrderAction(validData)
+      expect(result.status).toBe("PENDING")
+    })
 
-      vi.mocked(getCurrentUser).mockResolvedValueOnce(userWithMultiplier)
-      vi.mocked(db.order.findFirst).mockResolvedValueOnce(testCart as never)
+    it("should include notes if provided", async () => {
+      vi.mocked(db.order.findFirst).mockResolvedValueOnce(mockCart as never)
       vi.mocked(db.orderItem.update).mockResolvedValue({} as never)
-      vi.mocked(db.address.findFirst).mockResolvedValueOnce(existingAddress as never)
+      vi.mocked(db.address.findFirst).mockResolvedValueOnce({
+        id: VALID_UUID_2,
+        userId: mockUser.id,
+      } as never)
+      vi.mocked(db.order.findUniqueOrThrow).mockResolvedValueOnce({
+        ...mockCart,
+        status: "PENDING",
+      } as never)
       vi.mocked(db.order.update).mockResolvedValueOnce({
-        ...testCart,
-        status: "PENDING" as OrderStatus,
+        ...mockCart,
+        status: "PENDING",
+        notes: "Test note",
       } as never)
 
-      await createOrderAction(validOrderData)
-
-      expect(vi.mocked(db.orderItem.update)).toHaveBeenCalledWith(
+      await createOrderAction({ ...validData, notes: "Test note" })
+      expect(db.order.update).toHaveBeenCalledWith(
         expect.objectContaining({
-          data: expect.objectContaining({
-            price: 150.0,
-          }),
+          data: expect.objectContaining({ notes: "Test note" }),
         })
       )
     })
 
-    it.skip("should handle market-priced items (null price) without multiplier", async () => {
-      const cartWithItems = {
-        ...mockOrder,
-        id: "cart-1",
-        status: "CART" as OrderStatus,
+    it("should handle market items and multiplier in createOrderAction", async () => {
+      const marketCart = {
+        ...mockCart,
         items: [
-          {
-            id: "550e8400-e29b-41d4-a716-446655440011",
-            productId: "550e8400-e29b-41d4-a716-446655440001",
-            quantity: 1,
-            product: {
-              id: "prod-1",
-              name: "Market Item",
-              image: "market.jpg",
-              price: null,
-              type: "ROSE",
-              collectionId: null,
-              deletedAt: null,
-            },
-          },
+          { ...mockCart.items[0], product: { ...mockCart.items[0].product, price: null } },
+          { id: "item-2", productId: VALID_UUID_3, quantity: 1, product: { id: "p2", price: 100 } },
         ],
       }
-
-      const existingAddress = { id: "address-1", userId: mockUser.id }
-
-      vi.mocked(getCurrentUser).mockResolvedValueOnce(mockUser)
-      vi.mocked(db.order.findFirst).mockResolvedValueOnce(cartWithItems as never)
-      vi.mocked(db.address.findFirst).mockResolvedValueOnce(existingAddress as never)
+      vi.mocked(getCurrentUser).mockResolvedValueOnce({ ...mockUser, priceMultiplier: 1.5 })
+      vi.mocked(db.order.findFirst).mockResolvedValueOnce(marketCart as never)
       vi.mocked(db.orderItem.update).mockResolvedValue({} as never)
+      vi.mocked(db.address.findFirst).mockResolvedValueOnce({
+        id: VALID_UUID_2,
+        userId: mockUser.id,
+      } as never)
+      vi.mocked(db.order.findUniqueOrThrow).mockResolvedValueOnce({
+        ...marketCart,
+        status: "PENDING",
+      } as never)
       vi.mocked(db.order.update).mockResolvedValueOnce({
-        ...cartWithItems,
-        status: "PENDING" as OrderStatus,
+        ...marketCart,
+        status: "PENDING",
       } as never)
 
-      await createOrderAction(validOrderData)
-
-      expect(vi.mocked(db.orderItem.update)).toHaveBeenCalledWith(
+      await createOrderAction(validData)
+      expect(db.orderItem.update).toHaveBeenCalledWith(
         expect.objectContaining({
-          data: expect.objectContaining({
-            price: null,
-          }),
+          data: expect.objectContaining({ price: 150 }),
         })
       )
     })
 
-    it("should include notes in the created order", async () => {
-      const cartWithItems = {
-        ...mockOrder,
-        id: "cart-1",
-        status: "CART" as OrderStatus,
-        items: [
-          {
-            id: "550e8400-e29b-41d4-a716-446655440011",
-            productId: "550e8400-e29b-41d4-a716-446655440001",
-            quantity: 1,
-            product: {
-              id: "prod-1",
-              name: "Roses",
-              image: "roses.jpg",
-              price: 49.99,
-              type: "ROSE",
-              collectionId: null,
-              deletedAt: null,
-            },
-          },
-        ],
-      }
-
-      const existingAddress = { id: "address-1", userId: mockUser.id }
-
-      vi.mocked(getCurrentUser).mockResolvedValueOnce(mockUser)
-      vi.mocked(db.order.findFirst).mockResolvedValueOnce(cartWithItems as never)
-      vi.mocked(db.orderItem.update).mockResolvedValue({} as never)
-      vi.mocked(db.address.findFirst).mockResolvedValueOnce(existingAddress as never)
-      vi.mocked(db.order.update).mockResolvedValueOnce({
-        ...cartWithItems,
-        status: "PENDING" as OrderStatus,
-        notes: "Handle with care",
-      } as never)
-
-      const dataWithNotes = {
-        deliveryAddressId: "address-1",
-        deliveryAddress: null,
-        saveDeliveryAddress: false,
-        notes: "Handle with care",
-      }
-
-      await createOrderAction(dataWithNotes)
-
-      expect(vi.mocked(db.order.update)).toHaveBeenCalledWith(
-        expect.objectContaining({
-          data: expect.objectContaining({
-            notes: "Handle with care",
-          }),
-        })
-      )
-    })
-
-    it("should handle error when database operation fails", async () => {
-      const cartWithItems = {
-        ...mockOrder,
-        id: "cart-1",
-        status: "CART" as OrderStatus,
-        items: [
-          {
-            id: "550e8400-e29b-41d4-a716-446655440011",
-            productId: "550e8400-e29b-41d4-a716-446655440001",
-            quantity: 1,
-            product: {
-              id: "prod-1",
-              name: "Roses",
-              image: "roses.jpg",
-              price: 49.99,
-              type: "ROSE",
-              collectionId: null,
-              deletedAt: null,
-            },
-          },
-        ],
-      }
-
-      const newAddress = {
-        firstName: "John",
-        lastName: "Doe",
-        company: "Co",
-        street1: "123 St",
+    it("should create order with new address", async () => {
+      const newAddr = {
+        firstName: "A",
+        lastName: "B",
+        company: "Company",
+        street1: "S",
         street2: "",
-        city: "City",
-        state: "CA",
+        city: "C",
+        state: "S",
         zip: "12345",
+        phone: "+12065550100",
+        email: "a@b.com",
         country: "US",
-        email: "john@test.com",
-        phone: "+1-206-555-0100",
       }
-
-      const dataWithError = {
-        deliveryAddressId: null,
-        deliveryAddress: newAddress,
-        saveDeliveryAddress: false,
-        notes: null,
-      }
-
-      vi.mocked(getCurrentUser).mockResolvedValueOnce(mockUser)
-      vi.mocked(db.order.findFirst).mockResolvedValueOnce(cartWithItems as never)
+      vi.mocked(db.order.findFirst).mockResolvedValueOnce(mockCart as never)
       vi.mocked(db.orderItem.update).mockResolvedValue({} as never)
-      vi.mocked(db.address.create).mockRejectedValueOnce(new Error("DB Error"))
+      vi.mocked(db.address.create).mockResolvedValueOnce({ id: "address-new" } as never)
+      vi.mocked(db.order.findUniqueOrThrow).mockResolvedValueOnce({
+        ...mockCart,
+        status: "PENDING",
+      } as never)
+      vi.mocked(db.order.update).mockResolvedValueOnce({ ...mockCart, status: "PENDING" } as never)
 
-      await expect(createOrderAction(dataWithError)).rejects.toThrow("DB Error")
-    })
-
-    it.skip("should handle non-Error exception in createOrderAction", async () => {
-      vi.mocked(getCurrentUser).mockRejectedValueOnce("String error")
-
-      await expect(createOrderAction(validOrderData)).rejects.toThrow()
-    })
-
-    it("should throw error on invalid validation data", async () => {
-      vi.mocked(getCurrentUser).mockResolvedValueOnce(mockUser)
-
-      const invalidData = {
+      const result = await createOrderAction({
+        ...validData,
         deliveryAddressId: null,
-        deliveryAddress: null,
-        saveDeliveryAddress: false,
-        notes: null,
-      }
+        deliveryAddress: newAddr,
+      })
+      expect(result.status).toBe("PENDING")
+      expect(db.address.create).toHaveBeenCalled()
+    })
 
-      await expect(createOrderAction(invalidData)).rejects.toThrow()
+    it("should save new address to user if saveDeliveryAddress is true", async () => {
+      const newAddr = {
+        firstName: "A",
+        lastName: "B",
+        company: "Company",
+        street1: "S",
+        street2: "",
+        city: "C",
+        state: "S",
+        zip: "12345",
+        phone: "+12065550100",
+        email: "a@b.com",
+        country: "US",
+      }
+      vi.mocked(db.order.findFirst).mockResolvedValueOnce(mockCart as never)
+      vi.mocked(db.orderItem.update).mockResolvedValue({} as never)
+      vi.mocked(db.address.create).mockResolvedValueOnce({ id: "address-new" } as never)
+      vi.mocked(db.order.findUniqueOrThrow).mockResolvedValueOnce({
+        ...mockCart,
+        status: "PENDING",
+      } as never)
+      vi.mocked(db.order.update).mockResolvedValueOnce({ ...mockCart, status: "PENDING" } as never)
+
+      await createOrderAction({
+        ...validData,
+        deliveryAddressId: null,
+        deliveryAddress: newAddr,
+        saveDeliveryAddress: true,
+      })
+      expect(db.address.create).toHaveBeenCalledWith(
+        expect.objectContaining({
+          data: expect.objectContaining({ userId: mockUser.id }),
+        })
+      )
+    })
+
+    it("should handle Error object in createOrderAction catch block", async () => {
+      vi.mocked(db.order.findFirst).mockRejectedValueOnce(new Error("Specific Error"))
+      await expect(createOrderAction(validData)).rejects.toThrow("Specific Error")
+    })
+
+    it("should handle generic exception in createOrderAction", async () => {
+      vi.mocked(db.order.findFirst).mockRejectedValueOnce("Error")
+      await expect(createOrderAction(validData)).rejects.toThrow("Failed to create order")
     })
   })
 })

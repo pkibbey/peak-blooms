@@ -5,7 +5,7 @@
 
 import { db } from "@/lib/db"
 import { adjustPrice } from "@/lib/utils"
-import type { CollectionBasicWithCount, CollectionWithProducts } from "../types/collections"
+import type { CollectionBasic, CollectionWithProducts } from "../query-types"
 import { withTiming } from "./logger"
 
 /**
@@ -30,7 +30,7 @@ function applyMultiplierToCollection(
 /**
  * Get all collections (basic info only, no products)
  */
-export async function getAllCollections(): Promise<CollectionBasicWithCount[]> {
+export async function getAllCollections(): Promise<CollectionBasic[]> {
   return withTiming("getAllCollections", {}, async () => {
     return db.collection.findMany({
       orderBy: { name: "asc" },
@@ -42,7 +42,7 @@ export async function getAllCollections(): Promise<CollectionBasicWithCount[]> {
 /**
  * Get featured collections (basic info only, no products)
  */
-export async function getFeaturedCollections(): Promise<CollectionBasicWithCount[]> {
+export async function getFeaturedCollections(): Promise<CollectionBasic[]> {
   return withTiming("getFeaturedCollections", {}, async () => {
     return db.collection.findMany({
       where: { featured: true },

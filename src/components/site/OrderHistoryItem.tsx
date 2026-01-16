@@ -4,7 +4,7 @@ import Link from "next/link"
 import { type OrderStatus, OrderStatusBadge } from "@/components/site/OrderStatusBadge"
 import ReorderButton from "@/components/site/ReorderButton"
 import { calculateCartTotal } from "@/lib/cart-utils"
-import type { OrderWithItems } from "@/lib/types/orders"
+import type { OrderWithItems } from "@/lib/query-types"
 import { formatDate, formatPrice } from "@/lib/utils"
 
 /**

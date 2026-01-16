@@ -21,6 +21,7 @@ import type {
   AddressGetPayload,
   CollectionGetPayload,
   InspirationGetPayload,
+  MetricGetPayload,
   OrderGetPayload,
   OrderItemGetPayload,
   ProductGetPayload,
@@ -55,33 +56,16 @@ export type UserFull = UserGetPayload<{
  * UserForAdmin: User data safe for admin display (excludes email verification state)
  * Use when: Admin listings, user management tables
  */
-export type UserForAdmin = UserGetPayload<{
-  select: {
-    id: true
-    email: true
-    name: true
-    role: true
-    approved: true
-    priceMultiplier: true
-    createdAt: true
-  }
-}>
+export type UserForAdmin = Omit<UserFull, "emailVerified" | "image" | "phone" | "updatedAt">
 
 /**
  * UserForProfile: User data safe for public/profile display
  * Use when: User profile pages, session data that appears in UI
  */
-export type UserForProfile = UserGetPayload<{
-  select: {
-    id: true
-    email: true
-    name: true
-    image: true
-    role: true
-    approved: true
-    createdAt: true
-  }
-}>
+export type UserForProfile = Omit<
+  UserFull,
+  "emailVerified" | "phone" | "priceMultiplier" | "updatedAt"
+>
 
 /**
  * SessionUser: Minimal user data derived from UserForProfile for session storage
@@ -91,18 +75,10 @@ export type UserForProfile = UserGetPayload<{
  * Use when: Session storage, component props, cached user data
  * Note: This type is automatically synced with User schema changes through UserForProfile
  */
-export type SessionUser = {
-  id: string
-  email: string
-  name?: string | null
-  image?: string | null
-  role?: string
-  approved?: boolean
-  priceMultiplier?: number
-  createdAt?: Date
-  emailVerified?: boolean
-  updatedAt?: Date
-}
+export type SessionUser = Pick<UserFull, "id" | "email"> &
+  Partial<Omit<UserFull, "id" | "email" | "phone" | "role">> & {
+    role?: string
+  }
 
 /**
  * UserWithAddresses: User with their saved addresses
@@ -136,15 +112,7 @@ export type ProductFull = ProductGetPayload<{
  * ProductWithCollections: Product with collection associations
  * Use when: Product listings, category filtering, product cards
  */
-export type ProductWithCollections = ProductGetPayload<{
-  include: {
-    productCollections: {
-      include: {
-        collection: true
-      }
-    }
-  }
-}>
+export type ProductWithCollections = ProductFull
 
 /**
  * ProductBasic: Minimal product data (no relations)
@@ -199,30 +167,14 @@ export type OrderWithItems = OrderGetPayload<{
  * OrderWithItemsAndProducts: Full order with items and their product snapshots
  * Use when: Order detail pages, order confirmation, invoice generation
  */
-export type OrderWithItemsAndProducts = OrderGetPayload<{
-  include: {
-    items: {
-      include: {
-        product: true
-      }
-    }
-  }
-}>
+export type OrderWithItemsAndProducts = OrderWithItems
 
 /**
  * CartWithItems: Order in "CART" status with items and product details
  * Use when: Shopping cart view, cart modification, cart totals calculation
  * NOTE: This is an Order filtered by status: "CART"; type represents structure only
  */
-export type CartWithItems = OrderGetPayload<{
-  include: {
-    items: {
-      include: {
-        product: true
-      }
-    }
-  }
-}>
+export type CartWithItems = OrderWithItems
 
 /**
  * CartWithItemsAndUser: Full cart with items, products, AND user info
@@ -259,6 +211,19 @@ export type OrderItemWithOrder = OrderItemGetPayload<{
   }
 }>
 
+/**
+ * OrdersWithCount: Orders with user, delivery address, items with product prices, and item count
+ * Use when: Admin order listings, order tables with pagination metadata
+ */
+export type OrdersWithCount = OrderGetPayload<{
+  include: {
+    user: { select: { id: true; email: true; name: true } }
+    deliveryAddress: { select: { email: true } }
+    items: { include: { product: { select: { price: true } } } }
+    _count: { select: { items: true } }
+  }
+}>
+
 // =============================================================================
 // ADDRESS TYPES
 // =============================================================================
@@ -288,10 +253,18 @@ export type CollectionWithProducts = CollectionGetPayload<{
 }>
 
 /**
- * CollectionBasic: Minimal collection data (no product relations)
- * Use when: Collection references, collection lists, navigation
+ * CollectionBasic: Collection with product count
+ * Use when: Collection listings, admin tables, collection cards
  */
-export type CollectionBasic = CollectionGetPayload<true>
+export type CollectionBasic = CollectionGetPayload<{
+  include: {
+    _count: {
+      select: {
+        productCollections: true
+      }
+    }
+  }
+}>
 
 // =============================================================================
 // INSPIRATION TYPES
@@ -315,7 +288,22 @@ export type InspirationWithProducts = InspirationGetPayload<{
  * InspirationBasic: Minimal inspiration data (no product relations)
  * Use when: Inspiration listings, navigation, thumbnails
  */
-export type InspirationBasic = InspirationGetPayload<true>
+export type InspirationBasic = InspirationGetPayload<{
+  include: {
+    _count: {
+      select: {
+        products: true
+      }
+    }
+  }
+}>
+
+/**
+ * InspirationForResponse: Core inspiration fields for API/action responses
+ * Use when: Returning inspiration from create/update operations without product relations
+ */
+export type InspirationForResponse = Omit<InspirationGetPayload<true>, "products">
+
 // =============================================================================
 // RESPONSE TYPES FOR SERVER ACTIONS
 // =============================================================================
@@ -325,11 +313,55 @@ export type InspirationBasic = InspirationGetPayload<true>
  * Includes the cart with adjusted items and calculated total
  * Used by cart action functions to return consistent cart data
  */
-export interface CartResponse {
-  id: string
-  orderNumber: number | null
-  status: string
-  notes: string | null
+export type CartResponse = Pick<
+  OrderGetPayload<true>,
+  "id" | "orderNumber" | "status" | "notes"
+> & {
   items: CartItemData[]
   total: number
 }
+
+// =============================================================================
+// METRICS TYPES
+// =============================================================================
+
+/**
+ * Metric: Individual metric record
+ * Use when: Tracking performance metrics, recording query durations
+ */
+export type Metric = Omit<MetricGetPayload<true>, "id" | "createdAt">
+
+// =============================================================================
+// SEARCH & RESPONSE TYPES FOR SERVER ACTIONS
+// =============================================================================
+
+/**
+ * SearchProductsResult: Search results containing product summaries
+ * Use when: Returning search results from searchProducts action
+ */
+export type SearchProductsResult = {
+  products: Array<Pick<ProductBasic, "id" | "name" | "slug" | "image" | "price">>
+}
+
+/**
+ * CancelOrderResponse: Response from cancelOrderAction
+ * Use when: Canceling orders with optional cart conversion
+ */
+export type CancelOrderResponse = {
+  success: boolean
+  message: string
+  order?: OrderWithItems
+  error?: string
+}
+
+/**
+ * UserProfileResponse: User profile data returned from profile operations
+ * Use when: Updating or fetching user profile information
+ */
+export type UserProfileResponse = UserForProfile
+
+/**
+ * AdminUserResponse: User data for admin operations
+ * Use when: Admin user management (approve, unapprove, update multiplier)
+ */
+export type AdminUserResponse = UserForAdmin

@@ -1,8 +1,8 @@
 import { InspirationCard } from "@/components/site/InspirationCard"
-import type { InspirationModel } from "@/generated/models"
+import type { InspirationBasic } from "@/lib/query-types"
 
 interface InspirationJoin {
-  inspiration: InspirationModel & {
+  inspiration: InspirationBasic & {
     _count?: { products: number }
   }
 }
@@ -22,7 +22,7 @@ export function FeaturedInInspirations({ inspirations }: FeaturedInInspirationsP
       acc.push(isp.inspiration)
     }
     return acc
-  }, [] as InspirationModel[])
+  }, [] as InspirationBasic[])
 
   return (
     <div className="mt-12 pt-8">

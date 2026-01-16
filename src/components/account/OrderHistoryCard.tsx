@@ -5,7 +5,7 @@ import Link from "next/link"
 import OrderHistoryItem from "@/components/site/OrderHistoryItem"
 import { Button } from "@/components/ui/button"
 import { IconPackage } from "@/components/ui/icons"
-import type { OrderWithItems } from "@/lib/types/orders"
+import type { OrderWithItems } from "@/lib/query-types"
 
 /**
  * OrderHistoryCardProps - Uses generated types with items and products

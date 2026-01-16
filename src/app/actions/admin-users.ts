@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache"
 import { headers } from "next/headers"
 import { auth, invalidateUserSessions } from "@/lib/auth"
 import { db } from "@/lib/db"
+import type { AdminUserResponse } from "@/lib/query-types"
 import {
   type ApproveUserInput,
   approveUserSchema,
@@ -14,16 +15,6 @@ import {
   unapproveUserSchema,
   updateUserPriceMultiplierSchema,
 } from "@/lib/validations/auth"
-
-type AdminUserResponse = {
-  id: string
-  email: string
-  name: string | null
-  role: string
-  approved: boolean
-  priceMultiplier: number
-  createdAt: Date
-}
 
 /**
  * Approve a user (admin only)

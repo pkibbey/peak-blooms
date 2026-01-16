@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache"
 import type { Address } from "@/generated/client"
 import { getSession } from "@/lib/auth"
 import { db } from "@/lib/db"
+import type { UserProfileResponse } from "@/lib/query-types"
 import {
   type AddressFormData,
   addressSchema,
@@ -11,16 +12,6 @@ import {
   deleteAddressSchema,
 } from "@/lib/validations/address"
 import { type ProfileFormData, profileSchema } from "@/lib/validations/auth"
-
-type UserProfileResponse = {
-  id: string
-  email: string
-  name: string | null
-  image: string | null
-  role: string
-  approved: boolean
-  createdAt: Date
-}
 
 /**
  * Update current user's profile (name only)

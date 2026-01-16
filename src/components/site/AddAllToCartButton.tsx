@@ -7,7 +7,7 @@ import { toast } from "sonner"
 import { batchAddToCartAction } from "@/app/actions/cart"
 import { Button } from "@/components/ui/button"
 import { useSession } from "@/lib/auth-client"
-import type { SessionUser } from "@/lib/types/users"
+import type { SessionUser } from "@/lib/query-types"
 
 interface AddAllToCartButtonProps {
   productIds: string[]

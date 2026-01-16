@@ -5,26 +5,15 @@ import { useRouter } from "next/navigation"
 import { useState } from "react"
 import { toast } from "sonner"
 import { clearCartAction, removeFromCartAction, updateCartItemAction } from "@/app/actions/cart"
-import { CartItem, type CartItemData } from "@/components/site/CartItem"
+import { CartItem } from "@/components/site/CartItem"
 import EmptyState from "@/components/site/EmptyState"
 import { MarketPriceIndicator } from "@/components/site/MarketPriceIndicator"
 import { MarketPriceWarning } from "@/components/site/MarketPriceWarning"
 import { Button } from "@/components/ui/button"
 import { IconShoppingBag } from "@/components/ui/icons"
-import type { OrderModel } from "@/generated/models"
 import { calculateCartTotal } from "@/lib/cart-utils"
 import type { CartResponse } from "@/lib/query-types"
 import { useDebouncedCallback } from "@/lib/useDebouncedCallback"
-
-/**
- * CartData - Omits FK and timestamp fields not needed in UI
- * Represents an Order with status = 'CART' and its items
- * Total should be calculated from items using calculateCartTotal()
- */
-export interface CartData
-  extends Omit<OrderModel, "userId" | "deliveryAddressId" | "createdAt" | "updatedAt"> {
-  items: CartItemData[]
-}
 
 interface CartProps {
   initialCart: CartResponse

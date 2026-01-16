@@ -2,10 +2,10 @@ import Image from "next/image"
 import Link from "next/link"
 import { SortableTableHead } from "@/components/ui/SortableTableHead"
 import { Table, TableBody, TableCell, TableHeader, TableRow } from "@/components/ui/table"
-import type { InspirationWithCount } from "@/lib/types/inspirations"
+import type { InspirationBasic } from "@/lib/query-types"
 
 interface InspirationsTableProps {
-  inspirations: InspirationWithCount[]
+  inspirations: InspirationBasic[]
   sort?: string | null
   order?: "asc" | "desc" | null
 }

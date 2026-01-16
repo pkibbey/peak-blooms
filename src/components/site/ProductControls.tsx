@@ -6,7 +6,7 @@ import AddToCartButton from "@/components/site/AddToCartButton"
 import { Button } from "@/components/ui/button"
 import { QuantityStepper } from "@/components/ui/QuantityStepper"
 import type { ProductModel } from "@/generated/models"
-import type { SessionUser } from "@/lib/types/users"
+import type { SessionUser } from "@/lib/query-types"
 import { cn, formatPrice } from "@/lib/utils"
 
 interface ProductControlsProps {
@@ -34,26 +34,24 @@ export function ProductControls({ product, user, mode = "card" }: ProductControl
 
       {/* Unapproved User CTA - Show on detail page only */}
       {isSignedIn && !isApproved && mode === "detail" && (
-        <div className="flex flex-col gap-4">
-          <Button
-            nativeButton={false}
-            render={
-              <Link prefetch={false} href="/auth/signin">
-                Sign in to view pricing and purchase
-              </Link>
-            }
-          />
-        </div>
+        <Button
+          nativeButton={false}
+          render={
+            <Link prefetch={false} href="/auth/signin">
+              Sign in for pricing
+            </Link>
+          }
+        />
       )}
 
       {/* Sign in Button */}
       {!isSignedIn && (
         <Button
           nativeButton={false}
-          variant="outline"
+          // variant="outline"
           render={
             <Link prefetch={false} href="/auth/signin">
-              Sign in to view pricing
+              Sign in for pricing
             </Link>
           }
         />

@@ -4,7 +4,7 @@ import { useState } from "react"
 import AddAllToCartButton from "@/components/site/AddAllToCartButton"
 import { ProductItem } from "@/components/site/ProductItem"
 import type { ProductModel } from "@/generated/models"
-import type { SessionUser } from "@/lib/types/users"
+import type { SessionUser } from "@/lib/query-types"
 
 type DisplayableProduct = ProductModel & { quantity: number }
 

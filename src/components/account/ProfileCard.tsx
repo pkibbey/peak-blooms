@@ -1,5 +1,5 @@
 import ProfileForm from "@/components/site/ProfileForm"
-import type { SessionUser } from "@/lib/types/users"
+import type { SessionUser } from "@/lib/query-types"
 
 interface ProfileCardProps {
   user: SessionUser

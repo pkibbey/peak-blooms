@@ -1,6 +1,6 @@
 import { SortableTableHead } from "@/components/ui/SortableTableHead"
 import { Table, TableBody, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import type { ProductWithCollections } from "@/lib/types/products"
+import type { ProductWithCollections } from "@/lib/query-types"
 import ProductsTableRow from "./ProductsTableRow"
 
 interface ProductsTableProps {

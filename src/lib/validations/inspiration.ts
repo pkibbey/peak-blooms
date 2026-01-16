@@ -1,4 +1,5 @@
 import { z } from "zod"
+import type { InspirationUncheckedCreateInput } from "@/generated/models"
 
 const productSelectionSchema = z.object({
   productId: z.string().min(1, "Product is required"),
@@ -21,13 +22,19 @@ export type InspirationFormData = z.infer<typeof inspirationSchema>
 // Inspiration operation schemas for API requests
 export const createInspirationSchema = inspirationSchema
 
-export type CreateInspirationInput = z.infer<typeof createInspirationSchema>
+export type CreateInspirationInput = Omit<
+  InspirationUncheckedCreateInput,
+  "products" | "createdAt" | "updatedAt"
+> & { productSelections: ProductSelection[] }
 
 export const updateInspirationSchema = inspirationSchema.extend({
   id: z.string().uuid("Invalid inspiration ID"),
 })
 
-export type UpdateInspirationInput = z.infer<typeof updateInspirationSchema>
+export type UpdateInspirationInput = Omit<
+  InspirationUncheckedCreateInput,
+  "products" | "createdAt" | "updatedAt"
+> & { id: string; productSelections: ProductSelection[] }
 
 export const deleteInspirationSchema = z.object({
   id: z.string().uuid("Invalid inspiration ID"),

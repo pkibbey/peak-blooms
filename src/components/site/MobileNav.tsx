@@ -9,7 +9,7 @@ import SignOutButton from "@/components/site/SignOutButton"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { IconMenu, IconSettings, IconShoppingCart, IconUser } from "@/components/ui/icons"
-import type { SessionUser } from "@/lib/types/users"
+import type { SessionUser } from "@/lib/query-types"
 
 type LinkItem = { label: string; href: string }
 

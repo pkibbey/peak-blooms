@@ -7,11 +7,11 @@ import { deleteAddressAction, updateAddressAction } from "@/app/actions/user-act
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { IconEdit, IconStar, IconTrash } from "@/components/ui/icons"
-import type { AddressModel } from "@/generated/models"
+import type { AddressFull } from "@/lib/query-types"
 
 interface AddressCardProps {
-  address: AddressModel
-  onEdit: (address: AddressModel) => void
+  address: AddressFull
+  onEdit: (address: AddressFull) => void
 }
 
 export default function AddressCard({ address, onEdit }: AddressCardProps) {

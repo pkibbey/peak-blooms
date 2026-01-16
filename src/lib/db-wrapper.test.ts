@@ -10,6 +10,7 @@ vi.mock("@/lib/metrics", () => ({
   captureMetric: vi.fn().mockResolvedValue(undefined),
 }))
 
+import type { Role } from "@/generated/enums"
 import { db } from "@/lib/db"
 import { captureMetric } from "@/lib/metrics"
 import { createTrackedDb } from "./db-wrapper"
@@ -96,8 +97,7 @@ describe("Database Wrapper", () => {
         createdAt: new Date(),
         updatedAt: new Date(),
         approved: false,
-        // biome-ignore lint/suspicious/noExplicitAny: Role enum cast for test mock
-        role: "USER" as any,
+        role: "CUSTOMER" as Role,
         priceMultiplier: 1,
       }
 
@@ -125,8 +125,7 @@ describe("Database Wrapper", () => {
         image: "rose.jpg",
         price: 25,
         colors: ["red"],
-        // biome-ignore lint/suspicious/noExplicitAny: Product type enum cast for test mock
-        productType: "FLOWER" as any,
+        productType: "FLOWER",
         featured: true,
         deletedAt: null,
         createdAt: new Date(),
@@ -239,7 +238,6 @@ describe("Database Wrapper", () => {
 
       // Simulate a delay
       vi.mocked(db.product.findMany).mockImplementation(
-        // biome-ignore lint/suspicious/noExplicitAny: Mock promise with generic type for test
         () => new Promise<any>((resolve) => setTimeout(() => resolve([]), 50)) as any
       )
 
@@ -346,8 +344,7 @@ describe("Database Wrapper", () => {
           image: "test.jpg",
           price: 100,
           colors: [],
-          // biome-ignore lint/suspicious/noExplicitAny: Product type enum cast for test mock
-          productType: "FLOWER" as any,
+          productType: "FLOWER",
           featured: false,
           deletedAt: null,
           createdAt: new Date(),
@@ -362,8 +359,7 @@ describe("Database Wrapper", () => {
           image: "test.jpg",
           price: 100,
           colors: [],
-          // biome-ignore lint/suspicious/noExplicitAny: Product type enum cast for test mock
-          productType: "FLOWER" as any,
+          productType: "FLOWER",
           featured: false,
           deletedAt: null,
           createdAt: new Date(),
@@ -402,12 +398,14 @@ describe("Database Wrapper", () => {
       if (!vi.mocked(db.order.aggregate)) {
         vi.mocked(db).order.aggregate = vi.fn().mockResolvedValueOnce({
           _count: { id: 10 },
-          // biome-ignore lint/suspicious/noExplicitAny: Aggregate result partial mock for test
         } as any)
       } else {
         vi.mocked(db.order.aggregate).mockResolvedValueOnce({
           _count: { id: 10 },
-          // biome-ignore lint/suspicious/noExplicitAny: Aggregate result partial mock for test
+          _avg: { orderNumber: 10 },
+          _sum: { orderNumber: 10 },
+          _min: { orderNumber: 10 },
+          _max: { orderNumber: 10 },
         } as any)
       }
 

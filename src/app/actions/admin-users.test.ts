@@ -39,6 +39,7 @@ import {
 describe("Admin User Actions", () => {
   beforeEach(() => {
     vi.clearAllMocks()
+    vi.mocked(auth.api.getSession).mockReset()
   })
 
   const now = new Date()
@@ -107,7 +108,7 @@ describe("Admin User Actions", () => {
 
   describe("approveUserAction", () => {
     it("should approve user successfully", async () => {
-      vi.mocked(auth.api.getSession).mockResolvedValueOnce(mockAdminSession)
+      vi.mocked(auth.api.getSession).mockResolvedValue(mockAdminSession)
       vi.mocked(db.user.update).mockResolvedValueOnce({ ...mockUser, approved: true })
 
       const result = await approveUserAction({ userId: "550e8400-e29b-41d4-a716-446655440003" })
@@ -121,7 +122,7 @@ describe("Admin User Actions", () => {
     })
 
     it("should invalidate session for other users", async () => {
-      vi.mocked(auth.api.getSession).mockResolvedValueOnce(mockAdminSession)
+      vi.mocked(auth.api.getSession).mockResolvedValue(mockAdminSession)
       vi.mocked(db.user.update).mockResolvedValueOnce({ ...mockUser, approved: true })
 
       await approveUserAction({ userId: "550e8400-e29b-41d4-a716-446655440003" })
@@ -130,7 +131,7 @@ describe("Admin User Actions", () => {
     })
 
     it("should not invalidate session if approving self", async () => {
-      vi.mocked(auth.api.getSession).mockResolvedValueOnce(mockAdminSession)
+      vi.mocked(auth.api.getSession).mockResolvedValue(mockAdminSession)
       vi.mocked(db.user.update).mockResolvedValueOnce({
         ...mockAdminSession.user,
         approved: true,
@@ -141,22 +142,28 @@ describe("Admin User Actions", () => {
       expect(invalidateUserSessions).not.toHaveBeenCalled()
     })
 
+    it("should throw error on invalid input (ZodError)", async () => {
+      await expect(approveUserAction({ userId: "invalid-uuid" })).rejects.toThrow(
+        "User ID must be a valid UUID"
+      )
+    })
+
     it("should throw error if not admin", async () => {
-      vi.mocked(auth.api.getSession).mockResolvedValueOnce(mockUserSession)
+      vi.mocked(auth.api.getSession).mockResolvedValue(mockUserSession)
       await expect(
         approveUserAction({ userId: "550e8400-e29b-41d4-a716-446655440003" })
       ).rejects.toThrow("Unauthorized")
     })
 
     it("should throw error if no session", async () => {
-      vi.mocked(auth.api.getSession).mockResolvedValueOnce(null)
+      vi.mocked(auth.api.getSession).mockResolvedValue(null)
       await expect(
         approveUserAction({ userId: "550e8400-e29b-41d4-a716-446655440003" })
       ).rejects.toThrow("Unauthorized")
     })
 
     it("should throw custom error on db failure", async () => {
-      vi.mocked(auth.api.getSession).mockResolvedValueOnce(mockAdminSession)
+      vi.mocked(auth.api.getSession).mockResolvedValue(mockAdminSession)
       vi.mocked(db.user.update).mockRejectedValueOnce(new Error("DB Error"))
       await expect(
         approveUserAction({ userId: "550e8400-e29b-41d4-a716-446655440003" })
@@ -164,7 +171,7 @@ describe("Admin User Actions", () => {
     })
 
     it("should throw generic error on non-Error exception", async () => {
-      vi.mocked(auth.api.getSession).mockResolvedValueOnce(mockAdminSession)
+      vi.mocked(auth.api.getSession).mockResolvedValue(mockAdminSession)
       vi.mocked(db.user.update).mockRejectedValueOnce("String error")
       await expect(
         approveUserAction({ userId: "550e8400-e29b-41d4-a716-446655440003" })
@@ -174,7 +181,7 @@ describe("Admin User Actions", () => {
 
   describe("unapproveUserAction", () => {
     it("should unapprove user successfully", async () => {
-      vi.mocked(auth.api.getSession).mockResolvedValueOnce(mockAdminSession)
+      vi.mocked(auth.api.getSession).mockResolvedValue(mockAdminSession)
       vi.mocked(db.user.update).mockResolvedValueOnce({ ...mockUser, approved: false })
 
       const result = await unapproveUserAction({ userId: "550e8400-e29b-41d4-a716-446655440003" })
@@ -188,7 +195,7 @@ describe("Admin User Actions", () => {
     })
 
     it("should invalidate sessions for other users", async () => {
-      vi.mocked(auth.api.getSession).mockResolvedValueOnce(mockAdminSession)
+      vi.mocked(auth.api.getSession).mockResolvedValue(mockAdminSession)
       vi.mocked(db.user.update).mockResolvedValueOnce({ ...mockUser, approved: false })
 
       await unapproveUserAction({ userId: "550e8400-e29b-41d4-a716-446655440003" })
@@ -196,22 +203,40 @@ describe("Admin User Actions", () => {
       expect(invalidateUserSessions).toHaveBeenCalledWith("550e8400-e29b-41d4-a716-446655440003")
     })
 
+    it("should not invalidate session if unapproving self", async () => {
+      vi.mocked(auth.api.getSession).mockResolvedValue(mockAdminSession)
+      vi.mocked(db.user.update).mockResolvedValueOnce({
+        ...mockAdminSession.user,
+        approved: false,
+      })
+
+      await unapproveUserAction({ userId: "550e8400-e29b-41d4-a716-446655440001" })
+
+      expect(invalidateUserSessions).not.toHaveBeenCalled()
+    })
+
+    it("should throw error on invalid input (ZodError)", async () => {
+      await expect(unapproveUserAction({ userId: "invalid-uuid" })).rejects.toThrow(
+        "User ID must be a valid UUID"
+      )
+    })
+
     it("should throw error if not admin", async () => {
-      vi.mocked(auth.api.getSession).mockResolvedValueOnce(mockUserSession)
+      vi.mocked(auth.api.getSession).mockResolvedValue(mockUserSession)
       await expect(
         unapproveUserAction({ userId: "550e8400-e29b-41d4-a716-446655440003" })
       ).rejects.toThrow("Unauthorized")
     })
 
     it("should throw error if no session", async () => {
-      vi.mocked(auth.api.getSession).mockResolvedValueOnce(null)
+      vi.mocked(auth.api.getSession).mockResolvedValue(null)
       await expect(
         unapproveUserAction({ userId: "550e8400-e29b-41d4-a716-446655440003" })
       ).rejects.toThrow("Unauthorized")
     })
 
     it("should throw custom error message on db failure", async () => {
-      vi.mocked(auth.api.getSession).mockResolvedValueOnce(mockAdminSession)
+      vi.mocked(auth.api.getSession).mockResolvedValue(mockAdminSession)
       vi.mocked(db.user.update).mockRejectedValueOnce(new Error("DB Error"))
       await expect(
         unapproveUserAction({ userId: "550e8400-e29b-41d4-a716-446655440003" })
@@ -219,7 +244,7 @@ describe("Admin User Actions", () => {
     })
 
     it("should fallback to generic error message", async () => {
-      vi.mocked(auth.api.getSession).mockResolvedValueOnce(mockAdminSession)
+      vi.mocked(auth.api.getSession).mockResolvedValue(mockAdminSession)
       vi.mocked(db.user.update).mockRejectedValueOnce("String Error")
       await expect(
         unapproveUserAction({ userId: "550e8400-e29b-41d4-a716-446655440003" })
@@ -229,7 +254,7 @@ describe("Admin User Actions", () => {
 
   describe("updateUserPriceMultiplierAction", () => {
     it("should update multiplier if valid", async () => {
-      vi.mocked(auth.api.getSession).mockResolvedValueOnce(mockAdminSession)
+      vi.mocked(auth.api.getSession).mockResolvedValue(mockAdminSession)
       vi.mocked(db.user.update).mockResolvedValueOnce({ ...mockUser, priceMultiplier: 1.5 })
 
       const result = await updateUserPriceMultiplierAction({
@@ -246,7 +271,7 @@ describe("Admin User Actions", () => {
     })
 
     it("should invalidate sessions for other users", async () => {
-      vi.mocked(auth.api.getSession).mockResolvedValueOnce(mockAdminSession)
+      vi.mocked(auth.api.getSession).mockResolvedValue(mockAdminSession)
       vi.mocked(db.user.update).mockResolvedValueOnce({ ...mockUser, priceMultiplier: 1.5 })
 
       await updateUserPriceMultiplierAction({
@@ -258,7 +283,7 @@ describe("Admin User Actions", () => {
     })
 
     it("should not invalidate session for self", async () => {
-      vi.mocked(auth.api.getSession).mockResolvedValueOnce(mockAdminSession)
+      vi.mocked(auth.api.getSession).mockResolvedValue(mockAdminSession)
       vi.mocked(db.user.update).mockResolvedValueOnce({
         ...mockAdminSession.user,
         priceMultiplier: 1.5,
@@ -272,8 +297,17 @@ describe("Admin User Actions", () => {
       expect(invalidateUserSessions).not.toHaveBeenCalled()
     })
 
+    it("should throw error on invalid input (ZodError)", async () => {
+      await expect(
+        updateUserPriceMultiplierAction({
+          userId: "invalid-uuid",
+          multiplier: 1.0,
+        })
+      ).rejects.toThrow("User ID must be a valid UUID")
+    })
+
     it("should throw error if multiplier too low", async () => {
-      vi.mocked(auth.api.getSession).mockResolvedValueOnce(mockAdminSession)
+      vi.mocked(auth.api.getSession).mockResolvedValue(mockAdminSession)
       await expect(
         updateUserPriceMultiplierAction({
           userId: "550e8400-e29b-41d4-a716-446655440003",
@@ -283,7 +317,7 @@ describe("Admin User Actions", () => {
     })
 
     it("should throw error if multiplier too high", async () => {
-      vi.mocked(auth.api.getSession).mockResolvedValueOnce(mockAdminSession)
+      vi.mocked(auth.api.getSession).mockResolvedValue(mockAdminSession)
       await expect(
         updateUserPriceMultiplierAction({
           userId: "550e8400-e29b-41d4-a716-446655440003",
@@ -292,11 +326,47 @@ describe("Admin User Actions", () => {
       ).rejects.toThrow("Price multiplier cannot exceed 2.0")
     })
 
-    it.todo("should throw error if not admin")
+    it("should throw error if not admin", async () => {
+      vi.mocked(auth.api.getSession).mockResolvedValue(mockUserSession)
+      await expect(
+        updateUserPriceMultiplierAction({
+          userId: "550e8400-e29b-41d4-a716-446655440003",
+          multiplier: 1.0,
+        })
+      ).rejects.toThrow("Unauthorized")
+    })
 
-    it.todo("should throw error if no session")
+    it("should throw error if no session", async () => {
+      vi.mocked(auth.api.getSession).mockResolvedValue(null)
+      await expect(
+        updateUserPriceMultiplierAction({
+          userId: "550e8400-e29b-41d4-a716-446655440003",
+          multiplier: 1.0,
+        })
+      ).rejects.toThrow("Unauthorized")
+    })
 
-    it.todo("should throw custom error on db failure")
+    it("should throw custom error on db failure", async () => {
+      vi.mocked(auth.api.getSession).mockResolvedValue(mockAdminSession)
+      vi.mocked(db.user.update).mockRejectedValueOnce(new Error("DB Error"))
+      await expect(
+        updateUserPriceMultiplierAction({
+          userId: "550e8400-e29b-41d4-a716-446655440003",
+          multiplier: 1.0,
+        })
+      ).rejects.toThrow("DB Error")
+    })
+
+    it("should throw generic error on non-Error exception", async () => {
+      vi.mocked(auth.api.getSession).mockResolvedValue(mockAdminSession)
+      vi.mocked(db.user.update).mockRejectedValueOnce("String error")
+      await expect(
+        updateUserPriceMultiplierAction({
+          userId: "550e8400-e29b-41d4-a716-446655440003",
+          multiplier: 1.0,
+        })
+      ).rejects.toThrow("Failed to update price multiplier")
+    })
   })
 
   describe("createUserAction", () => {
@@ -311,10 +381,33 @@ describe("Admin User Actions", () => {
       image: null,
     }
 
-    it.todo("should create user if admin")
+    it("should create user if admin", async () => {
+      vi.mocked(auth.api.getSession).mockResolvedValue(mockAdminSession)
+      vi.mocked(db.user.findUnique).mockResolvedValueOnce(null)
+      vi.mocked(db.user.create).mockResolvedValueOnce({
+        ...userData,
+        id: "new-1",
+        createdAt: now,
+        updatedAt: now,
+      })
+
+      const result = await createUserAction(userData)
+
+      expect(result.email).toBe(userData.email)
+      expect(db.user.create).toHaveBeenCalledWith({
+        data: {
+          email: userData.email,
+          name: userData.name,
+          role: userData.role,
+          approved: userData.approved,
+          priceMultiplier: userData.priceMultiplier,
+        },
+        select: expect.any(Object),
+      })
+    })
 
     it("should check if email exists before creating", async () => {
-      vi.mocked(auth.api.getSession).mockResolvedValueOnce(mockAdminSession)
+      vi.mocked(auth.api.getSession).mockResolvedValue(mockAdminSession)
       vi.mocked(db.user.findUnique).mockResolvedValueOnce(null)
       vi.mocked(db.user.create).mockResolvedValueOnce({
         ...userData,
@@ -330,34 +423,51 @@ describe("Admin User Actions", () => {
       })
     })
 
-    it.todo("should throw error if email already exists")
+    it("should throw error if email already exists", async () => {
+      vi.mocked(auth.api.getSession).mockResolvedValue(mockAdminSession)
+      vi.mocked(db.user.findUnique).mockResolvedValueOnce(mockUser)
+
+      await expect(createUserAction(userData)).rejects.toThrow("Email already exists")
+    })
+
+    it("should throw error on invalid input (ZodError)", async () => {
+      await expect(createUserAction({ ...userData, email: "invalid-email" })).rejects.toThrow(
+        "Must be a valid email address"
+      )
+    })
 
     it("should throw error if multiplier invalid during creation", async () => {
-      vi.mocked(auth.api.getSession).mockResolvedValueOnce(mockAdminSession)
+      vi.mocked(auth.api.getSession).mockResolvedValue(mockAdminSession)
       vi.mocked(db.user.findUnique).mockResolvedValueOnce(null)
       await expect(createUserAction({ ...userData, priceMultiplier: 0.1 })).rejects.toThrow(
         "Price multiplier must be at least 0.5"
       )
     })
 
-    it.todo("should throw error if not admin")
+    it("should throw error if not admin", async () => {
+      vi.mocked(auth.api.getSession).mockResolvedValue(mockUserSession)
+      await expect(createUserAction(userData)).rejects.toThrow("Unauthorized")
+    })
 
-    it.todo("should throw error if no session")
+    it("should throw error if no session", async () => {
+      vi.mocked(auth.api.getSession).mockResolvedValue(null)
+      await expect(createUserAction(userData)).rejects.toThrow("Unauthorized")
+    })
 
     it("should throw custom error on db failure", async () => {
-      vi.mocked(auth.api.getSession).mockResolvedValueOnce(mockAdminSession)
+      vi.mocked(auth.api.getSession).mockResolvedValue(mockAdminSession)
       vi.mocked(db.user.findUnique).mockResolvedValueOnce(null)
       vi.mocked(db.user.create).mockRejectedValueOnce(new Error("DB Error"))
 
-      await expect(createUserAction(userData)).rejects.toThrow()
+      await expect(createUserAction(userData)).rejects.toThrow("DB Error")
     })
 
     it("should throw generic error on non-Error exception", async () => {
-      vi.mocked(auth.api.getSession).mockResolvedValueOnce(mockAdminSession)
+      vi.mocked(auth.api.getSession).mockResolvedValue(mockAdminSession)
       vi.mocked(db.user.findUnique).mockResolvedValueOnce(null)
       vi.mocked(db.user.create).mockRejectedValueOnce("String error")
 
-      await expect(createUserAction(userData)).rejects.toThrow()
+      await expect(createUserAction(userData)).rejects.toThrow("Failed to create user")
     })
   })
 })

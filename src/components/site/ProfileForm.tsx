@@ -15,7 +15,7 @@ import {
   FormMessage,
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
-import type { SessionUser } from "@/lib/types/users"
+import type { SessionUser } from "@/lib/query-types"
 import { type ProfileFormData, profileSchema } from "@/lib/validations/auth"
 
 interface ProfileFormProps {

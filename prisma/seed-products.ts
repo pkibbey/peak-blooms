@@ -147,7 +147,7 @@ function readProductsFromPriceList(): Array<{
   return products
 }
 
-// Helper function to read and parse CSV file (legacy products.csv format)
+// Helper function to read and parse CSV file (legacy price-list.csv format)
 function readProductsFromCSV(): Array<{
   name: string
   price: number | null
@@ -158,7 +158,7 @@ function readProductsFromCSV(): Array<{
   image?: string
 }> {
   // Get the CSV path using process.cwd() since __dirname may be unreliable with tsx
-  const csvPath = path.join(process.cwd(), "prisma", "products.csv")
+  const csvPath = path.join(process.cwd(), "prisma", "price-list.csv")
   console.log(`Reading CSV from: ${csvPath}`)
   let fileContent: string
   try {
@@ -281,11 +281,11 @@ async function seedProducts() {
       )
       console.log(`✅ Created/updated ${collections.length} collections`)
 
-      // Seed products from price-list.csv file (or fallback to products.csv)
+      // Seed products from price-list.csv file (or fallback to price-list.csv)
       console.log("📦 Seeding products from price-list...")
       const start_readCSV = performance.now()
 
-      // Try to read price-list.csv first, fall back to products.csv if not found
+      // Try to read price-list.csv first, fall back to price-list.csv if not found
       let csvProducts: Array<{
         name: string
         price: number | null
@@ -297,16 +297,16 @@ async function seedProducts() {
       }> = []
 
       const priceListPath = path.join(process.cwd(), "prisma", "price-list.csv")
-      const productsPath = path.join(process.cwd(), "prisma", "products.csv")
+      const productsPath = path.join(process.cwd(), "prisma", "price-list.csv")
 
       if (fs.existsSync(priceListPath)) {
         console.log("✅ Using price-list.csv")
         csvProducts = readProductsFromPriceList()
       } else if (fs.existsSync(productsPath)) {
-        console.log("✅ Using products.csv (price-list.csv not found)")
+        console.log("✅ Using price-list.csv (price-list.csv not found)")
         csvProducts = readProductsFromCSV()
       } else {
-        throw new Error("Neither price-list.csv nor products.csv found in prisma directory")
+        throw new Error("Neither price-list.csv nor price-list.csv found in prisma directory")
       }
 
       await captureMetric(MetricType.SEED, "read products CSV", performance.now() - start_readCSV)

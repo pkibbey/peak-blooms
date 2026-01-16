@@ -5,8 +5,7 @@ import { ZodError } from "zod"
 import { applyPriceMultiplierToItems, calculateCartTotal } from "@/lib/cart-utils"
 import { getCurrentUser } from "@/lib/current-user"
 import { db } from "@/lib/db"
-import type { CartResponse } from "@/lib/query-types"
-import type { SessionUser } from "@/lib/types/users"
+import type { CartResponse, SessionUser } from "@/lib/query-types"
 import {
   type AddToCartInput,
   addToCartSchema,
@@ -37,6 +36,8 @@ async function createCart(user: SessionUser) {
       },
     },
   })
+
+  if (!newCart) return null
 
   const multiplier = user.priceMultiplier ?? 1.0
   const adjustedItems = applyPriceMultiplierToItems(newCart.items, multiplier)
@@ -128,12 +129,12 @@ export async function addToCartAction(input: AddToCartInput): Promise<CartRespon
     }
   } catch (error) {
     if (error instanceof ZodError) {
-      const field = error.issues[0]?.path[0]
-      if (field === "productId") {
+      const issue = error.issues[0]
+      if (issue?.path[0] === "productId") {
         throw new Error("Product not found")
       }
-      if (field === "itemId") {
-        throw new Error("Order item not found")
+      if (issue?.code === "too_small" && issue?.path[0] === "quantity") {
+        throw new Error("Quantity must be at least 1")
       }
       throw new Error("Invalid product data")
     }
@@ -165,8 +166,9 @@ export async function updateCartItemAction(input: UpdateCartItemInput): Promise<
     }
 
     if (quantity <= 0) {
-      // Delete if quantity is 0 or less
-      await db.orderItem.delete({ where: { id: itemId } })
+      await db.orderItem.delete({
+        where: { id: itemId },
+      })
     } else {
       await db.orderItem.update({
         where: { id: itemId },
@@ -200,7 +202,12 @@ export async function updateCartItemAction(input: UpdateCartItemInput): Promise<
       total,
     }
   } catch (error) {
+    console.error(error)
     if (error instanceof ZodError) {
+      const issue = error.issues[0]
+      if (issue?.code === "too_small" && issue?.path[0] === "quantity") {
+        throw new Error("Quantity must be at least 0")
+      }
       throw new Error("Invalid cart item data")
     }
     if (error instanceof Error) {
@@ -259,6 +266,7 @@ export async function removeFromCartAction(input: RemoveFromCartInput): Promise<
       total,
     }
   } catch (error) {
+    console.error(error)
     if (error instanceof ZodError) {
       throw new Error("Invalid cart item data")
     }
@@ -388,7 +396,7 @@ export async function batchAddToCartAction(input: BatchAddToCartInput): Promise<
     if (typeof quantities === "number") {
       resolvedQuantities = productIds.map(() => quantities)
     } else if (Array.isArray(quantities)) {
-      resolvedQuantities = quantities.map((q) => (typeof q === "number" && q > 0 ? q : 1))
+      resolvedQuantities = quantities
     } else {
       resolvedQuantities = productIds.map(() => 1)
     }
@@ -397,7 +405,7 @@ export async function batchAddToCartAction(input: BatchAddToCartInput): Promise<
     await db.$transaction(async (tx) => {
       for (let i = 0; i < productIds.length; i++) {
         const productId = String(productIds[i])
-        const quantity = Math.max(1, Number(resolvedQuantities[i] ?? 1))
+        const quantity = resolvedQuantities[i] ?? 1
 
         const existingItem = await tx.orderItem.findFirst({
           where: {
@@ -451,6 +459,10 @@ export async function batchAddToCartAction(input: BatchAddToCartInput): Promise<
     }
   } catch (error) {
     if (error instanceof ZodError) {
+      const issue = error.issues[0]
+      if (issue?.code === "too_small" && issue.path.includes("quantities")) {
+        throw new Error("Quantity must be at least 1")
+      }
       throw new Error("Invalid product data")
     }
     if (error instanceof Error) {

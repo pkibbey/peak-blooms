@@ -2,17 +2,8 @@
 
 import { getCurrentUser } from "@/lib/current-user"
 import { getProducts } from "@/lib/data"
+import type { SearchProductsResult } from "@/lib/query-types"
 import { type SearchProductsInput, searchProductsSchema } from "@/lib/validations/search"
-
-interface SearchProductsResult {
-  products: Array<{
-    id: string
-    name: string
-    slug: string
-    image: string | null
-    price: number | null
-  }>
-}
 
 /**
  * Server action for searching products with debouncing on client

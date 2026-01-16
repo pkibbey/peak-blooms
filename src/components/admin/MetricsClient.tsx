@@ -12,10 +12,17 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
-import type { Metric, MetricSummary, MetricType } from "@/lib/types/metrics"
+import type { Metric, MetricType } from "@/generated/client"
 
 interface MetricsClientProps {
   types: MetricType[]
+}
+
+interface MetricSummary {
+  name: string
+  count: number
+  totalDuration: number
+  averageDuration: number
 }
 
 export default function MetricsClient({ types }: MetricsClientProps) {

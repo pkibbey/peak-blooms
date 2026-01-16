@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation"
 import MetricsClient from "@/components/admin/MetricsClient"
-import { MetricType } from "@/lib/types/metrics"
+import { MetricType } from "@/generated/enums"
 
 export const metadata = {
   title: "Database Metrics - Admin",

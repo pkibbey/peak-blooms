@@ -246,8 +246,7 @@ describe("useDebouncedCallback", () => {
 
   it("should handle different delay values", () => {
     const callback = vi.fn()
-    // biome-ignore lint/correctness/noUnusedVariables: rerender imported but not used in this test
-    const { result, rerender } = renderHook(
+    const { result } = renderHook(
       ({ delay }: { delay: number }) => useDebouncedCallback(callback, delay),
       { initialProps: { delay: 50 } }
     )

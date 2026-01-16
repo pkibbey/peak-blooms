@@ -150,7 +150,6 @@ describe("Product Actions", () => {
 
       const result = await createProductAction(data)
 
-      expect(result.success).toBe(true)
       expect(result.id).toBe("550e8400-e29b-41d4-a716-446655440001")
       expect(db.product.create).toHaveBeenCalledWith({
         data: {
@@ -206,7 +205,7 @@ describe("Product Actions", () => {
 
       const result = await createProductAction(data)
 
-      expect(result.success).toBe(true)
+      expect(result.id).toBe("550e8400-e29b-41d4-a716-446655440001")
       expect(db.product.create).toHaveBeenCalledWith({
         data: {
           name: "Roses",
@@ -269,7 +268,7 @@ describe("Product Actions", () => {
         ...data,
       })
 
-      expect(result.success).toBe(true)
+      expect(result.id).toBeDefined()
       expect(db.product.update).toHaveBeenCalledWith({
         where: { id: "550e8400-e29b-41d4-a716-446655440001" },
         data: {
@@ -312,7 +311,7 @@ describe("Product Actions", () => {
         ...data,
       })
 
-      expect(result.success).toBe(true)
+      expect(result.id).toBe("550e8400-e29b-41d4-a716-446655440001")
       expect(db.product.update).toHaveBeenCalledWith({
         where: { id: "550e8400-e29b-41d4-a716-446655440001" },
         data: {

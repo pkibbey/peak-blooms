@@ -325,11 +325,10 @@ describe("Products Data Access Layer", () => {
   describe("getShopFilterOptions", () => {
     it("should return color IDs and collections", async () => {
       const mockProducts = [
-        { colors: ["red", "white"] },
-        { colors: ["white", "pink"] },
-        { colors: ["red"] },
-        // biome-ignore lint/suspicious/noExplicitAny: Mock data with partial product structure for testing
-      ] as any
+        { ...mockProduct, colors: ["red", "white"] },
+        { ...mockProduct, id: "prod-2", colors: ["white", "pink"] },
+        { ...mockProduct, id: "prod-3", colors: ["red"] },
+      ]
 
       vi.mocked(db.product.findMany).mockResolvedValueOnce(mockProducts)
       vi.mocked(db.collection.findMany).mockResolvedValueOnce([

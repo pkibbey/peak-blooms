@@ -4,7 +4,7 @@ import { revalidatePath } from "next/cache"
 import { ZodError } from "zod"
 import { getCurrentUser } from "@/lib/current-user"
 import { db } from "@/lib/db"
-import type { OrderWithItems } from "@/lib/query-types"
+import type { CancelOrderResponse, OrderWithItems } from "@/lib/query-types"
 import { adjustPrice } from "@/lib/utils"
 import {
   type CancelOrderInput,
@@ -16,13 +16,6 @@ import {
   updateOrderItemPriceSchema,
   updateOrderStatusSchema,
 } from "@/lib/validations/checkout"
-
-interface CancelOrderResponse {
-  success: boolean
-  message: string
-  order?: OrderWithItems
-  error?: string
-}
 
 /**
  * Server action to cancel a PENDING order

@@ -4,7 +4,7 @@
  */
 
 import { db } from "@/lib/db"
-import type { InspirationWithCount, InspirationWithProducts } from "@/lib/types/inspirations"
+import type { InspirationBasic, InspirationWithProducts } from "@/lib/query-types"
 import { adjustPrice } from "@/lib/utils"
 import { withTiming } from "./logger"
 
@@ -30,7 +30,7 @@ function applyMultiplierToInspiration(
 /**
  * Get all inspirations with product counts
  */
-export async function getInspirationsWithCounts(): Promise<InspirationWithCount[]> {
+export async function getInspirationsWithCounts(): Promise<InspirationBasic[]> {
   return withTiming("getInspirationsWithCounts", {}, async () => {
     return db.inspiration.findMany({
       include: {

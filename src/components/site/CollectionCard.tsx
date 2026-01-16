@@ -3,18 +3,14 @@ import Link from "next/link"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { IconArrowRight } from "@/components/ui/icons"
-import type { CollectionModel } from "@/generated/models"
+import type { CollectionBasic } from "@/lib/query-types"
 
 interface CollectionCardProps {
-  collection: CollectionModel & {
-    _count?: {
-      productCollections: number
-    }
-  }
+  collection: CollectionBasic
 }
 
 export function CollectionCard({ collection }: CollectionCardProps) {
-  const productCount = collection._count?.productCollections ?? 0
+  const productCount = collection._count.productCollections
 
   return (
     <div className="group flex flex-col overflow-hidden rounded-xs shadow-md transition-shadow hover:shadow-lg border border-border">
@@ -42,7 +38,7 @@ export function CollectionCard({ collection }: CollectionCardProps) {
       </Link>
 
       {/* Card Content */}
-      <div className="flex flex-col justify-between bg-background p-6 grow">
+      <div className="flex flex-col justify-between items-start bg-background p-6 grow">
         <div>
           <Link prefetch={false} href={`/collections/${collection.slug}`} className="group/link">
             <h3 className="text-xl font-bold group-hover/link:text-primary transition-colors font-serif">
@@ -55,7 +51,7 @@ export function CollectionCard({ collection }: CollectionCardProps) {
         </div>
 
         <Button
-          className="mt-6 w-full"
+          className="mt-6"
           nativeButton={false}
           render={
             <Link

@@ -1,4 +1,5 @@
 import { z } from "zod"
+import type { CollectionUncheckedCreateInput } from "@/generated/models"
 
 export const collectionSchema = z.object({
   name: z.string().min(1, "Collection name is required"),
@@ -14,13 +15,19 @@ export const createCollectionSchema = collectionSchema.extend({
   productIds: z.array(z.string().uuid()).optional().default([]),
 })
 
-export type CreateCollectionInput = z.infer<typeof createCollectionSchema>
+export type CreateCollectionInput = Omit<
+  CollectionUncheckedCreateInput,
+  "productCollections" | "createdAt" | "updatedAt"
+> & { productIds?: string[] }
 
 export const updateCollectionSchema = createCollectionSchema.extend({
   id: z.string().uuid("Invalid collection ID"),
 })
 
-export type UpdateCollectionInput = z.infer<typeof updateCollectionSchema>
+export type UpdateCollectionInput = Omit<
+  CollectionUncheckedCreateInput,
+  "productCollections" | "createdAt" | "updatedAt"
+> & { id: string; productIds?: string[] }
 
 export const deleteCollectionSchema = z.object({
   id: z.string().uuid("Invalid collection ID"),

@@ -5,14 +5,9 @@
 
 import type { ProductWhereInput } from "@/generated/models"
 import { db } from "@/lib/db"
+import type { ProductWithCollections, ProductWithInspirations } from "@/lib/query-types"
 import { adjustPrice } from "@/lib/utils"
 import { ITEMS_PER_PAGE } from "../consts"
-import type {
-  GetProductsOptions,
-  GetProductsResult,
-  ProductWithCollections,
-  ProductWithInspirations,
-} from "../types/products"
 import { withTiming } from "./logger"
 
 /**
@@ -43,9 +38,20 @@ function applyMultiplierToProducts<T extends { price: number | null; [key: strin
  * Prices are automatically adjusted by the provided multiplier
  */
 export async function getProducts(
-  options: GetProductsOptions = {},
+  options: {
+    collectionIds?: string[]
+    featured?: boolean
+    colors?: string[]
+    priceMin?: number
+    priceMax?: number
+    search?: string
+    limit?: number
+    offset?: number
+    sort?: string
+    order?: "asc" | "desc"
+  } = {},
   priceMultiplier = 1.0
-): Promise<GetProductsResult> {
+): Promise<{ products: ProductWithCollections[]; total: number; limit: number; offset: number }> {
   return withTiming("getProducts", options as Record<string, unknown>, async () => {
     // Build the where clause for filtering
     const where: ProductWhereInput = {}

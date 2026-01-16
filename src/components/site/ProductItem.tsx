@@ -8,7 +8,7 @@ import { ColorsMiniDisplay } from "@/components/ui/ColorsMiniDisplay"
 import { IconTrash } from "@/components/ui/icons"
 import { QuantityStepper } from "@/components/ui/QuantityStepper"
 import type { ProductModel } from "@/generated/models"
-import type { SessionUser } from "@/lib/types/users"
+import type { SessionUser } from "@/lib/query-types"
 import { formatPrice } from "@/lib/utils"
 
 interface ProductItemProps {

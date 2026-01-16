@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache"
 import { ZodError } from "zod"
 import { getSession } from "@/lib/auth"
 import { db } from "@/lib/db"
+import type { InspirationForResponse } from "@/lib/query-types"
 import {
   type CreateInspirationInput,
   createInspirationSchema,
@@ -15,7 +16,7 @@ import {
 
 export async function createInspirationAction(
   input: CreateInspirationInput
-): Promise<{ success: boolean; id: string }> {
+): Promise<InspirationForResponse> {
   try {
     const data = createInspirationSchema.parse(input)
     const session = await getSession()
@@ -41,7 +42,7 @@ export async function createInspirationAction(
     })
 
     revalidatePath("/admin/inspirations")
-    return { success: true, id: inspiration.id }
+    return inspiration
   } catch (error) {
     if (error instanceof ZodError) {
       throw new Error("Invalid inspiration data")
@@ -55,7 +56,7 @@ export async function createInspirationAction(
 
 export async function updateInspirationAction(
   input: UpdateInspirationInput
-): Promise<{ success: boolean; id: string }> {
+): Promise<InspirationForResponse> {
   try {
     const { id, ...data } = updateInspirationSchema.parse(input)
     const session = await getSession()
@@ -83,7 +84,7 @@ export async function updateInspirationAction(
     })
 
     revalidatePath("/admin/inspirations")
-    return { success: true, id: inspiration.id }
+    return inspiration
   } catch (error) {
     if (error instanceof ZodError) {
       throw new Error("Invalid inspiration data")

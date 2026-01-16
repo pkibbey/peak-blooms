@@ -3,8 +3,9 @@
  * Database-backed metrics storage and capture functionality
  */
 
+import type { Metric } from "@/generated/client"
+import type { MetricType } from "@/generated/enums"
 import { db } from "@/lib/db"
-import type { Metric, MetricType } from "@/lib/types/metrics"
 
 /**
  * Capture a metric by recording its type, name, and duration

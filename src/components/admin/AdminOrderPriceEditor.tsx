@@ -5,7 +5,7 @@ import { toast } from "sonner"
 import { updateOrderItemPriceAction } from "@/app/actions/orders"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import type { OrderWithItems } from "@/lib/types/orders"
+import type { OrderWithItems } from "@/lib/query-types"
 import { formatPrice } from "@/lib/utils"
 
 interface AdminOrderPriceEditorProps {

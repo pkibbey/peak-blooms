@@ -19,7 +19,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
-import type { UserForAdmin } from "@/lib/types/users"
+import type { UserForAdmin } from "@/lib/query-types"
 import { formatDate, MAX_PRICE_MULTIPLIER, MIN_PRICE_MULTIPLIER } from "@/lib/utils"
 
 interface UsersTableProps {

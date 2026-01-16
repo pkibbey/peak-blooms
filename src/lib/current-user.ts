@@ -1,6 +1,6 @@
 import { cache } from "react"
+import type { SessionUser } from "@/lib/query-types"
 import { getSession } from "./auth"
-import type { SessionUser } from "./types/users"
 
 /**
  * Get the current authenticated user with their approval and role status

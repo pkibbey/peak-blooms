@@ -1,4 +1,5 @@
 import { z } from "zod"
+import { OrderStatus } from "@/generated/enums"
 import { addressSchema } from "./address"
 
 export const checkoutSchema = z.object({
@@ -30,7 +31,7 @@ export type AddToCartInput = z.infer<typeof addToCartSchema>
 
 export const updateCartItemSchema = z.object({
   itemId: z.string().uuid("Invalid item ID"),
-  quantity: z.number().int().min(1).max(999),
+  quantity: z.number().int().min(0).max(999),
 })
 
 export type UpdateCartItemInput = z.infer<typeof updateCartItemSchema>
@@ -41,13 +42,23 @@ export const removeFromCartSchema = z.object({
 
 export type RemoveFromCartInput = z.infer<typeof removeFromCartSchema>
 
-export const batchAddToCartSchema = z.object({
-  productIds: z.array(z.string().uuid()).min(1, "At least one product is required"),
-  quantities: z
-    .union([z.number().int().min(1).max(999), z.array(z.number().int().min(1).max(999))])
-    .default([])
-    .optional(),
-})
+export const batchAddToCartSchema = z
+  .object({
+    productIds: z.array(z.string().uuid()).min(1, "At least one product is required"),
+    quantities: z
+      .union([z.number().int().min(1).max(999), z.array(z.number().int().min(1).max(999))])
+      .optional(),
+  })
+  .refine(
+    (data) => {
+      if (!data.quantities || !Array.isArray(data.quantities)) return true
+      return data.quantities.length === data.productIds.length
+    },
+    {
+      message: "Invalid product data",
+      path: ["quantities"],
+    }
+  )
 
 export type BatchAddToCartInput = z.infer<typeof batchAddToCartSchema>
 
@@ -61,7 +72,7 @@ export type CancelOrderInput = z.infer<typeof cancelOrderSchema>
 
 export const updateOrderStatusSchema = z.object({
   orderId: z.string().uuid("Invalid order ID"),
-  status: z.enum(["CART", "PENDING", "CONFIRMED", "OUT_FOR_DELIVERY", "DELIVERED", "CANCELLED"]),
+  status: z.enum(OrderStatus),
 })
 
 export type UpdateOrderStatusInput = z.infer<typeof updateOrderStatusSchema>

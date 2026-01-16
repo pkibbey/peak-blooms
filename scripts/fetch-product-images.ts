@@ -414,9 +414,9 @@ function escapeCSVField(field: string): string {
 
 // Main execution
 async function main() {
-  const csvPath = path.join(__dirname, "../prisma/products.csv")
+  const csvPath = path.join(__dirname, "../prisma/price-list.csv")
 
-  console.log("📖 Reading products.csv...")
+  console.log("📖 Reading price-list.csv...")
   const products = readCSV(csvPath)
   console.log(`✓ Found ${products.length} products`)
 

@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache"
 import type { ProductWhereInput } from "@/generated/models"
 import { getSession } from "@/lib/auth"
 import { db } from "@/lib/db"
+import type { ProductBasic } from "@/lib/query-types"
 import {
   type CreateProductFormData,
   createProductFormSchema,
@@ -17,9 +18,7 @@ import {
   updateProductSchema,
 } from "@/lib/validations/product"
 
-export async function createProductAction(
-  data: CreateProductFormData
-): Promise<{ success: boolean; id: string }> {
+export async function createProductAction(data: CreateProductFormData): Promise<ProductBasic> {
   const validatedData = createProductFormSchema.parse(data)
   try {
     const session = await getSession()
@@ -46,15 +45,13 @@ export async function createProductAction(
     })
 
     revalidatePath("/admin/products")
-    return { success: true, id: product.id }
+    return product
   } catch (error) {
     throw new Error(error instanceof Error ? error.message : "Failed to create product")
   }
 }
 
-export async function updateProductAction(
-  input: UpdateProductInput
-): Promise<{ success: boolean; id: string }> {
+export async function updateProductAction(input: UpdateProductInput): Promise<ProductBasic> {
   const { id, ...data } = updateProductSchema.parse(input)
   try {
     const session = await getSession()
@@ -86,7 +83,7 @@ export async function updateProductAction(
     })
 
     revalidatePath("/admin/products")
-    return { success: true, id: product.id }
+    return product
   } catch (error) {
     throw new Error(error instanceof Error ? error.message : "Failed to update product")
   }

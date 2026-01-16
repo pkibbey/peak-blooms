@@ -1,4 +1,6 @@
 import { z } from "zod"
+import type { ProductUncheckedCreateInput } from "@/generated/models"
+import { ProductType } from "@/generated/enums"
 
 export const productSchema = z.object({
   name: z.string().min(1, "Product name is required"),
@@ -13,7 +15,7 @@ export const productSchema = z.object({
     }),
   colors: z.array(z.string()).nullable(),
   collectionIds: z.array(z.string()).nullable(),
-  productType: z.enum(["FLOWER", "FILLER", "ROSE", "PLANT", "SUCCULENT", "BRANCH"]),
+  productType: z.enum(ProductType),
   featured: z.boolean(),
 })
 
@@ -34,13 +36,32 @@ const createProductSchema = z.object({
   featured: z.boolean().default(false),
 })
 
-export type CreateProductInput = z.infer<typeof createProductSchema>
+export type CreateProductInput = Omit<
+  ProductUncheckedCreateInput,
+  | "inspirations"
+  | "orderItems"
+  | "productCollections"
+  | "createdAt"
+  | "updatedAt"
+  | "deletedAt"
+  | "colors"
+> & { colors?: string[] | null }
+
 // Product operation schemas for API requests
 export const updateProductSchema = createProductSchema.extend({
   id: z.string().uuid("Invalid product ID"),
 })
 
-export type UpdateProductInput = z.infer<typeof updateProductSchema>
+export type UpdateProductInput = Omit<
+  ProductUncheckedCreateInput,
+  | "inspirations"
+  | "orderItems"
+  | "productCollections"
+  | "createdAt"
+  | "updatedAt"
+  | "deletedAt"
+  | "colors"
+> & { id: string; colors?: string[] | null }
 
 export const deleteProductSchema = z.object({
   id: z.string().uuid("Invalid product ID"),

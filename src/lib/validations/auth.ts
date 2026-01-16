@@ -1,4 +1,5 @@
 import { z } from "zod"
+import { Role } from "@/generated/enums"
 
 // Profile schema - email is read-only (from Google), only name can be updated
 export const profileSchema = z.object({
@@ -8,7 +9,7 @@ export const profileSchema = z.object({
 export type ProfileFormData = z.infer<typeof profileSchema>
 
 // Admin user role enum
-const userRoleEnum = z.enum(["CUSTOMER", "ADMIN", "SUBSCRIBER"])
+const userRoleEnum = z.enum(Role)
 
 // Approve user schema
 export const approveUserSchema = z.object({

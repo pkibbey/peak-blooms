@@ -11,7 +11,7 @@ import {
   TableRow,
 } from "@/components/ui/table"
 import { calculateCartTotal } from "@/lib/cart-utils"
-import type { OrdersWithCount } from "@/lib/types/orders"
+import type { OrdersWithCount } from "@/lib/query-types"
 import { formatDate, formatPrice } from "@/lib/utils"
 import NavLink from "../site/NavLink"
 

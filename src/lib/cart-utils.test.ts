@@ -360,7 +360,6 @@ describe("applyPriceMultiplierToItems - apply price multiplier to cart items", (
           quantity: 1,
         },
       ]
-      // biome-ignore lint/suspicious/noExplicitAny: Items type is generic for test purposes
       const result = applyPriceMultiplierToItems(items as any, 1.5)
       expect(result[0].product).toBeNull()
     })

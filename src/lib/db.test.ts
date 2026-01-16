@@ -24,8 +24,6 @@ vi.mock("../generated/client", () => ({
 describe("Database Module", () => {
   beforeEach(() => {
     vi.clearAllMocks()
-    // Clear the global cache
-    // biome-ignore lint/suspicious/noExplicitAny: globalThis type is not fully typed in all environments
     const globalForPrisma = globalThis as any
     if (globalForPrisma.prisma) {
       delete globalForPrisma.prisma
