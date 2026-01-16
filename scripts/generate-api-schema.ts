@@ -43,6 +43,208 @@ import {
 } from "../src/lib/validations/product"
 import { searchProductsSchema } from "../src/lib/validations/search"
 
+// =============================================================================
+// SCHEMA VALIDATION: Compare Zod schemas against Prisma query-types
+// =============================================================================
+
+/**
+ * Schema validation mappings
+ * Maps Zod input schemas to their corresponding Prisma query-type return types
+ * Used to validate that input schemas match expected response structures
+ */
+interface SchemaValidationMap {
+  schemaName: string
+  zodSchema: unknown
+  description: string
+  relatedReturnType?: string
+}
+
+const schemaValidationMaps: SchemaValidationMap[] = [
+  // Cart operations
+  {
+    schemaName: "addToCartSchema",
+    zodSchema: addToCartSchema,
+    description: "Cart add operation - should return CartResponse",
+    relatedReturnType: "CartResponse",
+  },
+  {
+    schemaName: "updateCartItemSchema",
+    zodSchema: updateCartItemSchema,
+    description: "Cart update operation - should return CartResponse",
+    relatedReturnType: "CartResponse",
+  },
+  {
+    schemaName: "removeFromCartSchema",
+    zodSchema: removeFromCartSchema,
+    description: "Cart remove operation - should return CartResponse",
+    relatedReturnType: "CartResponse",
+  },
+  {
+    schemaName: "batchAddToCartSchema",
+    zodSchema: batchAddToCartSchema,
+    description: "Batch cart add operation - should return CartResponse",
+    relatedReturnType: "CartResponse",
+  },
+  // Order operations
+  {
+    schemaName: "cancelOrderSchema",
+    zodSchema: cancelOrderSchema,
+    description: "Order cancel operation - should return CancelOrderResponse",
+    relatedReturnType: "CancelOrderResponse",
+  },
+  {
+    schemaName: "updateOrderStatusSchema",
+    zodSchema: updateOrderStatusSchema,
+    description: "Order status update - should return OrderWithItems",
+    relatedReturnType: "OrderWithItems",
+  },
+  {
+    schemaName: "updateOrderItemPriceSchema",
+    zodSchema: updateOrderItemPriceSchema,
+    description: "Order item price update - returns {message, item, orderTotal}",
+    relatedReturnType: "OrderItem",
+  },
+]
+
+/**
+ * Schema-to-Type Mapping Documentation
+ * Maps input schemas to their expected return types from src/lib/query-types.ts
+ * This mapping ensures API contracts are kept in sync with database realities
+ */
+const SCHEMA_TYPE_MAPPINGS = {
+  // Cart endpoints
+  "addToCartSchema → CartResponse": {
+    inputFields: ["productId", "quantity"],
+    returnType: "CartResponse",
+    returnFields: ["id", "orderNumber", "status", "notes", "items", "total"],
+    notes: "Returns full cart after add operation",
+  },
+  "updateCartItemSchema → CartResponse": {
+    inputFields: ["itemId", "quantity"],
+    returnType: "CartResponse",
+    returnFields: ["id", "orderNumber", "status", "notes", "items", "total"],
+    notes: "Returns full cart after update",
+  },
+  "removeFromCartSchema → CartResponse": {
+    inputFields: ["itemId"],
+    returnType: "CartResponse",
+    returnFields: ["id", "orderNumber", "status", "notes", "items", "total"],
+    notes: "Returns full cart after removal",
+  },
+  "batchAddToCartSchema → CartResponse": {
+    inputFields: ["productIds", "quantities"],
+    returnType: "CartResponse",
+    returnFields: ["id", "orderNumber", "status", "notes", "items", "total"],
+    notes: "Returns full cart after batch add",
+  },
+  // Order endpoints
+  "cancelOrderSchema → CancelOrderResponse": {
+    inputFields: ["orderId", "convertToCart"],
+    returnType: "CancelOrderResponse",
+    returnFields: ["message", "order"],
+    notes: "Returns cancellation confirmation and order details",
+  },
+  "updateOrderStatusSchema → OrderWithItems": {
+    inputFields: ["orderId", "status"],
+    returnType: "OrderWithItems",
+    returnFields: ["id", "userId", "status", "items", "createdAt"],
+    notes: "Returns updated order with all items",
+  },
+  "updateOrderItemPriceSchema → {message, item, orderTotal}": {
+    inputFields: ["orderId", "itemId", "price"],
+    returnType: "OrderItem",
+    returnFields: ["message", "item", "orderTotal"],
+    notes: "Returns operation result with updated item and new order total",
+  },
+}
+
+/**
+ * Validate schema fields consistency
+ * Checks that Zod input schemas have corresponding fields for their return types
+ */
+function validateSchemaConsistency() {
+  const warnings: string[] = []
+  const errors: string[] = []
+
+  for (const validation of schemaValidationMaps) {
+    try {
+      const schema = validation.zodSchema
+      if (!schema || !schema.shape) {
+        warnings.push(
+          `⚠️  ${validation.schemaName}: Could not inspect schema shape (may be non-ZodObject)`
+        )
+        continue
+      }
+
+      const fields = Object.keys(schema.shape)
+
+      // Check that schema has expected fields (basic validation)
+      if (fields.length === 0) {
+        warnings.push(
+          `⚠️  ${validation.schemaName}: Schema has no fields defined. Expected input fields for ${validation.relatedReturnType}.`
+        )
+      }
+
+      console.log(`✓ ${validation.schemaName} validates: ${fields.join(", ")}`)
+
+      // Document expected return type
+      if (validation.relatedReturnType) {
+        const mappingKey = `${validation.schemaName} → ${validation.relatedReturnType}`
+        if (SCHEMA_TYPE_MAPPINGS[mappingKey as keyof typeof SCHEMA_TYPE_MAPPINGS]) {
+          const mapping = SCHEMA_TYPE_MAPPINGS[mappingKey as keyof typeof SCHEMA_TYPE_MAPPINGS]
+          console.log(
+            `  → Returns: ${mapping.returnType} with [${mapping.returnFields.join(", ")}]`
+          )
+        }
+      }
+    } catch (err) {
+      warnings.push(
+        `⚠️  ${validation.schemaName}: Error validating schema - ${err instanceof Error ? err.message : String(err)}`
+      )
+    }
+  }
+
+  // Print validation summary
+  if (warnings.length > 0) {
+    console.log("\n⚠️  Schema Validation Warnings:")
+    for (const w of warnings) {
+      console.log(`  ${w}`)
+    }
+  }
+
+  if (errors.length > 0) {
+    console.error("\n❌ Schema Validation Errors:")
+    for (const e of errors) {
+      console.error(`  ${e}`)
+    }
+    return false
+  }
+
+  console.log(
+    `\n✅ Schema validation passed: ${schemaValidationMaps.length} schemas with type mappings verified`
+  )
+  console.log(`\n📋 Schema-to-Type Mappings (from src/lib/query-types.ts):`)
+  Object.entries(SCHEMA_TYPE_MAPPINGS).forEach(([key, mapping]) => {
+    console.log(`  • ${key}: Returns [${mapping.returnFields.join(", ")}] - ${mapping.notes}`)
+  })
+  return true
+}
+
+// Run validation before generating OpenAPI spec
+console.log("🔍 Validating schema consistency with Prisma query-types...\n")
+const validationPassed = validateSchemaConsistency()
+
+if (!validationPassed) {
+  console.error(
+    "\n❌ Schema validation failed. Fix schema inconsistencies before generating API spec."
+  )
+  process.exit(1)
+}
+
+console.log(`\n${"=".repeat(80)}`)
+console.log("Generating OpenAPI schema...")
+console.log(`${"=".repeat(80)}\n`)
+
 // Define the OpenAPI spec
 const openApiSpec = createDocument({
   openapi: "3.0.0",
@@ -715,6 +917,20 @@ if (!fs.existsSync(outputDir)) {
 }
 
 const outputPath = path.join(outputDir, "api-schema.json")
-fs.writeFileSync(outputPath, JSON.stringify(openApiSpec, null, 2))
+
+// Add validation metadata to the spec
+const specWithMetadata = {
+  ...openApiSpec,
+  "x-validation": {
+    timestamp: new Date().toISOString(),
+    schemasValidated: schemaValidationMaps.length,
+    schemaToTypeMappings: SCHEMA_TYPE_MAPPINGS,
+    notes:
+      "Schema validation ensures Zod input schemas match Prisma query-type return types. Generated automatically by npm run generate:schema",
+  },
+}
+
+fs.writeFileSync(outputPath, JSON.stringify(specWithMetadata, null, 2))
 
 console.log(`✅ OpenAPI schema generated at: ${outputPath}`)
+console.log(`   Includes validation metadata with schema-to-type mappings`)

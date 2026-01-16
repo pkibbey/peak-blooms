@@ -2,9 +2,9 @@
 
 import { revalidatePath } from "next/cache"
 import { ZodError } from "zod"
-import type { Order } from "@/generated/client"
 import { getCurrentUser } from "@/lib/current-user"
 import { db } from "@/lib/db"
+import type { OrderWithItems } from "@/lib/query-types"
 import { adjustPrice } from "@/lib/utils"
 import {
   type CancelOrderInput,
@@ -20,7 +20,7 @@ import {
 interface CancelOrderResponse {
   success: boolean
   message: string
-  order?: Order
+  order?: OrderWithItems
   error?: string
 }
 
@@ -47,7 +47,11 @@ export async function cancelOrderAction(input: CancelOrderInput): Promise<Cancel
         userId: user.id,
       },
       include: {
-        items: true,
+        items: {
+          include: {
+            product: true,
+          },
+        },
       },
     })
 
@@ -96,7 +100,10 @@ export async function cancelOrderAction(input: CancelOrderInput): Promise<Cancel
       return {
         success: true,
         message: "Order converted back to cart",
-        order: updatedOrder,
+        order: {
+          ...updatedOrder,
+          items: order.items,
+        },
       }
     } else {
       // Simply transition to CANCELLED
@@ -113,7 +120,10 @@ export async function cancelOrderAction(input: CancelOrderInput): Promise<Cancel
       return {
         success: true,
         message: "Order cancelled successfully",
-        order: cancelledOrder,
+        order: {
+          ...cancelledOrder,
+          items: order.items,
+        },
       }
     }
   } catch (error) {
@@ -129,7 +139,7 @@ export async function cancelOrderAction(input: CancelOrderInput): Promise<Cancel
  * Create/finalize an order - transition from CART to PENDING with checkout data
  * Approved users only
  */
-export async function createOrderAction(data: CreateOrderInput) {
+export async function createOrderAction(data: CreateOrderInput): Promise<OrderWithItems> {
   try {
     const user = await getCurrentUser()
 
@@ -225,20 +235,23 @@ export async function createOrderAction(data: CreateOrderInput) {
     }
 
     // Transition the order from CART to PENDING
-    const order = await db.order.update({
+    const order = await db.order.findUniqueOrThrow({
       where: { id: cart.id },
-      data: {
-        status: "PENDING",
-        notes: notes || null,
-        deliveryAddressId: finalDeliveryAddressId,
-      },
       include: {
         items: {
           include: {
             product: true,
           },
         },
-        deliveryAddress: true,
+      },
+    })
+
+    await db.order.update({
+      where: { id: cart.id },
+      data: {
+        status: "PENDING",
+        notes: notes || null,
+        deliveryAddressId: finalDeliveryAddressId,
       },
     })
 
@@ -258,7 +271,9 @@ export async function createOrderAction(data: CreateOrderInput) {
 /**
  * Server action to update order status (admin only)
  */
-export async function updateOrderStatusAction(input: UpdateOrderStatusInput) {
+export async function updateOrderStatusAction(
+  input: UpdateOrderStatusInput
+): Promise<{ message: string; order: OrderWithItems }> {
   try {
     const { orderId, status } = updateOrderStatusSchema.parse(input)
     const user = await getCurrentUser()
@@ -289,9 +304,21 @@ export async function updateOrderStatusAction(input: UpdateOrderStatusInput) {
     }
 
     // Update the order status
-    const updatedOrder = await db.order.update({
+    await db.order.update({
       where: { id: orderId },
       data: { status },
+    })
+
+    // Fetch updated order with items
+    const updatedOrder = await db.order.findUniqueOrThrow({
+      where: { id: orderId },
+      include: {
+        items: {
+          include: {
+            product: true,
+          },
+        },
+      },
     })
 
     revalidatePath("/admin/orders")
@@ -315,7 +342,11 @@ export async function updateOrderStatusAction(input: UpdateOrderStatusInput) {
 /**
  * Server action to update order item price (admin only)
  */
-export async function updateOrderItemPriceAction(input: UpdateOrderItemPriceInput) {
+export async function updateOrderItemPriceAction(input: UpdateOrderItemPriceInput): Promise<{
+  message: string
+  item: { id: string; price: number | null }
+  orderTotal: number
+}> {
   try {
     const { orderId, itemId, price } = updateOrderItemPriceSchema.parse(input)
     const user = await getCurrentUser()
@@ -356,7 +387,8 @@ export async function updateOrderItemPriceAction(input: UpdateOrderItemPriceInpu
 
     return {
       message: "Price updated successfully",
-      newOrderTotal: Math.round(newOrderTotal * 100) / 100,
+      item: { id: itemId, price },
+      orderTotal: Math.round(newOrderTotal * 100) / 100,
     }
   } catch (error) {
     if (error instanceof ZodError) {

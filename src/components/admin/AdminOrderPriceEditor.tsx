@@ -53,7 +53,7 @@ export function AdminOrderPriceEditor({ order, onPriceUpdated }: AdminOrderPrice
       setEditingPrice("")
 
       // Recalculate total
-      const newTotal = result.newOrderTotal
+      const newTotal = result.orderTotal
       onPriceUpdated?.(newTotal)
 
       toast.success("Price updated successfully")

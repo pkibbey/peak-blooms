@@ -5,6 +5,7 @@ import { ZodError } from "zod"
 import { applyPriceMultiplierToItems, calculateCartTotal } from "@/lib/cart-utils"
 import { getCurrentUser } from "@/lib/current-user"
 import { db } from "@/lib/db"
+import type { CartResponse } from "@/lib/query-types"
 import type { SessionUser } from "@/lib/types/users"
 import {
   type AddToCartInput,
@@ -50,7 +51,7 @@ async function createCart(user: SessionUser) {
  * Server action to add or update item in cart
  * Returns the full cart with updated item list
  */
-export async function addToCartAction(input: AddToCartInput) {
+export async function addToCartAction(input: AddToCartInput): Promise<CartResponse> {
   try {
     const { productId, quantity } = addToCartSchema.parse(input)
     const user = await getCurrentUser()
@@ -147,7 +148,7 @@ export async function addToCartAction(input: AddToCartInput) {
  * Server action to update cart item quantity
  * Returns the updated cart
  */
-export async function updateCartItemAction(input: UpdateCartItemInput) {
+export async function updateCartItemAction(input: UpdateCartItemInput): Promise<CartResponse> {
   try {
     const { itemId, quantity } = updateCartItemSchema.parse(input)
     const user = await getCurrentUser()
@@ -213,7 +214,7 @@ export async function updateCartItemAction(input: UpdateCartItemInput) {
  * Server action to remove a single item from cart
  * Returns the updated cart
  */
-export async function removeFromCartAction(input: RemoveFromCartInput) {
+export async function removeFromCartAction(input: RemoveFromCartInput): Promise<CartResponse> {
   try {
     const { itemId } = removeFromCartSchema.parse(input)
     const user = await getCurrentUser()
@@ -272,7 +273,7 @@ export async function removeFromCartAction(input: RemoveFromCartInput) {
  * Server action to clear all items from cart
  * Returns empty cart
  */
-export async function clearCartAction() {
+export async function clearCartAction(): Promise<CartResponse> {
   try {
     const user = await getCurrentUser()
     if (!user) throw new Error("Unauthorized")
@@ -317,7 +318,7 @@ export async function clearCartAction() {
  * Server action to fetch user's current cart
  * Does not auto-create - returns null if cart doesn't exist
  */
-export async function getCartAction() {
+export async function getCartAction(): Promise<CartResponse | null> {
   try {
     const user = await getCurrentUser()
     if (!user) throw new Error("Unauthorized")
@@ -357,7 +358,7 @@ export async function getCartAction() {
  * Server action to add multiple items to cart in one transaction
  * Supports single quantity for all or per-item quantities
  */
-export async function batchAddToCartAction(input: BatchAddToCartInput) {
+export async function batchAddToCartAction(input: BatchAddToCartInput): Promise<CartResponse> {
   try {
     const { productIds, quantities } = batchAddToCartSchema.parse(input)
     const user = await getCurrentUser()

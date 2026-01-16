@@ -22,7 +22,7 @@ export function ProductControls({ product, user, mode = "card" }: ProductControl
   const [addQuantity, setAddQuantity] = useState<number>(1)
 
   return (
-    <div className={cn("flex flex-col", mode === "detail" ? "gap-6" : "gap-3")}>
+    <div className={cn("flex flex-col items-start", mode === "detail" ? "gap-6" : "gap-3")}>
       {/* Price Display */}
       {isSignedIn && isApproved && (
         <div
@@ -36,7 +36,6 @@ export function ProductControls({ product, user, mode = "card" }: ProductControl
       {isSignedIn && !isApproved && mode === "detail" && (
         <div className="flex flex-col gap-4">
           <Button
-            className="w-full"
             nativeButton={false}
             render={
               <Link prefetch={false} href="/auth/signin">
@@ -50,7 +49,6 @@ export function ProductControls({ product, user, mode = "card" }: ProductControl
       {/* Sign in Button */}
       {!isSignedIn && (
         <Button
-          className="w-full"
           nativeButton={false}
           variant="outline"
           render={

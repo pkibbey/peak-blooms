@@ -8,7 +8,6 @@ import { useForm } from "react-hook-form"
 import { toast } from "sonner"
 import { createOrderAction } from "@/app/actions/orders"
 import AddressFields from "@/components/site/AddressFields"
-import type { CartData } from "@/components/site/Cart"
 import { CheckoutOrderItem } from "@/components/site/CheckoutOrderItem"
 import { MarketPriceIndicator } from "@/components/site/MarketPriceIndicator"
 import { MarketPriceWarning } from "@/components/site/MarketPriceWarning"
@@ -32,6 +31,7 @@ import {
 } from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
 import { calculateCartTotal } from "@/lib/cart-utils"
+import type { CartResponse } from "@/lib/query-types"
 import { emptyAddress } from "@/lib/validations/address"
 import { type CheckoutFormData, checkoutSchema } from "@/lib/validations/checkout"
 
@@ -51,7 +51,7 @@ interface SavedAddress {
 }
 
 interface CheckoutFormProps {
-  cart: CartData
+  cart: CartResponse
   savedAddresses: SavedAddress[]
 }
 

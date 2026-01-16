@@ -16,6 +16,7 @@
  * - Collection types
  */
 
+import type { CartItemData } from "@/components/site/CartItem"
 import type {
   AddressGetPayload,
   CollectionGetPayload,
@@ -315,3 +316,20 @@ export type InspirationWithProducts = InspirationGetPayload<{
  * Use when: Inspiration listings, navigation, thumbnails
  */
 export type InspirationBasic = InspirationGetPayload<true>
+// =============================================================================
+// RESPONSE TYPES FOR SERVER ACTIONS
+// =============================================================================
+
+/**
+ * CartResponse: Structured response for cart operations
+ * Includes the cart with adjusted items and calculated total
+ * Used by cart action functions to return consistent cart data
+ */
+export interface CartResponse {
+  id: string
+  orderNumber: number | null
+  status: string
+  notes: string | null
+  items: CartItemData[]
+  total: number
+}

@@ -1,0 +1,1245 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Peak Blooms API",
+    "description": "Server action endpoints documentation for Peak Blooms e-commerce platform",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "http://localhost:3000",
+      "description": "Development server"
+    }
+  ],
+  "paths": {
+    "/api/cart/add": {
+      "post": {
+        "tags": ["Cart"],
+        "summary": "Add item to cart",
+        "description": "Add or update a product in the user's shopping cart",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "productId": {
+                    "type": "string",
+                    "format": "uuid",
+                    "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                  },
+                  "quantity": {
+                    "default": 1,
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 999
+                  }
+                },
+                "required": ["productId"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Item added to cart successfully"
+          },
+          "400": {
+            "description": "Invalid request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
+      }
+    },
+    "/api/cart/update": {
+      "post": {
+        "tags": ["Cart"],
+        "summary": "Update cart item quantity",
+        "description": "Update the quantity of an item in the cart",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "itemId": {
+                    "type": "string",
+                    "format": "uuid",
+                    "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                  },
+                  "quantity": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 999
+                  }
+                },
+                "required": ["itemId", "quantity"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Item updated successfully"
+          },
+          "400": {
+            "description": "Invalid request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
+      }
+    },
+    "/api/cart/remove": {
+      "post": {
+        "tags": ["Cart"],
+        "summary": "Remove item from cart",
+        "description": "Remove a single item from the cart",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "itemId": {
+                    "type": "string",
+                    "format": "uuid",
+                    "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                  }
+                },
+                "required": ["itemId"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Item removed successfully"
+          },
+          "400": {
+            "description": "Invalid request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
+      }
+    },
+    "/api/cart/batch-add": {
+      "post": {
+        "tags": ["Cart"],
+        "summary": "Add multiple items to cart",
+        "description": "Add multiple products to the cart in a single transaction",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "productIds": {
+                    "minItems": 1,
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "format": "uuid",
+                      "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                    }
+                  },
+                  "quantities": {
+                    "default": [],
+                    "anyOf": [
+                      {
+                        "type": "integer",
+                        "minimum": 1,
+                        "maximum": 999
+                      },
+                      {
+                        "type": "array",
+                        "items": {
+                          "type": "integer",
+                          "minimum": 1,
+                          "maximum": 999
+                        }
+                      }
+                    ]
+                  }
+                },
+                "required": ["productIds"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Items added to cart successfully"
+          },
+          "400": {
+            "description": "Invalid request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
+      }
+    },
+    "/api/orders/cancel": {
+      "post": {
+        "tags": ["Orders"],
+        "summary": "Cancel order",
+        "description": "Cancel a pending order or convert it back to cart",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "orderId": {
+                    "type": "string",
+                    "format": "uuid",
+                    "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                  },
+                  "convertToCart": {
+                    "type": "boolean"
+                  }
+                },
+                "required": ["orderId"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Order cancelled successfully"
+          },
+          "400": {
+            "description": "Invalid request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
+      }
+    },
+    "/api/orders/status": {
+      "post": {
+        "tags": ["Orders"],
+        "summary": "Update order status",
+        "description": "Update order status (admin only)",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "orderId": {
+                    "type": "string",
+                    "format": "uuid",
+                    "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                  },
+                  "status": {
+                    "type": "string",
+                    "enum": [
+                      "CART",
+                      "PENDING",
+                      "CONFIRMED",
+                      "OUT_FOR_DELIVERY",
+                      "DELIVERED",
+                      "CANCELLED"
+                    ]
+                  }
+                },
+                "required": ["orderId", "status"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Order status updated successfully"
+          },
+          "400": {
+            "description": "Invalid request"
+          },
+          "401": {
+            "description": "Unauthorized (admin only)"
+          }
+        }
+      }
+    },
+    "/api/orders/item-price": {
+      "post": {
+        "tags": ["Orders"],
+        "summary": "Update order item price",
+        "description": "Update the price of an order item (admin only, for market-priced items)",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "orderId": {
+                    "type": "string",
+                    "format": "uuid",
+                    "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                  },
+                  "itemId": {
+                    "type": "string",
+                    "format": "uuid",
+                    "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                  },
+                  "price": {
+                    "type": "number",
+                    "minimum": 0
+                  }
+                },
+                "required": ["orderId", "itemId", "price"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Item price updated successfully"
+          },
+          "400": {
+            "description": "Invalid request"
+          },
+          "401": {
+            "description": "Unauthorized (admin only)"
+          }
+        }
+      }
+    },
+    "/api/products/update": {
+      "post": {
+        "tags": ["Products"],
+        "summary": "Update product",
+        "description": "Update product details (admin only)",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "slug": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "description": {
+                    "nullable": true,
+                    "type": "string"
+                  },
+                  "image": {
+                    "nullable": true,
+                    "type": "string"
+                  },
+                  "price": {
+                    "nullable": true,
+                    "type": "number",
+                    "minimum": 0
+                  },
+                  "colors": {
+                    "nullable": true,
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  "collectionIds": {
+                    "nullable": true,
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  "productType": {
+                    "default": "FLOWER",
+                    "type": "string",
+                    "enum": ["FLOWER", "FILLER", "ROSE", "PLANT", "SUCCULENT", "BRANCH"]
+                  },
+                  "featured": {
+                    "default": false,
+                    "type": "boolean"
+                  },
+                  "id": {
+                    "type": "string",
+                    "format": "uuid",
+                    "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                  }
+                },
+                "required": [
+                  "name",
+                  "slug",
+                  "description",
+                  "image",
+                  "price",
+                  "colors",
+                  "collectionIds",
+                  "id"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Product updated successfully"
+          },
+          "400": {
+            "description": "Invalid request"
+          },
+          "401": {
+            "description": "Unauthorized (admin only)"
+          }
+        }
+      }
+    },
+    "/api/products/delete": {
+      "post": {
+        "tags": ["Products"],
+        "summary": "Delete product",
+        "description": "Delete a product (admin only, soft delete)",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "format": "uuid",
+                    "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                  }
+                },
+                "required": ["id"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Product deleted successfully"
+          },
+          "400": {
+            "description": "Invalid request"
+          },
+          "401": {
+            "description": "Unauthorized (admin only)"
+          }
+        }
+      }
+    },
+    "/api/products/toggle-featured": {
+      "post": {
+        "tags": ["Products"],
+        "summary": "Toggle product featured status",
+        "description": "Toggle whether a product is featured (admin only)",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "format": "uuid",
+                    "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                  },
+                  "featured": {
+                    "type": "boolean"
+                  }
+                },
+                "required": ["id", "featured"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Product featured status updated"
+          },
+          "400": {
+            "description": "Invalid request"
+          },
+          "401": {
+            "description": "Unauthorized (admin only)"
+          }
+        }
+      }
+    },
+    "/api/products/count": {
+      "get": {
+        "tags": ["Products"],
+        "summary": "Get product count",
+        "description": "Get the total count of products with optional filters",
+        "parameters": [
+          {
+            "name": "boxlotOnly",
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            },
+            "description": "Filter to only ROSE type products"
+          },
+          {
+            "name": "query",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "maxLength": 255
+            },
+            "description": "Search query for product name or description"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Product count retrieved successfully"
+          }
+        }
+      }
+    },
+    "/api/collections/create": {
+      "post": {
+        "tags": ["Collections"],
+        "summary": "Create collection",
+        "description": "Create a new product collection (admin only)",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "slug": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "image": {
+                    "type": "string"
+                  },
+                  "description": {
+                    "type": "string"
+                  },
+                  "featured": {
+                    "type": "boolean"
+                  },
+                  "productIds": {
+                    "default": [],
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "format": "uuid",
+                      "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                    }
+                  }
+                },
+                "required": ["name", "slug", "image", "description", "featured"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Collection created successfully"
+          },
+          "400": {
+            "description": "Invalid request"
+          },
+          "401": {
+            "description": "Unauthorized (admin only)"
+          }
+        }
+      }
+    },
+    "/api/collections/update": {
+      "post": {
+        "tags": ["Collections"],
+        "summary": "Update collection",
+        "description": "Update collection details (admin only)",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "slug": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "image": {
+                    "type": "string"
+                  },
+                  "description": {
+                    "type": "string"
+                  },
+                  "featured": {
+                    "type": "boolean"
+                  },
+                  "productIds": {
+                    "default": [],
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "format": "uuid",
+                      "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                    }
+                  },
+                  "id": {
+                    "type": "string",
+                    "format": "uuid",
+                    "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                  }
+                },
+                "required": ["name", "slug", "image", "description", "featured", "id"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Collection updated successfully"
+          },
+          "400": {
+            "description": "Invalid request"
+          },
+          "401": {
+            "description": "Unauthorized (admin only)"
+          }
+        }
+      }
+    },
+    "/api/collections/delete": {
+      "post": {
+        "tags": ["Collections"],
+        "summary": "Delete collection",
+        "description": "Delete a collection (admin only)",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "format": "uuid",
+                    "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                  }
+                },
+                "required": ["id"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Collection deleted successfully"
+          },
+          "400": {
+            "description": "Invalid request"
+          },
+          "401": {
+            "description": "Unauthorized (admin only)"
+          }
+        }
+      }
+    },
+    "/api/collections/toggle-featured": {
+      "post": {
+        "tags": ["Collections"],
+        "summary": "Toggle collection featured status",
+        "description": "Toggle whether a collection is featured (admin only)",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "format": "uuid",
+                    "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                  },
+                  "featured": {
+                    "type": "boolean"
+                  }
+                },
+                "required": ["id", "featured"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Collection featured status updated"
+          },
+          "400": {
+            "description": "Invalid request"
+          },
+          "401": {
+            "description": "Unauthorized (admin only)"
+          }
+        }
+      }
+    },
+    "/api/inspirations/create": {
+      "post": {
+        "tags": ["Inspirations"],
+        "summary": "Create inspiration",
+        "description": "Create a new inspiration guide (admin only)",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "slug": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "subtitle": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "image": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "excerpt": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "text": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "productSelections": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "productId": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "quantity": {
+                          "type": "number",
+                          "minimum": 1
+                        }
+                      },
+                      "required": ["productId", "quantity"]
+                    }
+                  }
+                },
+                "required": [
+                  "name",
+                  "slug",
+                  "subtitle",
+                  "image",
+                  "excerpt",
+                  "text",
+                  "productSelections"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Inspiration created successfully"
+          },
+          "400": {
+            "description": "Invalid request"
+          },
+          "401": {
+            "description": "Unauthorized (admin only)"
+          }
+        }
+      }
+    },
+    "/api/inspirations/update": {
+      "post": {
+        "tags": ["Inspirations"],
+        "summary": "Update inspiration",
+        "description": "Update inspiration details (admin only)",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "slug": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "subtitle": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "image": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "excerpt": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "text": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "productSelections": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "productId": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "quantity": {
+                          "type": "number",
+                          "minimum": 1
+                        }
+                      },
+                      "required": ["productId", "quantity"]
+                    }
+                  },
+                  "id": {
+                    "type": "string",
+                    "format": "uuid",
+                    "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                  }
+                },
+                "required": [
+                  "name",
+                  "slug",
+                  "subtitle",
+                  "image",
+                  "excerpt",
+                  "text",
+                  "productSelections",
+                  "id"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Inspiration updated successfully"
+          },
+          "400": {
+            "description": "Invalid request"
+          },
+          "401": {
+            "description": "Unauthorized (admin only)"
+          }
+        }
+      }
+    },
+    "/api/inspirations/delete": {
+      "post": {
+        "tags": ["Inspirations"],
+        "summary": "Delete inspiration",
+        "description": "Delete an inspiration guide (admin only)",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "format": "uuid",
+                    "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                  }
+                },
+                "required": ["id"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Inspiration deleted successfully"
+          },
+          "400": {
+            "description": "Invalid request"
+          },
+          "401": {
+            "description": "Unauthorized (admin only)"
+          }
+        }
+      }
+    },
+    "/api/admin/users/approve": {
+      "post": {
+        "tags": ["Admin"],
+        "summary": "Approve user",
+        "description": "Approve a user account (admin only)",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "userId": {
+                    "type": "string",
+                    "format": "uuid",
+                    "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                  }
+                },
+                "required": ["userId"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "User approved successfully"
+          },
+          "400": {
+            "description": "Invalid request"
+          },
+          "401": {
+            "description": "Unauthorized (admin only)"
+          }
+        }
+      }
+    },
+    "/api/admin/users/unapprove": {
+      "post": {
+        "tags": ["Admin"],
+        "summary": "Unapprove user",
+        "description": "Unapprove or revoke a user account (admin only)",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "userId": {
+                    "type": "string",
+                    "format": "uuid",
+                    "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                  }
+                },
+                "required": ["userId"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "User unapproved successfully"
+          },
+          "400": {
+            "description": "Invalid request"
+          },
+          "401": {
+            "description": "Unauthorized (admin only)"
+          }
+        }
+      }
+    },
+    "/api/admin/users/price-multiplier": {
+      "post": {
+        "tags": ["Admin"],
+        "summary": "Update user price multiplier",
+        "description": "Update a user's price multiplier (admin only)",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "userId": {
+                    "type": "string",
+                    "format": "uuid",
+                    "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                  },
+                  "multiplier": {
+                    "type": "number",
+                    "minimum": 0.5,
+                    "maximum": 2
+                  }
+                },
+                "required": ["userId", "multiplier"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Price multiplier updated successfully"
+          },
+          "400": {
+            "description": "Invalid request"
+          },
+          "401": {
+            "description": "Unauthorized (admin only)"
+          }
+        }
+      }
+    },
+    "/api/admin/users/create": {
+      "post": {
+        "tags": ["Admin"],
+        "summary": "Create user",
+        "description": "Create a new user account (admin only)",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "email": {
+                    "type": "string",
+                    "format": "email",
+                    "pattern": "^(?!\\.)(?!.*\\.\\.)([A-Za-z0-9_'+\\-\\.]*)[A-Za-z0-9_+-]@([A-Za-z0-9][A-Za-z0-9\\-]*\\.)+[A-Za-z]{2,}$"
+                  },
+                  "name": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "phone": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "role": {
+                    "type": "string",
+                    "enum": ["CUSTOMER", "ADMIN", "SUBSCRIBER"]
+                  },
+                  "priceMultiplier": {
+                    "type": "number",
+                    "minimum": 0.5,
+                    "maximum": 2
+                  },
+                  "approved": {
+                    "type": "boolean"
+                  }
+                },
+                "required": ["email", "name", "phone", "role", "priceMultiplier", "approved"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "User created successfully"
+          },
+          "400": {
+            "description": "Invalid request"
+          },
+          "401": {
+            "description": "Unauthorized (admin only)"
+          }
+        }
+      }
+    },
+    "/api/metrics/record": {
+      "post": {
+        "tags": ["Metrics"],
+        "summary": "Record metric",
+        "description": "Record a new performance metric (admin only)",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "type": {
+                    "type": "string",
+                    "enum": ["SEED", "QUERY", "FETCH", "ADMIN_QUERY", "USER_QUERY"]
+                  },
+                  "name": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "duration": {
+                    "type": "number",
+                    "minimum": 0,
+                    "exclusiveMinimum": true
+                  }
+                },
+                "required": ["type", "name", "duration"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Metric recorded successfully"
+          },
+          "400": {
+            "description": "Invalid request"
+          },
+          "401": {
+            "description": "Unauthorized (admin only)"
+          }
+        }
+      }
+    },
+    "/api/search/products": {
+      "post": {
+        "tags": ["Search"],
+        "summary": "Search products",
+        "description": "Search for products with optional price multiplier applied",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "searchTerm": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 100
+                  }
+                },
+                "required": ["searchTerm"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Search results retrieved successfully"
+          },
+          "400": {
+            "description": "Invalid request"
+          }
+        }
+      }
+    },
+    "/api/blob/delete": {
+      "post": {
+        "tags": ["Blob"],
+        "summary": "Delete blob file",
+        "description": "Delete a file from Vercel Blob storage (admin only)",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "url": {
+                    "type": "string",
+                    "format": "uri"
+                  }
+                },
+                "required": ["url"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Blob deletion result"
+          },
+          "400": {
+            "description": "Invalid request"
+          },
+          "401": {
+            "description": "Unauthorized (admin only)"
+          }
+        }
+      }
+    }
+  },
+  "x-validation": {
+    "timestamp": "2026-01-16T07:30:00.841Z",
+    "schemasValidated": 7,
+    "schemaToTypeMappings": {
+      "addToCartSchema → CartResponse": {
+        "inputFields": ["productId", "quantity"],
+        "returnType": "CartResponse",
+        "returnFields": ["id", "orderNumber", "status", "notes", "items", "total"],
+        "notes": "Returns full cart after add operation"
+      },
+      "updateCartItemSchema → CartResponse": {
+        "inputFields": ["itemId", "quantity"],
+        "returnType": "CartResponse",
+        "returnFields": ["id", "orderNumber", "status", "notes", "items", "total"],
+        "notes": "Returns full cart after update"
+      },
+      "removeFromCartSchema → CartResponse": {
+        "inputFields": ["itemId"],
+        "returnType": "CartResponse",
+        "returnFields": ["id", "orderNumber", "status", "notes", "items", "total"],
+        "notes": "Returns full cart after removal"
+      },
+      "batchAddToCartSchema → CartResponse": {
+        "inputFields": ["productIds", "quantities"],
+        "returnType": "CartResponse",
+        "returnFields": ["id", "orderNumber", "status", "notes", "items", "total"],
+        "notes": "Returns full cart after batch add"
+      },
+      "cancelOrderSchema → CancelOrderResponse": {
+        "inputFields": ["orderId", "convertToCart"],
+        "returnType": "CancelOrderResponse",
+        "returnFields": ["message", "order"],
+        "notes": "Returns cancellation confirmation and order details"
+      },
+      "updateOrderStatusSchema → OrderWithItems": {
+        "inputFields": ["orderId", "status"],
+        "returnType": "OrderWithItems",
+        "returnFields": ["id", "userId", "status", "items", "createdAt"],
+        "notes": "Returns updated order with all items"
+      },
+      "updateOrderItemPriceSchema → {message, item, orderTotal}": {
+        "inputFields": ["orderId", "itemId", "price"],
+        "returnType": "OrderItem",
+        "returnFields": ["message", "item", "orderTotal"],
+        "notes": "Returns operation result with updated item and new order total"
+      }
+    },
+    "notes": "Schema validation ensures Zod input schemas match Prisma query-type return types. Generated automatically by npm run generate:schema"
+  }
+}

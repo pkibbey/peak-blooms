@@ -405,7 +405,7 @@ describe("Order Actions", () => {
         where: { id: "550e8400-e29b-41d4-a716-446655440011" },
         data: { price: 0 },
       })
-      expect(result.newOrderTotal).toBe(0)
+      expect(result.orderTotal).toBe(0)
     })
 
     it.skip("should calculate correct order total with multiple items", async () => {
@@ -437,7 +437,7 @@ describe("Order Actions", () => {
       })
 
       // (49.99 * 2) + (39.99 * 1) = 99.98 + 39.99 = 139.97
-      expect(result.newOrderTotal).toBe(139.97)
+      expect(result.orderTotal).toBe(139.97)
     })
 
     it.skip("should throw error on database update failure for order item", async () => {

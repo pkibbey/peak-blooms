@@ -71,7 +71,7 @@ export function ProductItem({
         <div className="flex flex-col justify-between bg-background p-4 gap-2 grow">
           <div>
             <Link prefetch={false} href={`/shop/${product.slug}`}>
-              <h3 className="font-semibold text-primary">{product.name}</h3>
+              <h3 className="text-lg font-semibold text-secondary-foreground">{product.name}</h3>
             </Link>
           </div>
 

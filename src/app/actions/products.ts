@@ -17,7 +17,9 @@ import {
   updateProductSchema,
 } from "@/lib/validations/product"
 
-export async function createProductAction(data: CreateProductFormData) {
+export async function createProductAction(
+  data: CreateProductFormData
+): Promise<{ success: boolean; id: string }> {
   const validatedData = createProductFormSchema.parse(data)
   try {
     const session = await getSession()
@@ -50,7 +52,9 @@ export async function createProductAction(data: CreateProductFormData) {
   }
 }
 
-export async function updateProductAction(input: UpdateProductInput) {
+export async function updateProductAction(
+  input: UpdateProductInput
+): Promise<{ success: boolean; id: string }> {
   const { id, ...data } = updateProductSchema.parse(input)
   try {
     const session = await getSession()
@@ -88,7 +92,9 @@ export async function updateProductAction(input: UpdateProductInput) {
   }
 }
 
-export async function deleteProductAction(input: DeleteProductInput) {
+export async function deleteProductAction(
+  input: DeleteProductInput
+): Promise<{ success: boolean }> {
   const { id } = deleteProductSchema.parse(input)
   try {
     const session = await getSession()
@@ -107,7 +113,9 @@ export async function deleteProductAction(input: DeleteProductInput) {
   }
 }
 
-export async function toggleProductFeaturedAction(input: ToggleProductFeaturedInput) {
+export async function toggleProductFeaturedAction(
+  input: ToggleProductFeaturedInput
+): Promise<{ success: boolean; featured: boolean }> {
   const { id, featured } = toggleProductFeaturedSchema.parse(input)
   try {
     const session = await getSession()

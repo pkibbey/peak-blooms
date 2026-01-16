@@ -1,20 +1,10 @@
 import { SortableTableHead } from "@/components/ui/SortableTableHead"
 import { Table, TableBody, TableHead, TableHeader, TableRow } from "@/components/ui/table"
+import type { CollectionBasicWithCount } from "@/lib/types/collections"
 import CollectionsTableRow from "./CollectionsTableRow"
 
-interface Collection {
-  id: string
-  name: string
-  slug: string
-  image: string | null
-  featured: boolean
-  _count?: {
-    productCollections: number
-  }
-}
-
 interface CollectionsTableProps {
-  collections: Collection[]
+  collections: CollectionBasicWithCount[]
   sort?: string | null
   order?: "asc" | "desc" | null
 }

@@ -15,10 +15,20 @@ import {
   updateUserPriceMultiplierSchema,
 } from "@/lib/validations/auth"
 
+type AdminUserResponse = {
+  id: string
+  email: string
+  name: string | null
+  role: string
+  approved: boolean
+  priceMultiplier: number
+  createdAt: Date
+}
+
 /**
  * Approve a user (admin only)
  */
-export async function approveUserAction(input: ApproveUserInput) {
+export async function approveUserAction(input: ApproveUserInput): Promise<AdminUserResponse> {
   try {
     const { userId } = approveUserSchema.parse(input)
 
@@ -60,7 +70,7 @@ export async function approveUserAction(input: ApproveUserInput) {
 /**
  * Unapprove/revoke a user (admin only)
  */
-export async function unapproveUserAction(input: UnapproveUserInput) {
+export async function unapproveUserAction(input: UnapproveUserInput): Promise<AdminUserResponse> {
   try {
     const { userId } = unapproveUserSchema.parse(input)
 
@@ -102,7 +112,9 @@ export async function unapproveUserAction(input: UnapproveUserInput) {
 /**
  * Update user's price multiplier (admin only)
  */
-export async function updateUserPriceMultiplierAction(input: UpdateUserPriceMultiplierInput) {
+export async function updateUserPriceMultiplierAction(
+  input: UpdateUserPriceMultiplierInput
+): Promise<AdminUserResponse> {
   try {
     const { userId, multiplier } = updateUserPriceMultiplierSchema.parse(input)
 
@@ -144,7 +156,7 @@ export async function updateUserPriceMultiplierAction(input: UpdateUserPriceMult
 /**
  * Create a new user (admin only)
  */
-export async function createUserAction(input: CreateUserInput) {
+export async function createUserAction(input: CreateUserInput): Promise<AdminUserResponse> {
   try {
     const data = createUserSchema.parse(input)
 

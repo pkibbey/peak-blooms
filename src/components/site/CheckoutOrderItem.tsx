@@ -1,20 +1,7 @@
 import Image from "next/image"
+import type { CartItemData } from "@/components/site/CartItem"
 import { Badge } from "@/components/ui/badge"
 import { formatPrice } from "@/lib/utils"
-
-interface CartProduct {
-  id: string
-  name: string
-  slug: string
-  image: string | null
-  price: number | null
-}
-
-interface CartItemData {
-  id: string
-  quantity: number
-  product: CartProduct
-}
 
 interface CheckoutOrderItemProps {
   item: CartItemData

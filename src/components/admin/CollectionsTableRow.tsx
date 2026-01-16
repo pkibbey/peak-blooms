@@ -8,20 +8,14 @@ import { toast } from "sonner"
 import { toggleCollectionFeaturedAction } from "@/app/actions/collections"
 import { Checkbox } from "@/components/ui/checkbox"
 import { TableCell, TableRow } from "@/components/ui/table"
+import type { CollectionBasicWithCount } from "@/lib/types/collections"
 import { cn } from "@/lib/utils"
 
-interface Collection {
-  id: string
-  name: string
-  slug: string
-  image: string | null
-  featured: boolean
-  _count?: {
-    productCollections: number
-  }
-}
-
-export default function CollectionsTableRow({ collection }: { collection: Collection }) {
+export default function CollectionsTableRow({
+  collection,
+}: {
+  collection: CollectionBasicWithCount
+}) {
   const router = useRouter()
   const [featured, setFeatured] = useState<boolean>(!!collection.featured)
   const [isPending, startTransition] = useTransition()

@@ -8,7 +8,9 @@ import { newsletterSubscribeSchema } from "@/lib/validations/newsletter"
  * Subscribe to newsletter
  * Creates a SUBSCRIBER user account (silently succeeds if email already exists)
  */
-export async function subscribeToNewsletterAction(email: string) {
+export async function subscribeToNewsletterAction(
+  email: string
+): Promise<{ success: boolean; userId?: string }> {
   try {
     // Validate email
     const validation = newsletterSubscribeSchema.safeParse({ email })

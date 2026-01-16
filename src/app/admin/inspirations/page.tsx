@@ -18,8 +18,8 @@ export default async function AdminInspirationsPage({ searchParams }: AdminInspi
 
   const inspirations = await db.inspiration.findMany({
     include: {
-      products: {
-        select: { id: true },
+      _count: {
+        select: { products: true },
       },
     },
     orderBy: {
@@ -35,8 +35,8 @@ export default async function AdminInspirationsPage({ searchParams }: AdminInspi
     })
   } else if (sort === "products") {
     inspirations.sort((a, b) => {
-      const aCount = a.products?.length || 0
-      const bCount = b.products?.length || 0
+      const aCount = a._count.products || 0
+      const bCount = b._count.products || 0
       return order === "desc" ? bCount - aCount : aCount - bCount
     })
   } else if (sort === "slug") {

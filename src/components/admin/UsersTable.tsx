@@ -19,20 +19,11 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
+import type { UserForAdmin } from "@/lib/types/users"
 import { formatDate, MAX_PRICE_MULTIPLIER, MIN_PRICE_MULTIPLIER } from "@/lib/utils"
 
-interface User {
-  id: string
-  email: string | null
-  name: string | null
-  role: string
-  approved: boolean
-  priceMultiplier: number
-  createdAt: Date
-}
-
 interface UsersTableProps {
-  users: User[]
+  users: UserForAdmin[]
   sort?: string | null
   order?: "asc" | "desc" | null
 }

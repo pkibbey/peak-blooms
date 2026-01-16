@@ -49,7 +49,7 @@ export function CollectionCard({ collection }: CollectionCardProps) {
               {collection.name}
             </h3>
           </Link>
-          <p className="mt-2 text-sm text-muted-foreground line-clamp-2">
+          <p className="mt-2 text-base text-muted-foreground line-clamp-2">
             {collection.description}
           </p>
         </div>

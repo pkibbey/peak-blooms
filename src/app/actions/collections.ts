@@ -15,7 +15,9 @@ import {
   updateCollectionSchema,
 } from "@/lib/validations/collection"
 
-export async function createCollectionAction(input: CreateCollectionInput) {
+export async function createCollectionAction(
+  input: CreateCollectionInput
+): Promise<{ success: boolean; id: string }> {
   try {
     const { productIds, ...data } = createCollectionSchema.parse(input)
     const session = await getSession()
@@ -51,7 +53,9 @@ export async function createCollectionAction(input: CreateCollectionInput) {
   }
 }
 
-export async function updateCollectionAction(input: UpdateCollectionInput) {
+export async function updateCollectionAction(
+  input: UpdateCollectionInput
+): Promise<{ success: boolean; id: string }> {
   try {
     const { id, productIds, ...data } = updateCollectionSchema.parse(input)
     const session = await getSession()
@@ -92,7 +96,9 @@ export async function updateCollectionAction(input: UpdateCollectionInput) {
   }
 }
 
-export async function deleteCollectionAction(input: DeleteCollectionInput) {
+export async function deleteCollectionAction(
+  input: DeleteCollectionInput
+): Promise<{ success: boolean }> {
   try {
     const { id } = deleteCollectionSchema.parse(input)
     const session = await getSession()
@@ -117,7 +123,9 @@ export async function deleteCollectionAction(input: DeleteCollectionInput) {
   }
 }
 
-export async function toggleCollectionFeaturedAction(input: ToggleCollectionFeaturedInput) {
+export async function toggleCollectionFeaturedAction(
+  input: ToggleCollectionFeaturedInput
+): Promise<{ success: boolean; featured: boolean }> {
   try {
     const { id, featured } = toggleCollectionFeaturedSchema.parse(input)
     const session = await getSession()

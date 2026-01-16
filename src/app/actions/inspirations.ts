@@ -13,7 +13,9 @@ import {
   updateInspirationSchema,
 } from "@/lib/validations/inspiration"
 
-export async function createInspirationAction(input: CreateInspirationInput) {
+export async function createInspirationAction(
+  input: CreateInspirationInput
+): Promise<{ success: boolean; id: string }> {
   try {
     const data = createInspirationSchema.parse(input)
     const session = await getSession()
@@ -51,7 +53,9 @@ export async function createInspirationAction(input: CreateInspirationInput) {
   }
 }
 
-export async function updateInspirationAction(input: UpdateInspirationInput) {
+export async function updateInspirationAction(
+  input: UpdateInspirationInput
+): Promise<{ success: boolean; id: string }> {
   try {
     const { id, ...data } = updateInspirationSchema.parse(input)
     const session = await getSession()
@@ -91,7 +95,9 @@ export async function updateInspirationAction(input: UpdateInspirationInput) {
   }
 }
 
-export async function deleteInspirationAction(input: DeleteInspirationInput) {
+export async function deleteInspirationAction(
+  input: DeleteInspirationInput
+): Promise<{ success: boolean }> {
   try {
     const { id } = deleteInspirationSchema.parse(input)
     const session = await getSession()

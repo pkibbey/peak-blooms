@@ -1,6 +1,7 @@
 "use server"
 
 import { revalidatePath } from "next/cache"
+import type { Address } from "@/generated/client"
 import { getSession } from "@/lib/auth"
 import { db } from "@/lib/db"
 import {
@@ -11,11 +12,21 @@ import {
 } from "@/lib/validations/address"
 import { type ProfileFormData, profileSchema } from "@/lib/validations/auth"
 
+type UserProfileResponse = {
+  id: string
+  email: string
+  name: string | null
+  image: string | null
+  role: string
+  approved: boolean
+  createdAt: Date
+}
+
 /**
  * Update current user's profile (name only)
  * Email cannot be changed - it's verified by Google OAuth
  */
-export async function updateProfileAction(data: ProfileFormData) {
+export async function updateProfileAction(data: ProfileFormData): Promise<UserProfileResponse> {
   try {
     const session = await getSession()
 
@@ -55,7 +66,7 @@ export async function updateProfileAction(data: ProfileFormData) {
 /**
  * Get all addresses for the current user
  */
-async function _getAddressesAction() {
+async function _getAddressesAction(): Promise<Address[]> {
   try {
     const session = await getSession()
 
@@ -77,7 +88,9 @@ async function _getAddressesAction() {
 /**
  * Create a new address for the current user
  */
-export async function createAddressAction(data: AddressFormData & { isDefault?: boolean }) {
+export async function createAddressAction(
+  data: AddressFormData & { isDefault?: boolean }
+): Promise<Address> {
   try {
     const session = await getSession()
 
@@ -130,7 +143,7 @@ export async function createAddressAction(data: AddressFormData & { isDefault?: 
 export async function updateAddressAction(
   addressId: string,
   data: Partial<AddressFormData & { isDefault?: boolean }>
-) {
+): Promise<Address> {
   try {
     const session = await getSession()
 
@@ -194,7 +207,9 @@ export async function updateAddressAction(
 /**
  * Delete an address for the current user
  */
-export async function deleteAddressAction(input: DeleteAddressInput) {
+export async function deleteAddressAction(
+  input: DeleteAddressInput
+): Promise<{ success: boolean }> {
   const { addressId } = deleteAddressSchema.parse(input)
   try {
     const session = await getSession()

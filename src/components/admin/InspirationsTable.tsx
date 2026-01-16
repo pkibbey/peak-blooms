@@ -2,19 +2,10 @@ import Image from "next/image"
 import Link from "next/link"
 import { SortableTableHead } from "@/components/ui/SortableTableHead"
 import { Table, TableBody, TableCell, TableHeader, TableRow } from "@/components/ui/table"
-
-interface Inspiration {
-  id: string
-  name: string
-  slug: string
-  image: string | null
-  products?: {
-    id: string
-  }[]
-}
+import type { InspirationWithCount } from "@/lib/types/inspirations"
 
 interface InspirationsTableProps {
-  inspirations: Inspiration[]
+  inspirations: InspirationWithCount[]
   sort?: string | null
   order?: "asc" | "desc" | null
 }
@@ -68,7 +59,7 @@ export default function InspirationsTable({ inspirations, sort, order }: Inspira
         </TableHeader>
         <TableBody>
           {inspirations.map((inspiration) => {
-            const productCount = inspiration.products?.length || 0
+            const productCount = inspiration._count?.products || 0
 
             return (
               <TableRow key={inspiration.id}>

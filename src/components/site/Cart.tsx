@@ -13,6 +13,7 @@ import { Button } from "@/components/ui/button"
 import { IconShoppingBag } from "@/components/ui/icons"
 import type { OrderModel } from "@/generated/models"
 import { calculateCartTotal } from "@/lib/cart-utils"
+import type { CartResponse } from "@/lib/query-types"
 import { useDebouncedCallback } from "@/lib/useDebouncedCallback"
 
 /**
@@ -26,12 +27,12 @@ export interface CartData
 }
 
 interface CartProps {
-  initialCart: CartData
+  initialCart: CartResponse
 }
 
 export default function Cart({ initialCart }: CartProps) {
   const router = useRouter()
-  const [cart, setCart] = useState<CartData>(initialCart)
+  const [cart, setCart] = useState<CartResponse>(initialCart)
   const [updatingItems, setUpdatingItems] = useState<Set<string>>(new Set())
   const [isEmptying, setIsEmptying] = useState(false)
 
@@ -43,7 +44,7 @@ export default function Cart({ initialCart }: CartProps) {
 
     try {
       const result = await updateCartItemAction({ itemId, quantity })
-      setCart(result as CartData)
+      setCart(result)
       router.refresh()
     } catch (error) {
       console.error("Error updating quantity:", error)
@@ -85,7 +86,7 @@ export default function Cart({ initialCart }: CartProps) {
 
     try {
       const result = await removeFromCartAction({ itemId })
-      setCart(result as CartData)
+      setCart(result)
       toast.success(`Removed "${productName}" from cart`)
       router.refresh()
     } catch (error) {
@@ -115,7 +116,7 @@ export default function Cart({ initialCart }: CartProps) {
 
     try {
       const result = await clearCartAction()
-      setCart(result as CartData)
+      setCart(result)
       toast.success("Cart cleared")
       router.refresh()
     } catch (err) {
