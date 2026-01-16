@@ -55,7 +55,7 @@ describe("Current User", () => {
     it("should return null when session has no user", async () => {
       vi.mocked(getSession).mockResolvedValueOnce({
         session: mockSession.session,
-        user: null as any,
+        user: null as never,
       })
 
       const result = await getCurrentUser()
@@ -111,7 +111,7 @@ describe("Current User", () => {
         ...mockSession,
         user: {
           ...mockSession.user,
-          role: null as any,
+          role: null as never,
         },
       })
 
@@ -125,7 +125,7 @@ describe("Current User", () => {
         ...mockSession,
         user: {
           ...mockSession.user,
-          approved: null as any,
+          approved: null as never,
         },
       })
 
@@ -139,7 +139,7 @@ describe("Current User", () => {
         ...mockSession,
         user: {
           ...mockSession.user,
-          priceMultiplier: null as any,
+          priceMultiplier: null as never,
         },
       })
 

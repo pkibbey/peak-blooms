@@ -46,7 +46,6 @@ export type UserFull = UserGetPayload<{
     role: true
     approved: true
     priceMultiplier: true
-    phone: true
     createdAt: true
     updatedAt: true
   }

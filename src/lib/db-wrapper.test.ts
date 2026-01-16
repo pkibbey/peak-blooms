@@ -236,9 +236,13 @@ describe("Database Wrapper", () => {
     it("should measure operation timing", async () => {
       const trackedDb = createTrackedDb(db, "USER_QUERY")
 
-      // Simulate a delay
+      // Simulate a delay - cast is needed because we're mocking Prisma's internal Promise type
       vi.mocked(db.product.findMany).mockImplementation(
-        () => new Promise<any>((resolve) => setTimeout(() => resolve([]), 50)) as any
+        () =>
+          new Promise((resolve) => {
+            setTimeout(() => resolve([]), 50)
+            // biome-ignore lint/suspicious/noExplicitAny: Simulated delay
+          }) as any
       )
 
       await trackedDb.product.findMany({})
@@ -396,17 +400,25 @@ describe("Database Wrapper", () => {
 
       // Ensure the mock has aggregate
       if (!vi.mocked(db.order.aggregate)) {
-        vi.mocked(db).order.aggregate = vi.fn().mockResolvedValueOnce({
+        const aggregateResult: { _count: { id: number } } = {
           _count: { id: 10 },
-        } as any)
+        }
+        vi.mocked(db).order.aggregate = vi.fn().mockResolvedValueOnce(aggregateResult)
       } else {
-        vi.mocked(db.order.aggregate).mockResolvedValueOnce({
+        const aggregateResult: {
+          _count: { id: number }
+          _avg: { orderNumber: number }
+          _sum: { orderNumber: number }
+          _min: { orderNumber: number }
+          _max: { orderNumber: number }
+        } = {
           _count: { id: 10 },
           _avg: { orderNumber: 10 },
           _sum: { orderNumber: 10 },
           _min: { orderNumber: 10 },
           _max: { orderNumber: 10 },
-        } as any)
+        }
+        vi.mocked(db.order.aggregate).mockResolvedValueOnce(aggregateResult)
       }
 
       await trackedDb.order.aggregate({ _count: true })

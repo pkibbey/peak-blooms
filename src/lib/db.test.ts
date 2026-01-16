@@ -24,9 +24,8 @@ vi.mock("../generated/client", () => ({
 describe("Database Module", () => {
   beforeEach(() => {
     vi.clearAllMocks()
-    const globalForPrisma = globalThis as any
-    if (globalForPrisma.prisma) {
-      delete globalForPrisma.prisma
+    if (typeof global !== "undefined" && "prisma" in global) {
+      delete (global as Record<string, unknown>).prisma
     }
   })
 

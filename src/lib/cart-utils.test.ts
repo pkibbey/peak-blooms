@@ -1,6 +1,12 @@
 import { describe, expect, it } from "vitest"
 import { applyPriceMultiplierToItems, calculateCartTotal } from "@/lib/cart-utils"
 
+// Test type for items that satisfy the generic constraint
+type TestPriceItem = {
+  quantity?: number
+  product?: { price: number | null; [key: string]: unknown } | null
+}
+
 describe("calculateCartTotal - cart total calculation", () => {
   describe("valid inputs", () => {
     it("should calculate total for single item", () => {
@@ -355,12 +361,12 @@ describe("applyPriceMultiplierToItems - apply price multiplier to cart items", (
     })
 
     it("should handle items with undefined product", () => {
-      const items = [
+      const items: TestPriceItem[] = [
         {
           quantity: 1,
         },
       ]
-      const result = applyPriceMultiplierToItems(items as any, 1.5)
+      const result = applyPriceMultiplierToItems(items, 1.5)
       expect(result[0].product).toBeNull()
     })
 

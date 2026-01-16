@@ -1,6 +1,13 @@
 import { beforeEach, describe, expect, it, vi } from "vitest"
-import type { OrderStatus } from "@/generated/enums"
-import { createMockPrismaClient } from "@/test/mocks"
+import {
+  createMockPrismaClient,
+  mockCartWithItems,
+  mockOrder,
+  mockOrderItemWithOrder,
+  mockOrderItemWithProduct,
+  mockProductBasic,
+  mockSessionUser,
+} from "@/test/mocks"
 
 // Mock dependencies - must be before imports
 vi.mock("@/lib/db", () => ({
@@ -12,8 +19,11 @@ vi.mock("@/lib/current-user", () => ({
 }))
 
 vi.mock("@/lib/cart-utils", () => ({
+  // biome-ignore lint/suspicious/noExplicitAny: Items parameter is intentionally flexible
   calculateCartTotal: vi.fn((items: any[]) => items.length * 10),
+  // biome-ignore lint/suspicious/noExplicitAny: Items parameter is intentionally flexible
   applyPriceMultiplierToItems: vi.fn((items: any[], multiplier: number) =>
+    // biome-ignore lint/suspicious/noExplicitAny: Item type is intentionally flexible
     items.map((item: any) => ({
       ...item,
       product: item.product
@@ -45,50 +55,50 @@ describe("Cart Actions", () => {
   const CART_ID = "550e8400-e29b-41d4-a716-446655440004"
   const ITEM_ID_1 = "550e8400-e29b-41d4-a716-446655440005"
 
-  const mockUser = {
-    id: USER_ID,
-    email: "test@example.com",
-    approved: true,
-    priceMultiplier: 1.0,
-  }
+  const mockUser = mockSessionUser({ id: USER_ID, email: "test@example.com", approved: true })
 
-  const mockProduct = {
+  const mockProduct = mockProductBasic({
     id: PRODUCT_ID_1,
     name: "Product 1",
     price: 10,
-  }
+  })
 
-  const mockCart = {
+  const mockCart = mockOrder({
     id: CART_ID,
     userId: USER_ID,
-    status: "CART" as OrderStatus,
-    items: [],
-  }
+    status: "CART",
+  })
 
   beforeEach(() => {
     vi.clearAllMocks()
     vi.mocked(getCurrentUser).mockResolvedValue(mockUser)
+    // biome-ignore lint/suspicious/noExplicitAny: PrismaClient $transaction callback type varies
     vi.mocked(db.$transaction).mockImplementation((fn: any) => fn(db))
-    vi.mocked(db.orderItem.findFirst).mockResolvedValue(null as any)
+    vi.mocked(db.orderItem.findFirst).mockResolvedValue(null as never)
   })
 
   describe("addToCartAction", () => {
     it("should add to cart successfully", async () => {
-      vi.mocked(db.order.findFirst).mockResolvedValue(mockCart as any)
-      vi.mocked(db.product.findUnique).mockResolvedValue(mockProduct as any)
-      vi.mocked(db.orderItem.findFirst).mockResolvedValue(null as any)
-      vi.mocked(db.order.findUniqueOrThrow).mockResolvedValue({ ...mockCart, items: [] } as any)
+      vi.mocked(db.order.findFirst).mockResolvedValue(mockCart)
+      vi.mocked(db.product.findUnique).mockResolvedValue(mockProduct)
+      vi.mocked(db.orderItem.findFirst).mockResolvedValue(null as never)
+      vi.mocked(db.order.findUniqueOrThrow).mockResolvedValue(mockCartWithItems({ id: CART_ID }))
 
       const result = await addToCartAction({ productId: PRODUCT_ID_1, quantity: 1 })
       expect(result.id).toBe(CART_ID)
     })
 
     it("should update quantity if item already exists", async () => {
-      const existingItem = { id: ITEM_ID_1, orderId: CART_ID, productId: PRODUCT_ID_1, quantity: 1 }
-      vi.mocked(db.order.findFirst).mockResolvedValue(mockCart as any)
-      vi.mocked(db.product.findUnique).mockResolvedValue(mockProduct as any)
-      vi.mocked(db.orderItem.findFirst).mockResolvedValue(existingItem as any)
-      vi.mocked(db.order.findUniqueOrThrow).mockResolvedValue({ ...mockCart, items: [] } as any)
+      const existingItem = mockOrderItemWithProduct({
+        id: ITEM_ID_1,
+        orderId: CART_ID,
+        productId: PRODUCT_ID_1,
+        quantity: 1,
+      })
+      vi.mocked(db.order.findFirst).mockResolvedValue(mockCart)
+      vi.mocked(db.product.findUnique).mockResolvedValue(mockProduct)
+      vi.mocked(db.orderItem.findFirst).mockResolvedValue(existingItem)
+      vi.mocked(db.order.findUniqueOrThrow).mockResolvedValue(mockCartWithItems({ id: CART_ID }))
 
       const result = await addToCartAction({ productId: PRODUCT_ID_1, quantity: 5 })
       expect(result.id).toBe(CART_ID)
@@ -100,10 +110,10 @@ describe("Cart Actions", () => {
         ...mockUser,
         priceMultiplier: undefined,
       })
-      vi.mocked(db.order.findFirst).mockResolvedValue(null as any)
-      vi.mocked(db.order.create).mockResolvedValue(mockCart as any)
-      vi.mocked(db.product.findUnique).mockResolvedValue(mockProduct as any)
-      vi.mocked(db.order.findUniqueOrThrow).mockResolvedValue({ ...mockCart, items: [] } as any)
+      vi.mocked(db.order.findFirst).mockResolvedValue(null as never)
+      vi.mocked(db.order.create).mockResolvedValue(mockCartWithItems({ id: CART_ID }))
+      vi.mocked(db.product.findUnique).mockResolvedValue(mockProduct)
+      vi.mocked(db.order.findUniqueOrThrow).mockResolvedValue(mockCartWithItems({ id: CART_ID }))
 
       await addToCartAction({ productId: PRODUCT_ID_1, quantity: 1 })
       expect(db.order.create).toHaveBeenCalled()
@@ -124,16 +134,16 @@ describe("Cart Actions", () => {
     })
 
     it("should throw error if product not found in DB", async () => {
-      vi.mocked(db.order.findFirst).mockResolvedValue(mockCart as any)
-      vi.mocked(db.product.findUnique).mockResolvedValue(null)
+      vi.mocked(db.order.findFirst).mockResolvedValue(mockCart)
+      vi.mocked(db.product.findUnique).mockResolvedValue(null as never)
       await expect(addToCartAction({ productId: PRODUCT_ID_1, quantity: 1 })).rejects.toThrow(
         "Product not found"
       )
     })
 
     it("should handle createCart failure", async () => {
-      vi.mocked(db.order.findFirst).mockResolvedValue(null as any)
-      vi.mocked(db.order.create).mockResolvedValue(null as any)
+      vi.mocked(db.order.findFirst).mockResolvedValue(null as never)
+      vi.mocked(db.order.create).mockResolvedValue(null as never)
       await expect(addToCartAction({ productId: PRODUCT_ID_1, quantity: 1 })).rejects.toThrow(
         "Failed to create cart"
       )
@@ -174,9 +184,13 @@ describe("Cart Actions", () => {
 
   describe("updateCartItemAction", () => {
     it("should update quantity successfully", async () => {
-      const mockItem = { id: ITEM_ID_1, orderId: CART_ID, order: { userId: USER_ID } }
-      vi.mocked(db.orderItem.findUniqueOrThrow).mockResolvedValue(mockItem as any)
-      vi.mocked(db.order.findUniqueOrThrow).mockResolvedValue({ ...mockCart, items: [] } as any)
+      const mockItem = mockOrderItemWithOrder({
+        id: ITEM_ID_1,
+        orderId: CART_ID,
+        order: { userId: USER_ID },
+      })
+      vi.mocked(db.orderItem.findUniqueOrThrow).mockResolvedValue(mockItem)
+      vi.mocked(db.order.findUniqueOrThrow).mockResolvedValue(mockCartWithItems({ id: CART_ID }))
 
       await updateCartItemAction({ itemId: ITEM_ID_1, quantity: 5 })
       expect(db.orderItem.update).toHaveBeenCalled()
@@ -187,18 +201,26 @@ describe("Cart Actions", () => {
         ...mockUser,
         priceMultiplier: undefined,
       })
-      const mockItem = { id: ITEM_ID_1, orderId: CART_ID, order: { userId: USER_ID } }
-      vi.mocked(db.orderItem.findUniqueOrThrow).mockResolvedValue(mockItem as any)
-      vi.mocked(db.order.findUniqueOrThrow).mockResolvedValue({ ...mockCart, items: [] } as any)
+      const mockItem = mockOrderItemWithOrder({
+        id: ITEM_ID_1,
+        orderId: CART_ID,
+        order: { userId: USER_ID },
+      })
+      vi.mocked(db.orderItem.findUniqueOrThrow).mockResolvedValue(mockItem)
+      vi.mocked(db.order.findUniqueOrThrow).mockResolvedValue(mockCartWithItems({ id: CART_ID }))
 
       await updateCartItemAction({ itemId: ITEM_ID_1, quantity: 5 })
       expect(db.order.findUniqueOrThrow).toHaveBeenCalled()
     })
 
     it("should delete item if quantity is 0", async () => {
-      const mockItem = { id: ITEM_ID_1, orderId: CART_ID, order: { userId: USER_ID } }
-      vi.mocked(db.orderItem.findUniqueOrThrow).mockResolvedValue(mockItem as any)
-      vi.mocked(db.order.findUniqueOrThrow).mockResolvedValue({ ...mockCart, items: [] } as any)
+      const mockItem = mockOrderItemWithOrder({
+        id: ITEM_ID_1,
+        orderId: CART_ID,
+        order: { userId: USER_ID },
+      })
+      vi.mocked(db.orderItem.findUniqueOrThrow).mockResolvedValue(mockItem)
+      vi.mocked(db.order.findUniqueOrThrow).mockResolvedValue(mockCartWithItems({ id: CART_ID }))
 
       await updateCartItemAction({ itemId: ITEM_ID_1, quantity: 0 })
       expect(db.orderItem.delete).toHaveBeenCalled()
@@ -212,8 +234,12 @@ describe("Cart Actions", () => {
     })
 
     it("should throw error if not owner", async () => {
-      const mockItem = { id: ITEM_ID_1, orderId: CART_ID, order: { userId: "other" } }
-      vi.mocked(db.orderItem.findUniqueOrThrow).mockResolvedValue(mockItem as any)
+      const mockItem = mockOrderItemWithOrder({
+        id: ITEM_ID_1,
+        orderId: CART_ID,
+        order: { userId: "other-user" },
+      })
+      vi.mocked(db.orderItem.findUniqueOrThrow).mockResolvedValue(mockItem)
       await expect(updateCartItemAction({ itemId: ITEM_ID_1, quantity: 1 })).rejects.toThrow(
         "Unauthorized"
       )
@@ -241,9 +267,13 @@ describe("Cart Actions", () => {
 
   describe("removeFromCartAction", () => {
     it("should remove item successfully", async () => {
-      const mockItem = { id: ITEM_ID_1, orderId: CART_ID, order: { userId: USER_ID } }
-      vi.mocked(db.orderItem.findUniqueOrThrow).mockResolvedValue(mockItem as any)
-      vi.mocked(db.order.findUniqueOrThrow).mockResolvedValue({ ...mockCart, items: [] } as any)
+      const mockItem = mockOrderItemWithOrder({
+        id: ITEM_ID_1,
+        orderId: CART_ID,
+        order: { userId: USER_ID },
+      })
+      vi.mocked(db.orderItem.findUniqueOrThrow).mockResolvedValue(mockItem)
+      vi.mocked(db.order.findUniqueOrThrow).mockResolvedValue(mockCartWithItems({ id: CART_ID }))
 
       await removeFromCartAction({ itemId: ITEM_ID_1 })
       expect(db.orderItem.delete).toHaveBeenCalled()
@@ -254,17 +284,25 @@ describe("Cart Actions", () => {
         ...mockUser,
         priceMultiplier: undefined,
       })
-      const mockItem = { id: ITEM_ID_1, orderId: CART_ID, order: { userId: USER_ID } }
-      vi.mocked(db.orderItem.findUniqueOrThrow).mockResolvedValue(mockItem as any)
-      vi.mocked(db.order.findUniqueOrThrow).mockResolvedValue({ ...mockCart, items: [] } as any)
+      const mockItem = mockOrderItemWithOrder({
+        id: ITEM_ID_1,
+        orderId: CART_ID,
+        order: { userId: USER_ID },
+      })
+      vi.mocked(db.orderItem.findUniqueOrThrow).mockResolvedValue(mockItem)
+      vi.mocked(db.order.findUniqueOrThrow).mockResolvedValue(mockCartWithItems({ id: CART_ID }))
 
       await removeFromCartAction({ itemId: ITEM_ID_1 })
       expect(db.order.findUniqueOrThrow).toHaveBeenCalled()
     })
 
     it("should throw error if not owner", async () => {
-      const mockItem = { id: ITEM_ID_1, orderId: CART_ID, order: { userId: "other" } }
-      vi.mocked(db.orderItem.findUniqueOrThrow).mockResolvedValue(mockItem as any)
+      const mockItem = mockOrderItemWithOrder({
+        id: ITEM_ID_1,
+        orderId: CART_ID,
+        order: { userId: "other-user" },
+      })
+      vi.mocked(db.orderItem.findUniqueOrThrow).mockResolvedValue(mockItem)
       await expect(removeFromCartAction({ itemId: ITEM_ID_1 })).rejects.toThrow("Unauthorized")
     })
 
@@ -289,9 +327,9 @@ describe("Cart Actions", () => {
 
   describe("batchAddToCartAction", () => {
     it("should add multiple itemssuccessfully", async () => {
-      vi.mocked(db.order.findFirst).mockResolvedValue(mockCart as any)
-      vi.mocked(db.order.findUniqueOrThrow).mockResolvedValue({ ...mockCart, items: [] } as any)
-      vi.mocked(db.orderItem.findFirst).mockResolvedValue(null as any)
+      vi.mocked(db.order.findFirst).mockResolvedValue(mockCart)
+      vi.mocked(db.order.findUniqueOrThrow).mockResolvedValue(mockCartWithItems({ id: CART_ID }))
+      vi.mocked(db.orderItem.findFirst).mockResolvedValue(null as never)
 
       await batchAddToCartAction({ productIds: [PRODUCT_ID_1, PRODUCT_ID_2], quantities: [1, 2] })
       expect(db.orderItem.create).toHaveBeenCalledTimes(2)
@@ -302,42 +340,44 @@ describe("Cart Actions", () => {
         ...mockUser,
         priceMultiplier: undefined,
       })
-      vi.mocked(db.order.findFirst).mockResolvedValue(mockCart as any)
-      vi.mocked(db.order.findUniqueOrThrow).mockResolvedValue({ ...mockCart, items: [] } as any)
-      vi.mocked(db.orderItem.findFirst).mockResolvedValue(null as any)
+      vi.mocked(db.order.findFirst).mockResolvedValue(mockCart)
+      vi.mocked(db.order.findUniqueOrThrow).mockResolvedValue(mockCartWithItems({ id: CART_ID }))
+      vi.mocked(db.orderItem.findFirst).mockResolvedValue(null as never)
 
       await batchAddToCartAction({ productIds: [PRODUCT_ID_1], quantities: [1] })
       expect(db.order.findUniqueOrThrow).toHaveBeenCalled()
     })
 
     it("should update quantity if item already exists in batch", async () => {
-      vi.mocked(db.order.findFirst).mockResolvedValue(mockCart as any)
-      vi.mocked(db.order.findUniqueOrThrow).mockResolvedValue({ ...mockCart, items: [] } as any)
-      vi.mocked(db.orderItem.findFirst).mockResolvedValue({ id: "existing" } as any)
+      vi.mocked(db.order.findFirst).mockResolvedValue(mockCart)
+      vi.mocked(db.order.findUniqueOrThrow).mockResolvedValue(mockCartWithItems({ id: CART_ID }))
+      vi.mocked(db.orderItem.findFirst).mockResolvedValue(
+        mockOrderItemWithProduct({ id: "existing" })
+      )
 
       await batchAddToCartAction({ productIds: [PRODUCT_ID_1], quantities: [5] })
       expect(db.orderItem.update).toHaveBeenCalled()
     })
 
     it("should work when quantities is a number", async () => {
-      vi.mocked(db.order.findFirst).mockResolvedValue(mockCart as any)
-      vi.mocked(db.order.findUniqueOrThrow).mockResolvedValue({ ...mockCart, items: [] } as any)
-      vi.mocked(db.orderItem.findFirst).mockResolvedValue(null as any)
+      vi.mocked(db.order.findFirst).mockResolvedValue(mockCart)
+      vi.mocked(db.order.findUniqueOrThrow).mockResolvedValue(mockCartWithItems({ id: CART_ID }))
+      vi.mocked(db.orderItem.findFirst).mockResolvedValue(null as never)
       await batchAddToCartAction({ productIds: [PRODUCT_ID_1, PRODUCT_ID_2], quantities: 3 })
       expect(db.orderItem.create).toHaveBeenCalledTimes(2)
     })
 
     it("should work when quantities is omitted", async () => {
-      vi.mocked(db.order.findFirst).mockResolvedValue(mockCart as any)
-      vi.mocked(db.order.findUniqueOrThrow).mockResolvedValue({ ...mockCart, items: [] } as any)
-      vi.mocked(db.orderItem.findFirst).mockResolvedValue(null as any)
+      vi.mocked(db.order.findFirst).mockResolvedValue(mockCart)
+      vi.mocked(db.order.findUniqueOrThrow).mockResolvedValue(mockCartWithItems({ id: CART_ID }))
+      vi.mocked(db.orderItem.findFirst).mockResolvedValue(null as never)
       await batchAddToCartAction({ productIds: [PRODUCT_ID_1] })
       expect(db.orderItem.create).toHaveBeenCalled()
     })
 
     it("should handle createCart failure", async () => {
-      vi.mocked(db.order.findFirst).mockResolvedValue(null as any)
-      vi.mocked(db.order.create).mockResolvedValue(null as any)
+      vi.mocked(db.order.findFirst).mockResolvedValue(null as never)
+      vi.mocked(db.order.create).mockResolvedValue(null as never)
       await expect(batchAddToCartAction({ productIds: [PRODUCT_ID_1] })).rejects.toThrow(
         "Failed to create cart"
       )
@@ -379,22 +419,22 @@ describe("Cart Actions", () => {
 
   describe("clearCartAction", () => {
     it("should clear cart successfully", async () => {
-      vi.mocked(db.order.findFirst).mockResolvedValue(mockCart as any)
+      vi.mocked(db.order.findFirst).mockResolvedValue(mockCart)
       const result = await clearCartAction()
       expect(db.orderItem.deleteMany).toHaveBeenCalled()
       expect(result.id).toBe(CART_ID)
     })
 
     it("should create cart if none exists during clear", async () => {
-      vi.mocked(db.order.findFirst).mockResolvedValue(null as any)
-      vi.mocked(db.order.create).mockResolvedValue(mockCart as any)
+      vi.mocked(db.order.findFirst).mockResolvedValue(null as never)
+      vi.mocked(db.order.create).mockResolvedValue(mockCartWithItems({ id: CART_ID }))
       const result = await clearCartAction()
       expect(result.id).toBe(CART_ID)
     })
 
     it("should handle createCart failure during clear", async () => {
-      vi.mocked(db.order.findFirst).mockResolvedValue(null as any)
-      vi.mocked(db.order.create).mockResolvedValue(null as any)
+      vi.mocked(db.order.findFirst).mockResolvedValue(null as never)
+      vi.mocked(db.order.create).mockResolvedValue(null as never)
       await expect(clearCartAction()).rejects.toThrow("Failed to create cart")
     })
 
@@ -406,13 +446,13 @@ describe("Cart Actions", () => {
 
   describe("getCartAction", () => {
     it("should fetch cart successfully", async () => {
-      vi.mocked(db.order.findFirst).mockResolvedValue({ ...mockCart, items: [] } as any)
+      vi.mocked(db.order.findFirst).mockResolvedValue(mockCartWithItems({ id: CART_ID }))
       const result = await getCartAction()
       expect(result?.id).toBe(CART_ID)
     })
 
     it("should return null if no cart exists", async () => {
-      vi.mocked(db.order.findFirst).mockResolvedValue(null as any)
+      vi.mocked(db.order.findFirst).mockResolvedValue(null as never)
       const result = await getCartAction()
       expect(result).toBeNull()
     })

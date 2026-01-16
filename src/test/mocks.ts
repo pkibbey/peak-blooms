@@ -1,15 +1,28 @@
 import { vi } from "vitest"
+import { Role } from "@/generated/client"
+import type {
+  CartWithItems,
+  OrderItemWithOrder,
+  OrderItemWithProduct,
+  ProductBasic,
+  SessionUser,
+  UserFull,
+} from "@/lib/query-types"
 
 /**
- * Mock factory for common dependencies
- * Use these in your tests to avoid creating real instances
+ * Mock factory for common dependencies and test data
+ * Use these in your tests to create properly-typed test objects
  */
+
+// =============================================================================
+// PRISMA CLIENT MOCKS
+// =============================================================================
 
 /**
  * Create a mocked Prisma client for server action tests
  * Example usage:
  *   const mockPrisma = createMockPrismaClient()
- *   vi.mocked(prisma).user.findUnique.mockResolvedValueOnce({ id: '1', email: 'test@example.com' })
+ *   vi.mocked(mockPrisma).user.findUnique.mockResolvedValueOnce(mockUserFull())
  */
 export function createMockPrismaClient() {
   return {
@@ -121,4 +134,149 @@ export function createMockPrismaClient() {
     },
     $transaction: vi.fn(),
   }
+}
+// =============================================================================
+// TEST DATA FACTORIES
+// =============================================================================
+
+/**
+ * Create a mock UserFull object with sensible defaults
+ * Override any field by passing an object
+ * Example: mockUserFull({ role: "ADMIN", approved: true })
+ */
+export function mockUserFull(overrides?: Partial<UserFull>): UserFull {
+  return {
+    id: "test-user-id",
+    email: "test@example.com",
+    emailVerified: false,
+    name: "Test User",
+    image: null,
+    role: Role.CUSTOMER,
+    approved: false,
+    priceMultiplier: 1.0,
+    createdAt: new Date("2025-01-01"),
+    updatedAt: new Date("2025-01-15"),
+    ...overrides,
+  }
+}
+
+/**
+ * Create a mock SessionUser object (minimal user for session storage)
+ * Example: mockSessionUser({ role: "ADMIN", priceMultiplier: 1.5 })
+ */
+export function mockSessionUser(overrides?: Partial<SessionUser>): SessionUser {
+  return {
+    id: "test-user-id",
+    email: "test@example.com",
+    name: "Test User",
+    image: null,
+    role: Role.CUSTOMER,
+    approved: false,
+    priceMultiplier: 1.0,
+    ...overrides,
+  }
+}
+
+/**
+ * Create a mock ProductBasic object
+ * Example: mockProductBasic({ name: "Premium Rose", price: 75 })
+ */
+export function mockProductBasic(overrides?: Partial<ProductBasic>): ProductBasic {
+  return {
+    id: "test-product-id",
+    name: "Test Product",
+    slug: "test-product",
+    image: "/images/test-product.jpg",
+    price: 50.0,
+    description: "A test product",
+    colors: [],
+    featured: false,
+    productType: "ROSE" as const,
+    deletedAt: null,
+    createdAt: new Date("2025-01-01"),
+    updatedAt: new Date("2025-01-15"),
+    ...overrides,
+  }
+}
+
+/**
+ * Create a mock OrderItemWithProduct object
+ * Example: mockOrderItemWithProduct({ quantity: 2, product: mockProductBasic({ price: 100 }) })
+ */
+export function mockOrderItemWithProduct(
+  overrides?: Partial<OrderItemWithProduct>
+): OrderItemWithProduct {
+  return {
+    id: "test-order-item-id",
+    orderId: "test-order-id",
+    productId: "test-product-id",
+    quantity: 1,
+    price: 50.0,
+    productNameSnapshot: "Test Product",
+    productImageSnapshot: "/images/test-product.jpg",
+    product: mockProductBasic(),
+    ...overrides,
+  }
+}
+
+/**
+ * Create a mock CartWithItems object
+ * Example: mockCartWithItems({ userId: "user-123", items: [mockOrderItemWithProduct({ quantity: 2 })] })
+ */
+export function mockCartWithItems(overrides?: Partial<CartWithItems>): CartWithItems {
+  const cartId = overrides?.id || "test-order-id"
+  return {
+    id: cartId as string,
+    orderNumber: 1,
+    userId: "test-user-id",
+    status: "CART" as const,
+    notes: null,
+    createdAt: new Date("2025-01-15"),
+    updatedAt: new Date("2025-01-15"),
+    deliveryAddressId: null,
+    items: [
+      mockOrderItemWithProduct({
+        orderId: cartId as string,
+      }),
+    ],
+    ...overrides,
+  }
+}
+
+/**
+ * Create a mock Order (without items for API responses)
+ * Used for findFirst queries that don't include items
+ */
+export function mockOrder(overrides?: Record<string, unknown>) {
+  return {
+    id: "test-order-id",
+    orderNumber: 1,
+    userId: "test-user-id",
+    status: "CART" as const,
+    notes: null,
+    createdAt: new Date("2025-01-15"),
+    updatedAt: new Date("2025-01-15"),
+    deliveryAddressId: null,
+    ...overrides,
+  }
+}
+
+/**
+ * Create a mock OrderItem with Order relation
+ * Used when orderItem needs parent order reference
+ * Example: mockOrderItemWithOrder({ orderId: CART_ID, order: { userId: USER_ID } })
+ */
+export function mockOrderItemWithOrder(
+  overrides?: Record<string, unknown> & { order?: Record<string, unknown> }
+): OrderItemWithOrder {
+  const orderId = (overrides?.orderId as string) || "test-order-id"
+  const orderOverrides = overrides?.order || {}
+  const userId = (orderOverrides.userId as string) || "test-user-id"
+
+  const { order, ...itemOverrides } = overrides || {}
+
+  return {
+    ...mockOrderItemWithProduct({ orderId, ...itemOverrides }),
+    order: mockOrder({ id: orderId, userId, ...orderOverrides }),
+  } as OrderItemWithOrder
 }
