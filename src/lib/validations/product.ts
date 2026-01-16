@@ -13,7 +13,7 @@ export const productSchema = z.object({
     }),
   colors: z.array(z.string()).nullable(),
   collectionIds: z.array(z.string()).nullable(),
-  productType: z.enum(["FLOWER", "FILLER", "ROSE"]),
+  productType: z.enum(["FLOWER", "FILLER", "ROSE", "PLANT", "SUCCULENT", "BRANCH"]),
   featured: z.boolean(),
 })
 
@@ -28,7 +28,9 @@ const createProductSchema = z.object({
   price: z.number().min(0, "Price must be a positive number").nullable(),
   colors: z.array(z.string()).nullable(),
   collectionIds: z.array(z.string()).nullable(),
-  productType: z.enum(["FLOWER", "FILLER", "ROSE"]).default("FLOWER"),
+  productType: z
+    .enum(["FLOWER", "FILLER", "ROSE", "PLANT", "SUCCULENT", "BRANCH"])
+    .default("FLOWER"),
   featured: z.boolean().default(false),
 })
 
@@ -74,7 +76,9 @@ export const createProductFormSchema = z.object({
     }),
   colors: z.array(z.string()).nullable(),
   collectionIds: z.array(z.string()).nullable(),
-  productType: z.enum(["FLOWER", "FILLER", "ROSE"]).default("FLOWER"),
+  productType: z
+    .enum(["FLOWER", "FILLER", "ROSE", "PLANT", "SUCCULENT", "BRANCH"])
+    .default("FLOWER"),
   featured: z.boolean().default(false),
 })
 

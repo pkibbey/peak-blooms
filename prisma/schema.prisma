@@ -248,4 +248,7 @@ enum ProductType {
   FLOWER
   FILLER
   ROSE
+  PLANT
+  SUCCULENT
+  BRANCH
 }

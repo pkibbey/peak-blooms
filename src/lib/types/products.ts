@@ -1,4 +1,19 @@
-import type { ProductGetPayload } from "@/generated/models"
+/**
+ * Product Types - Re-exported from query-types.ts for backward compatibility
+ *
+ * This file serves as a re-export barrel for product-related types.
+ * New types should be added to src/lib/query-types.ts and imported here.
+ */
+
+import type {
+  ProductBasic,
+  ProductFull,
+  ProductWithCollections,
+  ProductWithInspirations,
+} from "@/lib/query-types"
+
+// Re-exports from query-types.ts
+export type { ProductFull, ProductWithCollections, ProductBasic, ProductWithInspirations }
 
 /**
  * Options for filtering and paginating products
@@ -26,29 +41,3 @@ export interface GetProductsResult {
   limit: number
   offset: number
 }
-
-export type ProductWithCollections = ProductGetPayload<{
-  include: { productCollections: { include: { collection: true } } }
-}>
-
-/** Product with collections and inspirations with counts */
-export type ProductWithInspirations = ProductGetPayload<{
-  include: {
-    productCollections: {
-      include: {
-        collection: true
-      }
-    }
-    inspirations: {
-      include: {
-        inspiration: {
-          include: {
-            _count: {
-              select: { products: true }
-            }
-          }
-        }
-      }
-    }
-  }
-}>

@@ -61,11 +61,97 @@ function getQuantity(priceString: string): number {
   return 10
 }
 
-// Helper function to read and parse CSV file
+// Helper function to map category to product type
+function categoryToProductType(
+  category: string
+): "FLOWER" | "FILLER" | "ROSE" | "PLANT" | "SUCCULENT" | "BRANCH" {
+  const lower = category.toLowerCase()
+  if (lower.includes("rose")) return "ROSE"
+  if (lower.includes("filler") || lower.includes("green")) return "FILLER"
+  if (lower.includes("plant")) return "PLANT"
+  if (lower.includes("succulent")) return "SUCCULENT"
+  if (lower.includes("branch")) return "BRANCH"
+  return "FLOWER"
+}
+
+// Helper function to read and parse price-list.csv format
+function readProductsFromPriceList(): Array<{
+  name: string
+  price: number | null
+  type: "FLOWER" | "FILLER" | "ROSE" | "PLANT" | "SUCCULENT" | "BRANCH"
+  quantity: number
+  description: string
+  colors: string[]
+  image?: string
+}> {
+  const csvPath = path.join(process.cwd(), "prisma", "price-list.csv")
+  console.log(`Reading price-list from: ${csvPath}`)
+  let fileContent: string
+  try {
+    fileContent = fs.readFileSync(csvPath, "utf-8")
+  } catch (err) {
+    console.error(`❌ Failed to read price-list CSV: ${(err as Error).message}`)
+    throw err
+  }
+  const lines = fileContent.split("\n")
+
+  const products: Array<{
+    name: string
+    price: number | null
+    type: "FLOWER" | "FILLER" | "ROSE" | "PLANT" | "SUCCULENT" | "BRANCH"
+    quantity: number
+    description: string
+    colors: string[]
+    image?: string
+  }> = []
+
+  // Skip header row (line 0)
+  for (let i = 1; i < lines.length; i++) {
+    const line = lines[i].trim()
+    if (!line) continue
+
+    // Parse CSV line (handle quoted fields with commas)
+    const match = line.match(/"([^"]*)"|([^,]+)/g) || []
+    if (match.length < 3) continue
+
+    const category = (match[0] || "").replace(/"/g, "").trim()
+    const name = (match[1] || "").replace(/"/g, "").trim()
+    const priceStr = (match[2] || "").replace(/"/g, "").trim()
+
+    const price = parsePrice(priceStr)
+    const quantity = getQuantity(priceStr)
+    const type = categoryToProductType(category)
+    // Colors not available in price-list, default to empty array
+    const colors: string[] = []
+
+    if (name && category) {
+      products.push({
+        name,
+        price,
+        type,
+        quantity,
+        description: "", // No description in price-list
+        colors,
+        image: undefined,
+      })
+    }
+  }
+
+  console.log(`✅ Parsed ${products.length} products from price-list (${lines.length} lines)`)
+  if (products.length === 0) {
+    console.warn(
+      "⚠️  No products were parsed from price-list - check the file format and header row."
+    )
+  }
+
+  return products
+}
+
+// Helper function to read and parse CSV file (legacy products.csv format)
 function readProductsFromCSV(): Array<{
   name: string
   price: number | null
-  type: "FLOWER" | "FILLER" | "ROSE"
+  type: "FLOWER" | "FILLER" | "ROSE" | "PLANT" | "SUCCULENT" | "BRANCH"
   quantity: number
   description: string
   colors: string[]
@@ -86,7 +172,7 @@ function readProductsFromCSV(): Array<{
   const products: Array<{
     name: string
     price: number | null
-    type: "FLOWER" | "FILLER" | "ROSE"
+    type: "FLOWER" | "FILLER" | "ROSE" | "PLANT" | "SUCCULENT" | "BRANCH"
     quantity: number
     description: string
     colors: string[]
@@ -195,10 +281,34 @@ async function seedProducts() {
       )
       console.log(`✅ Created/updated ${collections.length} collections`)
 
-      // Seed products from CSV file
-      console.log("📦 Seeding products from CSV...")
+      // Seed products from price-list.csv file (or fallback to products.csv)
+      console.log("📦 Seeding products from price-list...")
       const start_readCSV = performance.now()
-      const csvProducts = readProductsFromCSV()
+
+      // Try to read price-list.csv first, fall back to products.csv if not found
+      let csvProducts: Array<{
+        name: string
+        price: number | null
+        type: "FLOWER" | "FILLER" | "ROSE" | "PLANT" | "SUCCULENT" | "BRANCH"
+        quantity: number
+        description: string
+        colors: string[]
+        image?: string
+      }> = []
+
+      const priceListPath = path.join(process.cwd(), "prisma", "price-list.csv")
+      const productsPath = path.join(process.cwd(), "prisma", "products.csv")
+
+      if (fs.existsSync(priceListPath)) {
+        console.log("✅ Using price-list.csv")
+        csvProducts = readProductsFromPriceList()
+      } else if (fs.existsSync(productsPath)) {
+        console.log("✅ Using products.csv (price-list.csv not found)")
+        csvProducts = readProductsFromCSV()
+      } else {
+        throw new Error("Neither price-list.csv nor products.csv found in prisma directory")
+      }
+
       await captureMetric(MetricType.SEED, "read products CSV", performance.now() - start_readCSV)
       console.log(`📦 Found ${csvProducts.length} CSV products - starting bulk upsert...`)
 

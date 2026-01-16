@@ -37,7 +37,7 @@ async function createCart(user: SessionUser) {
     },
   })
 
-  const multiplier = user.priceMultiplier
+  const multiplier = user.priceMultiplier ?? 1.0
   const adjustedItems = applyPriceMultiplierToItems(newCart.items, multiplier)
 
   return {
@@ -110,7 +110,10 @@ export async function addToCartAction(input: AddToCartInput) {
       },
     })
 
-    const adjustedItems = applyPriceMultiplierToItems(updatedCart.items, user.priceMultiplier)
+    const adjustedItems = applyPriceMultiplierToItems(
+      updatedCart.items,
+      user.priceMultiplier ?? 1.0
+    )
     const total = calculateCartTotal(adjustedItems)
 
     revalidatePath("/cart")
@@ -180,7 +183,10 @@ export async function updateCartItemAction(input: UpdateCartItemInput) {
       },
     })
 
-    const adjustedItems = applyPriceMultiplierToItems(updatedCart.items, user.priceMultiplier)
+    const adjustedItems = applyPriceMultiplierToItems(
+      updatedCart.items,
+      user.priceMultiplier ?? 1.0
+    )
     const total = calculateCartTotal(adjustedItems)
 
     revalidatePath("/cart")
@@ -236,7 +242,10 @@ export async function removeFromCartAction(input: RemoveFromCartInput) {
       },
     })
 
-    const adjustedItems = applyPriceMultiplierToItems(updatedCart.items, user.priceMultiplier)
+    const adjustedItems = applyPriceMultiplierToItems(
+      updatedCart.items,
+      user.priceMultiplier ?? 1.0
+    )
     const total = calculateCartTotal(adjustedItems)
 
     revalidatePath("/cart")
@@ -328,7 +337,7 @@ export async function getCartAction() {
 
     if (!cart) return null
 
-    const adjustedItems = applyPriceMultiplierToItems(cart.items, user.priceMultiplier)
+    const adjustedItems = applyPriceMultiplierToItems(cart.items, user.priceMultiplier ?? 1.0)
     const total = calculateCartTotal(adjustedItems)
 
     return {
@@ -424,7 +433,10 @@ export async function batchAddToCartAction(input: BatchAddToCartInput) {
       },
     })
 
-    const adjustedItems = applyPriceMultiplierToItems(updatedCart.items, user.priceMultiplier)
+    const adjustedItems = applyPriceMultiplierToItems(
+      updatedCart.items,
+      user.priceMultiplier ?? 1.0
+    )
     const total = calculateCartTotal(adjustedItems)
 
     revalidatePath("/cart")

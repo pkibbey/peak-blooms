@@ -1,20 +1,19 @@
+/**
+ * Collection Types - Re-exported from query-types.ts for backward compatibility
+ *
+ * This file serves as a re-export barrel for collection-related types.
+ * New types should be added to src/lib/query-types.ts and imported here.
+ */
+
 import type { CollectionGetPayload } from "@/generated/models"
+import type { CollectionBasic, CollectionWithProducts } from "@/lib/query-types"
 
-/** Basic collection without relations */
-export type CollectionBasic = CollectionGetPayload<Record<string, never>>
+// Re-exports from query-types.ts
+export type { CollectionBasic, CollectionWithProducts }
 
-/** Basic collection including product count (_count.productCollections) */
+/** Basic collection including product count (_count.productCollections)
+ * @deprecated Use CollectionBasic or CollectionWithProducts from query-types.ts
+ */
 export type CollectionBasicWithCount = CollectionGetPayload<{
   include: { _count: { select: { productCollections: true } } }
-}>
-
-/** Collection with all products */
-export type CollectionWithProducts = CollectionGetPayload<{
-  include: {
-    productCollections: {
-      include: {
-        product: true
-      }
-    }
-  }
 }>

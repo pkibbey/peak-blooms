@@ -49,7 +49,7 @@ interface ProductFormProps {
     price: number | null
     colors?: string[] | null
     collectionIds: string[]
-    productType?: "FLOWER" | "FILLER" | "ROSE"
+    productType?: "FLOWER" | "FILLER" | "ROSE" | "PLANT" | "SUCCULENT" | "BRANCH"
     featured: boolean
   }
 }

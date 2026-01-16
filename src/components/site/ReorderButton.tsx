@@ -26,8 +26,8 @@ export default function ReorderButton({ order }: ReorderButtonProps) {
 
     setIsLoading(true)
     try {
-      const items = order.items.filter((item) => item.product?.id)
-      const productIds = items.map((item) => (item.product as NonNullable<typeof item.product>).id)
+      const items = order.items.filter((item) => item.productId)
+      const productIds = items.map((item) => item.productId)
       const quantities = items.map((item) => Math.max(1, Number(item.quantity || 1)))
 
       if (productIds.length === 0) {

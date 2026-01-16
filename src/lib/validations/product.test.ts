@@ -40,7 +40,7 @@ describe("productSchema (form validation)", () => {
     })
 
     it("should accept all valid productTypes", () => {
-      const types = ["FLOWER", "FILLER", "ROSE"] as const
+      const types = ["FLOWER", "FILLER", "ROSE", "PLANT", "SUCCULENT", "BRANCH"] as const
       types.forEach((productType) => {
         const result = productSchema.safeParse({ ...validProduct, productType })
         expect(result.success).toBe(true)
