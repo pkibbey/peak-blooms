@@ -2,9 +2,10 @@
   "openapi": "3.0.0",
   "info": {
     "title": "Peak Blooms API",
-    "description": "Server action endpoints documentation for Peak Blooms e-commerce platform",
+    "description": "INTERNAL: Server action validation reference for Peak Blooms — not a public HTTP API. For internal developer reference only.",
     "version": "1.0.0"
   },
+  "x-internal": true,
   "servers": [
     {
       "url": "http://localhost:3000",

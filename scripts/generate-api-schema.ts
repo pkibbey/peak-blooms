@@ -1,6 +1,6 @@
 /**
  * Generate OpenAPI schema from Zod validators
- * Output: docs/api-schema.json (OpenAPI 3.0.0 format)
+ * Output: docs/internal/api-schema.json (OpenAPI 3.0.0 format)
  * Run: npm run generate:schema
  */
 
@@ -250,9 +250,11 @@ const openApiSpec = createDocument({
   openapi: "3.0.0",
   info: {
     title: "Peak Blooms API",
-    description: "Server action endpoints documentation for Peak Blooms e-commerce platform",
+    description:
+      "INTERNAL: Server action validation reference for Peak Blooms — not a public HTTP API. For internal developer reference only.",
     version: "1.0.0",
   },
+  "x-internal": true,
   servers: [
     {
       url: "http://localhost:3000",
@@ -911,7 +913,7 @@ const openApiSpec = createDocument({
 })
 
 // Write the spec to file
-const outputDir = path.join(process.cwd(), "docs")
+const outputDir = path.join(process.cwd(), "docs/internal")
 if (!fs.existsSync(outputDir)) {
   fs.mkdirSync(outputDir, { recursive: true })
 }

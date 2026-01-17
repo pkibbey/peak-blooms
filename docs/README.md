@@ -11,7 +11,7 @@ Human-readable API documentation for all server actions. Lists all cart, order, 
 
 **When to use**: Finding what an endpoint does, what params it needs, or its location in code.
 
-### [api-schema.json](./api-schema.json)
+### [api-schema.json](./internal/api-schema.json)
 Auto-generated OpenAPI 3.0.0 specification from Zod validators. Contains complete request/response schemas with all validation rules.
 
 **How to regenerate**: Run `npm run generate:schema` after modifying any Zod schemas in `src/lib/validations/`

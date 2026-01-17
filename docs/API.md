@@ -1,6 +1,6 @@
 # Peak Blooms Server Actions Documentation
 
-> Zod-validated server actions with full type safety. Auto-generated schema reference available in [`docs/api-schema.json`](./api-schema.json).
+> Zod-validated server actions with full type safety. Auto-generated schema reference available in [`docs/internal/api-schema.json`](./api-schema.json).
 
 ## Overview
 
@@ -9,6 +9,24 @@ Peak Blooms uses **Next.js server actions** (not REST endpoints) with full Zod v
 - Validates input with Zod schema at entry point
 - Returns strongly-typed results
 - Handles authentication/authorization internally
+
+**Return Type Convention — AppResult<T>** 🔁
+
+All server actions return an `AppResult<T>` discriminated union for safe error handling in components. The shape lives in `src/lib/query-types.ts` and follows this pattern:
+
+```ts
+// Success
+{ success: true; data: T }
+
+// Error
+{ success: false; error: string; code?: ErrorCode; details?: Record<string, string | string[]> }
+```
+
+Why this matters:
+- Components can check `if (!result.success)` to narrow to `AppError` safely
+- Errors are structured with optional `code` and `details` for programmatic handling
+
+See `docs/ERROR_HANDLING_GUIDE.md` for implementation patterns and examples. For type derivation patterns and examples, see `docs/TYPE_DERIVATION.md`.
 
 **Note**: The `/api/` paths in the OpenAPI schema reference represent validation structures, not actual HTTP routes. Import the functions directly as shown below.
 
@@ -573,7 +591,7 @@ When you modify Zod schemas:
 npm run generate:schema
 ```
 
-This updates `docs/api-schema.json` (OpenAPI 3.0.0 spec) for reference in external tools like Swagger UI or Postman.
+This updates `docs/internal/api-schema.json` (OpenAPI 3.0.0 spec) for reference in external tools like Swagger UI or Postman.
 
 ---
 
