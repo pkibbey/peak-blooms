@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest"
-import { inspirationSchema, type ProductSelection } from "@/lib/validations/inspiration"
+import { createInspirationSchema, type ProductSelection } from "@/lib/validations/inspiration"
 
-describe("inspirationSchema", () => {
+describe("createInspirationSchema", () => {
   const validInspiration = {
     name: "Summer Garden",
     slug: "summer-garden",
@@ -23,12 +23,12 @@ describe("inspirationSchema", () => {
 
   describe("valid inputs", () => {
     it("should accept valid inspiration with all fields", () => {
-      const result = inspirationSchema.safeParse(validInspiration)
+      const result = createInspirationSchema.safeParse(validInspiration)
       expect(result.success).toBe(true)
     })
 
     it("should accept inspiration with single product selection", () => {
-      const result = inspirationSchema.safeParse({
+      const result = createInspirationSchema.safeParse({
         ...validInspiration,
         productSelections: [
           {
@@ -41,7 +41,7 @@ describe("inspirationSchema", () => {
     })
 
     it("should accept inspiration with multiple product selections", () => {
-      const result = inspirationSchema.safeParse({
+      const result = createInspirationSchema.safeParse({
         ...validInspiration,
         productSelections: [
           { productId: "product-1", quantity: 2 },
@@ -53,7 +53,7 @@ describe("inspirationSchema", () => {
     })
 
     it("should accept product selection with quantity 1", () => {
-      const result = inspirationSchema.safeParse({
+      const result = createInspirationSchema.safeParse({
         ...validInspiration,
         productSelections: [
           {
@@ -66,7 +66,7 @@ describe("inspirationSchema", () => {
     })
 
     it("should accept product selection with large quantity", () => {
-      const result = inspirationSchema.safeParse({
+      const result = createInspirationSchema.safeParse({
         ...validInspiration,
         productSelections: [
           {
@@ -82,12 +82,12 @@ describe("inspirationSchema", () => {
   describe("invalid inputs", () => {
     it("should reject missing name", () => {
       const { name, ...noName } = validInspiration
-      const result = inspirationSchema.safeParse(noName)
+      const result = createInspirationSchema.safeParse(noName)
       expect(result.success).toBe(false)
     })
 
     it("should reject empty name", () => {
-      const result = inspirationSchema.safeParse({
+      const result = createInspirationSchema.safeParse({
         ...validInspiration,
         name: "",
       })
@@ -96,12 +96,12 @@ describe("inspirationSchema", () => {
 
     it("should reject missing slug", () => {
       const { slug, ...noSlug } = validInspiration
-      const result = inspirationSchema.safeParse(noSlug)
+      const result = createInspirationSchema.safeParse(noSlug)
       expect(result.success).toBe(false)
     })
 
     it("should reject empty slug", () => {
-      const result = inspirationSchema.safeParse({
+      const result = createInspirationSchema.safeParse({
         ...validInspiration,
         slug: "",
       })
@@ -110,12 +110,12 @@ describe("inspirationSchema", () => {
 
     it("should reject missing subtitle", () => {
       const { subtitle, ...noSubtitle } = validInspiration
-      const result = inspirationSchema.safeParse(noSubtitle)
+      const result = createInspirationSchema.safeParse(noSubtitle)
       expect(result.success).toBe(false)
     })
 
     it("should reject empty subtitle", () => {
-      const result = inspirationSchema.safeParse({
+      const result = createInspirationSchema.safeParse({
         ...validInspiration,
         subtitle: "",
       })
@@ -124,12 +124,12 @@ describe("inspirationSchema", () => {
 
     it("should reject missing image", () => {
       const { image, ...noImage } = validInspiration
-      const result = inspirationSchema.safeParse(noImage)
+      const result = createInspirationSchema.safeParse(noImage)
       expect(result.success).toBe(false)
     })
 
     it("should reject empty image", () => {
-      const result = inspirationSchema.safeParse({
+      const result = createInspirationSchema.safeParse({
         ...validInspiration,
         image: "",
       })
@@ -138,12 +138,12 @@ describe("inspirationSchema", () => {
 
     it("should reject missing excerpt", () => {
       const { excerpt, ...noExcerpt } = validInspiration
-      const result = inspirationSchema.safeParse(noExcerpt)
+      const result = createInspirationSchema.safeParse(noExcerpt)
       expect(result.success).toBe(false)
     })
 
     it("should reject empty excerpt", () => {
-      const result = inspirationSchema.safeParse({
+      const result = createInspirationSchema.safeParse({
         ...validInspiration,
         excerpt: "",
       })
@@ -152,12 +152,12 @@ describe("inspirationSchema", () => {
 
     it("should reject missing text (inspiration text)", () => {
       const { text, ...noText } = validInspiration
-      const result = inspirationSchema.safeParse(noText)
+      const result = createInspirationSchema.safeParse(noText)
       expect(result.success).toBe(false)
     })
 
     it("should reject empty text", () => {
-      const result = inspirationSchema.safeParse({
+      const result = createInspirationSchema.safeParse({
         ...validInspiration,
         text: "",
       })
@@ -166,12 +166,12 @@ describe("inspirationSchema", () => {
 
     it("should reject missing productSelections array", () => {
       const { productSelections, ...noProducts } = validInspiration
-      const result = inspirationSchema.safeParse(noProducts)
+      const result = createInspirationSchema.safeParse(noProducts)
       expect(result.success).toBe(false)
     })
 
     it("should reject product selection without productId", () => {
-      const result = inspirationSchema.safeParse({
+      const result = createInspirationSchema.safeParse({
         ...validInspiration,
         productSelections: [
           {
@@ -183,7 +183,7 @@ describe("inspirationSchema", () => {
     })
 
     it("should reject product selection with empty productId", () => {
-      const result = inspirationSchema.safeParse({
+      const result = createInspirationSchema.safeParse({
         ...validInspiration,
         productSelections: [
           {
@@ -196,7 +196,7 @@ describe("inspirationSchema", () => {
     })
 
     it("should reject product selection without quantity", () => {
-      const result = inspirationSchema.safeParse({
+      const result = createInspirationSchema.safeParse({
         ...validInspiration,
         productSelections: [
           {
@@ -208,7 +208,7 @@ describe("inspirationSchema", () => {
     })
 
     it("should reject product selection with zero quantity", () => {
-      const result = inspirationSchema.safeParse({
+      const result = createInspirationSchema.safeParse({
         ...validInspiration,
         productSelections: [
           {
@@ -221,7 +221,7 @@ describe("inspirationSchema", () => {
     })
 
     it("should reject product selection with negative quantity", () => {
-      const result = inspirationSchema.safeParse({
+      const result = createInspirationSchema.safeParse({
         ...validInspiration,
         productSelections: [
           {
@@ -247,7 +247,7 @@ describe("inspirationSchema", () => {
 
   describe("error messages", () => {
     it("should provide clear error for empty name", () => {
-      const result = inspirationSchema.safeParse({
+      const result = createInspirationSchema.safeParse({
         ...validInspiration,
         name: "",
       })
@@ -259,7 +259,7 @@ describe("inspirationSchema", () => {
     })
 
     it("should provide clear error for invalid quantity", () => {
-      const result = inspirationSchema.safeParse({
+      const result = createInspirationSchema.safeParse({
         ...validInspiration,
         productSelections: [
           {
@@ -277,7 +277,7 @@ describe("inspirationSchema", () => {
 
   describe("type inference", () => {
     it("should correctly infer InspirationFormData type", () => {
-      const result = inspirationSchema.safeParse(validInspiration)
+      const result = createInspirationSchema.safeParse(validInspiration)
       expect(result.success).toBe(true)
       if (result.success) {
         expect(typeof result.data.name).toBe("string")

@@ -27,8 +27,8 @@ import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import type { ProductModel } from "@/generated/models"
 import {
+  createInspirationSchema,
   type InspirationFormData,
-  inspirationSchema,
   type ProductSelection,
 } from "@/lib/validations/inspiration"
 
@@ -70,7 +70,7 @@ export default function InspirationForm({ products, inspiration }: InspirationFo
   )
 
   const form = useForm<InspirationFormData>({
-    resolver: zodResolver(inspirationSchema),
+    resolver: zodResolver(createInspirationSchema),
     defaultValues: {
       name: inspiration?.name || "",
       slug: inspiration?.slug || "",

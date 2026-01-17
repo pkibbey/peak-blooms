@@ -63,7 +63,7 @@ export async function updateProfileAction(
 /**
  * Get all addresses for the current user
  */
-export async function getAddressesAction(): Promise<AppResult<Address[]>> {
+async function getAddressesAction(): Promise<AppResult<Address[]>> {
   try {
     const session = await getSession()
 

@@ -37,7 +37,7 @@ import type { Role } from "@/generated/enums"
  * UserFull: Complete user record with all fields
  * Use when: Internal operations, admin views that need all user data
  */
-export type UserFull = UserGetPayload<{
+type UserFull = UserGetPayload<{
   select: {
     id: true
     email: true
@@ -62,7 +62,7 @@ export type UserForAdmin = Omit<UserFull, "emailVerified" | "image" | "updatedAt
  * UserForProfile: User data safe for public/profile display
  * Use when: User profile pages, session data that appears in UI
  */
-export type UserForProfile = Omit<UserFull, "emailVerified" | "priceMultiplier" | "updatedAt">
+type UserForProfile = Omit<UserFull, "emailVerified" | "priceMultiplier" | "updatedAt">
 
 /**
  * SessionUser: Minimal user data derived from Prisma User for session storage
@@ -80,7 +80,7 @@ export type SessionUser = Pick<UserFull, "id" | "email" | "approved" | "priceMul
  * UserWithAddresses: User with their saved addresses
  * Use when: Checkout flow, address selection, user details with delivery info
  */
-export type UserWithAddresses = UserGetPayload<{
+type UserWithAddresses = UserGetPayload<{
   include: {
     addresses: true
   }
@@ -94,7 +94,7 @@ export type UserWithAddresses = UserGetPayload<{
  * ProductFull: Product with all related data
  * Use when: Product detail pages, admin product management, inventory operations
  */
-export type ProductFull = ProductGetPayload<{
+type ProductFull = ProductGetPayload<{
   include: {
     productCollections: {
       include: {
@@ -163,7 +163,7 @@ export type OrderWithItems = OrderGetPayload<{
  * OrderWithItemsAndProducts: Full order with items and their product snapshots
  * Use when: Order detail pages, order confirmation, invoice generation
  */
-export type OrderWithItemsAndProducts = OrderWithItems
+type OrderWithItemsAndProducts = OrderWithItems
 
 /**
  * CartWithItems: Order in "CART" status with items and product details
@@ -176,7 +176,7 @@ export type CartWithItems = OrderWithItems
  * CartWithItemsAndUser: Full cart with items, products, AND user info
  * Use when: Cart page rendering, cart operations with user context
  */
-export type CartWithItemsAndUser = OrderGetPayload<{
+type CartWithItemsAndUser = OrderGetPayload<{
   include: {
     user: true
     items: {

@@ -11,6 +11,7 @@ import {
   deleteProductAction,
   updateProductAction,
 } from "@/app/actions/products"
+import { GenerateDescriptionButton } from "@/components/admin/GenerateDescriptionButton"
 import { ImageUpload } from "@/components/admin/ImageUpload"
 import { ProductImageSelectorInline } from "@/components/admin/ProductImageSelectorInline"
 import SlugInput from "@/components/admin/SlugInput"
@@ -58,7 +59,6 @@ interface ProductFormProps {
 }
 
 export default function ProductForm({ collections, product }: ProductFormProps) {
-  console.log("product: ", product)
   const router = useRouter()
   const isEditing = !!product
 
@@ -83,14 +83,7 @@ export default function ProductForm({ collections, product }: ProductFormProps) 
   })
 
   const saveForm = async (data: ProductFormData) => {
-    console.log("[ProductForm] Form saving with data:", {
-      name: data.name,
-      slug: data.slug,
-      image: data.image ? `${data.image.substring(0, 50)}...` : "NO IMAGE",
-      price: data.price,
-      productType: data.productType,
-      collectionIds: data.collectionIds?.length || 0,
-    })
+    // saving form
 
     setIsSubmitting(true)
 
@@ -100,13 +93,8 @@ export default function ProductForm({ collections, product }: ProductFormProps) 
         collectionIds: data.collectionIds || [],
       }
 
-      console.log("[ProductForm] Processing save, isEditing:", isEditing)
-
       if (isEditing) {
-        console.log("[ProductForm] Calling updateProductAction")
-        console.log("[ProductForm] Product ID value:", product?.id, "Type:", typeof product?.id)
         if (!product?.id) {
-          console.error("[ProductForm] Missing product ID!")
           form.setError("root", { message: "Product ID is missing" })
           return
         }
@@ -116,16 +104,13 @@ export default function ProductForm({ collections, product }: ProductFormProps) 
           colors: formData.colors || null,
           price: formData.price ? parseFloat(formData.price) : null,
         })
-        console.log("[ProductForm] updateProductAction result:", result)
         if (!result.success) {
           form.setError("root", { message: result.error })
           return
         }
         toast.success("Product updated successfully")
       } else {
-        console.log("[ProductForm] Calling createProductAction")
         const result = await createProductAction({ ...formData, colors: formData.colors || null })
-        console.log("[ProductForm] createProductAction result:", result)
         if (!result.success) {
           form.setError("root", { message: result.error })
           return
@@ -135,9 +120,8 @@ export default function ProductForm({ collections, product }: ProductFormProps) 
     } catch (err) {
       const errorMessage =
         err instanceof Error ? err.message : "An error occurred. Please try again."
-      console.error("[ProductForm] Submission error:", errorMessage, err)
       form.setError("root", { message: errorMessage })
-      console.log(form.formState.errors)
+      // error set on form state
     } finally {
       setIsSubmitting(false)
     }
@@ -145,7 +129,6 @@ export default function ProductForm({ collections, product }: ProductFormProps) 
 
   const onSubmit = async (data: ProductFormData) => {
     await saveForm(data)
-    console.log("[ProductForm] Redirecting to products list")
     router.push("/admin/products")
     router.refresh()
   }
@@ -182,7 +165,7 @@ export default function ProductForm({ collections, product }: ProductFormProps) 
       const errorMessage =
         err instanceof Error ? err.message : "Failed to delete product. Please try again."
       form.setError("root", { message: errorMessage })
-      console.error(err)
+      // error saved to form
     } finally {
       setIsDeleting(false)
     }
@@ -195,19 +178,7 @@ export default function ProductForm({ collections, product }: ProductFormProps) 
     <Form {...form}>
       <form
         onSubmit={(e) => {
-          console.log("[ProductForm] Form submit event fired")
-          console.log("[ProductForm] Current form state:", {
-            isDirty: form.formState.isDirty,
-            isValid: form.formState.isValid,
-            isSubmitting: form.formState.isSubmitting,
-            errors: form.formState.errors,
-          })
-          console.log("[ProductForm] Current form values:", {
-            name: form.getValues("name"),
-            slug: form.getValues("slug"),
-            image: form.getValues("image") ? "SET" : "NOT SET",
-            price: form.getValues("price"),
-          })
+          // form submit
           form.handleSubmit(onSubmit)(e)
         }}
         className="space-y-6"
@@ -248,7 +219,18 @@ export default function ProductForm({ collections, product }: ProductFormProps) 
           name="description"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Description</FormLabel>
+              <div className="flex items-center justify-between">
+                <FormLabel>Description</FormLabel>
+                <GenerateDescriptionButton
+                  productName={form.watch("name")}
+                  productType={form.watch("productType") || ProductType.FLOWER}
+                  existingDescription={form.watch("description")}
+                  onDescriptionGenerated={(description) => {
+                    form.setValue("description", description)
+                    handleBlur()
+                  }}
+                />
+              </div>
               <FormControl>
                 <Textarea
                   {...field}
@@ -282,10 +264,6 @@ export default function ProductForm({ collections, product }: ProductFormProps) 
             <ImageUpload
               value={form.watch("image")}
               onChange={(url) => {
-                console.log(
-                  "[ProductForm] Image value changed to:",
-                  url ? `${url.substring(0, 50)}...` : "EMPTY"
-                )
                 form.setValue("image", url)
                 handleBlur()
               }}
@@ -452,9 +430,7 @@ export default function ProductForm({ collections, product }: ProductFormProps) 
               type="submit"
               disabled={isSubmitting}
               onClick={(e) => {
-                console.log("[ProductForm] Save button clicked")
                 if (isSubmitting) {
-                  console.log("[ProductForm] Already submitting, ignoring click")
                   e.preventDefault()
                 }
               }}

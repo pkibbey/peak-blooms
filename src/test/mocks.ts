@@ -6,7 +6,6 @@ import type {
   OrderItemWithProduct,
   ProductBasic,
   SessionUser,
-  UserFull,
 } from "@/lib/query-types"
 
 /**
@@ -138,27 +137,6 @@ export function createMockPrismaClient() {
 // =============================================================================
 // TEST DATA FACTORIES
 // =============================================================================
-
-/**
- * Create a mock UserFull object with sensible defaults
- * Override any field by passing an object
- * Example: mockUserFull({ role: "ADMIN", approved: true })
- */
-export function mockUserFull(overrides?: Partial<UserFull>): UserFull {
-  return {
-    id: "test-user-id",
-    email: "test@example.com",
-    emailVerified: false,
-    name: "Test User",
-    image: null,
-    role: Role.CUSTOMER,
-    approved: false,
-    priceMultiplier: 1.0,
-    createdAt: new Date("2025-01-01"),
-    updatedAt: new Date("2025-01-15"),
-    ...overrides,
-  }
-}
 
 /**
  * Create a mock SessionUser object (minimal user for session storage)

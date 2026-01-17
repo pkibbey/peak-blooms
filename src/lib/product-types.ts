@@ -27,6 +27,6 @@ export const PRODUCT_TYPES = Object.values(ProductType)
 /**
  * Get the human-readable label for a product type
  */
-export function getProductTypeLabel(type: ProductType): string {
+function getProductTypeLabel(type: ProductType): string {
   return PRODUCT_TYPE_LABELS[type] ?? type
 }

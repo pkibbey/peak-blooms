@@ -12,7 +12,7 @@ import type { AppError } from "@/lib/query-types"
  * Type guard: Check if error is a ZodError
  * Use to safely handle validation errors in catch blocks
  */
-export function isZodError(error: unknown): error is ZodError {
+function isZodError(error: unknown): error is ZodError {
   return error instanceof ZodError
 }
 
@@ -20,7 +20,7 @@ export function isZodError(error: unknown): error is ZodError {
  * Type guard: Check if error is an Error object
  * Use to safely extract message from caught exceptions
  */
-export function isErrorObject(error: unknown): error is Error {
+function isErrorObject(error: unknown): error is Error {
   return error instanceof Error
 }
 
@@ -31,7 +31,7 @@ export function isErrorObject(error: unknown): error is Error {
  * @param error - The error to extract a message from
  * @returns A safe error message string
  */
-export function getErrorMessage(error: unknown): string {
+function getErrorMessage(error: unknown): string {
   if (isErrorObject(error)) {
     return error.message
   }
@@ -108,7 +108,7 @@ export function toAppError(
  * @param json - JSON string to parse
  * @returns Parsed object or null if invalid
  */
-export function safeJsonParse<T = unknown>(json: string): T | null {
+function safeJsonParse<T = unknown>(json: string): T | null {
   try {
     return JSON.parse(json) as T
   } catch {
@@ -123,7 +123,7 @@ export function safeJsonParse<T = unknown>(json: string): T | null {
  * @param value - Value to stringify
  * @returns JSON string or empty string if fails
  */
-export function safeJsonStringify(value: unknown): string {
+function safeJsonStringify(value: unknown): string {
   try {
     return JSON.stringify(value)
   } catch {

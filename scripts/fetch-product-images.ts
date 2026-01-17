@@ -5,7 +5,7 @@
  * that allows for:
  * - Multi-source image search (Pixabay, Unsplash, Pexels)
  * - Human review and selection of images
- * - AI-powered image generation via LM Studio with style variation
+ * - AI-powered image generation with style variation
  * - Live API quota tracking
  *
  * Access the new workflow at: /admin/products/[id]/edit

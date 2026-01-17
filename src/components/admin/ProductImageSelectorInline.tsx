@@ -40,11 +40,7 @@ export function ProductImageSelectorInline({
   const handleGenerateImage = useCallback(async () => {
     try {
       setIsGenerating(true)
-      console.log("[Image Generation] Starting with:", {
-        productName,
-        productType,
-        selectedStyle,
-      })
+      // initiating generation
 
       const response = await fetch("/api/admin/generate-image", {
         method: "POST",
@@ -57,24 +53,16 @@ export function ProductImageSelectorInline({
         }),
       })
 
-      console.log("[Image Generation] Response status:", response.status, response.statusText)
-
       if (!response.ok) {
         const error = await response.json()
-        console.error("[Image Generation] API error:", error)
         toast.error(error.error || "Failed to generate image")
         return
       }
 
       const data = await response.json()
-      console.log(
-        "[Image Generation] Successfully generated, URL length:",
-        data.imageUrl?.length || "unknown"
-      )
       setGeneratedImage(data.imageUrl)
       toast.success("Image generated successfully")
     } catch (err) {
-      console.error("[Image Generation] Exception:", err instanceof Error ? err.message : err)
       toast.error("Error generating image")
     } finally {
       setIsGenerating(false)
@@ -88,24 +76,19 @@ export function ProductImageSelectorInline({
         setGeneratedImage(null)
         setIsUploading(true)
 
-        console.log("[Generated Image Upload] Starting with image size:", imageUrl.length)
-
         // Convert data URL to blob and upload to Vercel Blob
         const response = await fetch(imageUrl)
         if (!response.ok) {
           throw new Error(`Failed to fetch data URL: ${response.status} ${response.statusText}`)
         }
         const blob = await response.blob()
-        console.log("[Generated Image Upload] Blob created, size:", blob.size, "type:", blob.type)
 
         // Use Vercel Blob upload to persist the image
         const { upload } = await import("@vercel/blob/client")
-        console.log("[Generated Image Upload] Vercel Blob client loaded")
 
         // Generate a unique filename based on product name and timestamp
         const timestamp = Date.now()
         const filename = `generated_${productName.toLowerCase().replace(/\s+/g, "_")}_${timestamp}.jpg`
-        console.log("[Generated Image Upload] Uploading with filename:", filename)
 
         const uploadedBlob = await upload(filename, blob, {
           access: "public",
@@ -117,13 +100,11 @@ export function ProductImageSelectorInline({
           }),
         })
 
-        console.log("[Generated Image Upload] Successfully uploaded to:", uploadedBlob.url)
         onSelectImage(uploadedBlob.url)
         setIsUploading(false)
         toast.success("Generated image uploaded successfully")
       } catch (error) {
         const errorMessage = error instanceof Error ? error.message : String(error)
-        console.error("[Generated Image Upload] Error:", errorMessage)
         toast.error(`Failed to upload generated image: ${errorMessage}`)
         setIsUploading(false)
       }
@@ -171,7 +152,7 @@ export function ProductImageSelectorInline({
           ) : (
             <>
               <Zap className="mr-2 h-4 w-4" />
-              Generate with LM Studio
+              Generate Image
             </>
           )}
         </Button>

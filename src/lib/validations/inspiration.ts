@@ -8,7 +8,7 @@ const productSelectionSchema = z.object({
 
 export type ProductSelection = z.infer<typeof productSelectionSchema>
 
-export const inspirationSchema = z.object({
+export const createInspirationSchema = z.object({
   name: z.string().min(1, "Name is required"),
   slug: z.string().min(1, "Slug is required"),
   subtitle: z.string().min(1, "Subtitle is required"),
@@ -18,16 +18,14 @@ export const inspirationSchema = z.object({
   productSelections: z.array(productSelectionSchema),
 })
 
-export type InspirationFormData = z.infer<typeof inspirationSchema>
-// Inspiration operation schemas for API requests
-export const createInspirationSchema = inspirationSchema
+export type InspirationFormData = z.infer<typeof createInspirationSchema>
 
 export type CreateInspirationInput = Omit<
   InspirationUncheckedCreateInput,
   "products" | "createdAt" | "updatedAt"
 > & { productSelections: ProductSelection[] }
 
-export const updateInspirationSchema = inspirationSchema.extend({
+export const updateInspirationSchema = createInspirationSchema.extend({
   id: z.string().min(1, "Invalid inspiration ID"),
 })
 

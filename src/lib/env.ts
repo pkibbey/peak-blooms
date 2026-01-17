@@ -48,13 +48,13 @@ export const ENV = envSchema.parse(process.env)
  * Type of validated environment variables
  * Use for type-safe env variable access
  */
-export type Env = z.infer<typeof envSchema>
+type Env = z.infer<typeof envSchema>
 
 /**
  * Safely get an optional environment variable with a default
  * Use for optional configuration that has sensible defaults
  */
-export function getEnv<T extends keyof Env>(key: T, defaultValue?: Env[T]): Env[T] {
+function getEnv<T extends keyof Env>(key: T, defaultValue?: Env[T]): Env[T] {
   const value = ENV[key]
   if (value === undefined && defaultValue !== undefined) {
     return defaultValue
@@ -65,14 +65,14 @@ export function getEnv<T extends keyof Env>(key: T, defaultValue?: Env[T]): Env[
 /**
  * Check if running in production
  */
-export const isProduction = ENV.NODE_ENV === "production"
+const isProduction = ENV.NODE_ENV === "production"
 
 /**
  * Check if running in development
  */
-export const isDevelopment = ENV.NODE_ENV === "development"
+const isDevelopment = ENV.NODE_ENV === "development"
 
 /**
  * Check if running in test
  */
-export const isTest = ENV.NODE_ENV === "test"
+const isTest = ENV.NODE_ENV === "test"

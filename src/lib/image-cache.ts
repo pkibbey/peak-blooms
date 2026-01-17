@@ -21,16 +21,14 @@ export async function getRedisClient() {
     url,
   })
 
-  redisClient.on("error", (err: Error) => {
-    console.error("[Redis] Connection error:", err)
-  })
+  // Optional: handle errors silently or via a proper logger in the future
+  // redisClient.on("error", () => {})
 
   try {
     await redisClient.connect()
-    console.log("[Redis] Connected successfully")
   } catch (err) {
-    console.warn("[Redis] Failed to connect. Image search caching will be unavailable.", err)
-    // Continue without Redis; search will still work, just slower
+    console.error("Redis connect error: ", err)
+    // Failed to connect; continue without Redis
   }
 
   return redisClient
@@ -70,7 +68,6 @@ export async function cacheImageSearchResults(
     const key = getCacheKey(productName, source)
     await client.setEx(key, ttlSeconds, JSON.stringify(results))
   } catch (err) {
-    console.warn("[Redis] Failed to cache search results:", err)
     // Silently fail; search results just won't be cached
   }
 }
@@ -88,7 +85,6 @@ export async function getCachedImageSearchResults(
     const cached = await client.get(key)
     return cached ? JSON.parse(cached) : null
   } catch (err) {
-    console.warn("[Redis] Failed to retrieve cached results:", err)
     return null
   }
 }
@@ -106,7 +102,7 @@ export async function cacheApiQuota(
     const key = getQuotaCacheKey(source)
     await client.setEx(key, ttlSeconds, JSON.stringify(quota))
   } catch (err) {
-    console.warn("[Redis] Failed to cache quota info:", err)
+    // Silently fail
   }
 }
 
@@ -120,7 +116,6 @@ export async function getCachedApiQuota(source: string): Promise<ApiQuotaInfo | 
     const cached = await client.get(key)
     return cached ? JSON.parse(cached) : null
   } catch (err) {
-    console.warn("[Redis] Failed to retrieve quota info:", err)
     return null
   }
 }
@@ -136,7 +131,7 @@ export async function clearImageCache() {
       await client.del(keys)
     }
   } catch (err) {
-    console.warn("[Redis] Failed to clear cache:", err)
+    // Silently fail
   }
 }
 

@@ -23,12 +23,9 @@ export async function createProductAction(
   data: CreateProductFormData
 ): Promise<AppResult<ProductBasic>> {
   try {
-    console.log("[createProductAction] Starting with data:", { name: data.name, slug: data.slug })
     const validatedData = createProductFormSchema.parse(data)
-    console.log("[createProductAction] Data validated successfully")
 
     const session = await getSession()
-    console.log("[createProductAction] Session:", session?.user?.email)
 
     if (!session?.user || session.user.role !== "ADMIN") {
       console.error("[createProductAction] Not authorized")
@@ -39,7 +36,6 @@ export async function createProductAction(
       }
     }
 
-    console.log("[createProductAction] Creating product in database")
     const product = await db.product.create({
       data: {
         name: validatedData.name,
@@ -58,7 +54,6 @@ export async function createProductAction(
       },
     })
 
-    console.log("[createProductAction] Product created successfully with id:", product.id)
     revalidatePath("/admin/products")
     return {
       success: true,
@@ -75,17 +70,8 @@ export async function updateProductAction(
   input: UpdateProductInput
 ): Promise<AppResult<ProductBasic>> {
   try {
-    console.log("[updateProductAction] Starting with input:", {
-      id: input.id,
-      idType: typeof input.id,
-      idLength: input.id?.length,
-      name: input.name,
-    })
     const { id, ...data } = updateProductSchema.parse(input)
-    console.log("[updateProductAction] Data validated successfully")
-
     const session = await getSession()
-    console.log("[updateProductAction] Session:", session?.user?.email)
 
     if (!session?.user || session.user.role !== "ADMIN") {
       console.error("[updateProductAction] Not authorized")
@@ -96,7 +82,6 @@ export async function updateProductAction(
       }
     }
 
-    console.log("[updateProductAction] Updating product in database")
     const product = await db.product.update({
       where: { id },
       data: {
@@ -120,7 +105,6 @@ export async function updateProductAction(
       },
     })
 
-    console.log("[updateProductAction] Product updated successfully")
     revalidatePath("/admin/products")
     return {
       success: true,
@@ -221,5 +205,47 @@ export async function getProductCountAction(
     }
   } catch (error) {
     return toAppError(error, "Failed to get product count")
+  }
+}
+
+async function updateProductDescriptionAction(
+  productId: string,
+  description: string
+): Promise<AppResult<void>> {
+  try {
+    const session = await getSession()
+    if (!session?.user || session.user.role !== "ADMIN") {
+      console.error("[updateProductDescriptionAction] Not authorized")
+      return {
+        success: false,
+        error: "You must be an admin to update products",
+        code: "UNAUTHORIZED",
+      }
+    }
+
+    if (!productId || !description || description.trim().length === 0) {
+      console.error("[updateProductDescriptionAction] Missing required fields")
+      return {
+        success: false,
+        error: "Product ID and description are required",
+        code: "VALIDATION_ERROR",
+      }
+    }
+
+    await db.product.update({
+      where: { id: productId },
+      data: {
+        description: description.trim(),
+      },
+    })
+
+    revalidatePath("/admin/products")
+
+    return {
+      success: true,
+      data: undefined,
+    }
+  } catch (error) {
+    return toAppError(error, "Failed to update product description")
   }
 }
