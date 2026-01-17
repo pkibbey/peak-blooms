@@ -16,7 +16,6 @@ import {
 } from "@/components/ui/select"
 import type { ProductType } from "@/generated/enums"
 import { getAvailableTemplates, type StyleTemplate } from "@/lib/ai-prompt-templates"
-import { Input } from "../ui/input"
 
 interface ProductImageSelectorInlineProps {
   productName: string
@@ -32,7 +31,6 @@ export function ProductImageSelectorInline({
   onSelectImage,
 }: ProductImageSelectorInlineProps) {
   const [selectedStyle, setSelectedStyle] = useState<StyleTemplate>("botanical")
-  const [flowerDescription, setFlowerDescription] = useState<string>("")
   const [isGenerating, setIsGenerating] = useState(false)
   const [generatedImage, setGeneratedImage] = useState<string | null>(null)
   const [isUploading, setIsUploading] = useState(false)
@@ -49,7 +47,7 @@ export function ProductImageSelectorInline({
           productName,
           productType,
           styleTemplate: selectedStyle,
-          description: flowerDescription || productDescription,
+          description: productDescription,
         }),
       })
 
@@ -63,11 +61,12 @@ export function ProductImageSelectorInline({
       setGeneratedImage(data.imageUrl)
       toast.success("Image generated successfully")
     } catch (err) {
+      console.log("err: ", err)
       toast.error("Error generating image")
     } finally {
       setIsGenerating(false)
     }
-  }, [productName, productType, productDescription, selectedStyle, flowerDescription])
+  }, [productName, productType, productDescription, selectedStyle])
 
   const handleSelectGeneratedImage = useCallback(
     async (imageUrl: string) => {

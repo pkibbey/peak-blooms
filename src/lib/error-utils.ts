@@ -25,26 +25,6 @@ function isErrorObject(error: unknown): error is Error {
 }
 
 /**
- * Extract message from any error type
- * Returns a safe error message string for any error value
- *
- * @param error - The error to extract a message from
- * @returns A safe error message string
- */
-function getErrorMessage(error: unknown): string {
-  if (isErrorObject(error)) {
-    return error.message
-  }
-  if (typeof error === "string") {
-    return error
-  }
-  if (error && typeof error === "object" && "message" in error) {
-    return String(error.message)
-  }
-  return "An unexpected error occurred"
-}
-
-/**
  * Convert any error to a structured AppError
  * Use in server action catch blocks to return consistent error responses
  *
@@ -98,35 +78,5 @@ export function toAppError(
     success: false,
     error: message,
     code: "SERVER_ERROR",
-  }
-}
-
-/**
- * Safe JSON parse with error handling
- * Returns null if parsing fails, parsed value on success
- *
- * @param json - JSON string to parse
- * @returns Parsed object or null if invalid
- */
-function safeJsonParse<T = unknown>(json: string): T | null {
-  try {
-    return JSON.parse(json) as T
-  } catch {
-    return null
-  }
-}
-
-/**
- * Safe JSON stringify with error handling
- * Returns empty string if stringification fails
- *
- * @param value - Value to stringify
- * @returns JSON string or empty string if fails
- */
-function safeJsonStringify(value: unknown): string {
-  try {
-    return JSON.stringify(value)
-  } catch {
-    return ""
   }
 }

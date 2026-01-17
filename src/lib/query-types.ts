@@ -17,6 +17,7 @@
  */
 
 import type { CartItemData } from "@/components/site/CartItem"
+import type { Role } from "@/generated/enums"
 import type {
   AddressGetPayload,
   CollectionGetPayload,
@@ -27,7 +28,6 @@ import type {
   ProductGetPayload,
   UserGetPayload,
 } from "@/generated/models"
-import type { Role } from "@/generated/enums"
 
 // =============================================================================
 // USER TYPES
@@ -75,16 +75,6 @@ type UserForProfile = Omit<UserFull, "emailVerified" | "priceMultiplier" | "upda
 export type SessionUser = Pick<UserFull, "id" | "email" | "approved" | "priceMultiplier"> & {
   role: Role
 } & Partial<Pick<UserFull, "name" | "image" | "createdAt">>
-
-/**
- * UserWithAddresses: User with their saved addresses
- * Use when: Checkout flow, address selection, user details with delivery info
- */
-type UserWithAddresses = UserGetPayload<{
-  include: {
-    addresses: true
-  }
-}>
 
 // =============================================================================
 // PRODUCT TYPES
@@ -160,32 +150,11 @@ export type OrderWithItems = OrderGetPayload<{
 }>
 
 /**
- * OrderWithItemsAndProducts: Full order with items and their product snapshots
- * Use when: Order detail pages, order confirmation, invoice generation
- */
-type OrderWithItemsAndProducts = OrderWithItems
-
-/**
  * CartWithItems: Order in "CART" status with items and product details
  * Use when: Shopping cart view, cart modification, cart totals calculation
  * NOTE: This is an Order filtered by status: "CART"; type represents structure only
  */
 export type CartWithItems = OrderWithItems
-
-/**
- * CartWithItemsAndUser: Full cart with items, products, AND user info
- * Use when: Cart page rendering, cart operations with user context
- */
-type CartWithItemsAndUser = OrderGetPayload<{
-  include: {
-    user: true
-    items: {
-      include: {
-        product: true
-      }
-    }
-  }
-}>
 
 /**
  * OrderItemWithProduct: Single order item with its product snapshot

@@ -23,10 +23,3 @@ export const PRODUCT_TYPE_LABELS: Record<ProductType, string> = {
  * Array of all valid product types
  */
 export const PRODUCT_TYPES = Object.values(ProductType)
-
-/**
- * Get the human-readable label for a product type
- */
-function getProductTypeLabel(type: ProductType): string {
-  return PRODUCT_TYPE_LABELS[type] ?? type
-}

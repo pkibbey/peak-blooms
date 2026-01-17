@@ -46,14 +46,6 @@ export async function POST(request: Request): Promise<NextResponse> {
           }),
         }
       },
-      onUploadCompleted: async ({ blob, tokenPayload }) => {
-        // This callback is called after the file has been uploaded to Vercel Blob
-
-        if (tokenPayload) {
-          const payload = JSON.parse(tokenPayload)
-          // uploaded by user available in payload
-        }
-      },
     })
 
     return NextResponse.json(jsonResponse)

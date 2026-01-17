@@ -68,7 +68,7 @@ export async function cacheImageSearchResults(
     const key = getCacheKey(productName, source)
     await client.setEx(key, ttlSeconds, JSON.stringify(results))
   } catch (err) {
-    // Silently fail; search results just won't be cached
+    console.log("err: ", err)
   }
 }
 
@@ -85,6 +85,7 @@ export async function getCachedImageSearchResults(
     const cached = await client.get(key)
     return cached ? JSON.parse(cached) : null
   } catch (err) {
+    console.log("err: ", err)
     return null
   }
 }
@@ -102,7 +103,7 @@ export async function cacheApiQuota(
     const key = getQuotaCacheKey(source)
     await client.setEx(key, ttlSeconds, JSON.stringify(quota))
   } catch (err) {
-    // Silently fail
+    console.log("err: ", err)
   }
 }
 
@@ -116,6 +117,7 @@ export async function getCachedApiQuota(source: string): Promise<ApiQuotaInfo | 
     const cached = await client.get(key)
     return cached ? JSON.parse(cached) : null
   } catch (err) {
+    console.error("err: ", err)
     return null
   }
 }
@@ -131,7 +133,7 @@ export async function clearImageCache() {
       await client.del(keys)
     }
   } catch (err) {
-    // Silently fail
+    console.error("err: ", err)
   }
 }
 

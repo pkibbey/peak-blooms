@@ -1,5 +1,4 @@
 import { Suspense } from "react"
-import { BoxlotFilter } from "@/components/site/BoxlotFilter"
 import { DeliveryBanner } from "@/components/site/DeliveryBanner"
 import { PageHeader } from "@/components/site/PageHeader"
 import { ProductItem } from "@/components/site/ProductItem"

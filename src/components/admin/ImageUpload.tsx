@@ -51,7 +51,7 @@ export function ImageUpload({
     try {
       await deleteBlobAction({ url: oldUrl })
     } catch (error) {
-      // Silently fail - old blob cleanup is not critical
+      console.log("error: ", error)
       // cleanup failed
     }
   }

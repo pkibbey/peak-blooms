@@ -61,35 +61,6 @@ export async function updateProfileAction(
 }
 
 /**
- * Get all addresses for the current user
- */
-async function getAddressesAction(): Promise<AppResult<Address[]>> {
-  try {
-    const session = await getSession()
-
-    if (!session?.user?.id) {
-      return {
-        success: false,
-        error: "You must be logged in to view addresses",
-        code: "UNAUTHORIZED",
-      }
-    }
-
-    const addresses = await db.address.findMany({
-      where: { userId: session.user.id },
-      orderBy: { createdAt: "desc" },
-    })
-
-    return {
-      success: true,
-      data: addresses,
-    }
-  } catch (error) {
-    return toAppError(error, "Failed to fetch addresses")
-  }
-}
-
-/**
  * Create a new address for the current user
  */
 export async function createAddressAction(

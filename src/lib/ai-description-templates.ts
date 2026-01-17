@@ -5,9 +5,7 @@
 
 export type ProductType = "FLOWER" | "ROSE" | "FILLER" | "FOLIAGE" | "PLANT"
 
-const SYSTEM_PROMPT = `You are a knowledgeable florist and horticulturist. Write accurate, vivid visual descriptions of flowers and plants.
-Focus on: bloom color and color variations, form and shape, petal characteristics, texture, fragrance (if notable), and practical qualities like cut-flower longevity or seasonal availability.
-Keep descriptions to 1-2 sentences maximum.`
+const SYSTEM_PROMPT = `You are a florist. Write concise, vivid visual descriptions of flowers and plants in plain text (no markdown, no special formatting). Keep it to 100 words max. Focus on: color, bloom form, petal characteristics, and texture. Mention fragrance only if notable.`
 
 const PRODUCT_TYPE_CONTEXT: Record<ProductType, string> = {
   FLOWER: "Cut flower",
@@ -32,10 +30,10 @@ export function generateDescriptionPrompt(
   const typeContext = PRODUCT_TYPE_CONTEXT[productType] || "Cut flower"
 
   if (existingDescription) {
-    return `Write a visual description of the ${typeContext} "${productName}". Enhance or improve this existing description: "${existingDescription}". Focus on visual appearance: colors, blooms, form, and distinctive characteristics.`
+    return `Concise visual description of the ${typeContext} "${productName}": ${existingDescription}. Refine to focus on color, form, and visual distinctiveness in 100 words as plain text.`
   }
 
-  return `Write a visual description of the ${typeContext} "${productName}". Focus on colors, bloom characteristics, form, size, petal texture, and any other distinctive visual qualities. Include fragrance if it's notably fragrant.`
+  return `Describe the ${typeContext} "${productName}" visually in up to 100 words as plain text: color, bloom form, and distinctive characteristics.`
 }
 
 /**
