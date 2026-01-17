@@ -2,6 +2,7 @@
 
 import { useRouter, useSearchParams } from "next/navigation"
 import { useState } from "react"
+import { toast } from "sonner"
 import { getProductCountAction } from "@/app/actions/products"
 import { IconPackage } from "@/components/ui/icons"
 import { Label } from "@/components/ui/label"
@@ -30,7 +31,12 @@ export function BoxlotFilter() {
     setIsCounting(true)
     try {
       // Ask for a light-weight count with the new filter
-      const total = await getProductCountAction({ boxlotOnly: checked })
+      const result = await getProductCountAction({ boxlotOnly: checked })
+      if (!result.success) {
+        toast.error("Failed to get product count")
+        return
+      }
+      const total = result.data
       const maxPage = Math.max(1, Math.ceil(total / ITEMS_PER_PAGE))
 
       const currentPage = Number(searchParams.get("page") ?? 1)

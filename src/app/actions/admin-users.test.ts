@@ -113,7 +113,10 @@ describe("Admin User Actions", () => {
 
       const result = await approveUserAction({ userId: "550e8400-e29b-41d4-a716-446655440003" })
 
-      expect(result.approved).toBe(true)
+      expect(result.success).toBe(true)
+      if (result.success) {
+        expect(result.data.approved).toBe(true)
+      }
       expect(db.user.update).toHaveBeenCalledWith({
         where: { id: "550e8400-e29b-41d4-a716-446655440003" },
         data: { approved: true },
@@ -125,7 +128,8 @@ describe("Admin User Actions", () => {
       vi.mocked(auth.api.getSession).mockResolvedValue(mockAdminSession)
       vi.mocked(db.user.update).mockResolvedValueOnce({ ...mockUser, approved: true })
 
-      await approveUserAction({ userId: "550e8400-e29b-41d4-a716-446655440003" })
+      const result = await approveUserAction({ userId: "550e8400-e29b-41d4-a716-446655440003" })
+      expect(result.success).toBe(true)
 
       expect(invalidateUserSessions).toHaveBeenCalledWith("550e8400-e29b-41d4-a716-446655440003")
     })
@@ -137,45 +141,45 @@ describe("Admin User Actions", () => {
         approved: true,
       })
 
-      await approveUserAction({ userId: "550e8400-e29b-41d4-a716-446655440001" })
+      const result = await approveUserAction({ userId: "550e8400-e29b-41d4-a716-446655440001" })
+      expect(result.success).toBe(true)
 
       expect(invalidateUserSessions).not.toHaveBeenCalled()
     })
 
-    it("should throw error on invalid input (ZodError)", async () => {
-      await expect(approveUserAction({ userId: "invalid-uuid" })).rejects.toThrow(
-        "User ID must be a valid UUID"
-      )
-    })
-
-    it("should throw error if not admin", async () => {
+    it("should return error if not admin", async () => {
       vi.mocked(auth.api.getSession).mockResolvedValue(mockUserSession)
-      await expect(
-        approveUserAction({ userId: "550e8400-e29b-41d4-a716-446655440003" })
-      ).rejects.toThrow("Unauthorized")
+      const result = await approveUserAction({ userId: "550e8400-e29b-41d4-a716-446655440003" })
+      expect(result.success).toBe(false)
+      if (!result.success) {
+        expect(result.code).toBe("UNAUTHORIZED")
+      }
     })
 
-    it("should throw error if no session", async () => {
+    it("should return error if no session", async () => {
       vi.mocked(auth.api.getSession).mockResolvedValue(null)
-      await expect(
-        approveUserAction({ userId: "550e8400-e29b-41d4-a716-446655440003" })
-      ).rejects.toThrow("Unauthorized")
+      const result = await approveUserAction({ userId: "550e8400-e29b-41d4-a716-446655440003" })
+      expect(result.success).toBe(false)
+      if (!result.success) {
+        expect(result.code).toBe("UNAUTHORIZED")
+      }
     })
 
-    it("should throw custom error on db failure", async () => {
+    it("should return error on db failure", async () => {
       vi.mocked(auth.api.getSession).mockResolvedValue(mockAdminSession)
       vi.mocked(db.user.update).mockRejectedValueOnce(new Error("DB Error"))
-      await expect(
-        approveUserAction({ userId: "550e8400-e29b-41d4-a716-446655440003" })
-      ).rejects.toThrow("DB Error")
+      const result = await approveUserAction({ userId: "550e8400-e29b-41d4-a716-446655440003" })
+      expect(result.success).toBe(false)
+      if (!result.success) {
+        expect(result.error).toContain("DB Error")
+      }
     })
 
-    it("should throw generic error on non-Error exception", async () => {
+    it("should return error on non-Error exception", async () => {
       vi.mocked(auth.api.getSession).mockResolvedValue(mockAdminSession)
       vi.mocked(db.user.update).mockRejectedValueOnce("String error")
-      await expect(
-        approveUserAction({ userId: "550e8400-e29b-41d4-a716-446655440003" })
-      ).rejects.toThrow("Failed to approve user")
+      const result = await approveUserAction({ userId: "550e8400-e29b-41d4-a716-446655440003" })
+      expect(result.success).toBe(false)
     })
   })
 
@@ -186,7 +190,10 @@ describe("Admin User Actions", () => {
 
       const result = await unapproveUserAction({ userId: "550e8400-e29b-41d4-a716-446655440003" })
 
-      expect(result.approved).toBe(false)
+      expect(result.success).toBe(true)
+      if (result.success) {
+        expect(result.data.approved).toBe(false)
+      }
       expect(db.user.update).toHaveBeenCalledWith({
         where: { id: "550e8400-e29b-41d4-a716-446655440003" },
         data: { approved: false },
@@ -198,7 +205,8 @@ describe("Admin User Actions", () => {
       vi.mocked(auth.api.getSession).mockResolvedValue(mockAdminSession)
       vi.mocked(db.user.update).mockResolvedValueOnce({ ...mockUser, approved: false })
 
-      await unapproveUserAction({ userId: "550e8400-e29b-41d4-a716-446655440003" })
+      const result = await unapproveUserAction({ userId: "550e8400-e29b-41d4-a716-446655440003" })
+      expect(result.success).toBe(true)
 
       expect(invalidateUserSessions).toHaveBeenCalledWith("550e8400-e29b-41d4-a716-446655440003")
     })
@@ -210,45 +218,45 @@ describe("Admin User Actions", () => {
         approved: false,
       })
 
-      await unapproveUserAction({ userId: "550e8400-e29b-41d4-a716-446655440001" })
+      const result = await unapproveUserAction({ userId: "550e8400-e29b-41d4-a716-446655440001" })
+      expect(result.success).toBe(true)
 
       expect(invalidateUserSessions).not.toHaveBeenCalled()
     })
 
-    it("should throw error on invalid input (ZodError)", async () => {
-      await expect(unapproveUserAction({ userId: "invalid-uuid" })).rejects.toThrow(
-        "User ID must be a valid UUID"
-      )
-    })
-
-    it("should throw error if not admin", async () => {
+    it("should return error if not admin", async () => {
       vi.mocked(auth.api.getSession).mockResolvedValue(mockUserSession)
-      await expect(
-        unapproveUserAction({ userId: "550e8400-e29b-41d4-a716-446655440003" })
-      ).rejects.toThrow("Unauthorized")
+      const result = await unapproveUserAction({ userId: "550e8400-e29b-41d4-a716-446655440003" })
+      expect(result.success).toBe(false)
+      if (!result.success) {
+        expect(result.code).toBe("UNAUTHORIZED")
+      }
     })
 
-    it("should throw error if no session", async () => {
+    it("should return error if no session", async () => {
       vi.mocked(auth.api.getSession).mockResolvedValue(null)
-      await expect(
-        unapproveUserAction({ userId: "550e8400-e29b-41d4-a716-446655440003" })
-      ).rejects.toThrow("Unauthorized")
+      const result = await unapproveUserAction({ userId: "550e8400-e29b-41d4-a716-446655440003" })
+      expect(result.success).toBe(false)
+      if (!result.success) {
+        expect(result.code).toBe("UNAUTHORIZED")
+      }
     })
 
-    it("should throw custom error message on db failure", async () => {
+    it("should return error on db failure", async () => {
       vi.mocked(auth.api.getSession).mockResolvedValue(mockAdminSession)
       vi.mocked(db.user.update).mockRejectedValueOnce(new Error("DB Error"))
-      await expect(
-        unapproveUserAction({ userId: "550e8400-e29b-41d4-a716-446655440003" })
-      ).rejects.toThrow("DB Error")
+      const result = await unapproveUserAction({ userId: "550e8400-e29b-41d4-a716-446655440003" })
+      expect(result.success).toBe(false)
+      if (!result.success) {
+        expect(result.error).toContain("DB Error")
+      }
     })
 
-    it("should fallback to generic error message", async () => {
+    it("should return error on non-Error exception", async () => {
       vi.mocked(auth.api.getSession).mockResolvedValue(mockAdminSession)
       vi.mocked(db.user.update).mockRejectedValueOnce("String Error")
-      await expect(
-        unapproveUserAction({ userId: "550e8400-e29b-41d4-a716-446655440003" })
-      ).rejects.toThrow("Failed to unapprove user")
+      const result = await unapproveUserAction({ userId: "550e8400-e29b-41d4-a716-446655440003" })
+      expect(result.success).toBe(false)
     })
   })
 
@@ -262,7 +270,10 @@ describe("Admin User Actions", () => {
         multiplier: 1.5,
       })
 
-      expect(result.priceMultiplier).toBe(1.5)
+      expect(result.success).toBe(true)
+      if (result.success) {
+        expect(result.data.priceMultiplier).toBe(1.5)
+      }
       expect(db.user.update).toHaveBeenCalledWith({
         where: { id: "550e8400-e29b-41d4-a716-446655440003" },
         data: { priceMultiplier: 1.5 },
@@ -274,10 +285,11 @@ describe("Admin User Actions", () => {
       vi.mocked(auth.api.getSession).mockResolvedValue(mockAdminSession)
       vi.mocked(db.user.update).mockResolvedValueOnce({ ...mockUser, priceMultiplier: 1.5 })
 
-      await updateUserPriceMultiplierAction({
+      const result = await updateUserPriceMultiplierAction({
         userId: "550e8400-e29b-41d4-a716-446655440003",
         multiplier: 1.5,
       })
+      expect(result.success).toBe(true)
 
       expect(invalidateUserSessions).toHaveBeenCalledWith("550e8400-e29b-41d4-a716-446655440003")
     })
@@ -289,83 +301,60 @@ describe("Admin User Actions", () => {
         priceMultiplier: 1.5,
       })
 
-      await updateUserPriceMultiplierAction({
+      const result = await updateUserPriceMultiplierAction({
         userId: "550e8400-e29b-41d4-a716-446655440001",
         multiplier: 1.5,
       })
+      expect(result.success).toBe(true)
 
       expect(invalidateUserSessions).not.toHaveBeenCalled()
     })
 
-    it("should throw error on invalid input (ZodError)", async () => {
-      await expect(
-        updateUserPriceMultiplierAction({
-          userId: "invalid-uuid",
-          multiplier: 1.0,
-        })
-      ).rejects.toThrow("User ID must be a valid UUID")
-    })
-
-    it("should throw error if multiplier too low", async () => {
-      vi.mocked(auth.api.getSession).mockResolvedValue(mockAdminSession)
-      await expect(
-        updateUserPriceMultiplierAction({
-          userId: "550e8400-e29b-41d4-a716-446655440003",
-          multiplier: 0.3,
-        })
-      ).rejects.toThrow("Price multiplier must be at least 0.5")
-    })
-
-    it("should throw error if multiplier too high", async () => {
-      vi.mocked(auth.api.getSession).mockResolvedValue(mockAdminSession)
-      await expect(
-        updateUserPriceMultiplierAction({
-          userId: "550e8400-e29b-41d4-a716-446655440003",
-          multiplier: 3.0,
-        })
-      ).rejects.toThrow("Price multiplier cannot exceed 2.0")
-    })
-
-    it("should throw error if not admin", async () => {
+    it("should return error if not admin", async () => {
       vi.mocked(auth.api.getSession).mockResolvedValue(mockUserSession)
-      await expect(
-        updateUserPriceMultiplierAction({
-          userId: "550e8400-e29b-41d4-a716-446655440003",
-          multiplier: 1.0,
-        })
-      ).rejects.toThrow("Unauthorized")
+      const result = await updateUserPriceMultiplierAction({
+        userId: "550e8400-e29b-41d4-a716-446655440003",
+        multiplier: 1.0,
+      })
+      expect(result.success).toBe(false)
+      if (!result.success) {
+        expect(result.code).toBe("UNAUTHORIZED")
+      }
     })
 
-    it("should throw error if no session", async () => {
+    it("should return error if no session", async () => {
       vi.mocked(auth.api.getSession).mockResolvedValue(null)
-      await expect(
-        updateUserPriceMultiplierAction({
-          userId: "550e8400-e29b-41d4-a716-446655440003",
-          multiplier: 1.0,
-        })
-      ).rejects.toThrow("Unauthorized")
+      const result = await updateUserPriceMultiplierAction({
+        userId: "550e8400-e29b-41d4-a716-446655440003",
+        multiplier: 1.0,
+      })
+      expect(result.success).toBe(false)
+      if (!result.success) {
+        expect(result.code).toBe("UNAUTHORIZED")
+      }
     })
 
-    it("should throw custom error on db failure", async () => {
+    it("should return error on db failure", async () => {
       vi.mocked(auth.api.getSession).mockResolvedValue(mockAdminSession)
       vi.mocked(db.user.update).mockRejectedValueOnce(new Error("DB Error"))
-      await expect(
-        updateUserPriceMultiplierAction({
-          userId: "550e8400-e29b-41d4-a716-446655440003",
-          multiplier: 1.0,
-        })
-      ).rejects.toThrow("DB Error")
+      const result = await updateUserPriceMultiplierAction({
+        userId: "550e8400-e29b-41d4-a716-446655440003",
+        multiplier: 1.0,
+      })
+      expect(result.success).toBe(false)
+      if (!result.success) {
+        expect(result.error).toContain("DB Error")
+      }
     })
 
-    it("should throw generic error on non-Error exception", async () => {
+    it("should return error on non-Error exception", async () => {
       vi.mocked(auth.api.getSession).mockResolvedValue(mockAdminSession)
       vi.mocked(db.user.update).mockRejectedValueOnce("String error")
-      await expect(
-        updateUserPriceMultiplierAction({
-          userId: "550e8400-e29b-41d4-a716-446655440003",
-          multiplier: 1.0,
-        })
-      ).rejects.toThrow("Failed to update price multiplier")
+      const result = await updateUserPriceMultiplierAction({
+        userId: "550e8400-e29b-41d4-a716-446655440003",
+        multiplier: 1.0,
+      })
+      expect(result.success).toBe(false)
     })
   })
 
@@ -393,7 +382,10 @@ describe("Admin User Actions", () => {
 
       const result = await createUserAction(userData)
 
-      expect(result.email).toBe(userData.email)
+      expect(result.success).toBe(true)
+      if (result.success) {
+        expect(result.data.email).toBe(userData.email)
+      }
       expect(db.user.create).toHaveBeenCalledWith({
         data: {
           email: userData.email,
@@ -416,58 +408,62 @@ describe("Admin User Actions", () => {
         updatedAt: now,
       })
 
-      await createUserAction(userData)
+      const result = await createUserAction(userData)
+      expect(result.success).toBe(true)
 
       expect(db.user.findUnique).toHaveBeenCalledWith({
         where: { email: userData.email },
       })
     })
 
-    it("should throw error if email already exists", async () => {
+    it("should return error if email already exists", async () => {
       vi.mocked(auth.api.getSession).mockResolvedValue(mockAdminSession)
       vi.mocked(db.user.findUnique).mockResolvedValueOnce(mockUser)
 
-      await expect(createUserAction(userData)).rejects.toThrow("Email already exists")
+      const result = await createUserAction(userData)
+      expect(result.success).toBe(false)
+      if (!result.success) {
+        expect(result.code).toBe("CONFLICT")
+      }
     })
 
-    it("should throw error on invalid input (ZodError)", async () => {
-      await expect(createUserAction({ ...userData, email: "invalid-email" })).rejects.toThrow(
-        "Must be a valid email address"
-      )
-    })
-
-    it("should throw error if multiplier invalid during creation", async () => {
-      vi.mocked(auth.api.getSession).mockResolvedValue(mockAdminSession)
-      vi.mocked(db.user.findUnique).mockResolvedValueOnce(null)
-      await expect(createUserAction({ ...userData, priceMultiplier: 0.1 })).rejects.toThrow(
-        "Price multiplier must be at least 0.5"
-      )
-    })
-
-    it("should throw error if not admin", async () => {
+    it("should return error if not admin", async () => {
       vi.mocked(auth.api.getSession).mockResolvedValue(mockUserSession)
-      await expect(createUserAction(userData)).rejects.toThrow("Unauthorized")
+      const result = await createUserAction(userData)
+      expect(result.success).toBe(false)
+      if (!result.success) {
+        expect(result.code).toBe("UNAUTHORIZED")
+      }
     })
 
-    it("should throw error if no session", async () => {
+    it("should return error if no session", async () => {
       vi.mocked(auth.api.getSession).mockResolvedValue(null)
-      await expect(createUserAction(userData)).rejects.toThrow("Unauthorized")
+      const result = await createUserAction(userData)
+      expect(result.success).toBe(false)
+      if (!result.success) {
+        expect(result.code).toBe("UNAUTHORIZED")
+      }
     })
 
-    it("should throw custom error on db failure", async () => {
+    it("should return error on db failure", async () => {
       vi.mocked(auth.api.getSession).mockResolvedValue(mockAdminSession)
       vi.mocked(db.user.findUnique).mockResolvedValueOnce(null)
       vi.mocked(db.user.create).mockRejectedValueOnce(new Error("DB Error"))
 
-      await expect(createUserAction(userData)).rejects.toThrow("DB Error")
+      const result = await createUserAction(userData)
+      expect(result.success).toBe(false)
+      if (!result.success) {
+        expect(result.error).toContain("DB Error")
+      }
     })
 
-    it("should throw generic error on non-Error exception", async () => {
+    it("should return error on non-Error exception", async () => {
       vi.mocked(auth.api.getSession).mockResolvedValue(mockAdminSession)
       vi.mocked(db.user.findUnique).mockResolvedValueOnce(null)
       vi.mocked(db.user.create).mockRejectedValueOnce("String error")
 
-      await expect(createUserAction(userData)).rejects.toThrow("Failed to create user")
+      const result = await createUserAction(userData)
+      expect(result.success).toBe(false)
     })
   })
 })

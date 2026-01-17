@@ -1,8 +1,8 @@
 import Link from "next/link"
 import type * as React from "react"
 
-import { Button } from "../ui/button"
-import { IconShoppingBag } from "../ui/icons"
+import { Button } from "@/components/ui/button"
+import { IconShoppingBag } from "@/components/ui/icons"
 
 interface EmptyStateProps {
   title?: React.ReactNode

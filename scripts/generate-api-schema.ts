@@ -169,14 +169,14 @@ function validateSchemaConsistency() {
   for (const validation of schemaValidationMaps) {
     try {
       const schema = validation.zodSchema
-      if (!schema || !schema.shape) {
+      if (!schema) {
         warnings.push(
           `⚠️  ${validation.schemaName}: Could not inspect schema shape (may be non-ZodObject)`
         )
         continue
       }
 
-      const fields = Object.keys(schema.shape)
+      const fields = Object.keys(schema)
 
       // Check that schema has expected fields (basic validation)
       if (fields.length === 0) {

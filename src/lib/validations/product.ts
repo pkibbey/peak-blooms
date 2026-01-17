@@ -1,6 +1,6 @@
 import { z } from "zod"
-import type { ProductUncheckedCreateInput } from "@/generated/models"
 import { ProductType } from "@/generated/enums"
+import type { ProductUncheckedCreateInput } from "@/generated/models"
 
 export const productSchema = z.object({
   name: z.string().min(1, "Product name is required"),

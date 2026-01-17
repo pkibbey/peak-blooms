@@ -11,8 +11,9 @@ vi.mock("@/lib/utils", () => ({
 }))
 
 vi.mock("./logger", () => ({
-  // biome-ignore lint/suspicious/noExplicitAny: Mock function with generic parameters
-  withTiming: vi.fn(async (_name: string, _input: any, fn: () => Promise<any>) => fn()),
+  withTiming: vi.fn(
+    async <T>(_name: string, _input: Record<string, unknown>, fn: () => Promise<T>) => fn()
+  ),
 }))
 
 import { db } from "@/lib/db"

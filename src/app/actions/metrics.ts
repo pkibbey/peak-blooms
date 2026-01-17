@@ -1,70 +1,83 @@
 "use server"
 
-import { ZodError } from "zod"
-import type { Metric } from "@/generated/client"
 import { getSession } from "@/lib/auth"
+import { toAppError } from "@/lib/error-utils"
 import { captureMetric, clearMetrics, getAllMetrics } from "@/lib/metrics"
+import type { AppResult, Metric } from "@/lib/query-types"
 import { type RecordMetricInput, recordMetricSchema } from "@/lib/validations/metrics"
 
 /**
  * Server action to get all recorded metrics (admin only)
  */
-export async function getMetricsAction(): Promise<Metric[]> {
+export async function getMetricsAction(): Promise<AppResult<Metric[]>> {
   try {
     const session = await getSession()
     if (!session?.user || session.user.role !== "ADMIN") {
-      throw new Error("Unauthorized")
+      return {
+        success: false,
+        error: "You must be an admin to view metrics",
+        code: "UNAUTHORIZED",
+      }
     }
 
-    return await getAllMetrics()
-  } catch (error) {
-    if (error instanceof Error) {
-      throw error
+    const metrics = await getAllMetrics()
+    return {
+      success: true,
+      data: metrics,
     }
-    throw new Error("Failed to fetch metrics")
+  } catch (error) {
+    return toAppError(error, "Failed to fetch metrics")
   }
 }
 
 /**
  * Server action to record a new metric (admin only)
  */
-export async function recordMetricAction(input: RecordMetricInput): Promise<void> {
+export async function recordMetricAction(input: RecordMetricInput): Promise<AppResult<void>> {
   try {
     const session = await getSession()
     if (!session?.user || session.user.role !== "ADMIN") {
-      throw new Error("Unauthorized")
+      return {
+        success: false,
+        error: "You must be an admin to record metrics",
+        code: "UNAUTHORIZED",
+      }
     }
 
     const { type, name, duration } = recordMetricSchema.parse(input)
     await captureMetric(type, name, duration)
+
+    return {
+      success: true,
+      data: undefined,
+    }
   } catch (error) {
-    // Check if it's a Zod validation error
-    if (error instanceof ZodError) {
-      throw new Error("Invalid metric data")
-    }
-    if (error instanceof Error) {
-      throw error
-    }
-    throw new Error("Failed to record metric")
+    return toAppError(error, "Failed to record metric")
   }
 }
 
 /**
  * Server action to clear all metrics (admin only)
  */
-export async function clearMetricsAction(): Promise<{ success: boolean; message: string }> {
+export async function clearMetricsAction(): Promise<
+  AppResult<{ success: boolean; message: string }>
+> {
   try {
     const session = await getSession()
     if (!session?.user || session.user.role !== "ADMIN") {
-      throw new Error("Unauthorized")
+      return {
+        success: false,
+        error: "You must be an admin to clear metrics",
+        code: "UNAUTHORIZED",
+      }
     }
 
     await clearMetrics()
-    return { success: true, message: "All metrics cleared" }
-  } catch (error) {
-    if (error instanceof Error) {
-      throw error
+    return {
+      success: true,
+      data: { success: true, message: "All metrics cleared" },
     }
-    throw new Error("Failed to clear metrics")
+  } catch (error) {
+    return toAppError(error, "Failed to clear metrics")
   }
 }

@@ -7,13 +7,13 @@ import { toast } from "sonner"
 import { subscribeToNewsletterAction } from "@/app/actions/newsletter"
 import { Button } from "@/components/ui/button"
 import { Form, FormControl, FormField, FormItem, FormMessage } from "@/components/ui/form"
+import { IconX } from "@/components/ui/icons"
 import { Input } from "@/components/ui/input"
 import { useSession } from "@/lib/auth-client"
 import {
   type NewsletterSubscribeFormData,
   newsletterSubscribeSchema,
 } from "@/lib/validations/newsletter"
-import { IconX } from "../ui/icons"
 
 export function NewsletterBanner() {
   const { data: session, isPending } = useSession()

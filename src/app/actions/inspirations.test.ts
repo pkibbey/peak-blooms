@@ -79,13 +79,17 @@ describe("Inspiration Actions", () => {
   }
 
   describe("createInspirationAction", () => {
-    it("should throw error if user not authenticated", async () => {
+    it("should return UNAUTHORIZED if user not authenticated", async () => {
       vi.mocked(getSession).mockResolvedValueOnce(null)
 
-      await expect(createInspirationAction(mockInspirationData)).rejects.toThrow("Unauthorized")
+      const result = await createInspirationAction(mockInspirationData)
+      expect(result).toMatchObject({
+        success: false,
+        code: "UNAUTHORIZED",
+      })
     })
 
-    it("should throw error if user is not admin", async () => {
+    it("should return UNAUTHORIZED if user is not admin", async () => {
       vi.mocked(getSession).mockResolvedValueOnce({
         ...mockAdminSession,
         user: {
@@ -94,7 +98,11 @@ describe("Inspiration Actions", () => {
         },
       })
 
-      await expect(createInspirationAction(mockInspirationData)).rejects.toThrow("Unauthorized")
+      const result = await createInspirationAction(mockInspirationData)
+      expect(result).toMatchObject({
+        success: false,
+        code: "UNAUTHORIZED",
+      })
     })
 
     it("should create inspiration with products", async () => {
@@ -103,7 +111,10 @@ describe("Inspiration Actions", () => {
 
       const result = await createInspirationAction(mockInspirationData)
 
-      expect(result).toEqual(mockInspirationResult)
+      expect(result).toEqual({
+        success: true,
+        data: mockInspirationResult,
+      })
       expect(db.inspiration.create).toHaveBeenCalledWith({
         data: {
           name: mockInspirationData.name,
@@ -119,47 +130,58 @@ describe("Inspiration Actions", () => {
       })
     })
 
-    it("should propagate database errors", async () => {
+    it("should return SERVER_ERROR for database errors", async () => {
       vi.mocked(getSession).mockResolvedValueOnce(mockAdminSession)
       vi.mocked(db.inspiration.create).mockRejectedValueOnce(
         new Error("Database constraint violation")
       )
 
-      await expect(createInspirationAction(mockInspirationData)).rejects.toThrow(
-        "Database constraint violation"
-      )
+      const result = await createInspirationAction(mockInspirationData)
+      expect(result).toMatchObject({
+        success: false,
+        code: "SERVER_ERROR",
+        error: "Database constraint violation",
+      })
     })
 
-    it("should throw 'Invalid inspiration data' when Zod validation fails", async () => {
-      // @ts-expect-error - intentional invalid input
-      await expect(createInspirationAction({})).rejects.toThrow("Invalid inspiration data")
+    it("should return VALIDATION_ERROR when Zod validation fails", async () => {
+      const result = await createInspirationAction({} as never)
+      expect(result).toMatchObject({
+        success: false,
+        code: "VALIDATION_ERROR",
+      })
     })
 
-    it("should throw 'Failed to create inspiration' for unknown errors", async () => {
+    it("should return SERVER_ERROR for unknown errors", async () => {
       vi.mocked(getSession).mockResolvedValueOnce(mockAdminSession)
       vi.mocked(db.inspiration.create).mockImplementationOnce(() => {
         throw "String error"
       })
 
-      await expect(createInspirationAction(mockInspirationData)).rejects.toThrow(
-        "Failed to create inspiration"
-      )
+      const result = await createInspirationAction(mockInspirationData)
+      expect(result).toMatchObject({
+        success: false,
+        code: "SERVER_ERROR",
+        error: "String error",
+      })
     })
   })
 
   describe("updateInspirationAction", () => {
-    it("should throw error if user not authenticated", async () => {
+    it("should return UNAUTHORIZED if user not authenticated", async () => {
       vi.mocked(getSession).mockResolvedValueOnce(null)
 
-      await expect(
-        updateInspirationAction({
-          id: "550e8400-e29b-41d4-a716-446655440021",
-          ...mockInspirationData,
-        })
-      ).rejects.toThrow("Unauthorized")
+      const result = await updateInspirationAction({
+        id: "550e8400-e29b-41d4-a716-446655440021",
+        ...mockInspirationData,
+      })
+      expect(result).toMatchObject({
+        success: false,
+        code: "UNAUTHORIZED",
+      })
     })
 
-    it("should throw error if user is not admin", async () => {
+    it("should return UNAUTHORIZED if user is not admin", async () => {
       vi.mocked(getSession).mockResolvedValueOnce({
         ...mockAdminSession,
         user: {
@@ -168,12 +190,14 @@ describe("Inspiration Actions", () => {
         },
       })
 
-      await expect(
-        updateInspirationAction({
-          id: "550e8400-e29b-41d4-a716-446655440021",
-          ...mockInspirationData,
-        })
-      ).rejects.toThrow("Unauthorized")
+      const result = await updateInspirationAction({
+        id: "550e8400-e29b-41d4-a716-446655440021",
+        ...mockInspirationData,
+      })
+      expect(result).toMatchObject({
+        success: false,
+        code: "UNAUTHORIZED",
+      })
     })
 
     it("should update inspiration and replace products", async () => {
@@ -185,7 +209,10 @@ describe("Inspiration Actions", () => {
         ...mockInspirationData,
       })
 
-      expect(result).toEqual(mockInspirationResult)
+      expect(result).toEqual({
+        success: true,
+        data: mockInspirationResult,
+      })
       expect(db.inspiration.update).toHaveBeenCalledWith({
         where: { id: "550e8400-e29b-41d4-a716-446655440021" },
         data: {
@@ -203,48 +230,59 @@ describe("Inspiration Actions", () => {
       })
     })
 
-    it("should throw 'Invalid inspiration data' when Zod validation fails", async () => {
-      // @ts-expect-error - intentional invalid input
-      await expect(updateInspirationAction({})).rejects.toThrow("Invalid inspiration data")
+    it("should return VALIDATION_ERROR when Zod validation fails", async () => {
+      const result = await updateInspirationAction({} as never)
+      expect(result).toMatchObject({
+        success: false,
+        code: "VALIDATION_ERROR",
+      })
     })
 
-    it("should propagate Error instances", async () => {
+    it("should return SERVER_ERROR for Error instances", async () => {
       vi.mocked(getSession).mockResolvedValueOnce(mockAdminSession)
       vi.mocked(db.inspiration.update).mockRejectedValueOnce(new Error("Update failed"))
 
-      await expect(
-        updateInspirationAction({
-          id: "550e8400-e29b-41d4-a716-446655440021",
-          ...mockInspirationData,
-        })
-      ).rejects.toThrow("Update failed")
+      const result = await updateInspirationAction({
+        id: "550e8400-e29b-41d4-a716-446655440021",
+        ...mockInspirationData,
+      })
+      expect(result).toMatchObject({
+        success: false,
+        code: "SERVER_ERROR",
+        error: "Update failed",
+      })
     })
 
-    it("should throw 'Failed to update inspiration' for unknown errors", async () => {
+    it("should return SERVER_ERROR for unknown errors", async () => {
       vi.mocked(getSession).mockResolvedValueOnce(mockAdminSession)
       vi.mocked(db.inspiration.update).mockImplementationOnce(() => {
         throw "String error"
       })
 
-      await expect(
-        updateInspirationAction({
-          id: "550e8400-e29b-41d4-a716-446655440021",
-          ...mockInspirationData,
-        })
-      ).rejects.toThrow("Failed to update inspiration")
+      const result = await updateInspirationAction({
+        id: "550e8400-e29b-41d4-a716-446655440021",
+        ...mockInspirationData,
+      })
+      expect(result).toMatchObject({
+        success: false,
+        code: "SERVER_ERROR",
+        error: "String error",
+      })
     })
   })
 
   describe("deleteInspirationAction", () => {
-    it("should throw error if user not authenticated", async () => {
+    it("should return UNAUTHORIZED if user not authenticated", async () => {
       vi.mocked(getSession).mockResolvedValueOnce(null)
 
-      await expect(
-        deleteInspirationAction({ id: "550e8400-e29b-41d4-a716-446655440021" })
-      ).rejects.toThrow("Unauthorized")
+      const result = await deleteInspirationAction({ id: "550e8400-e29b-41d4-a716-446655440021" })
+      expect(result).toMatchObject({
+        success: false,
+        code: "UNAUTHORIZED",
+      })
     })
 
-    it("should throw error if user is not admin", async () => {
+    it("should return UNAUTHORIZED if user is not admin", async () => {
       vi.mocked(getSession).mockResolvedValueOnce({
         ...mockAdminSession,
         user: {
@@ -253,9 +291,11 @@ describe("Inspiration Actions", () => {
         },
       })
 
-      await expect(
-        deleteInspirationAction({ id: "550e8400-e29b-41d4-a716-446655440021" })
-      ).rejects.toThrow("Unauthorized")
+      const result = await deleteInspirationAction({ id: "550e8400-e29b-41d4-a716-446655440021" })
+      expect(result).toMatchObject({
+        success: false,
+        code: "UNAUTHORIZED",
+      })
     })
 
     it("should delete inspiration", async () => {
@@ -264,35 +304,47 @@ describe("Inspiration Actions", () => {
 
       const result = await deleteInspirationAction({ id: "550e8400-e29b-41d4-a716-446655440021" })
 
-      expect(result).toEqual({ success: true })
+      expect(result).toEqual({
+        success: true,
+        data: { id: "550e8400-e29b-41d4-a716-446655440021" },
+      })
       expect(db.inspiration.delete).toHaveBeenCalledWith({
         where: { id: "550e8400-e29b-41d4-a716-446655440021" },
       })
     })
 
-    it("should throw 'Invalid inspiration data' when Zod validation fails", async () => {
-      // @ts-expect-error - intentional invalid input
-      await expect(deleteInspirationAction({})).rejects.toThrow("Invalid inspiration data")
+    it("should return VALIDATION_ERROR when Zod validation fails", async () => {
+      const result = await deleteInspirationAction({} as never)
+      expect(result).toMatchObject({
+        success: false,
+        code: "VALIDATION_ERROR",
+      })
     })
 
-    it("should propagate Error instances", async () => {
+    it("should return SERVER_ERROR for Error instances", async () => {
       vi.mocked(getSession).mockResolvedValueOnce(mockAdminSession)
       vi.mocked(db.inspiration.delete).mockRejectedValueOnce(new Error("Delete failed"))
 
-      await expect(
-        deleteInspirationAction({ id: "550e8400-e29b-41d4-a716-446655440021" })
-      ).rejects.toThrow("Delete failed")
+      const result = await deleteInspirationAction({ id: "550e8400-e29b-41d4-a716-446655440021" })
+      expect(result).toMatchObject({
+        success: false,
+        code: "SERVER_ERROR",
+        error: "Delete failed",
+      })
     })
 
-    it("should throw 'Failed to delete inspiration' for unknown errors", async () => {
+    it("should return SERVER_ERROR for unknown errors", async () => {
       vi.mocked(getSession).mockResolvedValueOnce(mockAdminSession)
       vi.mocked(db.inspiration.delete).mockImplementationOnce(() => {
         throw "String error"
       })
 
-      await expect(
-        deleteInspirationAction({ id: "550e8400-e29b-41d4-a716-446655440021" })
-      ).rejects.toThrow("Failed to delete inspiration")
+      const result = await deleteInspirationAction({ id: "550e8400-e29b-41d4-a716-446655440021" })
+      expect(result).toMatchObject({
+        success: false,
+        code: "SERVER_ERROR",
+        error: "String error",
+      })
     })
   })
 })

@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation"
 import { useState } from "react"
 import { useForm } from "react-hook-form"
 import { toast } from "sonner"
+import { createUserAction } from "@/app/actions/admin-users"
 import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
 import {
@@ -23,7 +24,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
-import { createUserAction } from "@/app/actions/admin-users"
 
 interface UsersFormValues {
   email: string
@@ -53,19 +53,22 @@ export function UsersForm() {
     setIsSubmitting(true)
 
     try {
-      await createUserAction(values)
+      const result = await createUserAction(values)
+      if (!result.success) {
+        if (result.code === "CONFLICT") {
+          form.setError("email", {
+            message: "This email address is already in use",
+          })
+        } else {
+          toast.error(result.error)
+        }
+        return
+      }
       toast.success("User created successfully")
       router.push("/admin/users")
       router.refresh()
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : "Failed to create user"
-      if (errorMessage === "Email already exists") {
-        form.setError("email", {
-          message: "This email address is already in use",
-        })
-      } else {
-        toast.error(errorMessage)
-      }
+      toast.error("Failed to create user")
       console.error(error)
     } finally {
       setIsSubmitting(false)

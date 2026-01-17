@@ -12,7 +12,8 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
-import type { Metric, MetricType } from "@/generated/client"
+import type { MetricType } from "@/generated/client"
+import type { Metric } from "@/lib/query-types"
 
 interface MetricsClientProps {
   types: MetricType[]
@@ -42,9 +43,13 @@ export default function MetricsClient({ types }: MetricsClientProps) {
   const handleClearMetrics = async () => {
     try {
       setIsClearing(true)
-      await clearMetricsAction()
-      setSummaries([])
-      toast.success("Metrics cleared")
+      const res = await clearMetricsAction()
+      if (!res.success) {
+        toast.error(res.error ?? "Failed to clear metrics")
+      } else {
+        setSummaries([])
+        toast.success("Metrics cleared")
+      }
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Failed to clear metrics")
       console.error("Failed to clear metrics:", error)
@@ -88,8 +93,12 @@ export default function MetricsClient({ types }: MetricsClientProps) {
     const fetchMetrics = async () => {
       try {
         setIsLoading(true)
-        const data = await getMetricsAction()
-        calculateSummaries(data)
+        const res = await getMetricsAction()
+        if (!res.success) {
+          toast.error(res.error ?? "Failed to fetch metrics")
+          return
+        }
+        calculateSummaries(res.data)
       } catch (error) {
         toast.error(error instanceof Error ? error.message : "Failed to fetch metrics")
         console.error("Failed to fetch metrics:", error)

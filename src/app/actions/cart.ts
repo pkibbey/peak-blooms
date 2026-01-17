@@ -1,19 +1,15 @@
 "use server"
 
 import { revalidatePath } from "next/cache"
-import { ZodError } from "zod"
 import { applyPriceMultiplierToItems, calculateCartTotal } from "@/lib/cart-utils"
 import { getCurrentUser } from "@/lib/current-user"
 import { db } from "@/lib/db"
-import type { CartResponse, SessionUser } from "@/lib/query-types"
+import { toAppError } from "@/lib/error-utils"
+import type { AppResult, CartResponse, SessionUser } from "@/lib/query-types"
 import {
-  type AddToCartInput,
   addToCartSchema,
-  type BatchAddToCartInput,
   batchAddToCartSchema,
-  type RemoveFromCartInput,
   removeFromCartSchema,
-  type UpdateCartItemInput,
   updateCartItemSchema,
 } from "@/lib/validations/checkout"
 
@@ -50,16 +46,45 @@ async function createCart(user: SessionUser) {
 
 /**
  * Server action to add or update item in cart
- * Returns the full cart with updated item list
+ * Returns AppResult with full cart or error details
  */
-export async function addToCartAction(input: AddToCartInput): Promise<CartResponse> {
+export async function addToCartAction(input: unknown): Promise<AppResult<CartResponse>> {
   try {
+    // 1. Validate input
     const { productId, quantity } = addToCartSchema.parse(input)
-    const user = await getCurrentUser()
-    if (!user) throw new Error("Unauthorized")
-    if (!user.approved) throw new Error("Your account is not approved for purchases")
 
-    // Get or create cart
+    // 2. Check authentication
+    const user = await getCurrentUser()
+    if (!user) {
+      return {
+        success: false,
+        error: "You must be logged in to add items to cart",
+        code: "UNAUTHORIZED",
+      }
+    }
+
+    // 3. Check account approval
+    if (!user.approved) {
+      return {
+        success: false,
+        error: "Your account is not approved for purchases",
+        code: "FORBIDDEN",
+      }
+    }
+
+    // 4. Check product exists
+    const product = await db.product.findUnique({
+      where: { id: productId },
+    })
+    if (!product) {
+      return {
+        success: false,
+        error: "Product not found",
+        code: "NOT_FOUND",
+      }
+    }
+
+    // 5. Get or create cart
     let cart = await db.order.findFirst({
       where: { userId: user.id, status: "CART" },
       orderBy: { createdAt: "desc" },
@@ -72,16 +97,16 @@ export async function addToCartAction(input: AddToCartInput): Promise<CartRespon
 
     if (!cart) {
       cart = await createCart(user)
-      if (!cart) throw new Error("Failed to create cart")
+      if (!cart) {
+        return {
+          success: false,
+          error: "Failed to create cart",
+          code: "SERVER_ERROR",
+        }
+      }
     }
 
-    // Check if product exists
-    const product = await db.product.findUnique({
-      where: { id: productId },
-    })
-    if (!product) throw new Error("Product not found")
-
-    // Update or create order item
+    // 6. Update or create order item
     const existingItem = await db.orderItem.findFirst({
       where: { orderId: cart.id, productId },
     })
@@ -102,7 +127,7 @@ export async function addToCartAction(input: AddToCartInput): Promise<CartRespon
       })
     }
 
-    // Fetch updated cart
+    // 7. Fetch and return updated cart
     const updatedCart = await db.order.findUniqueOrThrow({
       where: { id: cart.id },
       include: {
@@ -120,51 +145,64 @@ export async function addToCartAction(input: AddToCartInput): Promise<CartRespon
 
     revalidatePath("/cart")
     return {
-      id: updatedCart.id,
-      orderNumber: updatedCart.orderNumber,
-      status: updatedCart.status,
-      notes: updatedCart.notes,
-      items: adjustedItems,
-      total,
+      success: true,
+      data: {
+        id: updatedCart.id,
+        orderNumber: updatedCart.orderNumber,
+        status: updatedCart.status,
+        notes: updatedCart.notes,
+        items: adjustedItems,
+        total,
+      },
     }
   } catch (error) {
-    if (error instanceof ZodError) {
-      const issue = error.issues[0]
-      if (issue?.path[0] === "productId") {
-        throw new Error("Product not found")
-      }
-      if (issue?.code === "too_small" && issue?.path[0] === "quantity") {
-        throw new Error("Quantity must be at least 1")
-      }
-      throw new Error("Invalid product data")
-    }
-    if (error instanceof Error) {
-      throw error
-    }
-    throw new Error("Failed to add to cart")
+    return toAppError(error, "Failed to add item to cart")
   }
 }
 
 /**
  * Server action to update cart item quantity
- * Returns the updated cart
+ * Returns AppResult with updated cart or error details
  */
-export async function updateCartItemAction(input: UpdateCartItemInput): Promise<CartResponse> {
+export async function updateCartItemAction(input: unknown): Promise<AppResult<CartResponse>> {
   try {
+    // 1. Validate input
     const { itemId, quantity } = updateCartItemSchema.parse(input)
-    const user = await getCurrentUser()
-    if (!user) throw new Error("Unauthorized")
 
-    const item = await db.orderItem.findUniqueOrThrow({
+    // 2. Check authentication
+    const user = await getCurrentUser()
+    if (!user) {
+      return {
+        success: false,
+        error: "You must be logged in",
+        code: "UNAUTHORIZED",
+      }
+    }
+
+    // 3. Fetch item with order
+    const item = await db.orderItem.findUnique({
       where: { id: itemId },
       include: { order: true, product: true },
     })
 
-    // Verify ownership
-    if (item.order.userId !== user.id) {
-      throw new Error("Unauthorized")
+    if (!item) {
+      return {
+        success: false,
+        error: "Cart item not found",
+        code: "NOT_FOUND",
+      }
     }
 
+    // 4. Verify ownership
+    if (item.order.userId !== user.id) {
+      return {
+        success: false,
+        error: "You cannot modify this cart",
+        code: "FORBIDDEN",
+      }
+    }
+
+    // 5. Delete if quantity <= 0, otherwise update
     if (quantity <= 0) {
       await db.orderItem.delete({
         where: { id: itemId },
@@ -176,7 +214,7 @@ export async function updateCartItemAction(input: UpdateCartItemInput): Promise<
       })
     }
 
-    // Fetch updated cart
+    // 6. Fetch and return updated cart
     const updatedCart = await db.order.findUniqueOrThrow({
       where: { id: item.orderId },
       include: {
@@ -194,53 +232,67 @@ export async function updateCartItemAction(input: UpdateCartItemInput): Promise<
 
     revalidatePath("/cart")
     return {
-      id: updatedCart.id,
-      orderNumber: updatedCart.orderNumber,
-      status: updatedCart.status,
-      notes: updatedCart.notes,
-      items: adjustedItems,
-      total,
+      success: true,
+      data: {
+        id: updatedCart.id,
+        orderNumber: updatedCart.orderNumber,
+        status: updatedCart.status,
+        notes: updatedCart.notes,
+        items: adjustedItems,
+        total,
+      },
     }
   } catch (error) {
-    console.error(error)
-    if (error instanceof ZodError) {
-      const issue = error.issues[0]
-      if (issue?.code === "too_small" && issue?.path[0] === "quantity") {
-        throw new Error("Quantity must be at least 0")
-      }
-      throw new Error("Invalid cart item data")
-    }
-    if (error instanceof Error) {
-      throw error
-    }
-    throw new Error("Failed to update cart item")
+    return toAppError(error, "Failed to update cart item")
   }
 }
 
 /**
  * Server action to remove a single item from cart
- * Returns the updated cart
+ * Returns AppResult with updated cart or error details
  */
-export async function removeFromCartAction(input: RemoveFromCartInput): Promise<CartResponse> {
+export async function removeFromCartAction(input: unknown): Promise<AppResult<CartResponse>> {
   try {
+    // 1. Validate input
     const { itemId } = removeFromCartSchema.parse(input)
-    const user = await getCurrentUser()
-    if (!user) throw new Error("Unauthorized")
 
-    const item = await db.orderItem.findUniqueOrThrow({
+    // 2. Check authentication
+    const user = await getCurrentUser()
+    if (!user) {
+      return {
+        success: false,
+        error: "You must be logged in",
+        code: "UNAUTHORIZED",
+      }
+    }
+
+    // 3. Fetch item with order
+    const item = await db.orderItem.findUnique({
       where: { id: itemId },
       include: { order: true },
     })
 
-    // Verify ownership
-    if (item.order.userId !== user.id) {
-      throw new Error("Unauthorized")
+    if (!item) {
+      return {
+        success: false,
+        error: "Cart item not found",
+        code: "NOT_FOUND",
+      }
     }
 
-    // Delete the item
+    // 4. Verify ownership
+    if (item.order.userId !== user.id) {
+      return {
+        success: false,
+        error: "You cannot modify this cart",
+        code: "FORBIDDEN",
+      }
+    }
+
+    // 5. Delete the item
     await db.orderItem.delete({ where: { id: itemId } })
 
-    // Fetch updated cart
+    // 6. Fetch and return updated cart
     const updatedCart = await db.order.findUniqueOrThrow({
       where: { id: item.orderId },
       include: {
@@ -258,34 +310,38 @@ export async function removeFromCartAction(input: RemoveFromCartInput): Promise<
 
     revalidatePath("/cart")
     return {
-      id: updatedCart.id,
-      orderNumber: updatedCart.orderNumber,
-      status: updatedCart.status,
-      notes: updatedCart.notes,
-      items: adjustedItems,
-      total,
+      success: true,
+      data: {
+        id: updatedCart.id,
+        orderNumber: updatedCart.orderNumber,
+        status: updatedCart.status,
+        notes: updatedCart.notes,
+        items: adjustedItems,
+        total,
+      },
     }
   } catch (error) {
-    console.error(error)
-    if (error instanceof ZodError) {
-      throw new Error("Invalid cart item data")
-    }
-    if (error instanceof Error) {
-      throw error
-    }
-    throw new Error("Failed to remove item from cart")
+    return toAppError(error, "Failed to remove item from cart")
   }
 }
 
 /**
  * Server action to clear all items from cart
- * Returns empty cart
+ * Returns AppResult with empty cart or error details
  */
-export async function clearCartAction(): Promise<CartResponse> {
+export async function clearCartAction(): Promise<AppResult<CartResponse>> {
   try {
+    // 1. Check authentication
     const user = await getCurrentUser()
-    if (!user) throw new Error("Unauthorized")
+    if (!user) {
+      return {
+        success: false,
+        error: "You must be logged in",
+        code: "UNAUTHORIZED",
+      }
+    }
 
+    // 2. Get existing cart
     const cart = await db.order.findFirst({
       where: { userId: user.id, status: "CART" },
       orderBy: { createdAt: "desc" },
@@ -296,29 +352,40 @@ export async function clearCartAction(): Promise<CartResponse> {
       },
     })
 
+    // 3. Clear items if cart exists
     if (cart) {
       await db.orderItem.deleteMany({
         where: { orderId: cart.id },
       })
     }
 
+    // 4. Return empty cart
     let updatedCart = cart
     if (!updatedCart) {
       updatedCart = await createCart(user)
-      if (!updatedCart) throw new Error("Failed to create cart")
+      if (!updatedCart) {
+        return {
+          success: false,
+          error: "Failed to create cart",
+          code: "SERVER_ERROR",
+        }
+      }
     }
 
     revalidatePath("/cart")
     return {
-      id: updatedCart.id,
-      orderNumber: updatedCart.orderNumber,
-      status: updatedCart.status,
-      notes: updatedCart.notes,
-      items: [],
-      total: 0,
+      success: true,
+      data: {
+        id: updatedCart.id,
+        orderNumber: updatedCart.orderNumber,
+        status: updatedCart.status,
+        notes: updatedCart.notes,
+        items: [],
+        total: 0,
+      },
     }
   } catch (error) {
-    throw new Error(error instanceof Error ? error.message : "Failed to clear cart")
+    return toAppError(error, "Failed to clear cart")
   }
 }
 
@@ -326,14 +393,28 @@ export async function clearCartAction(): Promise<CartResponse> {
  * Server action to fetch user's current cart
  * Does not auto-create - returns null if cart doesn't exist
  */
-export async function getCartAction(): Promise<CartResponse | null> {
+export async function getCartAction(): Promise<AppResult<CartResponse | null>> {
   try {
+    // 1. Check authentication
     const user = await getCurrentUser()
-    if (!user) throw new Error("Unauthorized")
+    if (!user) {
+      return {
+        success: false,
+        error: "You must be logged in",
+        code: "UNAUTHORIZED",
+      }
+    }
 
-    if (!user.approved) throw new Error("Your account is not approved for purchases")
+    // 2. Check approval
+    if (!user.approved) {
+      return {
+        success: false,
+        error: "Your account is not approved for purchases",
+        code: "FORBIDDEN",
+      }
+    }
 
-    // Get existing cart without creating one
+    // 3. Get existing cart without creating one
     const cart = await db.order.findFirst({
       where: { userId: user.id, status: "CART" },
       orderBy: { createdAt: "desc" },
@@ -344,21 +425,27 @@ export async function getCartAction(): Promise<CartResponse | null> {
       },
     })
 
-    if (!cart) return null
+    if (!cart) {
+      return { success: true, data: null }
+    }
 
+    // 4. Return cart with adjusted prices
     const adjustedItems = applyPriceMultiplierToItems(cart.items, user.priceMultiplier ?? 1.0)
     const total = calculateCartTotal(adjustedItems)
 
     return {
-      id: cart.id,
-      orderNumber: cart.orderNumber,
-      status: cart.status,
-      notes: cart.notes,
-      items: adjustedItems,
-      total,
+      success: true,
+      data: {
+        id: cart.id,
+        orderNumber: cart.orderNumber,
+        status: cart.status,
+        notes: cart.notes,
+        items: adjustedItems,
+        total,
+      },
     }
   } catch (error) {
-    throw new Error(error instanceof Error ? error.message : "Failed to fetch cart")
+    return toAppError(error, "Failed to fetch cart")
   }
 }
 
@@ -366,16 +453,31 @@ export async function getCartAction(): Promise<CartResponse | null> {
  * Server action to add multiple items to cart in one transaction
  * Supports single quantity for all or per-item quantities
  */
-export async function batchAddToCartAction(input: BatchAddToCartInput): Promise<CartResponse> {
+export async function batchAddToCartAction(input: unknown): Promise<AppResult<CartResponse>> {
   try {
+    // 1. Validate input
     const { productIds, quantities } = batchAddToCartSchema.parse(input)
+
+    // 2. Check authentication
     const user = await getCurrentUser()
-    if (!user) throw new Error("Unauthorized")
+    if (!user) {
+      return {
+        success: false,
+        error: "You must be logged in to add items to cart",
+        code: "UNAUTHORIZED",
+      }
+    }
 
-    // Check approval after validation
-    if (!user.approved) throw new Error("Your account is not approved for purchases")
+    // 3. Check approval
+    if (!user.approved) {
+      return {
+        success: false,
+        error: "Your account is not approved for purchases",
+        code: "FORBIDDEN",
+      }
+    }
 
-    // Get or create cart
+    // 4. Get or create cart
     let cart = await db.order.findFirst({
       where: { userId: user.id, status: "CART" },
       orderBy: { createdAt: "desc" },
@@ -388,10 +490,16 @@ export async function batchAddToCartAction(input: BatchAddToCartInput): Promise<
 
     if (!cart) {
       cart = await createCart(user)
-      if (!cart) throw new Error("Failed to create cart")
+      if (!cart) {
+        return {
+          success: false,
+          error: "Failed to create cart",
+          code: "SERVER_ERROR",
+        }
+      }
     }
 
-    // Determine per-item quantities
+    // 5. Determine per-item quantities
     let resolvedQuantities: number[] = []
     if (typeof quantities === "number") {
       resolvedQuantities = productIds.map(() => quantities)
@@ -401,7 +509,7 @@ export async function batchAddToCartAction(input: BatchAddToCartInput): Promise<
       resolvedQuantities = productIds.map(() => 1)
     }
 
-    // Transaction to add items atomically
+    // 6. Transaction to add items atomically
     await db.$transaction(async (tx) => {
       for (let i = 0; i < productIds.length; i++) {
         const productId = String(productIds[i])
@@ -432,7 +540,7 @@ export async function batchAddToCartAction(input: BatchAddToCartInput): Promise<
       }
     })
 
-    // Fetch updated cart
+    // 7. Fetch and return updated cart
     const updatedCart = await db.order.findUniqueOrThrow({
       where: { id: cart.id },
       include: {
@@ -450,24 +558,17 @@ export async function batchAddToCartAction(input: BatchAddToCartInput): Promise<
 
     revalidatePath("/cart")
     return {
-      id: updatedCart.id,
-      orderNumber: updatedCart.orderNumber,
-      status: updatedCart.status,
-      notes: updatedCart.notes,
-      items: adjustedItems,
-      total,
+      success: true,
+      data: {
+        id: updatedCart.id,
+        orderNumber: updatedCart.orderNumber,
+        status: updatedCart.status,
+        notes: updatedCart.notes,
+        items: adjustedItems,
+        total,
+      },
     }
   } catch (error) {
-    if (error instanceof ZodError) {
-      const issue = error.issues[0]
-      if (issue?.code === "too_small" && issue.path.includes("quantities")) {
-        throw new Error("Quantity must be at least 1")
-      }
-      throw new Error("Invalid product data")
-    }
-    if (error instanceof Error) {
-      throw error
-    }
-    throw new Error("Failed to add items to cart")
+    return toAppError(error, "Failed to add items to cart")
   }
 }

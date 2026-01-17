@@ -1,10 +1,10 @@
 "use server"
 
 import { revalidatePath } from "next/cache"
-import { ZodError } from "zod"
 import { getSession } from "@/lib/auth"
 import { db } from "@/lib/db"
-import type { CollectionBasic } from "@/lib/query-types"
+import { toAppError } from "@/lib/error-utils"
+import type { AppResult, CollectionBasic } from "@/lib/query-types"
 import {
   type CreateCollectionInput,
   createCollectionSchema,
@@ -19,18 +19,20 @@ import {
 export async function createCollectionAction(
   input: CreateCollectionInput
 ): Promise<
-  Pick<
-    CollectionBasic,
-    "id" | "name" | "slug" | "image" | "description" | "featured" | "createdAt" | "updatedAt"
+  AppResult<
+    Pick<
+      CollectionBasic,
+      "id" | "name" | "slug" | "image" | "description" | "featured" | "createdAt" | "updatedAt"
+    >
   >
 > {
-  try {
-    const { productIds, ...data } = createCollectionSchema.parse(input)
-    const session = await getSession()
-    if (!session?.user || session.user.role !== "ADMIN") {
-      throw new Error("Unauthorized")
-    }
+  const { productIds, ...data } = createCollectionSchema.parse(input)
+  const session = await getSession()
+  if (!session?.user || session.user.role !== "ADMIN") {
+    return { success: false, error: "Unauthorized", code: "UNAUTHORIZED" }
+  }
 
+  try {
     const collection = await db.collection.create({
       data: {
         name: data.name,
@@ -47,33 +49,29 @@ export async function createCollectionAction(
     })
 
     revalidatePath("/admin/collections")
-    return collection
+    return { success: true, data: collection }
   } catch (error) {
-    if (error instanceof ZodError) {
-      throw new Error("Invalid collection data")
-    }
-    if (error instanceof Error) {
-      throw error
-    }
-    throw new Error("Failed to create collection")
+    return toAppError(error, "Failed to create collection")
   }
 }
 
 export async function updateCollectionAction(
   input: UpdateCollectionInput
 ): Promise<
-  Pick<
-    CollectionBasic,
-    "id" | "name" | "slug" | "image" | "description" | "featured" | "createdAt" | "updatedAt"
+  AppResult<
+    Pick<
+      CollectionBasic,
+      "id" | "name" | "slug" | "image" | "description" | "featured" | "createdAt" | "updatedAt"
+    >
   >
 > {
-  try {
-    const { id, productIds, ...data } = updateCollectionSchema.parse(input)
-    const session = await getSession()
-    if (!session?.user || session.user.role !== "ADMIN") {
-      throw new Error("Unauthorized")
-    }
+  const { id, productIds, ...data } = updateCollectionSchema.parse(input)
+  const session = await getSession()
+  if (!session?.user || session.user.role !== "ADMIN") {
+    return { success: false, error: "Unauthorized", code: "UNAUTHORIZED" }
+  }
 
+  try {
     const collection = await db.collection.update({
       where: { id },
       data: {
@@ -92,69 +90,51 @@ export async function updateCollectionAction(
     })
 
     revalidatePath("/admin/collections")
-    return collection
+    return { success: true, data: collection }
   } catch (error) {
-    if (error instanceof ZodError) {
-      throw new Error("Invalid collection data")
-    }
-    if (error instanceof Error) {
-      throw error
-    }
-    throw new Error("Failed to update collection")
+    return toAppError(error, "Failed to update collection")
   }
 }
 
 export async function deleteCollectionAction(
   input: DeleteCollectionInput
-): Promise<{ success: boolean }> {
-  try {
-    const { id } = deleteCollectionSchema.parse(input)
-    const session = await getSession()
-    if (!session?.user || session.user.role !== "ADMIN") {
-      throw new Error("Unauthorized")
-    }
+): Promise<AppResult<{ id: string }>> {
+  const { id } = deleteCollectionSchema.parse(input)
+  const session = await getSession()
+  if (!session?.user || session.user.role !== "ADMIN") {
+    return { success: false, error: "Unauthorized", code: "UNAUTHORIZED" }
+  }
 
+  try {
     await db.collection.delete({
       where: { id },
     })
 
     revalidatePath("/admin/collections")
-    return { success: true }
+    return { success: true, data: { id } }
   } catch (error) {
-    if (error instanceof ZodError) {
-      throw new Error("Invalid collection data")
-    }
-    if (error instanceof Error) {
-      throw error
-    }
-    throw new Error("Failed to delete collection")
+    return toAppError(error, "Failed to delete collection")
   }
 }
 
 export async function toggleCollectionFeaturedAction(
   input: ToggleCollectionFeaturedInput
-): Promise<{ success: boolean; featured: boolean }> {
-  try {
-    const { id, featured } = toggleCollectionFeaturedSchema.parse(input)
-    const session = await getSession()
-    if (!session?.user || session.user.role !== "ADMIN") {
-      throw new Error("Unauthorized")
-    }
+): Promise<AppResult<{ id: string; featured: boolean }>> {
+  const { id, featured } = toggleCollectionFeaturedSchema.parse(input)
+  const session = await getSession()
+  if (!session?.user || session.user.role !== "ADMIN") {
+    return { success: false, error: "Unauthorized", code: "UNAUTHORIZED" }
+  }
 
+  try {
     const collection = await db.collection.update({
       where: { id },
       data: { featured },
     })
 
     revalidatePath("/admin/collections")
-    return { success: true, featured: collection.featured }
+    return { success: true, data: { id, featured: collection.featured } }
   } catch (error) {
-    if (error instanceof ZodError) {
-      throw new Error("Invalid collection data")
-    }
-    if (error instanceof Error) {
-      throw error
-    }
-    throw new Error("Failed to update collection")
+    return toAppError(error, "Failed to update collection")
   }
 }

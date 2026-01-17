@@ -54,13 +54,17 @@ export default function UsersTable({ users, sort, order }: UsersTableProps) {
 
     setLoadingId(userId)
     try {
-      await updateUserPriceMultiplierAction({ userId, multiplier: numValue })
+      const result = await updateUserPriceMultiplierAction({ userId, multiplier: numValue })
+      if (!result.success) {
+        toast.error(result.error)
+        return
+      }
       toast.success("Price multiplier updated")
       setEditingId(null)
       router.refresh()
     } catch (error) {
       console.error("Error updating multiplier:", error)
-      toast.error(error instanceof Error ? error.message : "Failed to update price multiplier")
+      toast.error("Failed to update price multiplier")
     } finally {
       setLoadingId(null)
     }
@@ -69,12 +73,16 @@ export default function UsersTable({ users, sort, order }: UsersTableProps) {
   const handleApprove = async (userId: string) => {
     setLoadingId(userId)
     try {
-      await approveUserAction({ userId })
+      const result = await approveUserAction({ userId })
+      if (!result.success) {
+        toast.error(result.error)
+        return
+      }
       toast.success("User approved")
       router.refresh()
     } catch (error) {
       console.error("Error approving user:", error)
-      toast.error(error instanceof Error ? error.message : "Failed to approve user")
+      toast.error("Failed to approve user")
     } finally {
       setLoadingId(null)
     }
@@ -83,12 +91,16 @@ export default function UsersTable({ users, sort, order }: UsersTableProps) {
   const handleUnapprove = async (userId: string) => {
     setLoadingId(userId)
     try {
-      await unapproveUserAction({ userId })
+      const result = await unapproveUserAction({ userId })
+      if (!result.success) {
+        toast.error(result.error)
+        return
+      }
       toast.success("User access revoked")
       router.refresh()
     } catch (error) {
       console.error("Error unapproving user:", error)
-      toast.error(error instanceof Error ? error.message : "Failed to unapprove user")
+      toast.error("Failed to unapprove user")
     } finally {
       setLoadingId(null)
     }

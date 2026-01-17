@@ -23,7 +23,7 @@ export function CancelOrderButton({ order }: CancelOrderButtonProps) {
       const result = await cancelOrderAction({ orderId: order.id, convertToCart })
 
       if (result.success) {
-        toast.success(result.message)
+        toast.success("Order cancelled successfully")
         setShowOptions(false)
 
         // Redirect based on action
@@ -33,7 +33,7 @@ export function CancelOrderButton({ order }: CancelOrderButtonProps) {
           router.push("/account/order-history")
         }
       } else {
-        toast.error(result.error || result.message)
+        toast.error(result.error || "Failed to cancel order")
       }
     } catch (error) {
       console.error("Cancel order error:", error)

@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useRef, useState } from "react"
-import type { OrderStatus } from "@/components/site/OrderStatusBadge"
+
 import {
   IconCheckCircle,
   IconClock,
@@ -9,6 +9,7 @@ import {
   IconShoppingCart,
   IconTruck,
 } from "@/components/ui/icons"
+import type { OrderStatus } from "@/generated/enums"
 import { formatDate } from "@/lib/utils"
 
 const TIMELINE_STEPS = [

@@ -1,4 +1,5 @@
 import Link from "next/link"
+import NavLink from "@/components/site/NavLink"
 import { OrderStatusBadge } from "@/components/site/OrderStatusBadge"
 import { IconEye } from "@/components/ui/icons"
 import { SortableTableHead } from "@/components/ui/SortableTableHead"
@@ -13,7 +14,6 @@ import {
 import { calculateCartTotal } from "@/lib/cart-utils"
 import type { OrdersWithCount } from "@/lib/query-types"
 import { formatDate, formatPrice } from "@/lib/utils"
-import NavLink from "../site/NavLink"
 
 interface OrdersTableProps {
   orders: OrdersWithCount[]

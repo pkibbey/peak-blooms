@@ -1,10 +1,10 @@
 "use server"
 
 import { revalidatePath } from "next/cache"
-import { ZodError } from "zod"
 import { getSession } from "@/lib/auth"
 import { db } from "@/lib/db"
-import type { InspirationForResponse } from "@/lib/query-types"
+import { toAppError } from "@/lib/error-utils"
+import type { AppResult, InspirationForResponse } from "@/lib/query-types"
 import {
   type CreateInspirationInput,
   createInspirationSchema,
@@ -16,12 +16,16 @@ import {
 
 export async function createInspirationAction(
   input: CreateInspirationInput
-): Promise<InspirationForResponse> {
+): Promise<AppResult<InspirationForResponse>> {
   try {
     const data = createInspirationSchema.parse(input)
     const session = await getSession()
     if (!session?.user || session.user.role !== "ADMIN") {
-      throw new Error("Unauthorized")
+      return {
+        success: false,
+        error: "You must be an admin to create inspirations",
+        code: "UNAUTHORIZED",
+      }
     }
 
     const inspiration = await db.inspiration.create({
@@ -42,26 +46,27 @@ export async function createInspirationAction(
     })
 
     revalidatePath("/admin/inspirations")
-    return inspiration
+    return {
+      success: true,
+      data: inspiration,
+    }
   } catch (error) {
-    if (error instanceof ZodError) {
-      throw new Error("Invalid inspiration data")
-    }
-    if (error instanceof Error) {
-      throw error
-    }
-    throw new Error("Failed to create inspiration")
+    return toAppError(error, "Failed to create inspiration")
   }
 }
 
 export async function updateInspirationAction(
   input: UpdateInspirationInput
-): Promise<InspirationForResponse> {
+): Promise<AppResult<InspirationForResponse>> {
   try {
     const { id, ...data } = updateInspirationSchema.parse(input)
     const session = await getSession()
     if (!session?.user || session.user.role !== "ADMIN") {
-      throw new Error("Unauthorized")
+      return {
+        success: false,
+        error: "You must be an admin to update inspirations",
+        code: "UNAUTHORIZED",
+      }
     }
 
     const inspiration = await db.inspiration.update({
@@ -84,26 +89,27 @@ export async function updateInspirationAction(
     })
 
     revalidatePath("/admin/inspirations")
-    return inspiration
+    return {
+      success: true,
+      data: inspiration,
+    }
   } catch (error) {
-    if (error instanceof ZodError) {
-      throw new Error("Invalid inspiration data")
-    }
-    if (error instanceof Error) {
-      throw error
-    }
-    throw new Error("Failed to update inspiration")
+    return toAppError(error, "Failed to update inspiration")
   }
 }
 
 export async function deleteInspirationAction(
   input: DeleteInspirationInput
-): Promise<{ success: boolean }> {
+): Promise<AppResult<{ id: string }>> {
   try {
     const { id } = deleteInspirationSchema.parse(input)
     const session = await getSession()
     if (!session?.user || session.user.role !== "ADMIN") {
-      throw new Error("Unauthorized")
+      return {
+        success: false,
+        error: "You must be an admin to delete inspirations",
+        code: "UNAUTHORIZED",
+      }
     }
 
     await db.inspiration.delete({
@@ -111,14 +117,11 @@ export async function deleteInspirationAction(
     })
 
     revalidatePath("/admin/inspirations")
-    return { success: true }
+    return {
+      success: true,
+      data: { id },
+    }
   } catch (error) {
-    if (error instanceof ZodError) {
-      throw new Error("Invalid inspiration data")
-    }
-    if (error instanceof Error) {
-      throw error
-    }
-    throw new Error("Failed to delete inspiration")
+    return toAppError(error, "Failed to delete inspiration")
   }
 }

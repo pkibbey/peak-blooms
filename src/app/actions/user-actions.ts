@@ -4,7 +4,8 @@ import { revalidatePath } from "next/cache"
 import type { Address } from "@/generated/client"
 import { getSession } from "@/lib/auth"
 import { db } from "@/lib/db"
-import type { UserProfileResponse } from "@/lib/query-types"
+import { toAppError } from "@/lib/error-utils"
+import type { AppResult, UserProfileResponse } from "@/lib/query-types"
 import {
   type AddressFormData,
   addressSchema,
@@ -17,24 +18,26 @@ import { type ProfileFormData, profileSchema } from "@/lib/validations/auth"
  * Update current user's profile (name only)
  * Email cannot be changed - it's verified by Google OAuth
  */
-export async function updateProfileAction(data: ProfileFormData): Promise<UserProfileResponse> {
+export async function updateProfileAction(
+  data: ProfileFormData
+): Promise<AppResult<UserProfileResponse>> {
   try {
     const session = await getSession()
 
     if (!session?.user?.id) {
-      throw new Error("Unauthorized")
+      return {
+        success: false,
+        error: "You must be logged in to update your profile",
+        code: "UNAUTHORIZED",
+      }
     }
 
-    const validationResult = profileSchema.safeParse(data)
-    if (!validationResult.success) {
-      const firstError = validationResult.error.issues[0]
-      throw new Error(firstError?.message || "Invalid profile data")
-    }
+    const validatedData = profileSchema.parse(data)
 
     const user = await db.user.update({
       where: { id: session.user.id },
       data: {
-        name: validationResult.data.name,
+        name: validatedData.name,
       },
       select: {
         id: true,
@@ -48,21 +51,28 @@ export async function updateProfileAction(data: ProfileFormData): Promise<UserPr
     })
 
     revalidatePath("/account")
-    return user
+    return {
+      success: true,
+      data: user,
+    }
   } catch (error) {
-    throw new Error(error instanceof Error ? error.message : "Failed to update profile")
+    return toAppError(error, "Failed to update profile")
   }
 }
 
 /**
  * Get all addresses for the current user
  */
-async function _getAddressesAction(): Promise<Address[]> {
+export async function getAddressesAction(): Promise<AppResult<Address[]>> {
   try {
     const session = await getSession()
 
     if (!session?.user?.id) {
-      throw new Error("Unauthorized")
+      return {
+        success: false,
+        error: "You must be logged in to view addresses",
+        code: "UNAUTHORIZED",
+      }
     }
 
     const addresses = await db.address.findMany({
@@ -70,9 +80,12 @@ async function _getAddressesAction(): Promise<Address[]> {
       orderBy: { createdAt: "desc" },
     })
 
-    return addresses
+    return {
+      success: true,
+      data: addresses,
+    }
   } catch (error) {
-    throw new Error(error instanceof Error ? error.message : "Failed to fetch addresses")
+    return toAppError(error, "Failed to fetch addresses")
   }
 }
 
@@ -81,19 +94,19 @@ async function _getAddressesAction(): Promise<Address[]> {
  */
 export async function createAddressAction(
   data: AddressFormData & { isDefault?: boolean }
-): Promise<Address> {
+): Promise<AppResult<Address>> {
   try {
     const session = await getSession()
 
     if (!session?.user?.id) {
-      throw new Error("Unauthorized")
+      return {
+        success: false,
+        error: "You must be logged in to create an address",
+        code: "UNAUTHORIZED",
+      }
     }
 
-    const validationResult = addressSchema.safeParse(data)
-    if (!validationResult.success) {
-      const firstError = validationResult.error.issues[0]
-      throw new Error(firstError?.message || "Invalid address data")
-    }
+    const validatedData = addressSchema.parse(data)
 
     // If setting as default, unset other defaults
     if (data.isDefault) {
@@ -106,25 +119,28 @@ export async function createAddressAction(
     const address = await db.address.create({
       data: {
         userId: session.user.id,
-        firstName: validationResult.data.firstName,
-        lastName: validationResult.data.lastName,
-        company: validationResult.data.company || "",
-        street1: validationResult.data.street1,
-        street2: validationResult.data.street2 || "",
-        city: validationResult.data.city,
-        state: validationResult.data.state,
-        zip: validationResult.data.zip,
-        country: validationResult.data.country,
-        email: validationResult.data.email,
-        phone: validationResult.data.phone,
+        firstName: validatedData.firstName,
+        lastName: validatedData.lastName,
+        company: validatedData.company || "",
+        street1: validatedData.street1,
+        street2: validatedData.street2 || "",
+        city: validatedData.city,
+        state: validatedData.state,
+        zip: validatedData.zip,
+        country: validatedData.country,
+        email: validatedData.email,
+        phone: validatedData.phone,
         isDefault: data.isDefault || false,
       },
     })
 
     revalidatePath("/account")
-    return address
+    return {
+      success: true,
+      data: address,
+    }
   } catch (error) {
-    throw new Error(error instanceof Error ? error.message : "Failed to create address")
+    return toAppError(error, "Failed to create address")
   }
 }
 
@@ -134,12 +150,16 @@ export async function createAddressAction(
 export async function updateAddressAction(
   addressId: string,
   data: Partial<AddressFormData & { isDefault?: boolean }>
-): Promise<Address> {
+): Promise<AppResult<Address>> {
   try {
     const session = await getSession()
 
     if (!session?.user?.id) {
-      throw new Error("Unauthorized")
+      return {
+        success: false,
+        error: "You must be logged in to update an address",
+        code: "UNAUTHORIZED",
+      }
     }
 
     // Verify ownership
@@ -148,16 +168,17 @@ export async function updateAddressAction(
     })
 
     if (!existingAddress || existingAddress.userId !== session.user.id) {
-      throw new Error("Address not found")
+      return {
+        success: false,
+        error: "Address not found",
+        code: "NOT_FOUND",
+      }
     }
 
     // Only validate if data contains address fields
+    let validatedData = data
     if (Object.keys(data).some((key) => key !== "isDefault")) {
-      const validationResult = addressSchema.safeParse(data)
-      if (!validationResult.success) {
-        const firstError = validationResult.error.issues[0]
-        throw new Error(firstError?.message || "Invalid address data")
-      }
+      validatedData = addressSchema.partial().parse(data)
     }
 
     // If setting as default, unset other defaults
@@ -170,17 +191,17 @@ export async function updateAddressAction(
 
     const updateData: Record<string, unknown> = {}
 
-    if (data.firstName !== undefined) updateData.firstName = data.firstName
-    if (data.lastName !== undefined) updateData.lastName = data.lastName
-    if (data.company !== undefined) updateData.company = data.company || ""
-    if (data.street1 !== undefined) updateData.street1 = data.street1
-    if (data.street2 !== undefined) updateData.street2 = data.street2 || ""
-    if (data.city !== undefined) updateData.city = data.city
-    if (data.state !== undefined) updateData.state = data.state
-    if (data.zip !== undefined) updateData.zip = data.zip
-    if (data.country !== undefined) updateData.country = data.country
-    if (data.email !== undefined) updateData.email = data.email
-    if (data.phone !== undefined) updateData.phone = data.phone
+    if (validatedData.firstName !== undefined) updateData.firstName = validatedData.firstName
+    if (validatedData.lastName !== undefined) updateData.lastName = validatedData.lastName
+    if (validatedData.company !== undefined) updateData.company = validatedData.company || ""
+    if (validatedData.street1 !== undefined) updateData.street1 = validatedData.street1
+    if (validatedData.street2 !== undefined) updateData.street2 = validatedData.street2 || ""
+    if (validatedData.city !== undefined) updateData.city = validatedData.city
+    if (validatedData.state !== undefined) updateData.state = validatedData.state
+    if (validatedData.zip !== undefined) updateData.zip = validatedData.zip
+    if (validatedData.country !== undefined) updateData.country = validatedData.country
+    if (validatedData.email !== undefined) updateData.email = validatedData.email
+    if (validatedData.phone !== undefined) updateData.phone = validatedData.phone
     if (data.isDefault !== undefined) updateData.isDefault = data.isDefault
 
     const address = await db.address.update({
@@ -189,9 +210,12 @@ export async function updateAddressAction(
     })
 
     revalidatePath("/account")
-    return address
+    return {
+      success: true,
+      data: address,
+    }
   } catch (error) {
-    throw new Error(error instanceof Error ? error.message : "Failed to update address")
+    return toAppError(error, "Failed to update address")
   }
 }
 
@@ -200,13 +224,17 @@ export async function updateAddressAction(
  */
 export async function deleteAddressAction(
   input: DeleteAddressInput
-): Promise<{ success: boolean }> {
-  const { addressId } = deleteAddressSchema.parse(input)
+): Promise<AppResult<{ id: string }>> {
   try {
+    const { addressId } = deleteAddressSchema.parse(input)
     const session = await getSession()
 
     if (!session?.user?.id) {
-      throw new Error("Unauthorized")
+      return {
+        success: false,
+        error: "You must be logged in to delete an address",
+        code: "UNAUTHORIZED",
+      }
     }
 
     // Verify ownership
@@ -215,7 +243,11 @@ export async function deleteAddressAction(
     })
 
     if (!address || address.userId !== session.user.id) {
-      throw new Error("Address not found")
+      return {
+        success: false,
+        error: "Address not found",
+        code: "NOT_FOUND",
+      }
     }
 
     await db.address.delete({
@@ -223,8 +255,11 @@ export async function deleteAddressAction(
     })
 
     revalidatePath("/account")
-    return { success: true }
+    return {
+      success: true,
+      data: { id: addressId },
+    }
   } catch (error) {
-    throw new Error(error instanceof Error ? error.message : "Failed to delete address")
+    return toAppError(error, "Failed to delete address")
   }
 }

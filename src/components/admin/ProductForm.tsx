@@ -24,6 +24,7 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form"
+import { IconTrash } from "@/components/ui/icons"
 import { Input } from "@/components/ui/input"
 import {
   Select,
@@ -36,7 +37,6 @@ import {
 import { Textarea } from "@/components/ui/textarea"
 import type { CollectionModel } from "@/generated/models"
 import { type ProductFormData, productSchema } from "@/lib/validations/product"
-import { IconTrash } from "../ui/icons"
 
 interface ProductFormProps {
   collections: CollectionModel[]
@@ -88,15 +88,23 @@ export default function ProductForm({ collections, product }: ProductFormProps) 
       }
 
       if (isEditing) {
-        await updateProductAction({
+        const result = await updateProductAction({
           id: product.id,
           ...formData,
           colors: formData.colors || null,
           price: parseFloat(formData.price) || null,
         })
+        if (!result.success) {
+          form.setError("root", { message: result.error })
+          return
+        }
         toast.success("Product updated successfully")
       } else {
-        await createProductAction({ ...formData, colors: formData.colors || null })
+        const result = await createProductAction({ ...formData, colors: formData.colors || null })
+        if (!result.success) {
+          form.setError("root", { message: result.error })
+          return
+        }
         toast.success("Product created successfully")
       }
 

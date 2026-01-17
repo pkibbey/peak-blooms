@@ -4,10 +4,10 @@
  */
 
 import type { ProductWhereInput } from "@/generated/models"
+import { ITEMS_PER_PAGE } from "@/lib/consts"
 import { db } from "@/lib/db"
 import type { ProductWithCollections, ProductWithInspirations } from "@/lib/query-types"
 import { adjustPrice } from "@/lib/utils"
-import { ITEMS_PER_PAGE } from "../consts"
 import { withTiming } from "./logger"
 
 /**

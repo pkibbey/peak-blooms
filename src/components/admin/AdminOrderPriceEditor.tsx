@@ -47,13 +47,18 @@ export function AdminOrderPriceEditor({ order, onPriceUpdated }: AdminOrderPrice
     try {
       const result = await updateOrderItemPriceAction({ orderId, itemId, price: newPrice })
 
+      if (!result.success) {
+        toast.error(result.error || "Failed to update price")
+        return
+      }
+
       // Update local state
       setItemPrices((prev) => ({ ...prev, [itemId]: newPrice }))
       setEditingItemId(null)
       setEditingPrice("")
 
       // Recalculate total
-      const newTotal = result.orderTotal
+      const newTotal = result.data.orderTotal
       onPriceUpdated?.(newTotal)
 
       toast.success("Price updated successfully")

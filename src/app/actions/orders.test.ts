@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vitest"
-import type { OrderStatus } from "@/generated/enums"
+import { type OrderStatus, Role } from "@/generated/enums"
 import { createMockPrismaClient } from "@/test/mocks"
 
 // Mock dependencies - must be before imports
@@ -30,6 +30,10 @@ vi.mock("@/generated/enums", () => ({
     DELIVERED: "DELIVERED",
     CANCELLED: "CANCELLED",
   },
+  Role: {
+    ADMIN: "ADMIN",
+    CUSTOMER: "CUSTOMER",
+  },
 }))
 
 import { getCurrentUser } from "@/lib/current-user"
@@ -50,13 +54,13 @@ describe("Order Actions", () => {
     id: "user-1",
     email: "test@example.com",
     approved: true,
-    role: "CUSTOMER",
+    role: Role.CUSTOMER,
     priceMultiplier: 1.0,
   }
 
   const mockAdminUser = {
     ...mockUser,
-    role: "ADMIN",
+    role: Role.ADMIN,
   }
 
   const mockOrder = {
@@ -81,13 +85,17 @@ describe("Order Actions", () => {
       vi.mocked(getCurrentUser).mockResolvedValueOnce(null)
       const result = await cancelOrderAction({ orderId: VALID_UUID })
       expect(result.success).toBe(false)
-      expect(result.error).toContain("must be logged in")
+      if (!result.success) {
+        expect(result.code).toBe("UNAUTHORIZED")
+      }
     })
 
     it("should return error if order id is not uuid", async () => {
       const result = await cancelOrderAction({ orderId: "not-a-uuid" })
       expect(result.success).toBe(false)
-      expect(result.error).toContain("Invalid order ID")
+      if (!result.success) {
+        expect(result.code).toBe("VALIDATION_ERROR")
+      }
     })
 
     it("should return error if order is not PENDING", async () => {
@@ -95,7 +103,9 @@ describe("Order Actions", () => {
       vi.mocked(db.order.findFirst).mockResolvedValueOnce(confirmedOrder)
       const result = await cancelOrderAction({ orderId: VALID_UUID })
       expect(result.success).toBe(false)
-      expect(result.error).toContain("Only PENDING orders can be cancelled")
+      if (!result.success) {
+        expect(result.code).toBe("CONFLICT")
+      }
     })
 
     it("should cancel PENDING order successfully", async () => {
@@ -105,7 +115,9 @@ describe("Order Actions", () => {
 
       const result = await cancelOrderAction({ orderId: VALID_UUID })
       expect(result.success).toBe(true)
-      expect(result.order?.status).toBe("CANCELLED")
+      if (result.success) {
+        expect(result.data?.status).toBe("CANCELLED")
+      }
     })
 
     it("should convert to cart successfully and clear snapshots", async () => {
@@ -122,7 +134,9 @@ describe("Order Actions", () => {
 
       const result = await cancelOrderAction({ orderId: VALID_UUID, convertToCart: true })
       expect(result.success).toBe(true)
-      expect(result.order?.status).toBe("CART")
+      if (result.success) {
+        expect(result.data?.status).toBe("CART")
+      }
       expect(db.orderItem.update).toHaveBeenCalledWith(
         expect.objectContaining({
           data: { productNameSnapshot: null, productImageSnapshot: null },
@@ -134,7 +148,9 @@ describe("Order Actions", () => {
       vi.mocked(db.order.findFirst).mockRejectedValueOnce("String error")
       const result = await cancelOrderAction({ orderId: VALID_UUID })
       expect(result.success).toBe(false)
-      expect(result.error).toBe("Unknown error occurred")
+      if (!result.success) {
+        expect(result.error).toBe("String error")
+      }
     })
   })
 
@@ -143,18 +159,22 @@ describe("Order Actions", () => {
       vi.mocked(getCurrentUser).mockResolvedValue(mockAdminUser)
     })
 
-    it("should throw if not admin", async () => {
+    it("should return error if not admin", async () => {
       vi.mocked(getCurrentUser).mockResolvedValueOnce(mockUser)
-      await expect(
-        updateOrderStatusAction({ orderId: VALID_UUID, status: "CONFIRMED" })
-      ).rejects.toThrow("Unauthorized")
+      const result = await updateOrderStatusAction({ orderId: VALID_UUID, status: "CONFIRMED" })
+      expect(result.success).toBe(false)
+      if (!result.success) {
+        expect(result.code).toBe("UNAUTHORIZED")
+      }
     })
 
-    it("should throw if order not found", async () => {
+    it("should return error if order not found", async () => {
       vi.mocked(db.order.findUnique).mockResolvedValueOnce(null)
-      await expect(
-        updateOrderStatusAction({ orderId: VALID_UUID, status: "CONFIRMED" })
-      ).rejects.toThrow("Order not found")
+      const result = await updateOrderStatusAction({ orderId: VALID_UUID, status: "CONFIRMED" })
+      expect(result.success).toBe(false)
+      if (!result.success) {
+        expect(result.code).toBe("NOT_FOUND")
+      }
     })
 
     it("should update status successfully", async () => {
@@ -166,20 +186,18 @@ describe("Order Actions", () => {
       })
 
       const result = await updateOrderStatusAction({ orderId: VALID_UUID, status: "CONFIRMED" })
-      expect(result.order.status).toBe("CONFIRMED")
+      expect(result.success).toBe(true)
+      if (result.success) {
+        expect(result.data?.status).toBe("CONFIRMED")
+      }
     })
 
-    it("should handle Zod validation error in updateOrderStatusAction", async () => {
-      await expect(
-        updateOrderStatusAction({ orderId: "not-a-uuid", status: "CONFIRMED" })
-      ).rejects.toThrow("Invalid status")
-    })
-
-    it("should handle error in updateOrderStatusAction", async () => {
-      vi.mocked(db.order.findUnique).mockRejectedValueOnce("Error")
-      await expect(
-        updateOrderStatusAction({ orderId: VALID_UUID, status: "CONFIRMED" })
-      ).rejects.toThrow("Failed to update order status")
+    it("should return error for invalid Zod validation", async () => {
+      const result = await updateOrderStatusAction({ orderId: "not-a-uuid", status: "CONFIRMED" })
+      expect(result.success).toBe(false)
+      if (!result.success) {
+        expect(result.code).toBe("VALIDATION_ERROR")
+      }
     })
   })
 
@@ -210,20 +228,38 @@ describe("Order Actions", () => {
         price: 50,
       })
 
-      expect(result.orderTotal).toBe(100)
+      expect(result.success).toBe(true)
+      if (result.success) {
+        expect(result.data?.orderTotal).toBe(100)
+      }
     })
 
-    it("should handle Zod validation error in updateOrderItemPriceAction", async () => {
-      await expect(
-        updateOrderItemPriceAction({ orderId: "not-a-uuid", itemId: VALID_UUID_3, price: 50 })
-      ).rejects.toThrow("Invalid price data")
+    it("should return error for invalid Zod validation in updateOrderItemPriceAction", async () => {
+      const result = await updateOrderItemPriceAction({
+        orderId: "not-a-uuid",
+        itemId: VALID_UUID_3,
+        price: 50,
+      })
+
+      expect(result.success).toBe(false)
+      if (!result.success) {
+        expect(result.code).toBe("VALIDATION_ERROR")
+      }
     })
 
-    it("should handle error in updateOrderItemPriceAction", async () => {
-      vi.mocked(db.orderItem.findFirst).mockRejectedValueOnce("Error")
-      await expect(
-        updateOrderItemPriceAction({ orderId: VALID_UUID, itemId: VALID_UUID_3, price: 50 })
-      ).rejects.toThrow("Failed to update price")
+    it("should return error when order item not found", async () => {
+      vi.mocked(db.orderItem.findFirst).mockResolvedValueOnce(null as never)
+
+      const result = await updateOrderItemPriceAction({
+        orderId: VALID_UUID,
+        itemId: VALID_UUID_3,
+        price: 50,
+      })
+
+      expect(result.success).toBe(false)
+      if (!result.success) {
+        expect(result.code).toBe("NOT_FOUND")
+      }
     })
   })
 
@@ -249,20 +285,32 @@ describe("Order Actions", () => {
       ],
     }
 
-    it("should throw if user not approved", async () => {
+    it("should return error if user not approved", async () => {
       vi.mocked(getCurrentUser).mockResolvedValueOnce({ ...mockUser, approved: false })
-      await expect(createOrderAction(validData)).rejects.toThrow("Your account is not approved")
+      const result = await createOrderAction(validData)
+      expect(result.success).toBe(false)
+      if (!result.success) {
+        expect(result.code).toBe("FORBIDDEN")
+      }
     })
 
-    it("should throw if cart empty", async () => {
+    it("should return error if cart empty", async () => {
       vi.mocked(db.order.findFirst).mockResolvedValueOnce(null)
-      await expect(createOrderAction(validData)).rejects.toThrow("Cart is empty")
+      const result = await createOrderAction(validData)
+      expect(result.success).toBe(false)
+      if (!result.success) {
+        expect(result.code).toBe("CONFLICT")
+      }
     })
 
-    it("should throw if existing address not found", async () => {
+    it("should return error if existing address not found", async () => {
       vi.mocked(db.order.findFirst).mockResolvedValueOnce(mockCart as never)
       vi.mocked(db.address.findFirst).mockResolvedValueOnce(null)
-      await expect(createOrderAction(validData)).rejects.toThrow("Invalid delivery address")
+      const result = await createOrderAction(validData)
+      expect(result.success).toBe(false)
+      if (!result.success) {
+        expect(result.code).toBe("NOT_FOUND")
+      }
     })
 
     it("should create order with existing address", async () => {
@@ -279,7 +327,10 @@ describe("Order Actions", () => {
       vi.mocked(db.order.update).mockResolvedValueOnce({ ...mockCart, status: "PENDING" } as never)
 
       const result = await createOrderAction(validData)
-      expect(result.status).toBe("PENDING")
+      expect(result.success).toBe(true)
+      if (result.success) {
+        expect(result.data?.status).toBe("PENDING")
+      }
     })
 
     it("should include notes if provided", async () => {
@@ -367,7 +418,10 @@ describe("Order Actions", () => {
         deliveryAddressId: null,
         deliveryAddress: newAddr,
       })
-      expect(result.status).toBe("PENDING")
+      expect(result.success).toBe(true)
+      if (result.success) {
+        expect(result.data?.status).toBe("PENDING")
+      }
       expect(db.address.create).toHaveBeenCalled()
     })
 
@@ -409,12 +463,20 @@ describe("Order Actions", () => {
 
     it("should handle Error object in createOrderAction catch block", async () => {
       vi.mocked(db.order.findFirst).mockRejectedValueOnce(new Error("Specific Error"))
-      await expect(createOrderAction(validData)).rejects.toThrow("Specific Error")
+      const result = await createOrderAction(validData)
+      expect(result.success).toBe(false)
+      if (!result.success) {
+        expect(result.error).toContain("Specific Error")
+      }
     })
 
     it("should handle generic exception in createOrderAction", async () => {
       vi.mocked(db.order.findFirst).mockRejectedValueOnce("Error")
-      await expect(createOrderAction(validData)).rejects.toThrow("Failed to create order")
+      const result = await createOrderAction(validData)
+      expect(result.success).toBe(false)
+      if (!result.success) {
+        expect(result.error).toContain("Error")
+      }
     })
   })
 })

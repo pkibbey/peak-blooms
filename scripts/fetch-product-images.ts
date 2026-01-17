@@ -3,6 +3,7 @@ import https from "node:https"
 import * as path from "node:path"
 import { fileURLToPath } from "node:url"
 import * as dotenv from "dotenv"
+import type { ProductBasic } from "../src/lib/query-types"
 
 // Load environment variables from .env
 dotenv.config()
@@ -143,23 +144,14 @@ if (!fs.existsSync(imageDir)) {
   console.log(`📁 Created image directory: ${imageDir}`)
 }
 
-interface ProductRow {
-  name: string
-  price: string
-  type: string
-  description: string
-  colors: string
-  image?: string
-}
-
 // Parse CSV file
-function readCSV(filePath: string): ProductRow[] {
+function readCSV(filePath: string): ProductBasic[] {
   const content = fs.readFileSync(filePath, "utf-8")
   const lines = content.split("\n")
 
   // Parse header
   const headers = parseCSVLine(lines[0])
-  const products: ProductRow[] = []
+  const products: ProductBasic[] = []
 
   for (let i = 1; i < lines.length; i++) {
     const line = lines[i].trim()
@@ -168,7 +160,7 @@ function readCSV(filePath: string): ProductRow[] {
     const values = parseCSVLine(line)
     if (values.length < headers.length) continue
 
-    const row: ProductRow = {
+    const row: ProductBasic = {
       name: values[0] || "",
       price: values[1] || "",
       type: values[2] || "",
@@ -377,7 +369,7 @@ async function downloadImageFromPixabay(query: string, filename: string): Promis
 }
 
 // Write CSV file
-function writeCSV(filePath: string, products: ProductRow[]): void {
+function writeCSV(filePath: string, products: ProductBasic[]): void {
   const headers = [
     "Product Name",
     "Price per bunch",

@@ -7,6 +7,7 @@ import {
   IconTruck,
   IconXCircle,
 } from "@/components/ui/icons"
+import type { OrderStatus } from "@/generated/enums"
 
 const STATUS_CONFIG = {
   CART: { label: "Cart", variant: "secondary" as const, icon: IconShoppingCart },
@@ -16,8 +17,6 @@ const STATUS_CONFIG = {
   DELIVERED: { label: "Delivered", variant: "default" as const, icon: IconPackage },
   CANCELLED: { label: "Cancelled", variant: "destructive" as const, icon: IconXCircle },
 } as const
-
-export type OrderStatus = keyof typeof STATUS_CONFIG
 
 interface OrderStatusBadgeProps {
   status: OrderStatus

@@ -1,7 +1,7 @@
 import { ChevronRight } from "lucide-react"
 import Image from "next/image"
 import Link from "next/link"
-import { type OrderStatus, OrderStatusBadge } from "@/components/site/OrderStatusBadge"
+import { OrderStatusBadge } from "@/components/site/OrderStatusBadge"
 import ReorderButton from "@/components/site/ReorderButton"
 import { calculateCartTotal } from "@/lib/cart-utils"
 import type { OrderWithItems } from "@/lib/query-types"
@@ -74,7 +74,7 @@ export default function OrderHistoryItem({ order }: OrderHistoryItemProps) {
         <div className="flex flex-col items-end gap-1">
           <p className="text-sm font-bold tabular-nums">{formatPrice(total)}</p>
           <OrderStatusBadge
-            status={order.status as OrderStatus}
+            status={order.status}
             className="text-[10px] px-2 h-5 font-bold uppercase tracking-tight"
           />
         </div>

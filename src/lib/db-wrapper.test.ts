@@ -10,7 +10,7 @@ vi.mock("@/lib/metrics", () => ({
   captureMetric: vi.fn().mockResolvedValue(undefined),
 }))
 
-import type { Role } from "@/generated/enums"
+import { Role } from "@/generated/enums"
 import { db } from "@/lib/db"
 import { captureMetric } from "@/lib/metrics"
 import { createTrackedDb } from "./db-wrapper"
@@ -97,7 +97,7 @@ describe("Database Wrapper", () => {
         createdAt: new Date(),
         updatedAt: new Date(),
         approved: false,
-        role: "CUSTOMER" as Role,
+        role: Role.CUSTOMER,
         priceMultiplier: 1,
       }
 

@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache"
 import { db } from "@/lib/db"
+import type { AppResult } from "@/lib/query-types"
 import { newsletterSubscribeSchema } from "@/lib/validations/newsletter"
 
 /**
@@ -10,12 +11,13 @@ import { newsletterSubscribeSchema } from "@/lib/validations/newsletter"
  */
 export async function subscribeToNewsletterAction(
   email: string
-): Promise<{ success: boolean; userId?: string }> {
+): Promise<AppResult<{ userId?: string }>> {
   try {
     // Validate email
     const validation = newsletterSubscribeSchema.safeParse({ email })
     if (!validation.success) {
-      throw new Error("Invalid email")
+      // Silently succeed to prevent email enumeration
+      return { success: true, data: {} }
     }
 
     // Check if user already exists
@@ -25,7 +27,7 @@ export async function subscribeToNewsletterAction(
 
     // Silently succeed even if user exists (prevents email enumeration attacks)
     if (existingUser) {
-      return { success: true }
+      return { success: true, data: {} }
     }
 
     // Create new newsletter subscriber user
@@ -39,9 +41,9 @@ export async function subscribeToNewsletterAction(
     })
 
     revalidatePath("/")
-    return { success: true, userId: user.id }
+    return { success: true, data: { userId: user.id } }
   } catch {
     // Silently fail on error to not leak information
-    return { success: true }
+    return { success: true, data: {} }
   }
 }

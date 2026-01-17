@@ -1,10 +1,10 @@
 "use server"
 
 import { revalidatePath } from "next/cache"
-import { ZodError } from "zod"
 import { getCurrentUser } from "@/lib/current-user"
 import { db } from "@/lib/db"
-import type { CancelOrderResponse, OrderWithItems } from "@/lib/query-types"
+import { toAppError } from "@/lib/error-utils"
+import type { AppResult, CancelOrderResponse, OrderWithItems } from "@/lib/query-types"
 import { adjustPrice } from "@/lib/utils"
 import {
   type CancelOrderInput,
@@ -21,15 +21,17 @@ import {
  * Server action to cancel a PENDING order
  * Can optionally convert it back to CART status
  */
-export async function cancelOrderAction(input: CancelOrderInput): Promise<CancelOrderResponse> {
+export async function cancelOrderAction(
+  input: CancelOrderInput
+): Promise<AppResult<CancelOrderResponse>> {
   try {
     const { orderId, convertToCart } = cancelOrderSchema.parse(input)
     const user = await getCurrentUser()
     if (!user) {
       return {
         success: false,
-        message: "Unauthorized",
         error: "You must be logged in to cancel an order",
+        code: "UNAUTHORIZED",
       }
     }
 
@@ -51,8 +53,8 @@ export async function cancelOrderAction(input: CancelOrderInput): Promise<Cancel
     if (!order) {
       return {
         success: false,
-        message: "Order not found",
         error: "The order you are trying to cancel does not exist or does not belong to you",
+        code: "NOT_FOUND",
       }
     }
 
@@ -60,8 +62,8 @@ export async function cancelOrderAction(input: CancelOrderInput): Promise<Cancel
     if (order.status !== "PENDING") {
       return {
         success: false,
-        message: `Cannot cancel order with status ${order.status}`,
         error: "Only PENDING orders can be cancelled",
+        code: "CONFLICT",
       }
     }
 
@@ -92,8 +94,7 @@ export async function cancelOrderAction(input: CancelOrderInput): Promise<Cancel
 
       return {
         success: true,
-        message: "Order converted back to cart",
-        order: {
+        data: {
           ...updatedOrder,
           items: order.items,
         },
@@ -112,19 +113,14 @@ export async function cancelOrderAction(input: CancelOrderInput): Promise<Cancel
 
       return {
         success: true,
-        message: "Order cancelled successfully",
-        order: {
+        data: {
           ...cancelledOrder,
           items: order.items,
         },
       }
     }
   } catch (error) {
-    return {
-      success: false,
-      message: "Failed to cancel order",
-      error: error instanceof Error ? error.message : "Unknown error occurred",
-    }
+    return toAppError(error, "Failed to cancel order")
   }
 }
 
@@ -132,16 +128,26 @@ export async function cancelOrderAction(input: CancelOrderInput): Promise<Cancel
  * Create/finalize an order - transition from CART to PENDING with checkout data
  * Approved users only
  */
-export async function createOrderAction(data: CreateOrderInput): Promise<OrderWithItems> {
+export async function createOrderAction(
+  data: CreateOrderInput
+): Promise<AppResult<OrderWithItems>> {
   try {
     const user = await getCurrentUser()
 
     if (!user) {
-      throw new Error("Unauthorized")
+      return {
+        success: false,
+        error: "You must be logged in",
+        code: "UNAUTHORIZED",
+      }
     }
 
     if (!user.approved) {
-      throw new Error("Your account is not approved for purchases")
+      return {
+        success: false,
+        error: "Your account is not approved for purchases",
+        code: "FORBIDDEN",
+      }
     }
 
     const priceMultiplier = user.priceMultiplier
@@ -164,7 +170,11 @@ export async function createOrderAction(data: CreateOrderInput): Promise<OrderWi
     })
 
     if (!cart || cart.items.length === 0) {
-      throw new Error("Cart is empty")
+      return {
+        success: false,
+        error: "Your cart is empty",
+        code: "CONFLICT",
+      }
     }
 
     // Update order items with product snapshots and capture current prices at checkout time
@@ -199,7 +209,11 @@ export async function createOrderAction(data: CreateOrderInput): Promise<OrderWi
       })
 
       if (!existingAddress) {
-        throw new Error("Invalid delivery address")
+        return {
+          success: false,
+          error: "The delivery address does not belong to you or does not exist",
+          code: "NOT_FOUND",
+        }
       }
 
       finalDeliveryAddressId = deliveryAddressId
@@ -224,7 +238,11 @@ export async function createOrderAction(data: CreateOrderInput): Promise<OrderWi
 
       finalDeliveryAddressId = newAddress.id
     } else {
-      throw new Error("Delivery address is required")
+      return {
+        success: false,
+        error: "Delivery address is required",
+        code: "VALIDATION_ERROR",
+      }
     }
 
     // Transition the order from CART to PENDING
@@ -249,15 +267,12 @@ export async function createOrderAction(data: CreateOrderInput): Promise<OrderWi
     })
 
     revalidatePath("/account/order-history")
-    return order
+    return {
+      success: true,
+      data: order,
+    }
   } catch (error) {
-    if (error instanceof ZodError) {
-      throw new Error("Invalid order data")
-    }
-    if (error instanceof Error) {
-      throw error
-    }
-    throw new Error("Failed to create order")
+    return toAppError(error, "Failed to create order")
   }
 }
 
@@ -266,13 +281,17 @@ export async function createOrderAction(data: CreateOrderInput): Promise<OrderWi
  */
 export async function updateOrderStatusAction(
   input: UpdateOrderStatusInput
-): Promise<{ message: string; order: OrderWithItems }> {
+): Promise<AppResult<OrderWithItems>> {
   try {
     const { orderId, status } = updateOrderStatusSchema.parse(input)
     const user = await getCurrentUser()
 
     if (!user || user.role !== "ADMIN") {
-      throw new Error("Unauthorized")
+      return {
+        success: false,
+        error: "You must be an admin to update order status",
+        code: "UNAUTHORIZED",
+      }
     }
 
     const validStatuses = [
@@ -284,7 +303,11 @@ export async function updateOrderStatusAction(
       "CANCELLED",
     ]
     if (!validStatuses.includes(status)) {
-      throw new Error("Invalid status")
+      return {
+        success: false,
+        error: "Invalid status",
+        code: "VALIDATION_ERROR",
+      }
     }
 
     // Fetch the order
@@ -293,7 +316,11 @@ export async function updateOrderStatusAction(
     })
 
     if (!order) {
-      throw new Error("Order not found")
+      return {
+        success: false,
+        error: "Order not found",
+        code: "NOT_FOUND",
+      }
     }
 
     // Update the order status
@@ -318,34 +345,30 @@ export async function updateOrderStatusAction(
     revalidatePath(`/admin/orders/${orderId}`)
 
     return {
-      message: "Order status updated successfully",
-      order: updatedOrder,
+      success: true,
+      data: updatedOrder,
     }
   } catch (error) {
-    if (error instanceof ZodError) {
-      throw new Error("Invalid status")
-    }
-    if (error instanceof Error) {
-      throw error
-    }
-    throw new Error("Failed to update order status")
+    return toAppError(error, "Failed to update order status")
   }
 }
 
 /**
  * Server action to update order item price (admin only)
  */
-export async function updateOrderItemPriceAction(input: UpdateOrderItemPriceInput): Promise<{
-  message: string
-  item: { id: string; price: number | null }
-  orderTotal: number
-}> {
+export async function updateOrderItemPriceAction(
+  input: UpdateOrderItemPriceInput
+): Promise<AppResult<{ id: string; price: number | null; orderTotal: number }>> {
   try {
     const { orderId, itemId, price } = updateOrderItemPriceSchema.parse(input)
     const user = await getCurrentUser()
 
     if (!user || user.role !== "ADMIN") {
-      throw new Error("Unauthorized")
+      return {
+        success: false,
+        error: "You must be an admin to update order item prices",
+        code: "UNAUTHORIZED",
+      }
     }
 
     // Fetch the order item
@@ -354,7 +377,11 @@ export async function updateOrderItemPriceAction(input: UpdateOrderItemPriceInpu
     })
 
     if (!orderItem) {
-      throw new Error("Order item not found")
+      return {
+        success: false,
+        error: "Order item not found",
+        code: "NOT_FOUND",
+      }
     }
 
     // Update the order item price
@@ -379,17 +406,14 @@ export async function updateOrderItemPriceAction(input: UpdateOrderItemPriceInpu
     revalidatePath(`/admin/orders/${orderId}`)
 
     return {
-      message: "Price updated successfully",
-      item: { id: itemId, price },
-      orderTotal: Math.round(newOrderTotal * 100) / 100,
+      success: true,
+      data: {
+        id: itemId,
+        price,
+        orderTotal: Math.round(newOrderTotal * 100) / 100,
+      },
     }
   } catch (error) {
-    if (error instanceof ZodError) {
-      throw new Error("Invalid price data")
-    }
-    if (error instanceof Error) {
-      throw error
-    }
-    throw new Error("Failed to update price")
+    return toAppError(error, "Failed to update order item price")
   }
 }

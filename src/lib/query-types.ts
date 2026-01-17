@@ -27,6 +27,7 @@ import type {
   ProductGetPayload,
   UserGetPayload,
 } from "@/generated/models"
+import type { Role } from "@/generated/enums"
 
 // =============================================================================
 // USER TYPES
@@ -55,29 +56,25 @@ export type UserFull = UserGetPayload<{
  * UserForAdmin: User data safe for admin display (excludes email verification state)
  * Use when: Admin listings, user management tables
  */
-export type UserForAdmin = Omit<UserFull, "emailVerified" | "image" | "phone" | "updatedAt">
+export type UserForAdmin = Omit<UserFull, "emailVerified" | "image" | "updatedAt">
 
 /**
  * UserForProfile: User data safe for public/profile display
  * Use when: User profile pages, session data that appears in UI
  */
-export type UserForProfile = Omit<
-  UserFull,
-  "emailVerified" | "phone" | "priceMultiplier" | "updatedAt"
->
+export type UserForProfile = Omit<UserFull, "emailVerified" | "priceMultiplier" | "updatedAt">
 
 /**
- * SessionUser: Minimal user data derived from UserForProfile for session storage
- * All fields optional since session is cached and may not have all data initially.
- * Includes priceMultiplier for cart calculations and permission checks.
+ * SessionUser: Minimal user data derived from Prisma User for session storage
+ * Required fields: id, email, approved, role, priceMultiplier (for auth & cart operations)
+ * Optional fields: name, image (user profile data)
  *
- * Use when: Session storage, component props, cached user data
- * Note: This type is automatically synced with User schema changes through UserForProfile
+ * Use when: Session storage, server actions, permission checks, component props
+ * Note: This type is automatically synced with User schema via Prisma's type generation
  */
-export type SessionUser = Pick<UserFull, "id" | "email"> &
-  Partial<Omit<UserFull, "id" | "email" | "phone" | "role">> & {
-    role?: string
-  }
+export type SessionUser = Pick<UserFull, "id" | "email" | "approved" | "priceMultiplier"> & {
+  role: Role
+} & Partial<Pick<UserFull, "name" | "image" | "createdAt">>
 
 /**
  * UserWithAddresses: User with their saved addresses
@@ -304,8 +301,38 @@ export type InspirationBasic = InspirationGetPayload<{
 export type InspirationForResponse = Omit<InspirationGetPayload<true>, "products">
 
 // =============================================================================
-// RESPONSE TYPES FOR SERVER ACTIONS
+// ERROR HANDLING TYPES
 // =============================================================================
+
+/**
+ * AppError: Standard error response from server actions
+ * Use discriminated union pattern: check 'success' field to narrow type in error handlers
+ * Example: if (!result.success) { console.error(result.error, result.code) }
+ */
+export type AppError = {
+  success: false
+  error: string
+  code?:
+    | "UNAUTHORIZED"
+    | "FORBIDDEN"
+    | "NOT_FOUND"
+    | "INVALID_INPUT"
+    | "CONFLICT"
+    | "SERVER_ERROR"
+    | "VALIDATION_ERROR"
+  details?: Record<string, string | string[]>
+}
+
+/**
+ * AppResult: Discriminated union for type-safe server action responses
+ * All server actions should return AppResult<T> or a specific success type
+ * Enables exhaustive type checking: result.success ? result.data : result.error
+ */
+export type AppResult<T> = { success: true; data: T } | AppError
+
+// =============================================================================
+// RESPONSE TYPES FOR SERVER ACTIONS
+// ============================================================================="
 
 /**
  * CartResponse: Structured response for cart operations
@@ -343,15 +370,10 @@ export type SearchProductsResult = {
 }
 
 /**
- * CancelOrderResponse: Response from cancelOrderAction
+ * CancelOrderResponse: Data returned on successful order cancellation
  * Use when: Canceling orders with optional cart conversion
  */
-export type CancelOrderResponse = {
-  success: boolean
-  message: string
-  order?: OrderWithItems
-  error?: string
-}
+export type CancelOrderResponse = OrderWithItems
 
 /**
  * UserProfileResponse: User profile data returned from profile operations

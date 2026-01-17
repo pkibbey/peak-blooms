@@ -33,8 +33,12 @@ export default function Cart({ initialCart }: CartProps) {
 
     try {
       const result = await updateCartItemAction({ itemId, quantity })
-      setCart(result)
-      router.refresh()
+      if (result.success) {
+        setCart(result.data)
+        router.refresh()
+      } else {
+        toast.error(result.error || "Failed to update quantity")
+      }
     } catch (error) {
       console.error("Error updating quantity:", error)
       toast.error(error instanceof Error ? error.message : "Failed to update quantity")
@@ -75,9 +79,14 @@ export default function Cart({ initialCart }: CartProps) {
 
     try {
       const result = await removeFromCartAction({ itemId })
-      setCart(result)
-      toast.success(`Removed "${productName}" from cart`)
-      router.refresh()
+      if (result.success) {
+        setCart(result.data)
+        toast.success(`Removed "${productName}" from cart`)
+        router.refresh()
+      } else {
+        toast.error(result.error || "Failed to remove item")
+        router.refresh()
+      }
     } catch (error) {
       console.error("Error removing item:", error)
       toast.error(error instanceof Error ? error.message : "Failed to remove item")
@@ -105,9 +114,14 @@ export default function Cart({ initialCart }: CartProps) {
 
     try {
       const result = await clearCartAction()
-      setCart(result)
-      toast.success("Cart cleared")
-      router.refresh()
+      if (result.success) {
+        setCart(result.data)
+        toast.success("Cart cleared")
+        router.refresh()
+      } else {
+        toast.error(result.error || "Failed to clear cart")
+        setCart(previousCart)
+      }
     } catch (err) {
       console.error("Error clearing cart:", err)
       toast.error(err instanceof Error ? err.message : "Failed to clear cart")

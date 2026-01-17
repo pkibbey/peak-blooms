@@ -87,10 +87,14 @@ describe("User Actions", () => {
   }
 
   describe("updateProfileAction", () => {
-    it("should throw error if user not authenticated", async () => {
+    it("should return UNAUTHORIZED if user not authenticated", async () => {
       vi.mocked(getSession).mockResolvedValueOnce(null)
 
-      await expect(updateProfileAction({ name: "New Name" })).rejects.toThrow("Unauthorized")
+      const result = await updateProfileAction({ name: "New Name" })
+      expect(result).toMatchObject({
+        success: false,
+        code: "UNAUTHORIZED",
+      })
     })
 
     it("should accept valid profile data", async () => {
@@ -99,7 +103,10 @@ describe("User Actions", () => {
 
       // Empty name is allowed by schema (z.string())
       const result = await updateProfileAction({ name: "" })
-      expect(result.id).toBe("user-1")
+      expect(result).toMatchObject({
+        success: true,
+        data: { id: "user-1" },
+      })
     })
 
     it("should update user profile successfully", async () => {
@@ -108,9 +115,10 @@ describe("User Actions", () => {
 
       const result = await updateProfileAction({ name: "New Name" })
 
-      expect(result.id).toBe("user-1")
-      expect(result.email).toBe("user@example.com")
-      expect(result.name).toBe("New Name")
+      expect(result).toEqual({
+        success: true,
+        data: mockUpdatedUser,
+      })
       expect(db.user.update).toHaveBeenCalledWith({
         where: { id: "user-1" },
         data: { name: "New Name" },
@@ -126,24 +134,39 @@ describe("User Actions", () => {
       })
     })
 
-    it("should propagate database errors", async () => {
+    it("should return SERVER_ERROR for database errors", async () => {
       vi.mocked(getSession).mockResolvedValueOnce(mockUserSession)
       vi.mocked(db.user.update).mockRejectedValueOnce(new Error("Database error"))
 
-      await expect(updateProfileAction({ name: "New Name" })).rejects.toThrow("Database error")
+      const result = await updateProfileAction({ name: "New Name" })
+      expect(result).toMatchObject({
+        success: false,
+        code: "SERVER_ERROR",
+        error: "Database error",
+      })
     })
 
-    it("should handle non-Error exceptions", async () => {
+    it("should return SERVER_ERROR for unknown errors", async () => {
       vi.mocked(getSession).mockResolvedValueOnce(mockUserSession)
       vi.mocked(db.user.update).mockRejectedValueOnce("String error")
 
-      await expect(updateProfileAction({ name: "New Name" })).rejects.toThrow()
+      const result = await updateProfileAction({ name: "New Name" })
+      expect(result).toMatchObject({
+        success: false,
+        code: "SERVER_ERROR",
+        error: "String error",
+      })
     })
 
-    it("should handle validation errors without message", async () => {
+    it("should return VALIDATION_ERROR for invalid profile data", async () => {
+      vi.mocked(getSession).mockResolvedValueOnce(mockUserSession)
       const invalidData = { name: 123 }
 
-      await expect(updateProfileAction(invalidData as never)).rejects.toThrow()
+      const result = await updateProfileAction(invalidData as never)
+      expect(result).toMatchObject({
+        success: false,
+        code: "VALIDATION_ERROR",
+      })
     })
   })
 
@@ -162,21 +185,27 @@ describe("User Actions", () => {
       phone: "+1-212-555-0123",
     }
 
-    it("should throw error if user not authenticated", async () => {
+    it("should return UNAUTHORIZED if user not authenticated", async () => {
       vi.mocked(getSession).mockResolvedValueOnce(null)
 
-      await expect(createAddressAction(validAddressData)).rejects.toThrow("Unauthorized")
+      const result = await createAddressAction(validAddressData)
+      expect(result).toMatchObject({
+        success: false,
+        code: "UNAUTHORIZED",
+      })
     })
 
-    it("should reject invalid address data", async () => {
+    it("should return VALIDATION_ERROR for invalid address data", async () => {
       vi.mocked(getSession).mockResolvedValueOnce(mockUserSession)
 
-      await expect(
-        createAddressAction({
-          ...validAddressData,
-          firstName: "", // Invalid
-        })
-      ).rejects.toThrow()
+      const result = await createAddressAction({
+        ...validAddressData,
+        firstName: "", // Invalid
+      })
+      expect(result).toMatchObject({
+        success: false,
+        code: "VALIDATION_ERROR",
+      })
     })
 
     it("should create address without setting as default", async () => {
@@ -185,7 +214,10 @@ describe("User Actions", () => {
 
       const result = await createAddressAction(validAddressData)
 
-      expect(result).toEqual(mockAddress)
+      expect(result).toEqual({
+        success: true,
+        data: mockAddress,
+      })
       expect(db.address.create).toHaveBeenCalledWith({
         data: {
           userId: "user-1",
@@ -204,34 +236,50 @@ describe("User Actions", () => {
 
       const result = await createAddressAction({ ...validAddressData, isDefault: true })
 
-      expect(result.isDefault).toBe(true)
+      expect(result).toMatchObject({
+        success: true,
+        data: { isDefault: true },
+      })
       expect(db.address.updateMany).toHaveBeenCalledWith({
         where: { userId: "user-1", isDefault: true },
         data: { isDefault: false },
       })
     })
 
-    it("should throw error if database create fails", async () => {
+    it("should return SERVER_ERROR if database create fails", async () => {
       vi.mocked(getSession).mockResolvedValueOnce(mockUserSession)
       vi.mocked(db.address.create).mockRejectedValueOnce(new Error("Create failed"))
 
-      await expect(createAddressAction(validAddressData)).rejects.toThrow("Create failed")
+      const result = await createAddressAction(validAddressData)
+      expect(result).toMatchObject({
+        success: false,
+        code: "SERVER_ERROR",
+        error: "Create failed",
+      })
     })
 
-    it("should handle updateMany failure when setting as default", async () => {
+    it("should return SERVER_ERROR if updateMany fails", async () => {
       vi.mocked(getSession).mockResolvedValueOnce(mockUserSession)
       vi.mocked(db.address.updateMany).mockRejectedValueOnce(new Error("UpdateMany failed"))
 
-      await expect(createAddressAction({ ...validAddressData, isDefault: true })).rejects.toThrow(
-        "UpdateMany failed"
-      )
+      const result = await createAddressAction({ ...validAddressData, isDefault: true })
+      expect(result).toMatchObject({
+        success: false,
+        code: "SERVER_ERROR",
+        error: "UpdateMany failed",
+      })
     })
 
-    it("should handle non-Error exception", async () => {
+    it("should return SERVER_ERROR for unknown errors", async () => {
       vi.mocked(getSession).mockResolvedValueOnce(mockUserSession)
       vi.mocked(db.address.create).mockRejectedValueOnce("String error")
 
-      await expect(createAddressAction(validAddressData)).rejects.toThrow()
+      const result = await createAddressAction(validAddressData)
+      expect(result).toMatchObject({
+        success: false,
+        code: "SERVER_ERROR",
+        error: "String error",
+      })
     })
   })
 
@@ -250,33 +298,39 @@ describe("User Actions", () => {
       phone: "+1-213-555-0456",
     }
 
-    it("should throw error if user not authenticated", async () => {
+    it("should return UNAUTHORIZED if user not authenticated", async () => {
       vi.mocked(getSession).mockResolvedValueOnce(null)
 
-      await expect(updateAddressAction(mockAddress.id, validAddressData)).rejects.toThrow(
-        "Unauthorized"
-      )
+      const result = await updateAddressAction(mockAddress.id, validAddressData)
+      expect(result).toMatchObject({
+        success: false,
+        code: "UNAUTHORIZED",
+      })
     })
 
-    it("should throw error if address not found", async () => {
+    it("should return NOT_FOUND if address not found", async () => {
       vi.mocked(getSession).mockResolvedValueOnce(mockUserSession)
       vi.mocked(db.address.findUnique).mockResolvedValueOnce(null)
 
-      await expect(updateAddressAction(mockAddress.id, validAddressData)).rejects.toThrow(
-        "Address not found"
-      )
+      const result = await updateAddressAction(mockAddress.id, validAddressData)
+      expect(result).toMatchObject({
+        success: false,
+        code: "NOT_FOUND",
+      })
     })
 
-    it("should throw error if user does not own address", async () => {
+    it("should return NOT_FOUND if user does not own address", async () => {
       vi.mocked(getSession).mockResolvedValueOnce(mockUserSession)
       vi.mocked(db.address.findUnique).mockResolvedValueOnce({
         ...mockAddress,
         userId: "different-user",
       })
 
-      await expect(updateAddressAction(mockAddress.id, validAddressData)).rejects.toThrow(
-        "Address not found"
-      )
+      const result = await updateAddressAction(mockAddress.id, validAddressData)
+      expect(result).toMatchObject({
+        success: false,
+        code: "NOT_FOUND",
+      })
     })
 
     it("should update address fields", async () => {
@@ -286,7 +340,10 @@ describe("User Actions", () => {
 
       const result = await updateAddressAction(mockAddress.id, validAddressData)
 
-      expect(result).toEqual({ ...mockAddress, ...validAddressData })
+      expect(result).toEqual({
+        success: true,
+        data: { ...mockAddress, ...validAddressData },
+      })
       expect(db.address.update).toHaveBeenCalledWith({
         where: { id: mockAddress.id },
         data: expect.any(Object),
@@ -301,7 +358,10 @@ describe("User Actions", () => {
 
       const result = await updateAddressAction(mockAddress.id, { isDefault: true })
 
-      expect(result.isDefault).toBe(true)
+      expect(result).toMatchObject({
+        success: true,
+        data: { isDefault: true },
+      })
       expect(db.address.update).toHaveBeenCalledWith({
         where: { id: mockAddress.id },
         data: { isDefault: true },
@@ -322,14 +382,17 @@ describe("User Actions", () => {
       })
     })
 
-    it("should throw error on address update failure", async () => {
+    it("should return SERVER_ERROR on address update failure", async () => {
       vi.mocked(getSession).mockResolvedValueOnce(mockUserSession)
       vi.mocked(db.address.findUnique).mockResolvedValueOnce(mockAddress)
       vi.mocked(db.address.update).mockRejectedValueOnce(new Error("Update failed"))
 
-      await expect(updateAddressAction(mockAddress.id, { isDefault: true })).rejects.toThrow(
-        "Update failed"
-      )
+      const result = await updateAddressAction(mockAddress.id, { isDefault: true })
+      expect(result).toMatchObject({
+        success: false,
+        code: "SERVER_ERROR",
+        error: "Update failed",
+      })
     })
 
     it("should handle partial address data with isDefault flag", async () => {
@@ -353,58 +416,74 @@ describe("User Actions", () => {
         isDefault: true,
       })
 
-      expect(result.isDefault).toBe(true)
+      expect(result).toMatchObject({
+        success: true,
+        data: { isDefault: true },
+      })
       expect(db.address.updateMany).toHaveBeenCalled()
     })
 
-    it("should handle non-Error exception", async () => {
+    it("should return SERVER_ERROR for unknown errors", async () => {
       vi.mocked(getSession).mockResolvedValueOnce(mockUserSession)
       vi.mocked(db.address.findUnique).mockResolvedValueOnce(mockAddress)
       vi.mocked(db.address.update).mockRejectedValueOnce("String error")
 
-      await expect(updateAddressAction(mockAddress.id, { firstName: "Updated" })).rejects.toThrow()
+      const result = await updateAddressAction(mockAddress.id, { firstName: "Updated" })
+      expect(result).toMatchObject({
+        success: false,
+        code: "SERVER_ERROR",
+        error: "String error",
+      })
     })
 
-    it("should reject invalid partial address data", async () => {
+    it("should return VALIDATION_ERROR for invalid partial address data", async () => {
       vi.mocked(getSession).mockResolvedValueOnce(mockUserSession)
       vi.mocked(db.address.findUnique).mockResolvedValueOnce(mockAddress)
 
-      await expect(
-        updateAddressAction(mockAddress.id, {
-          firstName: "", // Invalid
-        })
-      ).rejects.toThrow()
+      const result = await updateAddressAction(mockAddress.id, {
+        firstName: "", // Invalid
+      })
+      expect(result).toMatchObject({
+        success: false,
+        code: "VALIDATION_ERROR",
+      })
     })
   })
 
   describe("deleteAddressAction", () => {
-    it("should throw error if user not authenticated", async () => {
+    it("should return UNAUTHORIZED if user not authenticated", async () => {
       vi.mocked(getSession).mockResolvedValueOnce(null)
 
-      await expect(deleteAddressAction({ addressId: mockAddress.id })).rejects.toThrow(
-        "Unauthorized"
-      )
+      const result = await deleteAddressAction({ addressId: mockAddress.id })
+      expect(result).toMatchObject({
+        success: false,
+        code: "UNAUTHORIZED",
+      })
     })
 
-    it.skip("should throw error if address not found", async () => {
+    it("should return NOT_FOUND if address not found", async () => {
       vi.mocked(getSession).mockResolvedValueOnce(mockUserSession)
       vi.mocked(db.address.findUnique).mockResolvedValueOnce(null)
 
-      await expect(deleteAddressAction({ addressId: mockAddress.id })).rejects.toThrow(
-        "Address not found"
-      )
+      const result = await deleteAddressAction({ addressId: mockAddress.id })
+      expect(result).toMatchObject({
+        success: false,
+        code: "NOT_FOUND",
+      })
     })
 
-    it("should throw error if user does not own address", async () => {
+    it("should return NOT_FOUND if user does not own address", async () => {
       vi.mocked(getSession).mockResolvedValueOnce(mockUserSession)
       vi.mocked(db.address.findUnique).mockResolvedValueOnce({
         ...mockAddress,
         userId: "different-user",
       })
 
-      await expect(deleteAddressAction({ addressId: mockAddress.id })).rejects.toThrow(
-        "Address not found"
-      )
+      const result = await deleteAddressAction({ addressId: mockAddress.id })
+      expect(result).toMatchObject({
+        success: false,
+        code: "NOT_FOUND",
+      })
     })
 
     it("should delete address successfully", async () => {
@@ -414,28 +493,36 @@ describe("User Actions", () => {
 
       const result = await deleteAddressAction({ addressId: mockAddress.id })
 
-      expect(result).toEqual({ success: true })
+      expect(result).toEqual({ success: true, data: { id: mockAddress.id } })
       expect(db.address.delete).toHaveBeenCalledWith({
         where: { id: mockAddress.id },
       })
     })
 
-    it("should throw error on address delete failure", async () => {
+    it("should return SERVER_ERROR on address delete failure", async () => {
       vi.mocked(getSession).mockResolvedValueOnce(mockUserSession)
       vi.mocked(db.address.findUnique).mockResolvedValueOnce(mockAddress)
       vi.mocked(db.address.delete).mockRejectedValueOnce(new Error("Delete failed"))
 
-      await expect(deleteAddressAction({ addressId: mockAddress.id })).rejects.toThrow(
-        "Delete failed"
-      )
+      const result = await deleteAddressAction({ addressId: mockAddress.id })
+      expect(result).toMatchObject({
+        success: false,
+        code: "SERVER_ERROR",
+        error: "Delete failed",
+      })
     })
 
-    it("should handle non-Error exception", async () => {
+    it("should return SERVER_ERROR for unknown errors", async () => {
       vi.mocked(getSession).mockResolvedValueOnce(mockUserSession)
       vi.mocked(db.address.findUnique).mockResolvedValueOnce(mockAddress)
       vi.mocked(db.address.delete).mockRejectedValueOnce("String error")
 
-      await expect(deleteAddressAction({ addressId: mockAddress.id })).rejects.toThrow()
+      const result = await deleteAddressAction({ addressId: mockAddress.id })
+      expect(result).toMatchObject({
+        success: false,
+        code: "SERVER_ERROR",
+        error: "String error",
+      })
     })
   })
 })

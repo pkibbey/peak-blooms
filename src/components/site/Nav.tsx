@@ -2,11 +2,11 @@ import Image from "next/image"
 import Link from "next/link"
 import { getCartAction } from "@/app/actions/cart"
 import NavLink from "@/components/site/NavLink"
+import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
 // import UserMenu from "@/components/site/UserMenu"
 import { IconSearch, IconShoppingCart } from "@/components/ui/icons"
 import { getCurrentUser } from "@/lib/current-user"
-import { Badge } from "../ui/badge"
-import { Button } from "../ui/button"
 import MobileNav from "./MobileNav"
 import NavSearch from "./NavSearch"
 import UserMenu from "./UserMenu"
@@ -25,9 +25,9 @@ export default async function Nav() {
   // Only get the cart if it exists - don't create one just for displaying the count
   let cartCount = 0
   if (isApproved) {
-    const cart = await getCartAction()
-    if (cart?.items) {
-      cartCount = cart.items.length
+    const cartResult = await getCartAction()
+    if (cartResult?.success && cartResult.data?.items) {
+      cartCount = cartResult.data.items.length
     }
   }
 

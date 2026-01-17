@@ -1,6 +1,6 @@
 import { PrismaPg } from "@prisma/adapter-pg"
 import { Pool } from "pg"
-import { MetricType, PrismaClient } from "../generated/client"
+import { MetricType, PrismaClient } from "@/generated/client"
 import { createTrackedDb } from "./db-wrapper"
 
 const globalForPrisma = globalThis as unknown as { prisma: PrismaClient }

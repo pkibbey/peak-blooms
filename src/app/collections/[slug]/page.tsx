@@ -8,9 +8,7 @@ import { getCollectionBySlug } from "@/lib/data"
 import { db } from "@/lib/db"
 
 interface CollectionDetailPageProps {
-  params: Promise<{
-    slug: string
-  }>
+  params: Promise<{ slug: string }>
 }
 
 export async function generateMetadata({ params }: CollectionDetailPageProps) {

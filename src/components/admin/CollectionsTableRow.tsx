@@ -69,14 +69,22 @@ export default function CollectionsTableRow({ collection }: { collection: Collec
 
               startTransition(async () => {
                 try {
-                  await toggleCollectionFeaturedAction({ id: collection.id, featured: value })
+                  const result = await toggleCollectionFeaturedAction({
+                    id: collection.id,
+                    featured: value,
+                  })
+                  if (!result.success) {
+                    setFeatured(previous)
+                    toast.error(result.error)
+                    return
+                  }
                   toast.success(
                     `${value ? "Marked featured" : "Removed featured"} - ${collection.name}`
                   )
                   router.refresh()
-                } catch (err) {
+                } catch (_err) {
                   setFeatured(previous)
-                  toast.error(err instanceof Error ? err.message : "Failed to update collection")
+                  toast.error("Failed to update collection")
                 }
               })
             }}

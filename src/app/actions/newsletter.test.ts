@@ -25,7 +25,7 @@ describe("Newsletter Actions", () => {
       const result = await subscribeToNewsletterAction("invalid-email")
 
       // Action silently succeeds even on invalid input to prevent email enumeration
-      expect(result).toEqual({ success: true })
+      expect(result).toEqual({ success: true, data: {} })
     })
 
     it("should silently succeed if user already exists", async () => {
@@ -46,7 +46,7 @@ describe("Newsletter Actions", () => {
 
       const result = await subscribeToNewsletterAction("existing@example.com")
 
-      expect(result).toEqual({ success: true })
+      expect(result).toEqual({ success: true, data: {} })
       expect(db.user.create).not.toHaveBeenCalled()
     })
 
@@ -69,7 +69,7 @@ describe("Newsletter Actions", () => {
 
       const result = await subscribeToNewsletterAction("new@example.com")
 
-      expect(result).toEqual({ success: true, userId: "new-user-1" })
+      expect(result).toEqual({ success: true, data: { userId: "new-user-1" } })
       expect(db.user.findUnique).toHaveBeenCalledWith({
         where: { email: "new@example.com" },
       })
@@ -88,7 +88,7 @@ describe("Newsletter Actions", () => {
 
       const result = await subscribeToNewsletterAction("test@example.com")
 
-      expect(result).toEqual({ success: true })
+      expect(result).toEqual({ success: true, data: {} })
     })
 
     it("should silently succeed on create errors", async () => {
@@ -97,7 +97,7 @@ describe("Newsletter Actions", () => {
 
       const result = await subscribeToNewsletterAction("test@example.com")
 
-      expect(result).toEqual({ success: true })
+      expect(result).toEqual({ success: true, data: {} })
     })
 
     it("should handle email with uppercase characters", async () => {
@@ -119,7 +119,7 @@ describe("Newsletter Actions", () => {
 
       const result = await subscribeToNewsletterAction("New@Example.COM")
 
-      expect(result).toEqual({ success: true, userId: "new-user-2" })
+      expect(result).toEqual({ success: true, data: { userId: "new-user-2" } })
     })
   })
 })

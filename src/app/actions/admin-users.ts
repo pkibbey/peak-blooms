@@ -4,7 +4,8 @@ import { revalidatePath } from "next/cache"
 import { headers } from "next/headers"
 import { auth, invalidateUserSessions } from "@/lib/auth"
 import { db } from "@/lib/db"
-import type { AdminUserResponse } from "@/lib/query-types"
+import { toAppError } from "@/lib/error-utils"
+import type { AdminUserResponse, AppResult } from "@/lib/query-types"
 import {
   type ApproveUserInput,
   approveUserSchema,
@@ -19,19 +20,21 @@ import {
 /**
  * Approve a user (admin only)
  */
-export async function approveUserAction(input: ApproveUserInput): Promise<AdminUserResponse> {
+export async function approveUserAction(
+  input: ApproveUserInput
+): Promise<AppResult<AdminUserResponse>> {
+  const { userId } = approveUserSchema.parse(input)
+
+  const headersList = await headers()
+  const session = await auth.api.getSession({
+    headers: headersList,
+  })
+
+  if (!session || (session.user.role as string) !== "ADMIN") {
+    return { success: false, error: "Unauthorized", code: "UNAUTHORIZED" }
+  }
+
   try {
-    const { userId } = approveUserSchema.parse(input)
-
-    const headersList = await headers()
-    const session = await auth.api.getSession({
-      headers: headersList,
-    })
-
-    if (!session || (session.user.role as string) !== "ADMIN") {
-      throw new Error("Unauthorized")
-    }
-
     const user = await db.user.update({
       where: { id: userId },
       data: { approved: true },
@@ -52,28 +55,30 @@ export async function approveUserAction(input: ApproveUserInput): Promise<AdminU
     }
 
     revalidatePath("/admin/users")
-    return user
+    return { success: true, data: user }
   } catch (error) {
-    throw new Error(error instanceof Error ? error.message : "Failed to approve user")
+    return toAppError(error, "Failed to approve user")
   }
 }
 
 /**
  * Unapprove/revoke a user (admin only)
  */
-export async function unapproveUserAction(input: UnapproveUserInput): Promise<AdminUserResponse> {
+export async function unapproveUserAction(
+  input: UnapproveUserInput
+): Promise<AppResult<AdminUserResponse>> {
+  const { userId } = unapproveUserSchema.parse(input)
+
+  const headersList = await headers()
+  const session = await auth.api.getSession({
+    headers: headersList,
+  })
+
+  if (!session || (session.user.role as string) !== "ADMIN") {
+    return { success: false, error: "Unauthorized", code: "UNAUTHORIZED" }
+  }
+
   try {
-    const { userId } = unapproveUserSchema.parse(input)
-
-    const headersList = await headers()
-    const session = await auth.api.getSession({
-      headers: headersList,
-    })
-
-    if (!session || (session.user.role as string) !== "ADMIN") {
-      throw new Error("Unauthorized")
-    }
-
     const user = await db.user.update({
       where: { id: userId },
       data: { approved: false },
@@ -94,9 +99,9 @@ export async function unapproveUserAction(input: UnapproveUserInput): Promise<Ad
     }
 
     revalidatePath("/admin/users")
-    return user
+    return { success: true, data: user }
   } catch (error) {
-    throw new Error(error instanceof Error ? error.message : "Failed to unapprove user")
+    return toAppError(error, "Failed to unapprove user")
   }
 }
 
@@ -105,19 +110,19 @@ export async function unapproveUserAction(input: UnapproveUserInput): Promise<Ad
  */
 export async function updateUserPriceMultiplierAction(
   input: UpdateUserPriceMultiplierInput
-): Promise<AdminUserResponse> {
+): Promise<AppResult<AdminUserResponse>> {
+  const { userId, multiplier } = updateUserPriceMultiplierSchema.parse(input)
+
+  const headersList = await headers()
+  const session = await auth.api.getSession({
+    headers: headersList,
+  })
+
+  if (!session || (session.user.role as string) !== "ADMIN") {
+    return { success: false, error: "Unauthorized", code: "UNAUTHORIZED" }
+  }
+
   try {
-    const { userId, multiplier } = updateUserPriceMultiplierSchema.parse(input)
-
-    const headersList = await headers()
-    const session = await auth.api.getSession({
-      headers: headersList,
-    })
-
-    if (!session || (session.user.role as string) !== "ADMIN") {
-      throw new Error("Unauthorized")
-    }
-
     const user = await db.user.update({
       where: { id: userId },
       data: { priceMultiplier: multiplier },
@@ -138,35 +143,37 @@ export async function updateUserPriceMultiplierAction(
     }
 
     revalidatePath("/admin/users")
-    return user
+    return { success: true, data: user }
   } catch (error) {
-    throw new Error(error instanceof Error ? error.message : "Failed to update price multiplier")
+    return toAppError(error, "Failed to update price multiplier")
   }
 }
 
 /**
  * Create a new user (admin only)
  */
-export async function createUserAction(input: CreateUserInput): Promise<AdminUserResponse> {
+export async function createUserAction(
+  input: CreateUserInput
+): Promise<AppResult<AdminUserResponse>> {
+  const data = createUserSchema.parse(input)
+
+  const headersList = await headers()
+  const session = await auth.api.getSession({
+    headers: headersList,
+  })
+
+  if (!session || (session.user.role as string) !== "ADMIN") {
+    return { success: false, error: "Unauthorized", code: "UNAUTHORIZED" }
+  }
+
   try {
-    const data = createUserSchema.parse(input)
-
-    const headersList = await headers()
-    const session = await auth.api.getSession({
-      headers: headersList,
-    })
-
-    if (!session || (session.user.role as string) !== "ADMIN") {
-      throw new Error("Unauthorized")
-    }
-
     // Check if email already exists
     const existingUser = await db.user.findUnique({
       where: { email: data.email },
     })
 
     if (existingUser) {
-      throw new Error("Email already exists")
+      return { success: false, error: "Email already exists", code: "CONFLICT" }
     }
 
     const user = await db.user.create({
@@ -189,8 +196,8 @@ export async function createUserAction(input: CreateUserInput): Promise<AdminUse
     })
 
     revalidatePath("/admin/users")
-    return user
+    return { success: true, data: user }
   } catch (error) {
-    throw new Error(error instanceof Error ? error.message : "Failed to create user")
+    return toAppError(error, "Failed to create user")
   }
 }

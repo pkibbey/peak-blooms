@@ -13,7 +13,7 @@ vi.mock("@/lib/db-wrapper", () => ({
   createTrackedDb: vi.fn((db) => db), // Return db as-is for testing
 }))
 
-vi.mock("../generated/client", () => ({
+vi.mock("@/generated/client", () => ({
   PrismaClient: vi.fn(),
   MetricType: {
     ADMIN_QUERY: "ADMIN_QUERY",

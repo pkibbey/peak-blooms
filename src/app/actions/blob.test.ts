@@ -5,6 +5,12 @@ vi.mock("@/lib/auth", () => ({
   getSession: vi.fn(),
 }))
 
+vi.mock("@/lib/env", () => ({
+  ENV: {
+    BLOB_READ_WRITE_TOKEN: "test-token",
+  },
+}))
+
 import { getSession } from "@/lib/auth"
 import { deleteBlobAction } from "./blob"
 
@@ -40,14 +46,17 @@ describe("Blob Actions", () => {
   }
 
   describe("deleteBlobAction", () => {
-    it("should return success false if user not authenticated", async () => {
+    it("should return UNAUTHORIZED if user not authenticated", async () => {
       vi.mocked(getSession).mockResolvedValueOnce(null)
 
       const result = await deleteBlobAction({ url: "https://blob.vercel-storage.com/file-123" })
-      expect(result).toEqual({ success: false })
+      expect(result).toMatchObject({
+        success: false,
+        code: "UNAUTHORIZED",
+      })
     })
 
-    it("should return success false if user is not admin", async () => {
+    it("should return UNAUTHORIZED if user is not admin", async () => {
       vi.mocked(getSession).mockResolvedValueOnce({
         ...mockAdminSession,
         user: {
@@ -58,7 +67,10 @@ describe("Blob Actions", () => {
 
       const result = await deleteBlobAction({ url: "https://blob.vercel-storage.com/file-123" })
 
-      expect(result).toEqual({ success: false })
+      expect(result).toMatchObject({
+        success: false,
+        code: "UNAUTHORIZED",
+      })
     })
 
     it("should return success for non-blob URLs", async () => {
@@ -66,19 +78,24 @@ describe("Blob Actions", () => {
 
       const result = await deleteBlobAction({ url: "https://example.com/file.jpg" })
 
-      expect(result).toEqual({ success: true })
+      expect(result).toEqual({ success: true, data: { success: true } })
     })
 
-    it("should return success false if blob delete fails", async () => {
+    it("should return SERVER_ERROR if blob delete fails", async () => {
       vi.mocked(getSession).mockResolvedValueOnce(mockAdminSession)
 
       global.fetch = vi.fn().mockResolvedValueOnce({
         ok: false,
+        statusText: "Bad Request",
       })
 
       const result = await deleteBlobAction({ url: "https://blob.vercel-storage.com/file-123" })
 
-      expect(result).toEqual({ success: false })
+      expect(result).toMatchObject({
+        success: false,
+        code: "SERVER_ERROR",
+        error: "Failed to delete blob: Bad Request",
+      })
     })
 
     it("should return success true if blob delete succeeds", async () => {
@@ -90,25 +107,37 @@ describe("Blob Actions", () => {
 
       const result = await deleteBlobAction({ url: "https://blob.vercel-storage.com/file-123" })
 
-      expect(result).toEqual({ success: true })
+      expect(result).toEqual({ success: true, data: { success: true } })
       expect(global.fetch).toHaveBeenCalledWith("https://blob.vercel-storage.com/delete", {
         method: "POST",
         headers: {
-          Authorization: expect.stringContaining("Bearer"),
+          Authorization: "Bearer test-token",
           "Content-Type": "application/json",
         },
         body: JSON.stringify({ url: "https://blob.vercel-storage.com/file-123" }),
       })
     })
 
-    it("should return success false on fetch error", async () => {
+    it("should return SERVER_ERROR on fetch error", async () => {
       vi.mocked(getSession).mockResolvedValueOnce(mockAdminSession)
 
       global.fetch = vi.fn().mockRejectedValueOnce(new Error("Network error"))
 
       const result = await deleteBlobAction({ url: "https://blob.vercel-storage.com/file-123" })
 
-      expect(result).toEqual({ success: false })
+      expect(result).toMatchObject({
+        success: false,
+        code: "SERVER_ERROR",
+        error: "Network error",
+      })
+    })
+
+    it("should return VALIDATION_ERROR on invalid input", async () => {
+      const result = await deleteBlobAction({} as never)
+      expect(result).toMatchObject({
+        success: false,
+        code: "VALIDATION_ERROR",
+      })
     })
   })
 })

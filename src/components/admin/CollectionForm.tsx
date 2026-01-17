@@ -24,11 +24,11 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form"
+import { IconTrash } from "@/components/ui/icons"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import type { CollectionModel, ProductModel } from "@/generated/models"
 import { type CollectionFormData, collectionSchema } from "@/lib/validations/collection"
-import { IconTrash } from "../ui/icons"
 
 // Collection type with product count and associations for form display
 type CollectionWithProductCount = CollectionModel & {
@@ -76,18 +76,25 @@ export default function CollectionForm({ collection, products = [] }: Collection
       }
 
       if (isEditing) {
-        await updateCollectionAction({ id: collection.id, ...formData })
+        const result = await updateCollectionAction({ id: collection.id, ...formData })
+        if (!result.success) {
+          form.setError("root", { message: result.error })
+          return
+        }
         toast.success("Collection updated successfully")
       } else {
-        await createCollectionAction(formData)
+        const result = await createCollectionAction(formData)
+        if (!result.success) {
+          form.setError("root", { message: result.error })
+          return
+        }
         toast.success("Collection created successfully")
       }
 
       router.push("/admin/collections")
       router.refresh()
     } catch (err) {
-      const errorMessage =
-        err instanceof Error ? err.message : "An error occurred. Please try again."
+      const errorMessage = "An error occurred. Please try again."
       form.setError("root", { message: errorMessage })
       console.error(err)
     } finally {
@@ -111,14 +118,16 @@ export default function CollectionForm({ collection, products = [] }: Collection
 
     setIsDeleting(true)
     try {
-      await deleteCollectionAction({ id: collection.id })
+      const result = await deleteCollectionAction({ id: collection.id })
+      if (!result.success) {
+        toast.error(result.error)
+        return
+      }
       toast.success("Collection deleted successfully")
       router.push("/admin/collections")
       router.refresh()
     } catch (err) {
-      const errorMessage =
-        err instanceof Error ? err.message : "Failed to delete collection. Please try again."
-      form.setError("root", { message: errorMessage })
+      toast.error("Failed to delete collection. Please try again.")
       console.error(err)
     } finally {
       setIsDeleting(false)

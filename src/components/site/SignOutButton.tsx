@@ -1,8 +1,8 @@
 "use client"
 
 import { toast } from "sonner"
+import { Button } from "@/components/ui/button"
 import { signOut } from "@/lib/auth-client"
-import { Button } from "../ui/button"
 
 export default function SignOutButton() {
   return (

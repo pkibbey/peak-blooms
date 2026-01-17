@@ -1,4 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vitest"
+import { Role } from "@/generated/enums"
 
 // Mock dependencies - must be before imports
 vi.mock("@/lib/current-user", () => ({
@@ -28,7 +29,7 @@ describe("Search Actions", () => {
     createdAt: now,
     updatedAt: now,
     approved: true,
-    role: "USER",
+    role: Role.CUSTOMER,
     priceMultiplier: 1.5,
   }
 
@@ -71,17 +72,21 @@ describe("Search Actions", () => {
   }
 
   describe("searchProducts", () => {
-    it("should return empty results for empty search term", async () => {
+    it("should return VALIDATION_ERROR for empty search term", async () => {
       const result = await searchProducts({ searchTerm: "" })
 
-      expect(result).toEqual({ products: [] })
+      expect(result).toMatchObject({
+        success: false,
+        code: "VALIDATION_ERROR",
+        error: "searchTerm: Search term is required",
+      })
       expect(getProducts).not.toHaveBeenCalled()
     })
 
     it("should return empty results for whitespace-only search term", async () => {
       const result = await searchProducts({ searchTerm: "     " })
 
-      expect(result).toEqual({ products: [] })
+      expect(result).toEqual({ success: true, data: { products: [] } })
       expect(getProducts).not.toHaveBeenCalled()
     })
 
@@ -92,22 +97,25 @@ describe("Search Actions", () => {
       const result = await searchProducts({ searchTerm: "roses" })
 
       expect(result).toEqual({
-        products: [
-          {
-            id: "prod-1",
-            name: "Red Roses",
-            slug: "red-roses",
-            image: "roses.jpg",
-            price: 50,
-          },
-          {
-            id: "prod-2",
-            name: "White Roses",
-            slug: "white-roses",
-            image: "white-roses.jpg",
-            price: 55,
-          },
-        ],
+        success: true,
+        data: {
+          products: [
+            {
+              id: "prod-1",
+              name: "Red Roses",
+              slug: "red-roses",
+              image: "roses.jpg",
+              price: 50,
+            },
+            {
+              id: "prod-2",
+              name: "White Roses",
+              slug: "white-roses",
+              image: "white-roses.jpg",
+              price: 55,
+            },
+          ],
+        },
       })
       expect(getProducts).toHaveBeenCalledWith(
         {
@@ -125,22 +133,25 @@ describe("Search Actions", () => {
       const result = await searchProducts({ searchTerm: "roses" })
 
       expect(result).toEqual({
-        products: [
-          {
-            id: "prod-1",
-            name: "Red Roses",
-            slug: "red-roses",
-            image: "roses.jpg",
-            price: 50,
-          },
-          {
-            id: "prod-2",
-            name: "White Roses",
-            slug: "white-roses",
-            image: "white-roses.jpg",
-            price: 55,
-          },
-        ],
+        success: true,
+        data: {
+          products: [
+            {
+              id: "prod-1",
+              name: "Red Roses",
+              slug: "red-roses",
+              image: "roses.jpg",
+              price: 50,
+            },
+            {
+              id: "prod-2",
+              name: "White Roses",
+              slug: "white-roses",
+              image: "white-roses.jpg",
+              price: 55,
+            },
+          ],
+        },
       })
       expect(getProducts).toHaveBeenCalledWith(
         {
@@ -164,7 +175,7 @@ describe("Search Actions", () => {
 
       expect(getProducts).toHaveBeenCalledWith(
         {
-          search: "  roses  ",
+          search: "roses",
           limit: 10,
         },
         1.0
@@ -182,24 +193,40 @@ describe("Search Actions", () => {
 
       const result = await searchProducts({ searchTerm: "nonexistent" })
 
-      expect(result).toEqual({ products: [] })
+      expect(result).toEqual({ success: true, data: { products: [] } })
     })
 
-    it("should return empty results on error", async () => {
+    it("should return SERVER_ERROR on auth error", async () => {
       vi.mocked(getCurrentUser).mockRejectedValueOnce(new Error("Auth error"))
 
       const result = await searchProducts({ searchTerm: "roses" })
 
-      expect(result).toEqual({ products: [] })
+      expect(result).toMatchObject({
+        success: false,
+        code: "SERVER_ERROR",
+        error: "Auth error",
+      })
     })
 
-    it("should return empty results if getProducts fails", async () => {
+    it("should return SERVER_ERROR if getProducts fails", async () => {
       vi.mocked(getCurrentUser).mockResolvedValueOnce(null)
       vi.mocked(getProducts).mockRejectedValueOnce(new Error("Database error"))
 
       const result = await searchProducts({ searchTerm: "roses" })
 
-      expect(result).toEqual({ products: [] })
+      expect(result).toMatchObject({
+        success: false,
+        code: "SERVER_ERROR",
+        error: "Database error",
+      })
+    })
+
+    it("should return VALIDATION_ERROR on invalid input", async () => {
+      const result = await searchProducts({} as never)
+      expect(result).toMatchObject({
+        success: false,
+        code: "VALIDATION_ERROR",
+      })
     })
   })
 })

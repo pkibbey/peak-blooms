@@ -1,11 +1,8 @@
-import Link from "next/link"
 import { redirect } from "next/navigation"
+import { getCartAction } from "@/app/actions/cart"
 import CheckoutForm from "@/components/site/CheckoutForm"
-import { Button } from "@/components/ui/button"
-import { IconShoppingBag } from "@/components/ui/icons"
 import { getCurrentUser } from "@/lib/current-user"
 import { db } from "@/lib/db"
-import { getCartAction } from "../actions/cart"
 
 export default async function CheckoutPage() {
   const user = await getCurrentUser()
@@ -21,41 +18,25 @@ export default async function CheckoutPage() {
   }
 
   // Fetch cart data (don't create - redirect if doesn't exist)
-  const cart = await getCartAction()
+  const cartResult = await getCartAction()
 
-  // Redirect to cart if empty
-  if (!cart || cart.items.length === 0) {
+  // Redirect to cart if empty or error
+  if (
+    !cartResult ||
+    !cartResult.success ||
+    !cartResult.data ||
+    cartResult.data.items.length === 0
+  ) {
     redirect("/cart")
   }
+
+  const cart = cartResult.data
 
   // Fetch user's saved addresses, with default first
   const savedAddresses = await db.address.findMany({
     where: { userId: user.id },
     orderBy: [{ isDefault: "desc" }, { createdAt: "desc" }],
   })
-
-  // If cart is somehow null at this point (shouldn't happen)
-  if (!cart) {
-    return (
-      <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 py-10">
-        <div className="flex flex-col items-center justify-center py-12 text-center">
-          <IconShoppingBag className="h-16 w-16 text-muted-foreground/50 mb-4" />
-          <h2 className="heading-2 mb-2">Your cart is empty</h2>
-          <p className="text-muted-foreground mb-6">
-            Add some items to your cart before checking out.
-          </p>
-          <Button
-            nativeButton={false}
-            render={
-              <Link prefetch={false} href="/shop">
-                Browse Products
-              </Link>
-            }
-          />
-        </div>
-      </div>
-    )
-  }
 
   return (
     <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 py-10">
