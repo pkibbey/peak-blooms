@@ -21,7 +21,7 @@ export type CreateCollectionInput = Omit<
 > & { productIds?: string[] }
 
 export const updateCollectionSchema = createCollectionSchema.extend({
-  id: z.string().uuid("Invalid collection ID"),
+  id: z.string().min(1, "Invalid collection ID"),
 })
 
 export type UpdateCollectionInput = Omit<
@@ -30,13 +30,13 @@ export type UpdateCollectionInput = Omit<
 > & { id: string; productIds?: string[] }
 
 export const deleteCollectionSchema = z.object({
-  id: z.string().uuid("Invalid collection ID"),
+  id: z.string().min(1, "Invalid collection ID"),
 })
 
 export type DeleteCollectionInput = z.infer<typeof deleteCollectionSchema>
 
 export const toggleCollectionFeaturedSchema = z.object({
-  id: z.string().uuid("Invalid collection ID"),
+  id: z.string().min(1, "Invalid collection ID"),
   featured: z.boolean(),
 })
 

@@ -35,8 +35,26 @@ services:
     profiles:
       - tools
 
+  redis:
+    image: redis:7-alpine
+    container_name: peak-blooms-redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - peak_blooms_redis:/data
+    healthcheck:
+      test: ["CMD-SHELL", "redis-cli ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - peak_blooms_network
+
 volumes:
   peak_blooms_data:
+    driver: local
+  peak_blooms_redis:
     driver: local
 
 networks:

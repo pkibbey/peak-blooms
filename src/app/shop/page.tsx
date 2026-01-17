@@ -130,10 +130,7 @@ export default async function ShopPage({ searchParams }: ShopPageProps) {
               </div>
 
               {/* Boxlot Filter + Message */}
-              <div className="flex flex-wrap gap-4 items-center justify-between">
-                <Suspense fallback={null}>
-                  <BoxlotFilter />
-                </Suspense>
+              <div className="flex flex-wrap gap-4 items-center justify-end">
                 <Suspense fallback={null}>
                   <ViewToggle />
                 </Suspense>

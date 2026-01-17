@@ -14,6 +14,7 @@ vi.mock("next/cache", () => ({
   revalidatePath: vi.fn(),
 }))
 
+import { ProductType } from "@/generated/enums"
 import { getSession } from "@/lib/auth"
 import { db } from "@/lib/db"
 // Now import the modules
@@ -64,7 +65,7 @@ describe("Product Actions", () => {
     image: "roses.jpg",
     price: 49.99,
     colors: ["red"],
-    productType: "FLOWER" as const,
+    productType: ProductType.FLOWER,
     featured: false,
     deletedAt: null,
     createdAt: now,
@@ -82,7 +83,7 @@ describe("Product Actions", () => {
         image: "roses.jpg",
         price: "49.99",
         colors: ["red"],
-        productType: "FLOWER" as const,
+        productType: ProductType.FLOWER,
         featured: false,
         collectionIds: [],
       }
@@ -128,7 +129,7 @@ describe("Product Actions", () => {
         image: "roses.jpg",
         price: "49.99",
         colors: ["red"],
-        productType: "FLOWER" as const,
+        productType: ProductType.FLOWER,
         featured: false,
         collectionIds: [],
       }
@@ -151,7 +152,7 @@ describe("Product Actions", () => {
         image: "roses.jpg",
         price: "49.99",
         colors: ["red"],
-        productType: "FLOWER" as const,
+        productType: ProductType.FLOWER,
         featured: false,
         collectionIds: [],
       }
@@ -170,7 +171,7 @@ describe("Product Actions", () => {
           image: "roses.jpg",
           price: 49.99,
           colors: ["red"],
-          productType: "FLOWER",
+          productType: ProductType.FLOWER,
           featured: false,
           productCollections: {
             create: [],
@@ -190,7 +191,7 @@ describe("Product Actions", () => {
         image: "roses.jpg",
         price: "49.99",
         colors: ["red"],
-        productType: "FLOWER" as const,
+        productType: ProductType.FLOWER,
         featured: false,
         collectionIds: [],
       }
@@ -210,7 +211,7 @@ describe("Product Actions", () => {
         image: "roses.jpg",
         price: "49.99",
         colors: ["red"],
-        productType: "FLOWER" as const,
+        productType: ProductType.FLOWER,
         featured: false,
         collectionIds: ["collection-1", "collection-2"],
       }
@@ -229,7 +230,7 @@ describe("Product Actions", () => {
           image: "roses.jpg",
           price: 49.99,
           colors: ["red"],
-          productType: "FLOWER",
+          productType: ProductType.FLOWER,
           featured: false,
           productCollections: {
             create: [{ collectionId: "collection-1" }, { collectionId: "collection-2" }],
@@ -250,7 +251,7 @@ describe("Product Actions", () => {
         image: "image.jpg",
         price: 59.99,
         colors: ["red"],
-        productType: "FLOWER" as const,
+        productType: ProductType.FLOWER,
         featured: false,
         collectionIds: [],
       }
@@ -278,7 +279,7 @@ describe("Product Actions", () => {
         image: "roses.jpg",
         price: 49.99,
         colors: ["red"],
-        productType: "FLOWER" as const,
+        productType: ProductType.FLOWER,
         featured: false,
         collectionIds: [],
       }
@@ -301,7 +302,7 @@ describe("Product Actions", () => {
           image: "roses.jpg",
           price: 49.99,
           colors: ["red"],
-          productType: "FLOWER",
+          productType: ProductType.FLOWER,
           featured: false,
           productCollections: {
             create: [],
@@ -325,7 +326,7 @@ describe("Product Actions", () => {
         price: 49.99,
         colors: ["red"],
         collectionIds: ["collection-1"],
-        productType: "FLOWER" as const,
+        productType: ProductType.FLOWER,
         featured: false,
       }
 
@@ -347,7 +348,7 @@ describe("Product Actions", () => {
           image: "roses.jpg",
           price: 49.99,
           colors: ["red"],
-          productType: "FLOWER",
+          productType: ProductType.FLOWER,
           featured: false,
           productCollections: {
             create: [
@@ -373,7 +374,7 @@ describe("Product Actions", () => {
         price: 49.99,
         colors: ["red"],
         collectionIds: ["collection-1"],
-        productType: "FLOWER" as const,
+        productType: ProductType.FLOWER,
         featured: false,
       }
 
@@ -395,7 +396,7 @@ describe("Product Actions", () => {
         image: "roses.jpg",
         price: 49.99,
         colors: ["red"],
-        productType: "FLOWER" as const,
+        productType: ProductType.FLOWER,
         featured: false,
         collectionIds: ["collection-1"],
       }
@@ -415,7 +416,7 @@ describe("Product Actions", () => {
           image: "roses.jpg",
           price: 49.99,
           colors: ["red"],
-          productType: "FLOWER",
+          productType: ProductType.FLOWER,
           featured: false,
           productCollections: {
             deleteMany: {},

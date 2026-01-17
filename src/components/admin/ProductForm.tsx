@@ -12,6 +12,7 @@ import {
   updateProductAction,
 } from "@/app/actions/products"
 import { ImageUpload } from "@/components/admin/ImageUpload"
+import { ProductImageSelectorInline } from "@/components/admin/ProductImageSelectorInline"
 import SlugInput from "@/components/admin/SlugInput"
 import { ColorSelector } from "@/components/site/ColorSelector"
 import { Button } from "@/components/ui/button"
@@ -35,7 +36,9 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
+import { ProductType } from "@/generated/enums"
 import type { CollectionModel } from "@/generated/models"
+import { PRODUCT_TYPE_LABELS, PRODUCT_TYPES } from "@/lib/product-types"
 import { type ProductFormData, productSchema } from "@/lib/validations/product"
 
 interface ProductFormProps {
@@ -49,12 +52,13 @@ interface ProductFormProps {
     price: number | null
     colors?: string[] | null
     collectionIds: string[]
-    productType?: "FLOWER" | "FILLER" | "ROSE" | "PLANT" | "SUCCULENT" | "BRANCH"
+    productType?: ProductType
     featured: boolean
   }
 }
 
 export default function ProductForm({ collections, product }: ProductFormProps) {
+  console.log("product: ", product)
   const router = useRouter()
   const isEditing = !!product
 
@@ -73,12 +77,21 @@ export default function ProductForm({ collections, product }: ProductFormProps) 
       price: product?.price?.toString() || "",
       colors: product?.colors || [],
       collectionIds: product?.collectionIds || [],
-      productType: product?.productType || "FLOWER",
+      productType: product?.productType || ProductType.FLOWER,
       featured: product?.featured || false,
     },
   })
 
-  const onSubmit = async (data: ProductFormData) => {
+  const saveForm = async (data: ProductFormData) => {
+    console.log("[ProductForm] Form saving with data:", {
+      name: data.name,
+      slug: data.slug,
+      image: data.image ? `${data.image.substring(0, 50)}...` : "NO IMAGE",
+      price: data.price,
+      productType: data.productType,
+      collectionIds: data.collectionIds?.length || 0,
+    })
+
     setIsSubmitting(true)
 
     try {
@@ -87,36 +100,64 @@ export default function ProductForm({ collections, product }: ProductFormProps) 
         collectionIds: data.collectionIds || [],
       }
 
+      console.log("[ProductForm] Processing save, isEditing:", isEditing)
+
       if (isEditing) {
+        console.log("[ProductForm] Calling updateProductAction")
+        console.log("[ProductForm] Product ID value:", product?.id, "Type:", typeof product?.id)
+        if (!product?.id) {
+          console.error("[ProductForm] Missing product ID!")
+          form.setError("root", { message: "Product ID is missing" })
+          return
+        }
         const result = await updateProductAction({
           id: product.id,
           ...formData,
           colors: formData.colors || null,
-          price: parseFloat(formData.price) || null,
+          price: formData.price ? parseFloat(formData.price) : null,
         })
+        console.log("[ProductForm] updateProductAction result:", result)
         if (!result.success) {
           form.setError("root", { message: result.error })
           return
         }
         toast.success("Product updated successfully")
       } else {
+        console.log("[ProductForm] Calling createProductAction")
         const result = await createProductAction({ ...formData, colors: formData.colors || null })
+        console.log("[ProductForm] createProductAction result:", result)
         if (!result.success) {
           form.setError("root", { message: result.error })
           return
         }
         toast.success("Product created successfully")
       }
-
-      router.push("/admin/products")
-      router.refresh()
     } catch (err) {
       const errorMessage =
         err instanceof Error ? err.message : "An error occurred. Please try again."
+      console.error("[ProductForm] Submission error:", errorMessage, err)
       form.setError("root", { message: errorMessage })
-      console.error(err)
+      console.log(form.formState.errors)
     } finally {
       setIsSubmitting(false)
+    }
+  }
+
+  const onSubmit = async (data: ProductFormData) => {
+    await saveForm(data)
+    console.log("[ProductForm] Redirecting to products list")
+    router.push("/admin/products")
+    router.refresh()
+  }
+
+  const handleBlur = async () => {
+    // Validate and save on blur (only if it's in editing mode to avoid redirects)
+    if (isEditing) {
+      const isValid = await form.trigger()
+      if (isValid) {
+        const data = form.getValues()
+        await saveForm(data)
+      }
     }
   }
 
@@ -152,7 +193,25 @@ export default function ProductForm({ collections, product }: ProductFormProps) 
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+      <form
+        onSubmit={(e) => {
+          console.log("[ProductForm] Form submit event fired")
+          console.log("[ProductForm] Current form state:", {
+            isDirty: form.formState.isDirty,
+            isValid: form.formState.isValid,
+            isSubmitting: form.formState.isSubmitting,
+            errors: form.formState.errors,
+          })
+          console.log("[ProductForm] Current form values:", {
+            name: form.getValues("name"),
+            slug: form.getValues("slug"),
+            image: form.getValues("image") ? "SET" : "NOT SET",
+            price: form.getValues("price"),
+          })
+          form.handleSubmit(onSubmit)(e)
+        }}
+        className="space-y-6"
+      >
         {form.formState.errors.root && (
           <div className="rounded-md bg-destructive/10 p-4 text-sm text-destructive">
             {form.formState.errors.root.message}
@@ -191,23 +250,54 @@ export default function ProductForm({ collections, product }: ProductFormProps) 
             <FormItem>
               <FormLabel>Description</FormLabel>
               <FormControl>
-                <Textarea {...field} rows={4} placeholder="Product description..." />
+                <Textarea
+                  {...field}
+                  rows={4}
+                  placeholder="Product description..."
+                  onBlur={() => {
+                    field.onBlur()
+                    handleBlur()
+                  }}
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
           )}
         />
 
+        {/* Browse & Generate Images */}
+        <ProductImageSelectorInline
+          productName={form.watch("name") || product?.name || "Product"}
+          productType={form.watch("productType") || ProductType.FLOWER}
+          productDescription={form.watch("description")}
+          onSelectImage={(imageUrl) => {
+            form.setValue("image", imageUrl)
+            handleBlur()
+          }}
+        />
+
         <div className="flex gap-6 md:grid-cols-auto_1">
           {/* Image */}
-          <ImageUpload
-            value={form.watch("image")}
-            onChange={(url) => form.setValue("image", url)}
-            folder="products"
-            slug={watchedSlug}
-            previousUrl={originalImage}
-            label="Image"
-          />
+          <div className="flex flex-col gap-2">
+            <ImageUpload
+              value={form.watch("image")}
+              onChange={(url) => {
+                console.log(
+                  "[ProductForm] Image value changed to:",
+                  url ? `${url.substring(0, 50)}...` : "EMPTY"
+                )
+                form.setValue("image", url)
+                handleBlur()
+              }}
+              folder="products"
+              slug={watchedSlug}
+              previousUrl={originalImage}
+              label="Image"
+            />
+            {form.formState.errors.image && (
+              <div className="text-sm text-destructive">{form.formState.errors.image.message}</div>
+            )}
+          </div>
 
           {/* Color */}
           <FormField
@@ -220,7 +310,10 @@ export default function ProductForm({ collections, product }: ProductFormProps) 
                   {/* Color Swatches */}
                   <ColorSelector
                     selectedColors={Array.isArray(field.value) ? field.value : []}
-                    onChange={(colors) => form.setValue("colors", colors)}
+                    onChange={(colors) => {
+                      form.setValue("colors", colors)
+                      handleBlur()
+                    }}
                     showLabel={false}
                   />
                 </div>
@@ -255,6 +348,7 @@ export default function ProductForm({ collections, product }: ProductFormProps) 
                                   ? [...(field.value || []), col.id]
                                   : (field.value || []).filter((id) => id !== col.id)
                                 field.onChange(newValue)
+                                handleBlur()
                               }}
                             />
                           </FormControl>
@@ -277,7 +371,13 @@ export default function ProductForm({ collections, product }: ProductFormProps) 
           render={({ field }) => (
             <FormItem>
               <FormLabel>Product Type *</FormLabel>
-              <Select onValueChange={field.onChange} value={field.value}>
+              <Select
+                onValueChange={(value) => {
+                  field.onChange(value)
+                  handleBlur()
+                }}
+                value={field.value}
+              >
                 <FormControl>
                   <SelectTrigger className="w-full">
                     <SelectValue placeholder="Select a product type" />
@@ -285,9 +385,11 @@ export default function ProductForm({ collections, product }: ProductFormProps) 
                 </FormControl>
                 <SelectPositioner alignItemWithTrigger>
                   <SelectContent>
-                    <SelectItem value="FLOWER">Flower</SelectItem>
-                    <SelectItem value="ROSE">Rose</SelectItem>
-                    <SelectItem value="FILLER">Filler</SelectItem>
+                    {PRODUCT_TYPES.map((type) => (
+                      <SelectItem key={type} value={type}>
+                        {PRODUCT_TYPE_LABELS[type]}
+                      </SelectItem>
+                    ))}
                   </SelectContent>
                 </SelectPositioner>
               </Select>
@@ -302,9 +404,19 @@ export default function ProductForm({ collections, product }: ProductFormProps) 
           name="price"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Price (per unit) *</FormLabel>
+              <FormLabel>Price (per unit)</FormLabel>
               <FormControl>
-                <Input {...field} type="number" step="0.01" min="0" placeholder="0.00" />
+                <Input
+                  {...field}
+                  type="number"
+                  step="0.01"
+                  min="0"
+                  placeholder="0.00"
+                  onBlur={() => {
+                    field.onBlur()
+                    handleBlur()
+                  }}
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -318,7 +430,13 @@ export default function ProductForm({ collections, product }: ProductFormProps) 
           render={({ field }) => (
             <FormItem className="flex items-center gap-2 space-y-0">
               <FormControl>
-                <Checkbox checked={field.value} onCheckedChange={field.onChange} />
+                <Checkbox
+                  checked={field.value}
+                  onCheckedChange={(value) => {
+                    field.onChange(value)
+                    handleBlur()
+                  }}
+                />
               </FormControl>
               <FormLabel className="cursor-pointer font-normal">
                 Featured product (show on homepage)
@@ -330,7 +448,17 @@ export default function ProductForm({ collections, product }: ProductFormProps) 
         {/* Actions */}
         <div className="flex gap-4 justify-between">
           <div className="flex gap-4">
-            <Button type="submit" disabled={isSubmitting}>
+            <Button
+              type="submit"
+              disabled={isSubmitting}
+              onClick={(e) => {
+                console.log("[ProductForm] Save button clicked")
+                if (isSubmitting) {
+                  console.log("[ProductForm] Already submitting, ignoring click")
+                  e.preventDefault()
+                }
+              }}
+            >
               {isSubmitting ? "Saving..." : "Save Product"}
             </Button>
             <Button

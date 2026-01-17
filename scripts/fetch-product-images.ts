@@ -1,3 +1,19 @@
+/**
+ * DEPRECATED: This script is no longer actively maintained.
+ *
+ * The image sourcing workflow has been replaced by an admin UI feature
+ * that allows for:
+ * - Multi-source image search (Pixabay, Unsplash, Pexels)
+ * - Human review and selection of images
+ * - AI-powered image generation via LM Studio with style variation
+ * - Live API quota tracking
+ *
+ * Access the new workflow at: /admin/products/[id]/edit
+ * Click "Browse & Generate Images" button to search and select product images.
+ *
+ * This script is kept for reference only and is no longer run automatically.
+ */
+
 import * as fs from "node:fs"
 import https from "node:https"
 import * as path from "node:path"

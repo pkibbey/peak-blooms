@@ -1,4 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vitest"
+import { ProductType } from "@/generated/enums"
 import { createMockPrismaClient } from "@/test/mocks"
 
 // Mock dependencies - must be before imports
@@ -47,7 +48,7 @@ describe("Collections Data Access Layer", () => {
     image: "roses.jpg",
     price: 50,
     colors: ["red"],
-    productType: "FLOWER",
+    productType: ProductType.FLOWER,
     featured: false,
     deletedAt: null,
     createdAt: now,

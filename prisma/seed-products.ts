@@ -2,7 +2,12 @@ import * as fs from "node:fs"
 import * as path from "node:path"
 import { PrismaPg } from "@prisma/adapter-pg"
 import { Pool } from "pg"
-import { MetricType, PrismaClient, type Prisma as PrismaNamespace } from "../src/generated/client"
+import {
+  MetricType,
+  PrismaClient,
+  type Prisma as PrismaNamespace,
+  ProductType,
+} from "../src/generated/client"
 
 const connectionString = process.env.DATABASE_URL
 
@@ -39,8 +44,8 @@ function parsePrice(priceString: string): number | null {
   if (!priceString || priceString.includes("N/A")) return null
   if (priceString.includes("Market Price")) return null
 
-  // Remove "US$" prefix and "per stem" suffix, handle whitespace
-  const cleaned = priceString.replace(/US\$|per stem/gi, "").trim()
+  // Remove "$" prefix, "US$" prefix, and "per stem" suffix, handle whitespace
+  const cleaned = priceString.replace(/[$]|US\$|per stem/gi, "").trim()
 
   // Extract the first number (handles ranges like "$23.00-$26.00")
   const match = cleaned.match(/\d+\.?\d*/)
@@ -62,23 +67,21 @@ function getQuantity(priceString: string): number {
 }
 
 // Helper function to map category to product type
-function categoryToProductType(
-  category: string
-): "FLOWER" | "FILLER" | "ROSE" | "PLANT" | "SUCCULENT" | "BRANCH" {
+function categoryToProductType(category: string): ProductType {
   const lower = category.toLowerCase()
-  if (lower.includes("rose")) return "ROSE"
-  if (lower.includes("filler") || lower.includes("green")) return "FILLER"
-  if (lower.includes("plant")) return "PLANT"
-  if (lower.includes("succulent")) return "SUCCULENT"
-  if (lower.includes("branch")) return "BRANCH"
-  return "FLOWER"
+  if (lower.includes("rose")) return ProductType.ROSE
+  if (lower.includes("filler") || lower.includes("green")) return ProductType.FILLER
+  if (lower.includes("plant")) return ProductType.PLANT
+  if (lower.includes("succulent")) return ProductType.SUCCULENT
+  if (lower.includes("branch")) return ProductType.BRANCH
+  return ProductType.FLOWER
 }
 
 // Helper function to read and parse price-list.csv format
 function readProductsFromPriceList(): Array<{
   name: string
   price: number | null
-  type: "FLOWER" | "FILLER" | "ROSE" | "PLANT" | "SUCCULENT" | "BRANCH"
+  type: ProductType
   quantity: number
   description: string
   colors: string[]
@@ -98,7 +101,7 @@ function readProductsFromPriceList(): Array<{
   const products: Array<{
     name: string
     price: number | null
-    type: "FLOWER" | "FILLER" | "ROSE" | "PLANT" | "SUCCULENT" | "BRANCH"
+    type: ProductType
     quantity: number
     description: string
     colors: string[]
@@ -151,7 +154,7 @@ function readProductsFromPriceList(): Array<{
 function readProductsFromCSV(): Array<{
   name: string
   price: number | null
-  type: "FLOWER" | "FILLER" | "ROSE" | "PLANT" | "SUCCULENT" | "BRANCH"
+  type: ProductType
   quantity: number
   description: string
   colors: string[]
@@ -172,7 +175,7 @@ function readProductsFromCSV(): Array<{
   const products: Array<{
     name: string
     price: number | null
-    type: "FLOWER" | "FILLER" | "ROSE" | "PLANT" | "SUCCULENT" | "BRANCH"
+    type: ProductType
     quantity: number
     description: string
     colors: string[]
@@ -197,7 +200,12 @@ function readProductsFromCSV(): Array<{
 
     const price = parsePrice(priceStr)
     const quantity = getQuantity(priceStr)
-    const type = typeStr === "FILLER" ? "FILLER" : typeStr === "ROSE" ? "ROSE" : "FLOWER"
+    const type =
+      typeStr === ProductType.FILLER
+        ? ProductType.FILLER
+        : typeStr === ProductType.ROSE
+          ? ProductType.ROSE
+          : ProductType.FLOWER
     // Parse pipe-separated color IDs from CSV (e.g., "pink|rose|greenery")
     const colors = colorsStr
       .split("|")
@@ -289,7 +297,7 @@ async function seedProducts() {
       let csvProducts: Array<{
         name: string
         price: number | null
-        type: "FLOWER" | "FILLER" | "ROSE" | "PLANT" | "SUCCULENT" | "BRANCH"
+        type: ProductType
         quantity: number
         description: string
         colors: string[]

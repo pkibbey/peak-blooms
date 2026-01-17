@@ -26,16 +26,12 @@ export function ShopFilters({
   // Parse current filter state from URL
   const currentColors = searchParams.get("colors")?.split(",").filter(Boolean) || []
   const currentCollectionIds = searchParams.get("collectionIds")?.split(",").filter(Boolean) || []
-  const currentStemLengthMin = searchParams.get("stemLengthMin") || ""
-  const currentStemLengthMax = searchParams.get("stemLengthMax") || ""
   const currentPriceMin = searchParams.get("priceMin") || ""
   const currentPriceMax = searchParams.get("priceMax") || ""
 
   // Local state for filters
   const [selectedColors, setSelectedColors] = useState<string[]>(currentColors)
   const [selectedCollectionIds, setSelectedCollectionIds] = useState<string[]>(currentCollectionIds)
-  const [stemLengthMin, setStemLengthMin] = useState<string>(currentStemLengthMin)
-  const [stemLengthMax, setStemLengthMax] = useState<string>(currentStemLengthMax)
   const [priceMin, setPriceMin] = useState<string>(currentPriceMin)
   const [priceMax, setPriceMax] = useState<string>(currentPriceMax)
 
@@ -43,8 +39,6 @@ export function ShopFilters({
   const activeFilterCount = [
     ...selectedColors,
     ...selectedCollectionIds,
-    stemLengthMin ? 1 : 0,
-    stemLengthMax ? 1 : 0,
     priceMin ? 1 : 0,
     priceMax ? 1 : 0,
   ].filter(Boolean).length
@@ -52,19 +46,11 @@ export function ShopFilters({
   // Track which sections have active filters
   const hasActiveColors = selectedColors.length > 0
   const hasActiveCollections = selectedCollectionIds.length > 0
-  const hasActiveStemLength = !!stemLengthMin || !!stemLengthMax
   const hasActivePrice = !!priceMin || !!priceMax
 
   // Helper to build and navigate to filter URL
   const navigateWithFilters = useCallback(
-    (
-      colors: string[],
-      collectionIds: string[],
-      stemMin: string,
-      stemMax: string,
-      priceMinVal: string,
-      priceMaxVal: string
-    ) => {
+    (colors: string[], collectionIds: string[], priceMinVal: string, priceMaxVal: string) => {
       const params = new URLSearchParams(searchParams.toString())
       params.set("page", "1")
 
@@ -78,18 +64,6 @@ export function ShopFilters({
         params.set("collectionIds", collectionIds.join(","))
       } else {
         params.delete("collectionIds")
-      }
-
-      if (stemMin) {
-        params.set("stemLengthMin", stemMin)
-      } else {
-        params.delete("stemLengthMin")
-      }
-
-      if (stemMax) {
-        params.set("stemLengthMax", stemMax)
-      } else {
-        params.delete("stemLengthMax")
       }
 
       if (priceMinVal) {
@@ -113,17 +87,10 @@ export function ShopFilters({
   const handleColorsChange = useCallback(
     (colors: string[]) => {
       setSelectedColors(colors)
-      navigateWithFilters(
-        colors,
-        selectedCollectionIds,
-        stemLengthMin,
-        stemLengthMax,
-        priceMin,
-        priceMax
-      )
+      navigateWithFilters(colors, selectedCollectionIds, priceMin, priceMax)
       setIsOpen(false)
     },
-    [selectedCollectionIds, stemLengthMin, stemLengthMax, priceMin, priceMax, navigateWithFilters]
+    [selectedCollectionIds, priceMin, priceMax, navigateWithFilters]
   )
 
   // Handle collection toggle - add/remove from selection
@@ -133,60 +100,28 @@ export function ShopFilters({
         ? selectedCollectionIds.filter((id) => id !== collectionId)
         : [...selectedCollectionIds, collectionId]
       setSelectedCollectionIds(newCollectionIds)
-      navigateWithFilters(
-        selectedColors,
-        newCollectionIds,
-        stemLengthMin,
-        stemLengthMax,
-        priceMin,
-        priceMax
-      )
+      navigateWithFilters(selectedColors, newCollectionIds, priceMin, priceMax)
       setIsOpen(false)
     },
-    [
-      selectedColors,
-      selectedCollectionIds,
-      stemLengthMin,
-      stemLengthMax,
-      priceMin,
-      priceMax,
-      navigateWithFilters,
-    ]
+    [selectedColors, selectedCollectionIds, priceMin, priceMax, navigateWithFilters]
   )
 
   // Clear all collections
   const clearCollections = useCallback(() => {
     setSelectedCollectionIds([])
-    navigateWithFilters(selectedColors, [], stemLengthMin, stemLengthMax, priceMin, priceMax)
-  }, [selectedColors, stemLengthMin, stemLengthMax, priceMin, priceMax, navigateWithFilters])
+    navigateWithFilters(selectedColors, [], priceMin, priceMax)
+  }, [selectedColors, priceMin, priceMax, navigateWithFilters])
 
   // Apply filters for numeric inputs (blur/Enter)
   const applyFilters = useCallback(() => {
-    navigateWithFilters(
-      selectedColors,
-      selectedCollectionIds,
-      stemLengthMin,
-      stemLengthMax,
-      priceMin,
-      priceMax
-    )
+    navigateWithFilters(selectedColors, selectedCollectionIds, priceMin, priceMax)
     setIsOpen(false)
-  }, [
-    selectedColors,
-    selectedCollectionIds,
-    stemLengthMin,
-    stemLengthMax,
-    priceMin,
-    priceMax,
-    navigateWithFilters,
-  ])
+  }, [selectedColors, selectedCollectionIds, priceMin, priceMax, navigateWithFilters])
 
   // Clear all filters
   const clearFilters = useCallback(() => {
     setSelectedColors([])
     setSelectedCollectionIds([])
-    setStemLengthMin("")
-    setStemLengthMax("")
     setPriceMin("")
     setPriceMax("")
     router.push("/shop?page=1", { scroll: false })
@@ -305,48 +240,6 @@ export function ShopFilters({
               </div>
             </FilterSection>
           )}
-
-          {/* Stem Length Filter */}
-          <FilterSection title="Stem Length (inches)" hasActive={hasActiveStemLength}>
-            <div className="space-y-4">
-              <div>
-                <label htmlFor="stem-length-min" className="text-sm font-medium block mb-1">
-                  Minimum
-                </label>
-                <input
-                  id="stem-length-min"
-                  type="number"
-                  min="0"
-                  value={stemLengthMin}
-                  onChange={(e) => setStemLengthMin(e.target.value)}
-                  onBlur={applyFilters}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter") applyFilters()
-                  }}
-                  placeholder="0"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm"
-                />
-              </div>
-              <div>
-                <label htmlFor="stem-length-max" className="text-sm font-medium block mb-1">
-                  Maximum
-                </label>
-                <input
-                  id="stem-length-max"
-                  type="number"
-                  min="0"
-                  value={stemLengthMax}
-                  onChange={(e) => setStemLengthMax(e.target.value)}
-                  onBlur={applyFilters}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter") applyFilters()
-                  }}
-                  placeholder="No limit"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm"
-                />
-              </div>
-            </div>
-          </FilterSection>
 
           {/* Price Filter */}
           <FilterSection title="Price" hasActive={hasActivePrice}>

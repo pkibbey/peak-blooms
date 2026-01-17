@@ -9,13 +9,16 @@ export const productSchema = z.object({
   image: z.string(),
   price: z
     .string()
-    .min(1, "Price is required")
-    .refine((val) => !Number.isNaN(Number.parseFloat(val)) && Number.parseFloat(val) >= 0, {
-      message: "Price must be a valid positive number",
-    }),
+    .optional()
+    .refine(
+      (val) => !val || (!Number.isNaN(Number.parseFloat(val)) && Number.parseFloat(val) >= 0),
+      {
+        message: "Price must be a valid number 0 or greater",
+      }
+    ),
   colors: z.array(z.string()).nullable(),
   collectionIds: z.array(z.string()).nullable(),
-  productType: z.enum(ProductType),
+  productType: z.nativeEnum(ProductType),
   featured: z.boolean(),
 })
 
@@ -30,9 +33,7 @@ const createProductSchema = z.object({
   price: z.number().min(0, "Price must be a positive number").nullable(),
   colors: z.array(z.string()).nullable(),
   collectionIds: z.array(z.string()).nullable(),
-  productType: z
-    .enum(["FLOWER", "FILLER", "ROSE", "PLANT", "SUCCULENT", "BRANCH"])
-    .default("FLOWER"),
+  productType: z.nativeEnum(ProductType).default(ProductType.FLOWER),
   featured: z.boolean().default(false),
 })
 
@@ -49,7 +50,7 @@ export type CreateProductInput = Omit<
 
 // Product operation schemas for API requests
 export const updateProductSchema = createProductSchema.extend({
-  id: z.string().uuid("Invalid product ID"),
+  id: z.string().min(1, "Invalid product ID"),
 })
 
 export type UpdateProductInput = Omit<
@@ -64,13 +65,13 @@ export type UpdateProductInput = Omit<
 > & { id: string; colors?: string[] | null }
 
 export const deleteProductSchema = z.object({
-  id: z.string().uuid("Invalid product ID"),
+  id: z.string().min(1, "Invalid product ID"),
 })
 
 export type DeleteProductInput = z.infer<typeof deleteProductSchema>
 
 export const toggleProductFeaturedSchema = z.object({
-  id: z.string().uuid("Invalid product ID"),
+  id: z.string().min(1, "Invalid product ID"),
   featured: z.boolean(),
 })
 
@@ -91,15 +92,16 @@ export const createProductFormSchema = z.object({
   image: z.string().nullable(),
   price: z
     .string()
-    .min(1, "Price is required")
-    .refine((val) => !Number.isNaN(Number.parseFloat(val)) && Number.parseFloat(val) >= 0, {
-      message: "Price must be a valid positive number",
-    }),
+    .optional()
+    .refine(
+      (val) => !val || (!Number.isNaN(Number.parseFloat(val)) && Number.parseFloat(val) >= 0),
+      {
+        message: "Price must be a valid number 0 or greater",
+      }
+    ),
   colors: z.array(z.string()).nullable(),
   collectionIds: z.array(z.string()).nullable(),
-  productType: z
-    .enum(["FLOWER", "FILLER", "ROSE", "PLANT", "SUCCULENT", "BRANCH"])
-    .default("FLOWER"),
+  productType: z.nativeEnum(ProductType).default(ProductType.FLOWER),
   featured: z.boolean().default(false),
 })
 

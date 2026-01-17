@@ -23,9 +23,15 @@ export async function createProductAction(
   data: CreateProductFormData
 ): Promise<AppResult<ProductBasic>> {
   try {
+    console.log("[createProductAction] Starting with data:", { name: data.name, slug: data.slug })
     const validatedData = createProductFormSchema.parse(data)
+    console.log("[createProductAction] Data validated successfully")
+
     const session = await getSession()
+    console.log("[createProductAction] Session:", session?.user?.email)
+
     if (!session?.user || session.user.role !== "ADMIN") {
+      console.error("[createProductAction] Not authorized")
       return {
         success: false,
         error: "You must be an admin to create products",
@@ -33,13 +39,14 @@ export async function createProductAction(
       }
     }
 
+    console.log("[createProductAction] Creating product in database")
     const product = await db.product.create({
       data: {
         name: validatedData.name,
         slug: validatedData.slug,
         description: validatedData.description,
         image: validatedData.image,
-        price: parseFloat(validatedData.price),
+        price: validatedData.price ? parseFloat(validatedData.price) : null,
         colors: validatedData.colors || [],
         productType: validatedData.productType,
         featured: validatedData.featured,
@@ -51,12 +58,15 @@ export async function createProductAction(
       },
     })
 
+    console.log("[createProductAction] Product created successfully with id:", product.id)
     revalidatePath("/admin/products")
     return {
       success: true,
       data: product,
     }
   } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : String(error)
+    console.error("[createProductAction] Error:", errorMessage, error)
     return toAppError(error, "Failed to create product")
   }
 }
@@ -65,9 +75,20 @@ export async function updateProductAction(
   input: UpdateProductInput
 ): Promise<AppResult<ProductBasic>> {
   try {
+    console.log("[updateProductAction] Starting with input:", {
+      id: input.id,
+      idType: typeof input.id,
+      idLength: input.id?.length,
+      name: input.name,
+    })
     const { id, ...data } = updateProductSchema.parse(input)
+    console.log("[updateProductAction] Data validated successfully")
+
     const session = await getSession()
+    console.log("[updateProductAction] Session:", session?.user?.email)
+
     if (!session?.user || session.user.role !== "ADMIN") {
+      console.error("[updateProductAction] Not authorized")
       return {
         success: false,
         error: "You must be an admin to update products",
@@ -75,6 +96,7 @@ export async function updateProductAction(
       }
     }
 
+    console.log("[updateProductAction] Updating product in database")
     const product = await db.product.update({
       where: { id },
       data: {
@@ -98,12 +120,15 @@ export async function updateProductAction(
       },
     })
 
+    console.log("[updateProductAction] Product updated successfully")
     revalidatePath("/admin/products")
     return {
       success: true,
       data: product,
     }
   } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : String(error)
+    console.error("[updateProductAction] Error:", errorMessage, error)
     return toAppError(error, "Failed to update product")
   }
 }

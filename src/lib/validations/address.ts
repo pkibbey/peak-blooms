@@ -18,7 +18,7 @@ export const addressSchema = z.object({
 export type AddressFormData = z.infer<typeof addressSchema>
 
 export const deleteAddressSchema = z.object({
-  addressId: z.string().uuid("Invalid address ID"),
+  addressId: z.string().min(1, "Invalid address ID"),
 })
 
 export type DeleteAddressInput = z.infer<typeof deleteAddressSchema>

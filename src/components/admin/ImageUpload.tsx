@@ -58,41 +58,50 @@ export function ImageUpload({
 
   const handleFile = async (file: File) => {
     if (!slug) {
+      console.warn("[ImageUpload] No slug provided")
       toast.error("Please enter a slug before uploading an image.")
       return
     }
 
     // Client-side validation
     if (!ALLOWED_TYPES.includes(file.type)) {
+      console.warn("[ImageUpload] Invalid file type:", file.type)
       toast.error("Invalid file type. Please upload a JPEG, PNG, or WebP image.")
       return
     }
 
     if (file.size > MAX_FILE_SIZE) {
+      console.warn("[ImageUpload] File too large:", file.size, "bytes")
       toast.error("File too large. Maximum size is 5 MB.")
       return
     }
 
     setIsUploading(true)
     setUploadProgress(0)
+    console.log("[ImageUpload] Starting upload for file:", file.name, file.size, "bytes")
 
     try {
       const extension = file.name.split(".").pop()?.toLowerCase() || "jpg"
       // Use slug-based pathname for predictable URLs (e.g., products/pink-rose.png)
       const pathname = `${folder}/${slug}.${extension}`
+      console.log("[ImageUpload] Pathname:", pathname)
 
       const blob = await upload(pathname, file, {
         access: "public",
         handleUploadUrl: "/api/upload",
         clientPayload: JSON.stringify({ folder, slug, extension }),
         onUploadProgress: (progress) => {
+          console.log("[ImageUpload] Progress:", progress.percentage + "%")
           setUploadProgress(progress.percentage)
         },
       })
 
+      console.log("[ImageUpload] Upload successful, URL:", blob.url)
+
       // Delete old blob if URL changed (e.g., slug changed or different extension)
       const oldUrl = previousUrl || value
       if (oldUrl && oldUrl !== blob.url) {
+        console.log("[ImageUpload] Deleting old blob:", oldUrl)
         deleteOldBlob(oldUrl)
       }
 
@@ -101,6 +110,7 @@ export function ImageUpload({
       toast.success("Image uploaded successfully")
     } catch (error) {
       const message = error instanceof Error ? error.message : "Upload failed"
+      console.error("[ImageUpload] Error:", message, error)
       toast.error(message)
     } finally {
       setIsUploading(false)

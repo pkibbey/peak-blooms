@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest"
+import { ProductType } from "@/generated/enums"
 import { COLORS } from "@/lib/colors"
 
 describe("COLORS registry", () => {
@@ -44,7 +45,7 @@ describe("COLORS registry", () => {
     })
 
     it("should have valid categories", () => {
-      const validCategories = ["flower", "greenery", "neutral"]
+      const validCategories = Object.values(ProductType)
       COLORS.forEach((color) => {
         expect(validCategories).toContain(color.category)
       })
@@ -73,17 +74,17 @@ describe("COLORS registry", () => {
 
   describe("category distribution", () => {
     it("should have at least one flower color", () => {
-      const flowers = COLORS.filter((c) => c.category === "flower")
+      const flowers = COLORS.filter((c) => c.category === ProductType.FLOWER)
       expect(flowers.length).toBeGreaterThan(0)
     })
 
     it("should have at least one greenery color", () => {
-      const greenery = COLORS.filter((c) => c.category === "greenery")
+      const greenery = COLORS.filter((c) => c.category === ProductType.FILLER)
       expect(greenery.length).toBeGreaterThan(0)
     })
 
     it("should have at least one neutral color", () => {
-      const neutral = COLORS.filter((c) => c.category === "neutral")
+      const neutral = COLORS.filter((c) => c.category === ProductType.FILLER)
       expect(neutral.length).toBeGreaterThan(0)
     })
   })
@@ -103,16 +104,16 @@ describe("COLORS registry", () => {
       expect(colorIds).toContain("eucalyptus")
     })
 
-    it("white should be neutral", () => {
+    it("white should be flower category", () => {
       const white = COLORS.find((c) => c.id === "white")
-      expect(white?.category).toBe("neutral")
+      expect(white?.category).toBe(ProductType.FLOWER)
     })
 
     it("should have coral flower color with correct hex", () => {
       const coral = COLORS.find((c) => c.id === "coral")
       expect(coral?.label).toBe("Coral")
       expect(coral?.hex).toBe("#FF6B6B")
-      expect(coral?.category).toBe("flower")
+      expect(coral?.category).toBe(ProductType.FLOWER)
     })
   })
 
@@ -130,10 +131,10 @@ describe("COLORS registry", () => {
     })
 
     it("should be able to find colors by category", () => {
-      const flowers = COLORS.filter((c) => c.category === "flower")
+      const flowers = COLORS.filter((c) => c.category === ProductType.FLOWER)
       expect(flowers.length).toBeGreaterThan(0)
       flowers.forEach((f) => {
-        expect(f.category).toBe("flower")
+        expect(f.category).toBe(ProductType.FLOWER)
       })
     })
   })
@@ -160,19 +161,19 @@ describe("COLORS registry", () => {
 
   describe("real-world usage", () => {
     it("should support filtering flowers for UI dropdown", () => {
-      const flowers = COLORS.filter((c) => c.category === "flower")
+      const flowers = COLORS.filter((c) => c.category === ProductType.FLOWER)
       expect(flowers.length).toBeGreaterThan(10)
     })
 
     it("should support filtering greenery for UI dropdown", () => {
-      const greenery = COLORS.filter((c) => c.category === "greenery")
+      const greenery = COLORS.filter((c) => c.category === ProductType.FILLER)
       expect(greenery.length).toBeGreaterThan(3)
     })
 
     it("should be usable for product color selection", () => {
       const validColorIds = COLORS.map((c) => c.id)
       expect(validColorIds).toContain("pink")
-      const testSelection = ["pink", "greenery"]
+      const testSelection = ["pink", "white"]
       const allValid = testSelection.every((id) => validColorIds.includes(id))
       expect(allValid).toBe(true)
     })

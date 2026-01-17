@@ -10,7 +10,7 @@ vi.mock("@/lib/metrics", () => ({
   captureMetric: vi.fn().mockResolvedValue(undefined),
 }))
 
-import { Role } from "@/generated/enums"
+import { ProductType, Role } from "@/generated/enums"
 import { db } from "@/lib/db"
 import { captureMetric } from "@/lib/metrics"
 import { createTrackedDb } from "./db-wrapper"
@@ -125,7 +125,7 @@ describe("Database Wrapper", () => {
         image: "rose.jpg",
         price: 25,
         colors: ["red"],
-        productType: "FLOWER",
+        productType: ProductType.FLOWER,
         featured: true,
         deletedAt: null,
         createdAt: new Date(),
@@ -348,7 +348,7 @@ describe("Database Wrapper", () => {
           image: "test.jpg",
           price: 100,
           colors: [],
-          productType: "FLOWER",
+          productType: ProductType.FLOWER,
           featured: false,
           deletedAt: null,
           createdAt: new Date(),
@@ -363,7 +363,7 @@ describe("Database Wrapper", () => {
           image: "test.jpg",
           price: 100,
           colors: [],
-          productType: "FLOWER",
+          productType: ProductType.FLOWER,
           featured: false,
           deletedAt: null,
           createdAt: new Date(),
@@ -379,7 +379,7 @@ describe("Database Wrapper", () => {
           description: "Test product",
           image: "test.jpg",
           price: 100,
-          productType: "FLOWER",
+          productType: ProductType.FLOWER,
         },
         update: {
           name: "Test",
@@ -512,7 +512,7 @@ describe("Database Wrapper", () => {
               slug: "test",
               image: "test.jpg",
               price: 100,
-              productType: "FLOWER",
+              productType: ProductType.FLOWER,
             },
           })
         ).rejects.toThrow("Database constraint violated")

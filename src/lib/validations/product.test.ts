@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest"
+import { ProductType } from "@/generated/enums"
 import { productSchema } from "@/lib/validations/product"
 
 describe("productSchema (form validation)", () => {
@@ -10,7 +11,7 @@ describe("productSchema (form validation)", () => {
     price: "49.99",
     colors: ["red", "crimson"],
     collectionIds: ["collection-1", "collection-2"],
-    productType: "ROSE" as const,
+    productType: ProductType.ROSE,
     featured: true,
   }
 
@@ -40,7 +41,7 @@ describe("productSchema (form validation)", () => {
     })
 
     it("should accept all valid productTypes", () => {
-      const types = ["FLOWER", "FILLER", "ROSE", "PLANT", "SUCCULENT", "BRANCH"] as const
+      const types = Object.values(ProductType)
       types.forEach((productType) => {
         const result = productSchema.safeParse({ ...validProduct, productType })
         expect(result.success).toBe(true)
@@ -57,6 +58,22 @@ describe("productSchema (form validation)", () => {
         ...validProduct,
         collectionIds: ["collection-1"],
       })
+      expect(result.success).toBe(true)
+    })
+
+    it("should accept missing price", () => {
+      const { price, ...noPrice } = validProduct
+      const result = productSchema.safeParse(noPrice)
+      expect(result.success).toBe(true)
+    })
+
+    it("should accept empty price string", () => {
+      const result = productSchema.safeParse({ ...validProduct, price: "" })
+      expect(result.success).toBe(true)
+    })
+
+    it("should accept empty collectionIds array", () => {
+      const result = productSchema.safeParse({ ...validProduct, collectionIds: [] })
       expect(result.success).toBe(true)
     })
   })
@@ -79,30 +96,14 @@ describe("productSchema (form validation)", () => {
       expect(result.success).toBe(false)
     })
 
-    it("should reject missing price", () => {
-      const { price, ...noPrice } = validProduct
-      const result = productSchema.safeParse(noPrice)
-      expect(result.success).toBe(false)
-    })
-
-    it("should reject empty price string", () => {
-      const result = productSchema.safeParse({ ...validProduct, price: "" })
-      expect(result.success).toBe(false)
-    })
-
     it("should reject negative price", () => {
       const result = productSchema.safeParse({ ...validProduct, price: "-10" })
       expect(result.success).toBe(false)
     })
 
-    it("should reject non-numeric price", () => {
-      const result = productSchema.safeParse({ ...validProduct, price: null })
+    it("should reject invalid price format", () => {
+      const result = productSchema.safeParse({ ...validProduct, price: "abc" })
       expect(result.success).toBe(false)
-    })
-
-    it("should accept empty collectionIds array", () => {
-      const result = productSchema.safeParse({ ...validProduct, collectionIds: [] })
-      expect(result.success).toBe(true)
     })
 
     it("should reject missing collectionIds", () => {

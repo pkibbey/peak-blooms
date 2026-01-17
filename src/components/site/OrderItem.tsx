@@ -1,4 +1,5 @@
 import { ProductItem } from "@/components/site/ProductItem"
+import { ProductType } from "@/generated/enums"
 import type { OrderItemModel, ProductModel } from "@/generated/models"
 
 /**
@@ -30,7 +31,7 @@ export function OrderItem({ item }: OrderItemProps) {
         description: item.product?.description ?? null,
         colors: item.product?.colors ?? [],
         featured: item.product?.featured ?? false,
-        productType: item.product?.productType ?? "FLOWER",
+        productType: item.product?.productType ?? ProductType.FLOWER,
         createdAt: item.product?.createdAt ?? new Date(),
         updatedAt: item.product?.updatedAt ?? new Date(),
         deletedAt: item.product?.deletedAt ?? null,

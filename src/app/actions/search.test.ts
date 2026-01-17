@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vitest"
-import { Role } from "@/generated/enums"
+import { ProductType, Role } from "@/generated/enums"
 
 // Mock dependencies - must be before imports
 vi.mock("@/lib/current-user", () => ({
@@ -43,7 +43,7 @@ describe("Search Actions", () => {
         image: "roses.jpg",
         price: 50,
         colors: ["red"],
-        productType: "FLOWER" as const,
+        productType: ProductType.FLOWER,
         featured: false,
         deletedAt: null,
         createdAt: now,
@@ -58,7 +58,7 @@ describe("Search Actions", () => {
         image: "white-roses.jpg",
         price: 55,
         colors: ["white"],
-        productType: "FLOWER" as const,
+        productType: ProductType.FLOWER,
         featured: false,
         deletedAt: null,
         createdAt: now,

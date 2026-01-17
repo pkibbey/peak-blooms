@@ -36,6 +36,12 @@ export default async function EditProductPage({ params }: EditProductPageProps) 
     collectionIds: product.productCollections.map((pc) => pc.collectionId),
   }
 
+  console.log("[EditProductPage] Product loaded:", {
+    id: productForForm.id,
+    name: productForForm.name,
+    idType: typeof productForForm.id,
+  })
+
   return (
     <>
       <BackLink href="/admin/products" label="Products" />

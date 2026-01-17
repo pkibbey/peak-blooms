@@ -45,10 +45,10 @@ export function ProductItem({
   // Grid Layout - renders as a product card
   if (layout === "grid") {
     return (
-      <div className="group flex flex-col overflow-hidden rounded-xs shadow-md transition-shadow hover:shadow-lg border border-border">
+      <div className="group flex flex-col overflow-hidden rounded-xs transition-shadow border border-border">
         {/* Image Container */}
         <Link prefetch={false} href={`/shop/${product.slug}`}>
-          <div className="relative aspect-square overflow-hidden bg-zinc-200">
+          <div className="shadow-2xs hover:shadow-lg transition-shadow relative aspect-square overflow-hidden bg-zinc-200">
             {product.image && (
               <Image
                 src={product.image}

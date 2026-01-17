@@ -41,21 +41,6 @@ export default function ProductsTable({ products, sort, order, headerUrl }: Prod
               className="hidden lg:table-cell"
             />
             <TableHead>Colors</TableHead>
-            <SortableTableHead
-              label="Description"
-              sortKey="description"
-              currentSort={sort}
-              currentOrder={order}
-              href={headerUrl}
-              className="hidden lg:table-cell"
-            />
-            <SortableTableHead
-              label="Featured"
-              sortKey="featured"
-              currentSort={sort}
-              currentOrder={order}
-              href={headerUrl}
-            />
           </TableRow>
         </TableHeader>
         <TableBody>

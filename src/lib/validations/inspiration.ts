@@ -28,7 +28,7 @@ export type CreateInspirationInput = Omit<
 > & { productSelections: ProductSelection[] }
 
 export const updateInspirationSchema = inspirationSchema.extend({
-  id: z.string().uuid("Invalid inspiration ID"),
+  id: z.string().min(1, "Invalid inspiration ID"),
 })
 
 export type UpdateInspirationInput = Omit<
@@ -37,7 +37,7 @@ export type UpdateInspirationInput = Omit<
 > & { id: string; productSelections: ProductSelection[] }
 
 export const deleteInspirationSchema = z.object({
-  id: z.string().uuid("Invalid inspiration ID"),
+  id: z.string().min(1, "Invalid inspiration ID"),
 })
 
 export type DeleteInspirationInput = z.infer<typeof deleteInspirationSchema>
