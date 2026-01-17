@@ -35,11 +35,3 @@ export function generateDescriptionPrompt(
 
   return `Describe the ${typeContext} "${productName}" visually in up to 100 words as plain text: color, bloom form, and distinctive characteristics.`
 }
-
-/**
- * Gets the system prompt for description generation
- * @returns The system prompt that instructs the AI
- */
-export function getDescriptionSystemPrompt(): string {
-  return SYSTEM_PROMPT
-}

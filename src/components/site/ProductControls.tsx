@@ -41,6 +41,7 @@ export function ProductControls({ product, user, mode = "card" }: ProductControl
               Sign in for pricing
             </Link>
           }
+          size="sm"
         />
       )}
 
@@ -54,6 +55,7 @@ export function ProductControls({ product, user, mode = "card" }: ProductControl
               Sign in for pricing
             </Link>
           }
+          size="sm"
         />
       )}
 
