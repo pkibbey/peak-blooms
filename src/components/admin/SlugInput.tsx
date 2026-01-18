@@ -69,9 +69,6 @@ export default function SlugInput({ name, slug, onSlugChange, disabled = false }
           </Button>
         )}
       </div>
-      <p className="text-xs text-muted-foreground">
-        URL-friendly identifier. {isManualEdit ? "Manually edited." : "Auto-generated from name."}
-      </p>
     </div>
   )
 }

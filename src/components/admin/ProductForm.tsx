@@ -419,8 +419,8 @@ export default function ProductForm({ collections, product }: ProductFormProps) 
         />
 
         {/* Actions */}
-        <div className="flex gap-4 justify-end">
-          {isEditing && (
+        {isEditing && (
+          <div className="flex gap-4 justify-end">
             <Button
               type="button"
               variant="outline-destructive"
@@ -430,29 +430,8 @@ export default function ProductForm({ collections, product }: ProductFormProps) 
               <IconTrash className="inline-block" />
               {isDeleting ? "Deleting..." : "Delete"}
             </Button>
-          )}
-
-          <Button
-            variant="outline"
-            nativeButton={false}
-            render={
-              <Link prefetch={false} href="/admin/products">
-                Cancel
-              </Link>
-            }
-          />
-          <Button
-            type="submit"
-            disabled={isSubmitting}
-            onClick={(e) => {
-              if (isSubmitting) {
-                e.preventDefault()
-              }
-            }}
-          >
-            {isSubmitting ? "Saving..." : "Save Product"}
-          </Button>
-        </div>
+          </div>
+        )}
       </form>
     </Form>
   )

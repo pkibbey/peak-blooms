@@ -1,7 +1,6 @@
 "use client"
 
 import { zodResolver } from "@hookform/resolvers/zod"
-import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { useState, useTransition } from "react"
 import { useForm } from "react-hook-form"
@@ -82,30 +81,46 @@ export default function InspirationForm({ products, inspiration }: InspirationFo
     },
   })
 
-  const onSubmit = async (data: InspirationFormData) => {
-    startTransition(async () => {
-      try {
-        if (isEditing) {
-          await updateInspirationAction({
-            id: inspiration.id,
-            ...data,
-            productSelections: productSelections,
-          })
-          toast.success("Inspiration updated successfully")
-        } else {
-          await createInspirationAction({
-            ...data,
-            productSelections: productSelections,
-          })
-          toast.success("Inspiration created successfully")
-        }
+  const saveForm = async (data: InspirationFormData) => {
+    try {
+      if (isEditing) {
+        await updateInspirationAction({
+          id: inspiration.id,
+          ...data,
+          productSelections: productSelections,
+        })
+        toast.success("Inspiration updated successfully")
+      } else {
+        await createInspirationAction({
+          ...data,
+          productSelections: productSelections,
+        })
+        toast.success("Inspiration created successfully")
         router.push("/admin/inspirations")
         router.refresh()
-      } catch (err) {
-        const message = err instanceof Error ? err.message : "Failed to save inspiration"
-        form.setError("root", { message })
       }
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "Failed to save inspiration"
+      form.setError("root", { message })
+    }
+  }
+
+  const onSubmit = async (data: InspirationFormData) => {
+    startTransition(async () => {
+      await saveForm(data)
     })
+  }
+
+  const handleBlur = async () => {
+    if (isEditing) {
+      const isValid = await form.trigger()
+      if (isValid) {
+        const data = form.getValues()
+        startTransition(async () => {
+          await saveForm(data)
+        })
+      }
+    }
   }
 
   const handleDelete = async () => {
@@ -155,7 +170,14 @@ export default function InspirationForm({ products, inspiration }: InspirationFo
               <FormItem>
                 <FormLabel>Name *</FormLabel>
                 <FormControl>
-                  <Input {...field} placeholder="Inspiration name" />
+                  <Input
+                    {...field}
+                    placeholder="Inspiration name"
+                    onBlur={() => {
+                      field.onBlur()
+                      handleBlur()
+                    }}
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -178,7 +200,14 @@ export default function InspirationForm({ products, inspiration }: InspirationFo
             <FormItem>
               <FormLabel>Subtitle *</FormLabel>
               <FormControl>
-                <Input {...field} placeholder="A short, catchy subtitle" />
+                <Input
+                  {...field}
+                  placeholder="A short, catchy subtitle"
+                  onBlur={() => {
+                    field.onBlur()
+                    handleBlur()
+                  }}
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -188,7 +217,10 @@ export default function InspirationForm({ products, inspiration }: InspirationFo
         {/* Image */}
         <ImageUpload
           value={form.watch("image")}
-          onChange={(url) => form.setValue("image", url)}
+          onChange={(url) => {
+            form.setValue("image", url)
+            handleBlur()
+          }}
           folder="inspiration"
           slug={watchedSlug}
           previousUrl={originalImage}
@@ -212,6 +244,10 @@ export default function InspirationForm({ products, inspiration }: InspirationFo
                   {...field}
                   rows={3}
                   placeholder="A brief description for previews and cards..."
+                  onBlur={() => {
+                    field.onBlur()
+                    handleBlur()
+                  }}
                 />
               </FormControl>
               <FormMessage />
@@ -231,6 +267,10 @@ export default function InspirationForm({ products, inspiration }: InspirationFo
                   {...field}
                   rows={6}
                   placeholder="The full story or description for the inspiration page..."
+                  onBlur={() => {
+                    field.onBlur()
+                    handleBlur()
+                  }}
                 />
               </FormControl>
               <FormMessage />
@@ -254,22 +294,8 @@ export default function InspirationForm({ products, inspiration }: InspirationFo
         </div>
 
         {/* Actions */}
-        <div className="flex gap-4 justify-between">
-          <div className="flex gap-4">
-            <Button type="submit" disabled={isPending}>
-              {isPending ? "Saving..." : "Save Inspiration"}
-            </Button>
-            <Button
-              variant="outline"
-              nativeButton={false}
-              render={
-                <Link prefetch={false} href="/admin/inspirations">
-                  Cancel
-                </Link>
-              }
-            />
-          </div>
-          {isEditing && (
+        {isEditing && (
+          <div className="flex gap-4 justify-end">
             <Button
               type="button"
               variant="outline-destructive"
@@ -278,8 +304,8 @@ export default function InspirationForm({ products, inspiration }: InspirationFo
             >
               {isDeleting ? "Deleting..." : "Delete Inspiration"}
             </Button>
-          )}
-        </div>
+          </div>
+        )}
       </form>
     </Form>
   )

@@ -1,9 +1,8 @@
 "use client"
 
 import { zodResolver } from "@hookform/resolvers/zod"
-import Link from "next/link"
 import { useRouter } from "next/navigation"
-import { useState } from "react"
+import { useState, useTransition } from "react"
 import { useForm } from "react-hook-form"
 import { toast } from "sonner"
 import {
@@ -44,10 +43,10 @@ interface CollectionFormProps {
 export default function CollectionForm({ collection, products = [] }: CollectionFormProps) {
   const router = useRouter()
   const isEditing = !!collection
+  const [isPending, startTransition] = useTransition()
 
   // Track original image URL to clean up old blob when image changes
   const [originalImage] = useState(collection?.image || "")
-  const [isSubmitting, setIsSubmitting] = useState(false)
   const [isDeleting, setIsDeleting] = useState(false)
 
   // Product selection state
@@ -66,9 +65,7 @@ export default function CollectionForm({ collection, products = [] }: Collection
     },
   })
 
-  const onSubmit = async (data: CollectionFormData) => {
-    setIsSubmitting(true)
-
+  const saveForm = async (data: CollectionFormData) => {
     try {
       const formData = {
         ...data,
@@ -89,16 +86,31 @@ export default function CollectionForm({ collection, products = [] }: Collection
           return
         }
         toast.success("Collection created successfully")
+        router.push("/admin/collections")
+        router.refresh()
       }
-
-      router.push("/admin/collections")
-      router.refresh()
     } catch (err) {
       const errorMessage = "An error occurred. Please try again."
       form.setError("root", { message: errorMessage })
       console.error(err)
-    } finally {
-      setIsSubmitting(false)
+    }
+  }
+
+  const onSubmit = async (data: CollectionFormData) => {
+    startTransition(async () => {
+      await saveForm(data)
+    })
+  }
+
+  const handleBlur = async () => {
+    if (isEditing) {
+      const isValid = await form.trigger()
+      if (isValid) {
+        const data = form.getValues()
+        startTransition(async () => {
+          await saveForm(data)
+        })
+      }
     }
   }
 
@@ -155,7 +167,14 @@ export default function CollectionForm({ collection, products = [] }: Collection
               <FormItem>
                 <FormLabel>Name *</FormLabel>
                 <FormControl>
-                  <Input {...field} placeholder="Collection name" />
+                  <Input
+                    {...field}
+                    placeholder="Collection name"
+                    onBlur={() => {
+                      field.onBlur()
+                      handleBlur()
+                    }}
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -178,7 +197,15 @@ export default function CollectionForm({ collection, products = [] }: Collection
             <FormItem>
               <FormLabel>Description</FormLabel>
               <FormControl>
-                <Textarea {...field} rows={4} placeholder="Collection description..." />
+                <Textarea
+                  {...field}
+                  rows={4}
+                  placeholder="Collection description..."
+                  onBlur={() => {
+                    field.onBlur()
+                    handleBlur()
+                  }}
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -192,7 +219,13 @@ export default function CollectionForm({ collection, products = [] }: Collection
           render={({ field }) => (
             <FormItem className="flex flex-row items-center space-x-3 space-y-0 rounded-md border p-4">
               <FormControl>
-                <Checkbox checked={field.value} onCheckedChange={field.onChange} />
+                <Checkbox
+                  checked={field.value}
+                  onCheckedChange={(value) => {
+                    field.onChange(value)
+                    handleBlur()
+                  }}
+                />
               </FormControl>
               <div className="space-y-1 leading-none">
                 <FormLabel>Featured collection (show on homepage)</FormLabel>
@@ -205,7 +238,10 @@ export default function CollectionForm({ collection, products = [] }: Collection
         {/* Image */}
         <ImageUpload
           value={form.watch("image")}
-          onChange={(url) => form.setValue("image", url)}
+          onChange={(url) => {
+            form.setValue("image", url)
+            handleBlur()
+          }}
           folder="collections"
           slug={watchedSlug}
           previousUrl={originalImage}
@@ -228,22 +264,8 @@ export default function CollectionForm({ collection, products = [] }: Collection
         )}
 
         {/* Actions */}
-        <div className="flex gap-4 justify-between">
-          <div className="flex gap-4">
-            <Button type="submit" disabled={isSubmitting}>
-              {isSubmitting ? "Saving..." : "Save Collection"}
-            </Button>
-            <Button
-              variant="outline"
-              nativeButton={false}
-              render={
-                <Link prefetch={false} href="/admin/collections">
-                  Cancel
-                </Link>
-              }
-            />
-          </div>
-          {isEditing && (
+        {isEditing && (
+          <div className="flex gap-4 justify-end">
             <Button
               type="button"
               variant="outline-destructive"
@@ -253,8 +275,8 @@ export default function CollectionForm({ collection, products = [] }: Collection
               <IconTrash className="mr-2 inline-block" />
               {isDeleting ? "Deleting..." : "Delete Collection"}
             </Button>
-          )}
-        </div>
+          </div>
+        )}
       </form>
     </Form>
   )
