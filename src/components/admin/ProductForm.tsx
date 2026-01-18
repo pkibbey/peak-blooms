@@ -13,7 +13,7 @@ import {
 } from "@/app/actions/products"
 import { GenerateDescriptionButton } from "@/components/admin/GenerateDescriptionButton"
 import { ImageUpload } from "@/components/admin/ImageUpload"
-import { ProductImageSelectorInline } from "@/components/admin/ProductImageSelectorInline"
+import { ProductImageGeneratorInline } from "@/components/admin/ProductImageGeneratorInline"
 import SlugInput from "@/components/admin/SlugInput"
 import { ColorSelector } from "@/components/site/ColorSelector"
 import { Button } from "@/components/ui/button"
@@ -37,6 +37,7 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
+import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group"
 import { ProductType } from "@/generated/enums"
 import type { CollectionModel } from "@/generated/models"
 import { PRODUCT_TYPE_LABELS, PRODUCT_TYPES } from "@/lib/product-types"
@@ -50,7 +51,7 @@ interface ProductFormProps {
     slug: string
     description: string | null
     image: string | null
-    price: number | null
+    price: number
     colors?: string[] | null
     collectionIds: string[]
     productType?: ProductType
@@ -102,7 +103,7 @@ export default function ProductForm({ collections, product }: ProductFormProps) 
           id: product.id,
           ...formData,
           colors: formData.colors || null,
-          price: formData.price ? parseFloat(formData.price) : null,
+          price: formData.price ? parseFloat(formData.price) : 0,
         })
         if (!result.success) {
           form.setError("root", { message: result.error })
@@ -247,20 +248,9 @@ export default function ProductForm({ collections, product }: ProductFormProps) 
           )}
         />
 
-        {/* Browse & Generate Images */}
-        <ProductImageSelectorInline
-          productName={form.watch("name") || product?.name || "Product"}
-          productType={form.watch("productType") || ProductType.FLOWER}
-          productDescription={form.watch("description")}
-          onSelectImage={(imageUrl) => {
-            form.setValue("image", imageUrl)
-            handleBlur()
-          }}
-        />
-
-        <div className="flex gap-6 md:grid-cols-auto_1">
+        <div className="flex gap-6 md:grid-cols-3 items-start">
           {/* Image */}
-          <div className="flex flex-col gap-2">
+          <div className="flex-1 flex flex-col gap-2">
             <ImageUpload
               value={form.watch("image")}
               onChange={(url) => {
@@ -276,6 +266,17 @@ export default function ProductForm({ collections, product }: ProductFormProps) 
               <div className="text-sm text-destructive">{form.formState.errors.image.message}</div>
             )}
           </div>
+
+          {/* Generate Product Image */}
+          <ProductImageGeneratorInline
+            productName={form.watch("name") || product?.name || "Product"}
+            productType={form.watch("productType") || ProductType.FLOWER}
+            productDescription={form.watch("description")}
+            onImageSaved={(imageUrl) => {
+              form.setValue("image", imageUrl)
+              handleBlur()
+            }}
+          />
 
           {/* Color */}
           <FormField
@@ -300,47 +301,6 @@ export default function ProductForm({ collections, product }: ProductFormProps) 
             )}
           />
         </div>
-
-        {/* Collections */}
-        <FormField
-          control={form.control}
-          name="collectionIds"
-          render={() => (
-            <FormItem>
-              <FormLabel>Collections *</FormLabel>
-              <div className="space-y-2">
-                {collections.map((col) => (
-                  <FormField
-                    key={col.id}
-                    control={form.control}
-                    name="collectionIds"
-                    render={({ field }) => {
-                      const isChecked = (field.value ?? []).includes(col.id)
-                      return (
-                        <FormItem className="flex items-center gap-2 space-y-0">
-                          <FormControl>
-                            <Checkbox
-                              checked={isChecked}
-                              onCheckedChange={(value) => {
-                                const newValue = value
-                                  ? [...(field.value || []), col.id]
-                                  : (field.value || []).filter((id) => id !== col.id)
-                                field.onChange(newValue)
-                                handleBlur()
-                              }}
-                            />
-                          </FormControl>
-                          <FormLabel className="cursor-pointer font-normal">{col.name}</FormLabel>
-                        </FormItem>
-                      )
-                    }}
-                  />
-                ))}
-              </div>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
 
         {/* Product Type */}
         <FormField
@@ -423,30 +383,43 @@ export default function ProductForm({ collections, product }: ProductFormProps) 
           )}
         />
 
+        {/* Collections */}
+        <FormField
+          control={form.control}
+          name="collectionIds"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Collections *</FormLabel>
+              <FormControl>
+                <ToggleGroup
+                  variant="outline"
+                  multiple
+                  value={field.value ?? []}
+                  onValueChange={(value) => {
+                    field.onChange(value)
+                    handleBlur()
+                  }}
+                  className="flex flex-wrap sm:flex-row w-auto"
+                >
+                  {collections.map((col) => (
+                    <ToggleGroupItem
+                      key={col.id}
+                      value={col.id}
+                      aria-label={col.name}
+                      className="px-4 font-semibold"
+                    >
+                      {col.name}
+                    </ToggleGroupItem>
+                  ))}
+                </ToggleGroup>
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
         {/* Actions */}
-        <div className="flex gap-4 justify-between">
-          <div className="flex gap-4">
-            <Button
-              type="submit"
-              disabled={isSubmitting}
-              onClick={(e) => {
-                if (isSubmitting) {
-                  e.preventDefault()
-                }
-              }}
-            >
-              {isSubmitting ? "Saving..." : "Save Product"}
-            </Button>
-            <Button
-              variant="outline"
-              nativeButton={false}
-              render={
-                <Link prefetch={false} href="/admin/products">
-                  Cancel
-                </Link>
-              }
-            />
-          </div>
+        <div className="flex gap-4 justify-end">
           {isEditing && (
             <Button
               type="button"
@@ -454,10 +427,31 @@ export default function ProductForm({ collections, product }: ProductFormProps) 
               onClick={handleDelete}
               disabled={isDeleting}
             >
-              <IconTrash className="mr-2 inline-block" />
-              {isDeleting ? "Deleting..." : "Delete Product"}
+              <IconTrash className="inline-block" />
+              {isDeleting ? "Deleting..." : "Delete"}
             </Button>
           )}
+
+          <Button
+            variant="outline"
+            nativeButton={false}
+            render={
+              <Link prefetch={false} href="/admin/products">
+                Cancel
+              </Link>
+            }
+          />
+          <Button
+            type="submit"
+            disabled={isSubmitting}
+            onClick={(e) => {
+              if (isSubmitting) {
+                e.preventDefault()
+              }
+            }}
+          >
+            {isSubmitting ? "Saving..." : "Save Product"}
+          </Button>
         </div>
       </form>
     </Form>

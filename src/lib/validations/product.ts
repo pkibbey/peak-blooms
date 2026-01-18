@@ -30,7 +30,7 @@ const createProductSchema = z.object({
   slug: z.string().min(1, "Slug is required"),
   description: z.string().nullable(),
   image: z.string().nullable(),
-  price: z.number().min(0, "Price must be a positive number").nullable(),
+  price: z.number().min(0, "Price must be a non-negative number"),
   colors: z.array(z.string()).nullable(),
   collectionIds: z.array(z.string()).nullable(),
   productType: z.nativeEnum(ProductType).default(ProductType.FLOWER),

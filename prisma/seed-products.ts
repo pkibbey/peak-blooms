@@ -40,9 +40,9 @@ async function captureMetric(type: MetricType, name: string, duration: number): 
 }
 
 // Helper function to parse price strings from CSV
-function parsePrice(priceString: string): number | null {
-  if (!priceString || priceString.includes("N/A")) return null
-  if (priceString.includes("Market Price")) return null
+function parsePrice(priceString: string): number {
+  if (!priceString || priceString.includes("N/A")) return 0
+  if (priceString.includes("Market Price")) return 0
 
   // Remove "$" prefix, "US$" prefix, and "per stem" suffix, handle whitespace
   const cleaned = priceString.replace(/[$]|US\$|per stem/gi, "").trim()

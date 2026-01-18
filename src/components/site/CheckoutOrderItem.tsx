@@ -9,7 +9,7 @@ interface CheckoutOrderItemProps {
 
 export function CheckoutOrderItem({ item }: CheckoutOrderItemProps) {
   const price = item.product.price
-  const lineTotal = price === null ? null : price * item.quantity
+  const lineTotal = price === 0 ? 0 : price * item.quantity
 
   return (
     <div className="flex gap-3">

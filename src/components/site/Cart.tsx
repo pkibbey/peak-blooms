@@ -174,7 +174,7 @@ export default function Cart({ initialCart }: CartProps) {
           <h2 className="heading-3 mb-4 font-serif">Order Summary</h2>
 
           <MarketPriceWarning
-            showWarning={cart.items.some((item) => item.product?.price === null)}
+            showWarning={cart.items.some((item) => item.product?.price === 0)}
             className="mb-4"
           />
 

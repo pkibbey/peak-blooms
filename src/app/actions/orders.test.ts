@@ -207,19 +207,19 @@ describe("Order Actions", () => {
       orderId: VALID_UUID,
       productId: VALID_UUID_2,
       quantity: 2,
-      price: null,
+      price: 0,
     }
 
     beforeEach(() => {
       vi.mocked(getCurrentUser).mockResolvedValue(mockAdminUser)
     })
 
-    it("should update price and recalculate total including null prices", async () => {
+    it("should update price and recalculate total including market prices", async () => {
       vi.mocked(db.orderItem.findFirst).mockResolvedValueOnce(mockItem as never)
       vi.mocked(db.orderItem.update).mockResolvedValueOnce({ ...mockItem, price: 50 } as never)
       vi.mocked(db.orderItem.findMany).mockResolvedValueOnce([
         { ...mockItem, price: 50, quantity: 2 },
-        { id: "item-2", price: null, quantity: 1 },
+        { id: "item-2", price: 0, quantity: 1 },
       ] as never)
 
       const result = await updateOrderItemPriceAction({
@@ -362,7 +362,7 @@ describe("Order Actions", () => {
       const marketCart = {
         ...mockCart,
         items: [
-          { ...mockCart.items[0], product: { ...mockCart.items[0].product, price: null } },
+          { ...mockCart.items[0], product: { ...mockCart.items[0].product, price: 0 } },
           { id: "item-2", productId: VALID_UUID_3, quantity: 1, product: { id: "p2", price: 100 } },
         ],
       }

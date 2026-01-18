@@ -1,25 +1,12 @@
 import Image from "next/image"
 import Link from "next/link"
 import { TableCell, TableRow } from "@/components/ui/table"
+import type { ProductModel } from "@/generated/models"
 import { cn, formatPrice } from "@/lib/utils"
+import { ColorsMiniDisplay } from "../ui/ColorsMiniDisplay"
 
 interface ProductRowProps {
-  product: {
-    id: string
-    name: string
-    slug: string
-    featured: boolean
-    image: string | null
-    price: number | null
-    productCollections: {
-      collection: {
-        id: string
-        name: string
-      }
-    }[]
-    description?: string | null
-    colors?: string[] | null
-  }
+  product: ProductModel
 }
 
 export default function ProductsTableRow({ product }: ProductRowProps) {
@@ -59,6 +46,11 @@ export default function ProductsTableRow({ product }: ProductRowProps) {
 
       {/* Price */}
       <TableCell className="hidden lg:table-cell">{priceDisplay}</TableCell>
+
+      {/* Colors */}
+      <TableCell className="hidden lg:table-cell">
+        <ColorsMiniDisplay colorIds={product.colors} size="md" />
+      </TableCell>
     </TableRow>
   )
 }

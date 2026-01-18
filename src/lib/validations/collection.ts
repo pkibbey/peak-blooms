@@ -12,7 +12,7 @@ export const collectionSchema = z.object({
 export type CollectionFormData = z.infer<typeof collectionSchema>
 // Collection operation schemas for API requests
 export const createCollectionSchema = collectionSchema.extend({
-  productIds: z.array(z.string().uuid()).optional().default([]),
+  productIds: z.array(z.string()).optional().default([]),
 })
 
 export type CreateCollectionInput = Omit<

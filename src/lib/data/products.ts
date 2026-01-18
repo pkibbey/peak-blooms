@@ -13,20 +13,20 @@ import { withTiming } from "./logger"
 /**
  * Apply price multiplier to a single product
  */
-function applyMultiplierToProduct<T extends { price: number | null; [key: string]: unknown }>(
+function applyMultiplierToProduct<T extends { price: number; [key: string]: unknown }>(
   product: T,
   multiplier: number
 ): T {
   return {
     ...product,
-    price: product.price !== null ? adjustPrice(product.price, multiplier) : null,
+    price: adjustPrice(product.price, multiplier),
   }
 }
 
 /**
  * Apply price multiplier to an array of products
  */
-function applyMultiplierToProducts<T extends { price: number | null; [key: string]: unknown }>(
+function applyMultiplierToProducts<T extends { price: number; [key: string]: unknown }>(
   products: T[],
   multiplier: number
 ): T[] {

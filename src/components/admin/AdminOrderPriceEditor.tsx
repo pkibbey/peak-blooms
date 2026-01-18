@@ -15,22 +15,22 @@ interface AdminOrderPriceEditorProps {
 
 /**
  * Admin component to edit individual order item prices and see total recalculation
- * Used for setting market-priced items that have null prices at checkout
+ * Used for setting market-priced items that have 0 prices at checkout
  */
 export function AdminOrderPriceEditor({ order, onPriceUpdated }: AdminOrderPriceEditorProps) {
   const { id: orderId, items } = order
   const [editingItemId, setEditingItemId] = useState<string | null>(null)
   const [editingPrice, setEditingPrice] = useState<string>("")
   const [isSaving, setIsSaving] = useState(false)
-  const [itemPrices, setItemPrices] = useState<Record<string, number | null>>(() => {
-    const prices: Record<string, number | null> = {}
+  const [itemPrices, setItemPrices] = useState<Record<string, number>>(() => {
+    const prices: Record<string, number> = {}
     for (const item of items) {
       prices[item.id] = item.price
     }
     return prices
   })
 
-  const handleEditClick = (itemId: string, currentPrice: number | null) => {
+  const handleEditClick = (itemId: string, currentPrice: number) => {
     setEditingItemId(itemId)
     setEditingPrice(currentPrice?.toString() || "")
   }
@@ -77,11 +77,11 @@ export function AdminOrderPriceEditor({ order, onPriceUpdated }: AdminOrderPrice
   // Calculate current total from item prices
   const currentTotal = items.reduce((sum, item) => {
     const price = itemPrices[item.id]
-    if (price === null) return sum // Skip null prices
+    if (price === 0) return sum // Skip 0 prices
     return sum + (price ?? 0) * item.quantity
   }, 0)
 
-  const hasMarketPriceItems = items.some((item) => itemPrices[item.id] === null)
+  const hasMarketPriceItems = items.some((item) => itemPrices[item.id] === 0)
 
   return (
     <div className="bg-background rounded-xs shadow-sm border p-6">
@@ -126,7 +126,7 @@ export function AdminOrderPriceEditor({ order, onPriceUpdated }: AdminOrderPrice
               <div className="flex gap-2 ml-4">
                 <div className="text-right w-24">
                   <p className="font-medium">
-                    {itemPrices[item.id] === null
+                    {itemPrices[item.id] === 0
                       ? "Market Price"
                       : formatPrice(itemPrices[item.id] ?? 0)}
                   </p>

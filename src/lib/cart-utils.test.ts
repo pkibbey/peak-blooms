@@ -4,7 +4,7 @@ import { applyPriceMultiplierToItems, calculateCartTotal } from "@/lib/cart-util
 // Test type for items that satisfy the generic constraint
 type TestPriceItem = {
   quantity?: number
-  product?: { price: number | null; [key: string]: unknown } | null
+  product?: { price: number; [key: string]: unknown } | null
 }
 
 describe("calculateCartTotal - cart total calculation", () => {
@@ -35,14 +35,14 @@ describe("calculateCartTotal - cart total calculation", () => {
       expect(total).toBe(130) // 50*2 + 30*1
     })
 
-    it("should skip market-priced items (null price)", () => {
+    it("should skip market-priced items (0 price)", () => {
       const cartItems = [
         {
           product: { price: 50 },
           quantity: 2,
         },
         {
-          product: { price: null },
+          product: { price: 0 },
           quantity: 1,
         },
       ]
@@ -93,14 +93,14 @@ describe("calculateCartTotal - cart total calculation", () => {
       expect(total).toBe(0)
     })
 
-    it("should handle mixed valid and null-priced items", () => {
+    it("should handle mixed valid and 0-priced items", () => {
       const cartItems = [
         {
           product: { price: 25 },
           quantity: 2,
         },
         {
-          product: { price: null },
+          product: { price: 0 },
           quantity: 1,
         },
         {
@@ -147,7 +147,7 @@ describe("calculateCartTotal - cart total calculation", () => {
       expect(total).toBe(0.03)
     })
 
-    it("should only skip items with price === null, not falsy values", () => {
+    it("should skip market-priced items with price === 0", () => {
       const cartItems = [
         {
           product: { price: 0 },
@@ -155,7 +155,7 @@ describe("calculateCartTotal - cart total calculation", () => {
         },
       ]
       const total = calculateCartTotal(cartItems)
-      expect(total).toBe(0) // Price of 0 should still be included
+      expect(total).toBe(0) // Price of 0 should be skipped as market price
     })
 
     it("should handle high-precision decimal rounding correctly", () => {
@@ -194,7 +194,7 @@ describe("calculateCartTotal - cart total calculation", () => {
           quantity: 2, // Two bouquets
         },
         {
-          product: { price: null },
+          product: { price: 0 },
           quantity: 1, // Market-priced vase
         },
         {
@@ -314,26 +314,26 @@ describe("applyPriceMultiplierToItems - apply price multiplier to cart items", (
     })
   })
 
-  describe("null prices (market-priced items)", () => {
-    it("should keep null prices as null", () => {
+  describe("zero prices (market-priced items)", () => {
+    it("should keep 0 prices as 0", () => {
       const items = [
         {
-          product: { price: null, name: "Market Item" },
+          product: { price: 0, name: "Market Item" },
           quantity: 1,
         },
       ]
       const result = applyPriceMultiplierToItems(items, 1.5)
-      expect(result[0].product?.price).toBeNull()
+      expect(result[0].product?.price).toBe(0)
     })
 
-    it("should handle mix of null and regular prices", () => {
+    it("should handle mix of 0 and regular prices", () => {
       const items = [
         {
           product: { price: 50, name: "Fixed" },
           quantity: 1,
         },
         {
-          product: { price: null, name: "Market" },
+          product: { price: 0, name: "Market" },
           quantity: 1,
         },
         {
@@ -343,7 +343,7 @@ describe("applyPriceMultiplierToItems - apply price multiplier to cart items", (
       ]
       const result = applyPriceMultiplierToItems(items, 2.0)
       expect(result[0].product?.price).toBe(100)
-      expect(result[1].product?.price).toBeNull()
+      expect(result[1].product?.price).toBe(0)
       expect(result[2].product?.price).toBe(150)
     })
   })

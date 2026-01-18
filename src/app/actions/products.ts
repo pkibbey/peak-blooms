@@ -42,7 +42,7 @@ export async function createProductAction(
         slug: validatedData.slug,
         description: validatedData.description,
         image: validatedData.image,
-        price: validatedData.price ? parseFloat(validatedData.price) : null,
+        price: validatedData.price ? parseFloat(validatedData.price) : 0,
         colors: validatedData.colors || [],
         productType: validatedData.productType,
         featured: validatedData.featured,

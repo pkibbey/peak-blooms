@@ -33,8 +33,8 @@ describe("adjustPrice - price multiplier", () => {
     expect(adjustPrice(100, 1.5)).toBe(150)
   })
 
-  it("should return null when basePrice is null", () => {
-    expect(adjustPrice(null, 1.5)).toBeNull()
+  it("should return 0 when basePrice is 0 (market price)", () => {
+    expect(adjustPrice(0, 1.5)).toBe(0)
   })
 
   it("should round to 2 decimal places", () => {
@@ -88,18 +88,13 @@ describe("formatPrice - currency formatting", () => {
     expect(result).toContain("99.99")
   })
 
-  it('should return "Market Price" for null', () => {
-    expect(formatPrice(null)).toBe("Market Price")
+  it('should return "Market Price" for 0', () => {
+    expect(formatPrice(0)).toBe("Market Price")
   })
 
   it("should format whole dollar amounts", () => {
     const result = formatPrice(100)
     expect(result).toContain("100")
-  })
-
-  it("should handle zero price", () => {
-    const result = formatPrice(0)
-    expect(result).toContain("0")
   })
 
   it("should handle large prices", () => {

@@ -12,7 +12,7 @@ interface MarketPriceIndicatorProps {
 }
 
 export function MarketPriceIndicator({ items, total, size = "xs" }: MarketPriceIndicatorProps) {
-  const hasMarketPricedItems = items.some((item) => item.product?.price === null)
+  const hasMarketPricedItems = items.some((item) => item.product?.price === 0)
   const sizeClass =
     size === "sm" ? "text-muted-foreground text-sm" : "text-muted-foreground text-xs"
 

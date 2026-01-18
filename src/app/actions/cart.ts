@@ -122,7 +122,7 @@ export async function addToCartAction(input: unknown): Promise<AppResult<CartRes
           orderId: cart.id,
           productId,
           quantity,
-          price: null,
+          price: 0,
         },
       })
     }
@@ -533,7 +533,7 @@ export async function batchAddToCartAction(input: unknown): Promise<AppResult<Ca
               orderId: cart.id,
               productId,
               quantity,
-              price: null,
+              price: 0,
             },
           })
         }

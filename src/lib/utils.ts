@@ -15,12 +15,12 @@ export const MAX_PRICE_MULTIPLIER = 20.0
 /**
  * Apply a price multiplier to a base price
  * Returns the adjusted price rounded to 2 decimal places
- * @param basePrice - The original price (null indicates market price)
+ * @param basePrice - The original price (0 indicates market price)
  * @param multiplier - The multiplier to apply (default: 1.0)
- * @returns The adjusted price rounded to 2 decimal places, or null if basePrice is null
+ * @returns The adjusted price rounded to 2 decimal places, or 0 if basePrice is 0
  */
-export function adjustPrice(basePrice: number | null, multiplier: number = 1.0): number | null {
-  if (basePrice === null) return null
+export function adjustPrice(basePrice: number, multiplier: number = 1.0): number {
+  if (basePrice === 0) return 0
   return Math.round(basePrice * multiplier * 100) / 100
 }
 
@@ -40,11 +40,11 @@ export function isValidPriceMultiplier(multiplier: number): boolean {
 
 /**
  * Format a number as USD currency
- * @param price - Price to format. null indicates market price.
+ * @param price - Price to format. 0 indicates market price.
  */
-export function formatPrice(price: number | null): string {
-  // If a product's price is null, it's a market price
-  if (price === null) return "Market Price"
+export function formatPrice(price: number): string {
+  // If a product's price is 0, it's a market price
+  if (price === 0) return "Market Price"
 
   return new Intl.NumberFormat("en-US", {
     style: "currency",

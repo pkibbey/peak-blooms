@@ -315,7 +315,7 @@ export default function CheckoutForm({ cart, savedAddresses }: CheckoutFormProps
             <h2 className="heading-3 mb-4">Order Summary</h2>
 
             <MarketPriceWarning
-              showWarning={cart.items.some((item) => item.product?.price === null)}
+              showWarning={cart.items.some((item) => item.product?.price === 0)}
               className="mb-4"
             />
 

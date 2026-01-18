@@ -23,7 +23,7 @@ interface ProductHit {
   name: string
   slug: string
   image?: string | null
-  price: number | null
+  price: number
 }
 
 export default function NavSearch() {

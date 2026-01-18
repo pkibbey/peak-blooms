@@ -185,12 +185,9 @@ export async function createOrderAction(
           data: {
             productNameSnapshot: item.product?.name || null,
             productImageSnapshot: item.product?.image || null,
-            // Capture current product price (or null if market-priced)
-            // Null indicates market-priced item to be set by admin later
-            price:
-              item.product?.price === null
-                ? null
-                : adjustPrice(item.product?.price ?? 0, priceMultiplier),
+            // Capture current product price (or 0 if market-priced)
+            // 0 indicates market-priced item to be set by admin later
+            price: adjustPrice(item.product?.price ?? 0, priceMultiplier),
           },
         })
       )
@@ -358,7 +355,7 @@ export async function updateOrderStatusAction(
  */
 export async function updateOrderItemPriceAction(
   input: UpdateOrderItemPriceInput
-): Promise<AppResult<{ id: string; price: number | null; orderTotal: number }>> {
+): Promise<AppResult<{ id: string; price: number; orderTotal: number }>> {
   try {
     const { orderId, itemId, price } = updateOrderItemPriceSchema.parse(input)
     const user = await getCurrentUser()
@@ -397,8 +394,8 @@ export async function updateOrderItemPriceAction(
 
     // Calculate order total (for informational response only)
     const newOrderTotal = allItems.reduce((sum, item) => {
-      // Skip null (market-priced) items that haven't been set
-      if (item.price === null) return sum
+      // Skip 0 (market-priced) items that haven't been set
+      if (item.price === 0) return sum
       return sum + (item.price ?? 0) * item.quantity
     }, 0)
 

@@ -48,7 +48,7 @@ export default async function ProductDetailPage({ params }: ProductDetailPagePro
           {/* Product Detail Grid */}
           <div className="grid grid-cols-1 gap-12 md:grid-cols-2">
             {/* Product Image */}
-            <div className="flex items-center justify-center">
+            <div className="flex items-start justify-center">
               <div className="relative w-full aspect-square overflow-hidden rounded-xs bg-zinc-200">
                 {product.image && (
                   <Image
