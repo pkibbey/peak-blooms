@@ -26,7 +26,7 @@ export function ProductControls({ product, user, mode = "card" }: ProductControl
       {/* Price Display */}
       {isSignedIn && isApproved && (
         <div
-          className={cn("font-semibold text-primary", mode === "detail" ? "text-4xl" : "text-2xl")}
+          className={cn("font-semibold text-primary", mode === "detail" ? "text-4xl" : "text-base")}
         >
           {formatPrice(product.price)}
         </div>

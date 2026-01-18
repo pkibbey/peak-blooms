@@ -22,6 +22,7 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form"
+import { IconTrash } from "@/components/ui/icons"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import type { ProductModel } from "@/generated/models"
@@ -81,6 +82,17 @@ export default function InspirationForm({ products, inspiration }: InspirationFo
     },
   })
 
+  // Store original values for change detection
+  const [originalValues] = useState<InspirationFormData>({
+    name: inspiration?.name || "",
+    slug: inspiration?.slug || "",
+    subtitle: inspiration?.subtitle || "",
+    image: inspiration?.image || "",
+    excerpt: inspiration?.excerpt || "",
+    text: inspiration?.text || "",
+    productSelections: productSelections,
+  })
+
   const saveForm = async (data: InspirationFormData) => {
     try {
       if (isEditing) {
@@ -113,12 +125,17 @@ export default function InspirationForm({ products, inspiration }: InspirationFo
 
   const handleBlur = async () => {
     if (isEditing) {
-      const isValid = await form.trigger()
-      if (isValid) {
-        const data = form.getValues()
-        startTransition(async () => {
-          await saveForm(data)
-        })
+      const currentData = form.getValues()
+      const hasChanged = JSON.stringify(currentData) !== JSON.stringify(originalValues)
+
+      if (hasChanged) {
+        const isValid = await form.trigger()
+        if (isValid) {
+          const data = form.getValues()
+          startTransition(async () => {
+            await saveForm(data)
+          })
+        }
       }
     }
   }
@@ -294,18 +311,32 @@ export default function InspirationForm({ products, inspiration }: InspirationFo
         </div>
 
         {/* Actions */}
-        {isEditing && (
-          <div className="flex gap-4 justify-end">
+        <div className="flex gap-4 justify-end">
+          {isEditing && (
             <Button
               type="button"
               variant="outline-destructive"
               onClick={handleDelete}
               disabled={isDeleting}
             >
+              <IconTrash className="mr-2 inline-block" />
               {isDeleting ? "Deleting..." : "Delete Inspiration"}
             </Button>
-          </div>
-        )}
+          )}
+          {isEditing && (
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => router.back()}
+              disabled={isPending}
+            >
+              Cancel
+            </Button>
+          )}
+          <Button type="submit" disabled={isPending}>
+            {isPending ? "Saving..." : isEditing ? "Save Changes" : "Create Inspiration"}
+          </Button>
+        </div>
       </form>
     </Form>
   )

@@ -19,10 +19,7 @@ export default async function AdminSidebar() {
 
   return (
     <nav className="rounded-lg border border-border p-4 sticky top-20 bg-primary-foreground">
-      <div className="mb-4">
-        <h4 className="mb-1 text-sm font-semibold">Admin</h4>
-        <p className="text-xs text-muted-foreground">Quick navigation</p>
-      </div>
+      <h4 className="font-serif mb-4">Quick navigation</h4>
 
       <ul className="space-y-2 text-sm">
         <li>
@@ -32,7 +29,7 @@ export default async function AdminSidebar() {
             className="flex items-center justify-between w-full hover:underline"
           >
             <span className="flex items-center gap-2">
-              <span className="text-muted-foreground">Overview</span>
+              <IconStar className="h-4 w-4 text-muted-foreground" /> Dashboard
             </span>
           </Link>
         </li>

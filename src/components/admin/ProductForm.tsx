@@ -1,7 +1,6 @@
 "use client"
 
 import { zodResolver } from "@hookform/resolvers/zod"
-import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { useState } from "react"
 import { useForm } from "react-hook-form"
@@ -65,7 +64,6 @@ export default function ProductForm({ collections, product }: ProductFormProps) 
 
   // Track original image URL to clean up old blob when image changes
   const [originalImage] = useState(product?.image || "")
-  const [isSubmitting, setIsSubmitting] = useState(false)
   const [isDeleting, setIsDeleting] = useState(false)
 
   const form = useForm<ProductFormData>({
@@ -83,11 +81,21 @@ export default function ProductForm({ collections, product }: ProductFormProps) 
     },
   })
 
+  // Store original values for change detection
+  const [originalValues] = useState<ProductFormData>({
+    name: product?.name || "",
+    slug: product?.slug || "",
+    description: product?.description || "",
+    image: product?.image || "",
+    price: product?.price?.toString() || "",
+    colors: product?.colors || [],
+    collectionIds: product?.collectionIds || [],
+    productType: product?.productType || ProductType.FLOWER,
+    featured: product?.featured || false,
+  })
+
   const saveForm = async (data: ProductFormData) => {
     // saving form
-
-    setIsSubmitting(true)
-
     try {
       const formData = {
         ...data,
@@ -123,8 +131,6 @@ export default function ProductForm({ collections, product }: ProductFormProps) 
         err instanceof Error ? err.message : "An error occurred. Please try again."
       form.setError("root", { message: errorMessage })
       // error set on form state
-    } finally {
-      setIsSubmitting(false)
     }
   }
 
@@ -136,11 +142,16 @@ export default function ProductForm({ collections, product }: ProductFormProps) 
 
   const handleBlur = async () => {
     // Validate and save on blur (only if it's in editing mode to avoid redirects)
+    // Check if the current values differ from the original values
     if (isEditing) {
-      const isValid = await form.trigger()
-      if (isValid) {
-        const data = form.getValues()
-        await saveForm(data)
+      const currentData = form.getValues()
+      const hasChanged = JSON.stringify(currentData) !== JSON.stringify(originalValues)
+
+      if (hasChanged) {
+        const isValid = await form.trigger()
+        if (isValid) {
+          await saveForm(currentData)
+        }
       }
     }
   }
@@ -199,7 +210,14 @@ export default function ProductForm({ collections, product }: ProductFormProps) 
               <FormItem>
                 <FormLabel>Name *</FormLabel>
                 <FormControl>
-                  <Input {...field} placeholder="Product name" />
+                  <Input
+                    {...field}
+                    placeholder="Product name"
+                    onBlur={() => {
+                      field.onBlur()
+                      handleBlur()
+                    }}
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>

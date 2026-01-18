@@ -111,7 +111,7 @@ export async function getProducts(
       const sortField = options.sort as keyof typeof orderBy
       const sortOrder = options.order ?? "asc"
       // Validate sort field to prevent injection
-      const validFields = ["name", "createdAt", "featured", "description", "price"]
+      const validFields = ["name", "createdAt", "featured", "description", "price", "productType"]
       if (validFields.includes(options.sort)) {
         orderBy = { [sortField]: sortOrder }
       }

@@ -2,6 +2,7 @@ import Image from "next/image"
 import Link from "next/link"
 import { TableCell, TableRow } from "@/components/ui/table"
 import type { ProductModel } from "@/generated/models"
+import { PRODUCT_TYPE_LABELS } from "@/lib/product-types"
 import { cn, formatPrice } from "@/lib/utils"
 import { ColorsMiniDisplay } from "../ui/ColorsMiniDisplay"
 
@@ -46,6 +47,13 @@ export default function ProductsTableRow({ product }: ProductRowProps) {
 
       {/* Price */}
       <TableCell className="hidden lg:table-cell">{priceDisplay}</TableCell>
+
+      {/* Product Type */}
+      <TableCell className="hidden md:table-cell">
+        <span className="text-sm text-muted-foreground">
+          {PRODUCT_TYPE_LABELS[product.productType]}
+        </span>
+      </TableCell>
 
       {/* Colors */}
       <TableCell className="hidden lg:table-cell">

@@ -65,6 +65,15 @@ export default function CollectionForm({ collection, products = [] }: Collection
     },
   })
 
+  // Store original values for change detection
+  const [originalValues] = useState<CollectionFormData>({
+    name: collection?.name || "",
+    slug: collection?.slug || "",
+    image: collection?.image || "",
+    description: collection?.description || "",
+    featured: collection?.featured || false,
+  })
+
   const saveForm = async (data: CollectionFormData) => {
     try {
       const formData = {
@@ -104,12 +113,17 @@ export default function CollectionForm({ collection, products = [] }: Collection
 
   const handleBlur = async () => {
     if (isEditing) {
-      const isValid = await form.trigger()
-      if (isValid) {
-        const data = form.getValues()
-        startTransition(async () => {
-          await saveForm(data)
-        })
+      const currentData = form.getValues()
+      const hasChanged = JSON.stringify(currentData) !== JSON.stringify(originalValues)
+
+      if (hasChanged) {
+        const isValid = await form.trigger()
+        if (isValid) {
+          const data = form.getValues()
+          startTransition(async () => {
+            await saveForm(data)
+          })
+        }
       }
     }
   }
@@ -264,8 +278,8 @@ export default function CollectionForm({ collection, products = [] }: Collection
         )}
 
         {/* Actions */}
-        {isEditing && (
-          <div className="flex gap-4 justify-end">
+        <div className="flex gap-4 justify-end">
+          {isEditing && (
             <Button
               type="button"
               variant="outline-destructive"
@@ -275,8 +289,21 @@ export default function CollectionForm({ collection, products = [] }: Collection
               <IconTrash className="mr-2 inline-block" />
               {isDeleting ? "Deleting..." : "Delete Collection"}
             </Button>
-          </div>
-        )}
+          )}
+          {isEditing && (
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => router.back()}
+              disabled={isPending}
+            >
+              Cancel
+            </Button>
+          )}
+          <Button type="submit" disabled={isPending}>
+            {isPending ? "Saving..." : isEditing ? "Save Changes" : "Create Collection"}
+          </Button>
+        </div>
       </form>
     </Form>
   )

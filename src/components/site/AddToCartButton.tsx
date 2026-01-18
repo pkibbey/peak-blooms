@@ -63,12 +63,12 @@ export default function AddToCartButton({
   return (
     <>
       <Button
-        size="sm"
-        className="w-full md:w-auto"
+        size="icon-xs"
+        className="w-full md:w-auto px-2"
         onClick={handleAddToCart}
         disabled={isPending || !!disabled}
       >
-        Add to Cart
+        Add
       </Button>
       {error ? <p className="mt-2 text-sm text-destructive">{error}</p> : null}
     </>

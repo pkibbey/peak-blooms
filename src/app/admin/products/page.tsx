@@ -28,7 +28,10 @@ export default async function AdminProductsPage({ searchParams }: AdminProductsP
       limit: ITEMS_PER_PAGE,
       offset,
       // Pass sort to data layer only for database-sortable fields
-      sort: sort && ["name", "createdAt", "featured", "price"].includes(sort) ? sort : undefined,
+      sort:
+        sort && ["name", "createdAt", "featured", "price", "productType"].includes(sort)
+          ? sort
+          : undefined,
       order,
     },
     1.0
