@@ -8,8 +8,6 @@
  * 3. Keeps the image field for backwards compatibility
  */
 
-import { db } from "@/lib/db"
-
 async function migrateProductImages() {
   console.log("Starting product image migration...")
 

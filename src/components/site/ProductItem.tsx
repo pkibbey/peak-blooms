@@ -1,13 +1,17 @@
 "use client"
 
+import { Pencil } from "lucide-react"
 import Image from "next/image"
 import Link from "next/link"
+import { useRouter } from "next/navigation"
 import { ProductControls } from "@/components/site/ProductControls"
+import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { ColorsMiniDisplay } from "@/components/ui/ColorsMiniDisplay"
 import { IconTrash } from "@/components/ui/icons"
 import { QuantityStepper } from "@/components/ui/QuantityStepper"
 import type { ProductModel } from "@/generated/models"
+import { PRODUCT_TYPE_LABELS } from "@/lib/product-types"
 import type { SessionUser } from "@/lib/query-types"
 import { formatPrice } from "@/lib/utils"
 
@@ -42,6 +46,15 @@ export function ProductItem({
   onRemove,
   isUpdating = false,
 }: ProductItemProps) {
+  const router = useRouter()
+  const isAdmin = user?.role === "ADMIN"
+
+  const handleEditClick = (e: React.MouseEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
+    router.push(`/admin/products/${product.id}/edit`)
+  }
+
   // Grid Layout - renders as a product card
   if (layout === "grid") {
     return (
@@ -71,19 +84,38 @@ export function ProductItem({
             )}
             {/* Colors Display - Bottom Left */}
             {product.colors && product.colors.length > 0 && (
-              <div className="absolute bottom-2 left-2 bg-background/90 rounded-md px-2 py-1">
+              <div className="z-10 absolute bottom-2 left-2 bg-background/90 rounded-md px-2 py-1">
                 <ColorsMiniDisplay colorIds={product.colors} />
               </div>
+            )}
+            {/* Edit Button - Top Right (Admin Only) */}
+            {isAdmin && (
+              <Button
+                onClick={handleEditClick}
+                variant="outline"
+                size="icon-xs"
+                className="absolute top-2 right-2 z-30 bg-background/80 hover:bg-background"
+                aria-label="Edit product"
+              >
+                <Pencil className="p-0.5" />
+              </Button>
             )}
           </div>
         </Link>
 
         {/* Card Content */}
         <div className="flex flex-col justify-between bg-background p-4 gap-2 grow">
-          <div>
-            <Link prefetch={false} href={`/shop/${product.slug}`}>
-              <h3 className="text-lg font-semibold text-secondary-foreground">{product.name}</h3>
-            </Link>
+          <div className="min-w-0">
+            <div className="flex items-center gap-2">
+              <Link prefetch={false} href={`/shop/${product.slug}`} className="min-w-0">
+                <h3 className="text-lg font-semibold text-secondary-foreground truncate">
+                  {product.name}
+                </h3>
+              </Link>
+              <Badge variant="secondary" className="text-xs">
+                {PRODUCT_TYPE_LABELS[product.productType]}
+              </Badge>
+            </div>
           </div>
 
           <ProductControls product={product} user={user} mode="card" />
@@ -137,14 +169,19 @@ export function ProductItem({
       {/* Product Details */}
       <div className="flex flex-1 flex-col px-4 py-3">
         <div className="flex justify-between items-start">
-          <div>
-            <Link
-              prefetch={false}
-              href={`/shop/${product.slug}`}
-              className="font-semibold hover:text-primary transition-colors"
-            >
-              {product.name}
-            </Link>
+          <div className="min-w-0">
+            <div className="flex items-center gap-2">
+              <Link
+                prefetch={false}
+                href={`/shop/${product.slug}`}
+                className="font-semibold hover:text-primary transition-colors truncate"
+              >
+                {product.name}
+              </Link>
+              <Badge variant="secondary" className="text-xs">
+                {PRODUCT_TYPE_LABELS[product.productType]}
+              </Badge>
+            </div>
             <p className="text-sm text-muted-foreground mt-1">{formatPrice(price)} each</p>
             {/* View Options Link */}
             {showSimilarLink && (

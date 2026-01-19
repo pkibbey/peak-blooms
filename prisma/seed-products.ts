@@ -9,6 +9,8 @@ import {
   ProductType,
 } from "../src/generated/client"
 
+import { logUnknownColors, normalizeAndMapColors } from "./seed-utils"
+
 const connectionString = process.env.DATABASE_URL
 
 if (!connectionString) {
@@ -124,8 +126,18 @@ function readProductsFromPriceList(): Array<{
     const price = parsePrice(priceStr)
     const quantity = getQuantity(priceStr)
     const type = categoryToProductType(category)
-    // Colors not available in price-list, default to empty array
-    const colors: string[] = []
+
+    // Parse optional colors column if present (some price-lists include a colors column)
+    const colorsStr = (match[3] || "").replace(/"/g, "").trim()
+    const rawColors = colorsStr
+      ? colorsStr
+          .split("|")
+          .map((c) => c.trim())
+          .filter(Boolean)
+      : []
+
+    const { mapped: colors, unknowns } = normalizeAndMapColors(rawColors)
+    if (unknowns.length) logUnknownColors(unknowns)
 
     if (name && category) {
       products.push({
@@ -207,10 +219,15 @@ function readProductsFromCSV(): Array<{
           ? ProductType.ROSE
           : ProductType.FLOWER
     // Parse pipe-separated color IDs from CSV (e.g., "pink|rose|greenery")
-    const colors = colorsStr
-      .split("|")
-      .map((c) => c.trim())
-      .filter(Boolean)
+    const rawColors = colorsStr
+      ? colorsStr
+          .split("|")
+          .map((c) => c.trim())
+          .filter(Boolean)
+      : []
+
+    const { mapped: colors, unknowns } = normalizeAndMapColors(rawColors)
+    if (unknowns.length) logUnknownColors(unknowns)
 
     if (name) {
       products.push({
@@ -536,8 +553,8 @@ async function seedProducts() {
         `⭐ Marked ${featuredResult.count ?? 0} products as featured: ${featuredSlugs.join(", ")}`
       )
 
-      // Mark featured collections: Flowers, Fillers, and Exotic Blooms
-      const featuredCollectionSlugs = ["flowers", "fillers", "exotic-blooms"]
+      // Mark featured collections: Flowers, Fillers, and Exotic
+      const featuredCollectionSlugs = ["flowers", "fillers", "exotic"]
       const start_updateFeaturedCollections = performance.now()
       const featuredCollectionsResult = await tx.collection.updateMany({
         where: { slug: { in: featuredCollectionSlugs } },
@@ -553,14 +570,14 @@ async function seedProducts() {
         `⭐ Marked ${featuredCollectionsResult.count ?? 0} collections as featured: ${featuredCollectionSlugs.join(", ")}`
       )
 
-      // Add some products to Exotic Blooms collection
-      const exoticBlooms = await tx.collection.findUnique({
-        where: { slug: "exotic-blooms" },
+      // Add some products to Exotic collection
+      const exotic = await tx.collection.findUnique({
+        where: { slug: "exotic" },
       })
 
-      if (exoticBlooms) {
-        // Add a selection of products to Exotic Blooms
-        const exoticBloomsProductSlugs = [
+      if (exotic) {
+        // Add a selection of products to Exotic
+        const exoticProductSlugs = [
           "peonies",
           "sunflower",
           "hydrangea",
@@ -572,12 +589,12 @@ async function seedProducts() {
         const start_fetchExoticProducts = performance.now()
         // Fetch all exotic bloom products in one query
         const exoticProducts = await tx.product.findMany({
-          where: { slug: { in: exoticBloomsProductSlugs } },
+          where: { slug: { in: exoticProductSlugs } },
           select: { id: true },
         })
         await captureMetric(
           MetricType.SEED,
-          "fetch exotic-blooms products",
+          "fetch exotic products",
           performance.now() - start_fetchExoticProducts
         )
 
@@ -589,26 +606,26 @@ async function seedProducts() {
               where: {
                 productId_collectionId: {
                   productId: product.id,
-                  collectionId: exoticBlooms.id,
+                  collectionId: exotic.id,
                 },
               },
               create: {
                 productId: product.id,
-                collectionId: exoticBlooms.id,
+                collectionId: exotic.id,
               },
               update: {},
             })
           } catch (error) {
-            console.warn(`⚠️  Failed to add product to Exotic Blooms: ${(error as Error).message}`)
+            console.warn(`⚠️  Failed to add product to Exotic: ${(error as Error).message}`)
           }
         }
         await captureMetric(
           MetricType.SEED,
-          "batch upsert exotic-blooms associations",
+          "batch upsert exotic associations",
           performance.now() - start_exoticUpserts
         )
 
-        console.log(`✅ Added ${exoticProducts.length} products to Exotic Blooms collection`)
+        console.log(`✅ Added ${exoticProducts.length} products to Exotic collection`)
       }
 
       console.log("✅ Product seeding completed!")

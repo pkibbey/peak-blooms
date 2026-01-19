@@ -5,6 +5,7 @@ import Image from "next/image"
 import { useState } from "react"
 import { toast } from "sonner"
 import { ImageUpload } from "@/components/admin/ImageUpload"
+import { ImageSearchPicker } from "@/components/admin/ImageSearchPicker"
 import { ProductImageGeneratorInline } from "@/components/admin/ProductImageGeneratorInline"
 import { Button } from "@/components/ui/button"
 import { Label } from "@/components/ui/label"
@@ -171,7 +172,7 @@ export function ProductImageManager({
       </div>
 
       {/* Add Image Actions */}
-      <div className="flex gap-6">
+      <div className="flex flex-col md:flex-row flex-wrap gap-6">
         {/* Upload Image */}
         <div>
           <ImageUpload
@@ -185,6 +186,13 @@ export function ProductImageManager({
             addRandomSuffix
           />
         </div>
+
+        {/* Search for Image from APIs */}
+        <ImageSearchPicker
+          productName={productName}
+          productType={productType}
+          onImageSelected={handleAddImage}
+        />
 
         {/* Generate Image with AI */}
         <ProductImageGeneratorInline

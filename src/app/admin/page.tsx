@@ -1,5 +1,4 @@
 import ActivityFeed from "@/components/admin/ActivityFeed"
-import QuickActions from "@/components/admin/QuickActions"
 import { getTrackedDb } from "@/lib/db"
 
 export default async function AdminDashboard() {
@@ -62,10 +61,7 @@ export default async function AdminDashboard() {
       </div>
 
       {/* Row with quick actions and activity feed */}
-      <div className="mb-6 grid gap-6 lg:grid-cols-3">
-        <div className="lg:col-span-1">
-          <QuickActions />
-        </div>
+      <div className="mb-6">
         <div className="lg:col-span-2">
           <ActivityFeed items={sortedFeed} />
         </div>

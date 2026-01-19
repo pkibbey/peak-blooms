@@ -27,6 +27,7 @@ import { IconTrash } from "@/components/ui/icons"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import type { CollectionModel, ProductModel } from "@/generated/models"
+import { saveOnBlur } from "@/lib/saveOnBlur"
 import { type CollectionFormData, collectionSchema } from "@/lib/validations/collection"
 
 // Collection type with product count and associations for form display
@@ -43,7 +44,7 @@ interface CollectionFormProps {
 export default function CollectionForm({ collection, products = [] }: CollectionFormProps) {
   const router = useRouter()
   const isEditing = !!collection
-  const [isPending, startTransition] = useTransition()
+  const [, startTransition] = useTransition()
 
   // Track original image URL to clean up old blob when image changes
   const [originalImage] = useState(collection?.image || "")
@@ -111,20 +112,15 @@ export default function CollectionForm({ collection, products = [] }: Collection
     })
   }
 
-  const handleBlur = async () => {
+  const handleFieldBlur = async () => {
     if (isEditing) {
-      const currentData = form.getValues()
-      const hasChanged = JSON.stringify(currentData) !== JSON.stringify(originalValues)
-
-      if (hasChanged) {
-        const isValid = await form.trigger()
-        if (isValid) {
-          const data = form.getValues()
-          startTransition(async () => {
-            await saveForm(data)
-          })
-        }
-      }
+      startTransition(async () => {
+        await saveOnBlur({
+          form,
+          originalValues,
+          onSave: saveForm,
+        })
+      })
     }
   }
 
@@ -186,7 +182,7 @@ export default function CollectionForm({ collection, products = [] }: Collection
                     placeholder="Collection name"
                     onBlur={() => {
                       field.onBlur()
-                      handleBlur()
+                      handleFieldBlur()
                     }}
                   />
                 </FormControl>
@@ -217,7 +213,7 @@ export default function CollectionForm({ collection, products = [] }: Collection
                   placeholder="Collection description..."
                   onBlur={() => {
                     field.onBlur()
-                    handleBlur()
+                    handleFieldBlur()
                   }}
                 />
               </FormControl>
@@ -237,7 +233,7 @@ export default function CollectionForm({ collection, products = [] }: Collection
                   checked={field.value}
                   onCheckedChange={(value) => {
                     field.onChange(value)
-                    handleBlur()
+                    handleFieldBlur()
                   }}
                 />
               </FormControl>
@@ -254,7 +250,7 @@ export default function CollectionForm({ collection, products = [] }: Collection
           value={form.watch("image")}
           onChange={(url) => {
             form.setValue("image", url)
-            handleBlur()
+            handleFieldBlur()
           }}
           folder="collections"
           slug={watchedSlug}
@@ -290,19 +286,6 @@ export default function CollectionForm({ collection, products = [] }: Collection
               {isDeleting ? "Deleting..." : "Delete Collection"}
             </Button>
           )}
-          {isEditing && (
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => router.back()}
-              disabled={isPending}
-            >
-              Cancel
-            </Button>
-          )}
-          <Button type="submit" disabled={isPending}>
-            {isPending ? "Saving..." : isEditing ? "Save Changes" : "Create Collection"}
-          </Button>
         </div>
       </form>
     </Form>

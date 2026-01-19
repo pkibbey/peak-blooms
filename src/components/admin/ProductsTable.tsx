@@ -48,7 +48,8 @@ export default function ProductsTable({ products, sort, order, headerUrl }: Prod
               href={headerUrl}
               className="hidden md:table-cell"
             />
-            <TableHead>Colors</TableHead>
+            <TableHead>Featured</TableHead>
+            <TableHead className="hidden lg:table-cell">Colors</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>

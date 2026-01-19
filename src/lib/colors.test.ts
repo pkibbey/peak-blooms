@@ -1,6 +1,31 @@
 import { describe, expect, it } from "vitest"
-import { ProductType } from "@/generated/enums"
-import { COLORS } from "@/lib/colors"
+import { COLOR_IDS, COLOR_MAP, COLORS, getColorById, getHexById } from "@/lib/colors"
+
+describe("COLOR_IDS registry", () => {
+  describe("structure validation", () => {
+    it("should have COLOR_IDS array defined", () => {
+      expect(Array.isArray(COLOR_IDS)).toBe(true)
+    })
+
+    it("should have at least one color ID", () => {
+      expect(COLOR_IDS.length).toBeGreaterThan(0)
+    })
+  })
+
+  describe("COLOR_IDS uniqueness", () => {
+    it("should have unique color IDs", () => {
+      const uniqueIds = new Set(COLOR_IDS)
+      expect(uniqueIds.size).toBe(COLOR_IDS.length)
+    })
+
+    it("should have lowercase ids with optional hyphens", () => {
+      COLOR_IDS.forEach((id) => {
+        expect(id.toLowerCase()).toBe(id)
+        expect(id).toMatch(/^[a-z-]+$/)
+      })
+    })
+  })
+})
 
 describe("COLORS registry", () => {
   describe("structure validation", () => {
@@ -17,7 +42,6 @@ describe("COLORS registry", () => {
         expect(color).toHaveProperty("id")
         expect(color).toHaveProperty("label")
         expect(color).toHaveProperty("hex")
-        expect(color).toHaveProperty("category")
       })
     })
   })
@@ -43,13 +67,6 @@ describe("COLORS registry", () => {
         expect(color.label.length).toBeGreaterThan(0)
       })
     })
-
-    it("should have valid categories", () => {
-      const validCategories = Object.values(ProductType)
-      COLORS.forEach((color) => {
-        expect(validCategories).toContain(color.category)
-      })
-    })
   })
 
   describe("uniqueness validation", () => {
@@ -72,23 +89,6 @@ describe("COLORS registry", () => {
     })
   })
 
-  describe("category distribution", () => {
-    it("should have at least one flower color", () => {
-      const flowers = COLORS.filter((c) => c.category === ProductType.FLOWER)
-      expect(flowers.length).toBeGreaterThan(0)
-    })
-
-    it("should have at least one greenery color", () => {
-      const greenery = COLORS.filter((c) => c.category === ProductType.FILLER)
-      expect(greenery.length).toBeGreaterThan(0)
-    })
-
-    it("should have at least one neutral color", () => {
-      const neutral = COLORS.filter((c) => c.category === ProductType.FILLER)
-      expect(neutral.length).toBeGreaterThan(0)
-    })
-  })
-
   describe("specific color validation", () => {
     it("should contain common flower colors", () => {
       const colorIds = COLORS.map((c) => c.id)
@@ -97,45 +97,42 @@ describe("COLORS registry", () => {
       expect(colorIds).toContain("white")
     })
 
-    it("should contain common greenery colors", () => {
+    it("should contain greenery color", () => {
       const colorIds = COLORS.map((c) => c.id)
-      expect(colorIds).toContain("greenery")
-      expect(colorIds).toContain("sage")
-      expect(colorIds).toContain("eucalyptus")
-    })
-
-    it("white should be flower category", () => {
-      const white = COLORS.find((c) => c.id === "white")
-      expect(white?.category).toBe(ProductType.FLOWER)
-    })
-
-    it("should have coral flower color with correct hex", () => {
-      const coral = COLORS.find((c) => c.id === "coral")
-      expect(coral?.label).toBe("Coral")
-      expect(coral?.hex).toBe("#FF6B6B")
-      expect(coral?.category).toBe(ProductType.FLOWER)
+      expect(colorIds).toContain("green")
     })
   })
 
   describe("color lookup utilities", () => {
-    it("should be able to find color by id", () => {
-      const color = COLORS.find((c) => c.id === "pink")
+    it("should be able to find color by id using getColorById", () => {
+      const color = getColorById("pink")
       expect(color).toBeDefined()
       expect(color?.label).toBe("Pink")
     })
 
-    it("should be able to find color by label", () => {
-      const color = COLORS.find((c) => c.label === "Rose")
-      expect(color).toBeDefined()
-      expect(color?.id).toBe("rose")
+    it("should get hex color by ID using getHexById", () => {
+      const hex = getHexById("pink")
+      expect(hex).toBe("#FF9ECF")
     })
 
-    it("should be able to find colors by category", () => {
-      const flowers = COLORS.filter((c) => c.category === ProductType.FLOWER)
-      expect(flowers.length).toBeGreaterThan(0)
-      flowers.forEach((f) => {
-        expect(f.category).toBe(ProductType.FLOWER)
+    it("should return default hex for unknown IDs", () => {
+      const hex = getHexById("unknown-color")
+      expect(hex).toBe("#000000")
+    })
+  })
+
+  describe("COLOR_MAP validation", () => {
+    it("should have all COLORS in COLOR_MAP", () => {
+      COLORS.forEach((color) => {
+        const mapped = COLOR_MAP.get(color.id)
+        expect(mapped).toBeDefined()
+        expect(mapped?.id).toBe(color.id)
       })
+    })
+
+    it("should have COLOR_MAP for efficient lookups", () => {
+      expect(COLOR_MAP.size).toBeGreaterThan(0)
+      expect(COLOR_MAP.get("pink")).toBeDefined()
     })
   })
 
@@ -160,16 +157,6 @@ describe("COLORS registry", () => {
   })
 
   describe("real-world usage", () => {
-    it("should support filtering flowers for UI dropdown", () => {
-      const flowers = COLORS.filter((c) => c.category === ProductType.FLOWER)
-      expect(flowers.length).toBeGreaterThan(10)
-    })
-
-    it("should support filtering greenery for UI dropdown", () => {
-      const greenery = COLORS.filter((c) => c.category === ProductType.FILLER)
-      expect(greenery.length).toBeGreaterThan(3)
-    })
-
     it("should be usable for product color selection", () => {
       const validColorIds = COLORS.map((c) => c.id)
       expect(validColorIds).toContain("pink")

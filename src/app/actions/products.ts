@@ -111,8 +111,6 @@ export async function updateProductAction(
       data: product,
     }
   } catch (error) {
-    const errorMessage = error instanceof Error ? error.message : String(error)
-    console.error("[updateProductAction] Error:", errorMessage, error)
     return toAppError(error, "Failed to update product")
   }
 }

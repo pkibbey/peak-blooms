@@ -1,6 +1,6 @@
 "use client"
 
-import { COLORS } from "@/lib/colors"
+import { COLOR_MAP } from "@/lib/colors"
 import { cn } from "@/lib/utils"
 
 interface ColorsMiniDisplayProps {
@@ -17,7 +17,7 @@ interface ColorsMiniDisplayProps {
 /**
  * Renders a compact display of color swatches as tiny circles.
  * Used on product cards and table rows.
- * Translates color IDs to hex values using the COLORS registry.
+ * Translates color IDs to hex values using the COLOR_MAP registry.
  */
 export function ColorsMiniDisplay({
   colorIds,
@@ -36,7 +36,7 @@ export function ColorsMiniDisplay({
     <div className={`flex gap-2 items-center ${className}`}>
       <div className="flex -space-x-1">
         {displayedColors.map((colorId) => {
-          const color = COLORS.find((c) => c.id === colorId)
+          const color = COLOR_MAP.get(colorId)
           return (
             <div
               key={colorId}
@@ -57,8 +57,7 @@ export function ColorsMiniDisplay({
         <span className="text-xs text-muted-foreground">+{remainingCount}</span>
       )}
       <span className="sr-only">
-        Colors:{" "}
-        {displayedColors.map((id) => COLORS.find((c) => c.id === id)?.label || id).join(", ")}
+        Colors: {displayedColors.map((id) => COLOR_MAP.get(id)?.label || id).join(", ")}
         {remainingCount > 0 && ` and ${remainingCount} more`}
       </span>
     </div>

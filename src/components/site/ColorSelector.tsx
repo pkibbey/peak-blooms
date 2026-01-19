@@ -1,6 +1,6 @@
 "use client"
 
-import { COLORS } from "@/lib/colors"
+import { COLOR_IDS, COLOR_MAP } from "@/lib/colors"
 import { cn } from "@/lib/utils"
 
 interface ColorSelectorProps {
@@ -31,15 +31,17 @@ export function ColorSelector({
     <div className="flex flex-col gap-2">
       {showLabel && <span className="text-sm font-medium">Colors</span>}
       <div className={cn("flex flex-wrap gap-2", compact && "gap-1")}>
-        {COLORS.map((color) => {
-          const isActive = selectedColors.includes(color.id)
+        {COLOR_IDS.map((colorId) => {
+          const color = COLOR_MAP.get(colorId)
+          if (!color) return null
+          const isActive = selectedColors.includes(colorId)
           return (
             <button
-              key={color.id}
+              key={colorId}
               type="button"
               aria-label={color.label}
               title={color.label}
-              onClick={() => handleColorClick(color.id)}
+              onClick={() => handleColorClick(colorId)}
               className={cn(
                 "rounded-full border-2 transition-shadow focus:outline-none",
                 compact ? "h-6 w-6" : "h-8 w-8",

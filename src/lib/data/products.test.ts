@@ -1,5 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from "vitest"
 import { ProductType } from "@/generated/enums"
+import { ITEMS_PER_PAGE } from "@/lib/consts"
 import { createMockPrismaClient } from "@/test/mocks"
 
 // Mock dependencies - must be before imports
@@ -223,6 +224,41 @@ describe("Products Data Access Layer", () => {
       expect(result.products).toHaveLength(0)
       expect(result.total).toBe(0)
     })
+
+    it("should use default limit from ITEMS_PER_PAGE when not specified", async () => {
+      vi.mocked(db.product.count).mockResolvedValueOnce(1)
+      vi.mocked(db.product.findMany).mockResolvedValueOnce([mockProductWithCollections])
+
+      const result = await getProducts({}, 1.0)
+
+      expect(result.limit).toBe(ITEMS_PER_PAGE)
+    })
+
+    it("should ignore invalid sort fields and keep default ordering", async () => {
+      vi.mocked(db.product.count).mockResolvedValueOnce(1)
+      vi.mocked(db.product.findMany).mockResolvedValueOnce([mockProductWithCollections])
+
+      await getProducts({ sort: "notAField" }, 1.0)
+
+      expect(db.product.findMany).toHaveBeenCalledWith(
+        expect.objectContaining({
+          orderBy: { createdAt: "desc" },
+        })
+      )
+    })
+
+    it("should default to asc when sort field provided without order", async () => {
+      vi.mocked(db.product.count).mockResolvedValueOnce(1)
+      vi.mocked(db.product.findMany).mockResolvedValueOnce([mockProductWithCollections])
+
+      await getProducts({ sort: "name" }, 1.0)
+
+      expect(db.product.findMany).toHaveBeenCalledWith(
+        expect.objectContaining({
+          orderBy: { name: "asc" },
+        })
+      )
+    })
   })
 
   describe("getFeaturedProducts", () => {
@@ -352,6 +388,21 @@ describe("Products Data Access Layer", () => {
       expect(result.colorIds).toContain("white")
       expect(result.colorIds).toContain("pink")
       expect(result.collections).toHaveLength(1)
+    })
+
+    it("should return unique sorted color IDs", async () => {
+      const mockProducts = [
+        { ...mockProduct, colors: ["blue", "red"] },
+        { ...mockProduct, id: "prod-2", colors: ["red", "pink"] },
+        { ...mockProduct, id: "prod-3", colors: ["blue", "white"] },
+      ]
+
+      vi.mocked(db.product.findMany).mockResolvedValueOnce(mockProducts)
+      vi.mocked(db.collection.findMany).mockResolvedValueOnce([])
+
+      const result = await getShopFilterOptions()
+
+      expect(result.colorIds).toEqual(["blue", "pink", "red", "white"].sort())
     })
 
     it("should only include non-deleted products in color list", async () => {

@@ -85,7 +85,7 @@ export function ProductImageGeneratorInline({
         access: "public",
         handleUploadUrl: "/api/upload",
         clientPayload: JSON.stringify({
-          folder: "products",
+          folder: "products/generated",
           slug: productName.toLowerCase().replace(/\s+/g, "-"),
           extension: "jpg",
         }),
@@ -108,9 +108,9 @@ export function ProductImageGeneratorInline({
   const isProcessing = isGenerating || isUploading
 
   return (
-    <div className="shrink-0 grid gap-4">
-      <div className="grid gap-2">
-        <Label htmlFor="generation-style-template">AI Image Style</Label>
+    <div className="shrink-0 space-y-4">
+      <Label htmlFor="generation-style-template">AI Image Style</Label>
+      <div className="flex flex-wrap gap-2">
         <Select
           value={selectedStyle}
           onValueChange={(value) => setSelectedStyle(value as StyleTemplate)}
@@ -132,28 +132,24 @@ export function ProductImageGeneratorInline({
             </SelectContent>
           </SelectPositioner>
         </Select>
+        <div>
+          <Button onClick={handleGenerateAndSave} disabled={isProcessing} type="button">
+            {isProcessing ? (
+              <>
+                <LoaderCircle className="mr-2 h-4 w-4 animate-spin" />
+                {isGenerating ? "Generating..." : "Uploading..."}
+              </>
+            ) : (
+              <>
+                <Zap className="mr-2 h-4 w-4" />
+                {buttonLabel}
+              </>
+            )}
+          </Button>
+        </div>
       </div>
 
-      <div className="col-span-2 space-y-2">
-        <Button
-          onClick={handleGenerateAndSave}
-          disabled={isProcessing}
-          className="w-full col-span-2"
-          type="button"
-        >
-          {isProcessing ? (
-            <>
-              <LoaderCircle className="mr-2 h-4 w-4 animate-spin" />
-              {isGenerating ? "Generating..." : "Uploading..."}
-            </>
-          ) : (
-            <>
-              <Zap className="mr-2 h-4 w-4" />
-              {buttonLabel}
-            </>
-          )}
-        </Button>
-
+      <div className="space-y-2">
         {statusMessage && (
           <div className="text-sm text-muted-foreground text-center">{statusMessage}</div>
         )}

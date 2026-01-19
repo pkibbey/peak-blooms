@@ -3,7 +3,17 @@
 import { ChevronLeft, ChevronRight } from "lucide-react"
 import Image from "next/image"
 import { useState } from "react"
+import FadeImage from "@/components/site/FadeImage"
 import { Button } from "@/components/ui/button"
+
+// Layout constants
+const GALLERY_HEIGHT_SM = "h-[420px]"
+const GALLERY_HEIGHT_MD = "md:h-[680px]"
+const THUMBNAIL_SIZE = "w-16 h-16"
+const CONTAINER_GAP = "gap-4"
+const THUMBNAIL_GAP = "gap-2"
+const NAV_BUTTON_BASE_CLASS =
+  "absolute top-1/2 -translate-y-1/2 z-10 bg-background/80 hover:bg-background"
 
 interface ImageGalleryProps {
   images: { url: string; order: number }[]
@@ -20,12 +30,18 @@ export function ImageGallery({ images, productName, fallbackImage }: ImageGaller
         ? [{ url: fallbackImage, order: 0 }]
         : []
   const [currentImageIndex, setCurrentImageIndex] = useState(0)
+  const [hoverIndex, setHoverIndex] = useState<number | null>(null)
 
   if (imageList.length === 0) {
-    return <div className="relative w-full aspect-square overflow-hidden rounded-xs bg-zinc-200" />
+    return (
+      <div
+        className={`relative w-full ${GALLERY_HEIGHT_SM} ${GALLERY_HEIGHT_MD} overflow-hidden rounded-xs bg-zinc-200`}
+      />
+    )
   }
 
-  const currentImage = imageList[currentImageIndex]
+  const displayIndex = hoverIndex ?? currentImageIndex
+  const currentImage = imageList[displayIndex]
   const hasMultipleImages = imageList.length > 1
 
   const goToPrevious = () => {
@@ -36,31 +52,31 @@ export function ImageGallery({ images, productName, fallbackImage }: ImageGaller
     setCurrentImageIndex((prev) => (prev === imageList.length - 1 ? 0 : prev + 1))
   }
 
-  // Handle keyboard navigation
+  // Handle keyboard navigation (only for multiple images)
   const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (!hasMultipleImages) return
     if (e.key === "ArrowLeft") goToPrevious()
     if (e.key === "ArrowRight") goToNext()
   }
 
   return (
-    <div className="flex flex-col gap-4">
+    <div className={`flex flex-col ${CONTAINER_GAP}`}>
       {/* Main Image Container */}
       {/** biome-ignore lint/a11y/useSemanticElements: Main image*/}
       <div
-        className="relative w-full aspect-square overflow-hidden rounded-xs bg-zinc-200 focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-primary"
-        onKeyDown={handleKeyDown}
-        // biome-ignore lint/a11y/noNoninteractiveTabindex: tab access
-        tabIndex={0}
+        className={`relative w-full ${GALLERY_HEIGHT_SM} ${GALLERY_HEIGHT_MD} overflow-hidden rounded-xs bg-zinc-200 focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-primary`}
+        onKeyDown={hasMultipleImages ? handleKeyDown : undefined}
+        tabIndex={hasMultipleImages ? 0 : undefined}
         role="region"
         aria-label={`Image gallery showing ${currentImageIndex + 1} of ${imageList.length} images`}
       >
-        <Image
+        <FadeImage
           src={currentImage.url}
           alt={`${productName} - Image ${currentImageIndex + 1}`}
-          fill
           sizes="(max-width: 768px) 100vw, 50vw"
-          className="object-cover"
           priority={currentImageIndex === 0}
+          duration={200}
+          className="absolute inset-0"
         />
 
         {/* Navigation Controls - Only show if multiple images */}
@@ -71,7 +87,7 @@ export function ImageGallery({ images, productName, fallbackImage }: ImageGaller
               variant="outline"
               size="icon"
               onClick={goToPrevious}
-              className="absolute left-2 top-1/2 -translate-y-1/2 bg-background/80 hover:bg-background"
+              className={`${NAV_BUTTON_BASE_CLASS} left-2`}
               aria-label="Previous image"
             >
               <ChevronLeft className="h-4 w-4" />
@@ -82,14 +98,18 @@ export function ImageGallery({ images, productName, fallbackImage }: ImageGaller
               variant="outline"
               size="icon"
               onClick={goToNext}
-              className="absolute right-2 top-1/2 -translate-y-1/2 bg-background/80 hover:bg-background"
+              className={`${NAV_BUTTON_BASE_CLASS} right-2`}
               aria-label="Next image"
             >
               <ChevronRight className="h-4 w-4" />
             </Button>
 
             {/* Image Counter */}
-            <div className="absolute bottom-2 right-2 bg-background/80 rounded px-2 py-1 text-sm font-medium">
+            <div
+              className="absolute bottom-2 right-2 z-10 bg-background/80 rounded px-2 py-1 text-sm font-medium"
+              aria-live="polite"
+              aria-atomic="true"
+            >
               {currentImageIndex + 1} / {imageList.length}
             </div>
           </>
@@ -98,13 +118,15 @@ export function ImageGallery({ images, productName, fallbackImage }: ImageGaller
 
       {/* Thumbnail Strip */}
       {hasMultipleImages && (
-        <div className="flex gap-2 overflow-x-auto pb-2">
+        <div className={`flex ${THUMBNAIL_GAP} overflow-x-auto pb-2`}>
           {imageList.map((image, index) => (
             <Button
               key={image.url}
               onClick={() => setCurrentImageIndex(index)}
-              className={`relative flex-shrink-0 w-16 h-16 rounded border-2 overflow-hidden transition-colors ${
-                index === currentImageIndex
+              onMouseEnter={() => setHoverIndex(index)}
+              onMouseLeave={() => setHoverIndex(null)}
+              className={`relative flex-shrink-0 ${THUMBNAIL_SIZE} rounded border-2 overflow-hidden transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary ${
+                index === displayIndex
                   ? "border-primary"
                   : "border-transparent hover:border-muted-foreground"
               }`}

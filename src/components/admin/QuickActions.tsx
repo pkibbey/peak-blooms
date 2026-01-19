@@ -3,8 +3,8 @@ import { Button } from "@/components/ui/button"
 
 export default function QuickActions() {
   return (
-    <div className="rounded-lg border border-border p-6">
-      <h3 className="heading-3 mb-3">Quick actions</h3>
+    <div className="rounded-lg border border-border p-6 bg-primary-foreground">
+      <h4 className="heading-4 mb-2">Quick actions</h4>
       <p className="text-sm text-muted-foreground mb-4">Common admin tasks for fast access</p>
 
       <div className="flex flex-wrap gap-3">
@@ -38,7 +38,7 @@ export default function QuickActions() {
         />
 
         <Button
-          variant="ghost"
+          variant="outline"
           nativeButton={false}
           render={
             <Link prefetch={false} href="/admin/collections/new">

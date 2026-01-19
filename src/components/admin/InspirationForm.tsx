@@ -26,6 +26,7 @@ import { IconTrash } from "@/components/ui/icons"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import type { ProductModel } from "@/generated/models"
+import { saveOnBlur } from "@/lib/saveOnBlur"
 import {
   createInspirationSchema,
   type InspirationFormData,
@@ -52,7 +53,7 @@ interface InspirationFormProps {
 export default function InspirationForm({ products, inspiration }: InspirationFormProps) {
   const router = useRouter()
   const isEditing = !!inspiration
-  const [isPending, startTransition] = useTransition()
+  const [, startTransition] = useTransition()
 
   // Track original image URL to clean up old blob when image changes
   const [originalImage] = useState(inspiration?.image || "")
@@ -96,24 +97,33 @@ export default function InspirationForm({ products, inspiration }: InspirationFo
   const saveForm = async (data: InspirationFormData) => {
     try {
       if (isEditing) {
-        await updateInspirationAction({
+        const result = await updateInspirationAction({
           id: inspiration.id,
           ...data,
           productSelections: productSelections,
         })
+        if (!result.success) {
+          form.setError("root", { message: result.error })
+          return
+        }
         toast.success("Inspiration updated successfully")
       } else {
-        await createInspirationAction({
+        const result = await createInspirationAction({
           ...data,
           productSelections: productSelections,
         })
+        if (!result.success) {
+          form.setError("root", { message: result.error })
+          return
+        }
         toast.success("Inspiration created successfully")
         router.push("/admin/inspirations")
         router.refresh()
       }
     } catch (err) {
-      const message = err instanceof Error ? err.message : "Failed to save inspiration"
-      form.setError("root", { message })
+      const errorMessage = "An error occurred. Please try again."
+      form.setError("root", { message: errorMessage })
+      console.error(err)
     }
   }
 
@@ -123,20 +133,15 @@ export default function InspirationForm({ products, inspiration }: InspirationFo
     })
   }
 
-  const handleBlur = async () => {
+  const handleFieldBlur = async () => {
     if (isEditing) {
-      const currentData = form.getValues()
-      const hasChanged = JSON.stringify(currentData) !== JSON.stringify(originalValues)
-
-      if (hasChanged) {
-        const isValid = await form.trigger()
-        if (isValid) {
-          const data = form.getValues()
-          startTransition(async () => {
-            await saveForm(data)
-          })
-        }
-      }
+      startTransition(async () => {
+        await saveOnBlur({
+          form,
+          originalValues,
+          onSave: saveForm,
+        })
+      })
     }
   }
 
@@ -155,13 +160,18 @@ export default function InspirationForm({ products, inspiration }: InspirationFo
 
     setIsDeleting(true)
     try {
-      await deleteInspirationAction({ id: inspiration.id })
+      const result = await deleteInspirationAction({ id: inspiration.id })
+      if (!result.success) {
+        toast.error(result.error)
+        setIsDeleting(false)
+        return
+      }
       toast.success("Inspiration deleted successfully")
       router.push("/admin/inspirations")
       router.refresh()
     } catch (err) {
-      const message = err instanceof Error ? err.message : "Failed to delete inspiration"
-      form.setError("root", { message })
+      toast.error("Failed to delete inspiration. Please try again.")
+      console.error(err)
       setIsDeleting(false)
     }
   }
@@ -192,7 +202,7 @@ export default function InspirationForm({ products, inspiration }: InspirationFo
                     placeholder="Inspiration name"
                     onBlur={() => {
                       field.onBlur()
-                      handleBlur()
+                      handleFieldBlur()
                     }}
                   />
                 </FormControl>
@@ -222,7 +232,7 @@ export default function InspirationForm({ products, inspiration }: InspirationFo
                   placeholder="A short, catchy subtitle"
                   onBlur={() => {
                     field.onBlur()
-                    handleBlur()
+                    handleFieldBlur()
                   }}
                 />
               </FormControl>
@@ -236,7 +246,7 @@ export default function InspirationForm({ products, inspiration }: InspirationFo
           value={form.watch("image")}
           onChange={(url) => {
             form.setValue("image", url)
-            handleBlur()
+            handleFieldBlur()
           }}
           folder="inspiration"
           slug={watchedSlug}
@@ -263,7 +273,7 @@ export default function InspirationForm({ products, inspiration }: InspirationFo
                   placeholder="A brief description for previews and cards..."
                   onBlur={() => {
                     field.onBlur()
-                    handleBlur()
+                    handleFieldBlur()
                   }}
                 />
               </FormControl>
@@ -286,7 +296,7 @@ export default function InspirationForm({ products, inspiration }: InspirationFo
                   placeholder="The full story or description for the inspiration page..."
                   onBlur={() => {
                     field.onBlur()
-                    handleBlur()
+                    handleFieldBlur()
                   }}
                 />
               </FormControl>
@@ -304,9 +314,15 @@ export default function InspirationForm({ products, inspiration }: InspirationFo
           <ProductMultiSelect
             products={products}
             selectedIds={selectedProductIds}
-            onChange={setSelectedProductIds}
+            onChange={(ids) => {
+              setSelectedProductIds(ids)
+              handleFieldBlur()
+            }}
             productSelections={productSelections}
-            onSelectionsChange={setProductSelections}
+            onSelectionsChange={(selections) => {
+              setProductSelections(selections)
+              handleFieldBlur()
+            }}
           />
         </div>
 
@@ -323,19 +339,6 @@ export default function InspirationForm({ products, inspiration }: InspirationFo
               {isDeleting ? "Deleting..." : "Delete Inspiration"}
             </Button>
           )}
-          {isEditing && (
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => router.back()}
-              disabled={isPending}
-            >
-              Cancel
-            </Button>
-          )}
-          <Button type="submit" disabled={isPending}>
-            {isPending ? "Saving..." : isEditing ? "Save Changes" : "Create Inspiration"}
-          </Button>
         </div>
       </form>
     </Form>
