@@ -39,7 +39,7 @@ export default function OrderHistoryItem({ order }: OrderHistoryItemProps) {
         {/* Item Previews - Overlapping style */}
         <div className="hidden md:flex -space-x-4 overflow-hidden py-1">
           {order.items.slice(0, 4).map((item) => {
-            const productImage = item.productImageSnapshot ?? item.product?.image
+            const productImage = item.productImageSnapshot ?? item.product?.images?.[0]
             const productName = item.productNameSnapshot ?? item.product?.name ?? "Unknown Product"
 
             return (

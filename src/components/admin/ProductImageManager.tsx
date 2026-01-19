@@ -10,19 +10,14 @@ import { Button } from "@/components/ui/button"
 import { Label } from "@/components/ui/label"
 import type { ProductType } from "@/generated/enums"
 
-interface ProductImage {
-  url: string
-  order: number
-}
-
 interface ProductImageManagerProps {
   productId?: string
   slug: string
   productName: string
   productType: ProductType
   productDescription?: string | null
-  initialImages: ProductImage[]
-  onImagesChange: (images: ProductImage[]) => void
+  initialImages: string[]
+  onImagesChange: (images: string[]) => void
 }
 
 export function ProductImageManager({
@@ -34,32 +29,24 @@ export function ProductImageManager({
   initialImages,
   onImagesChange,
 }: ProductImageManagerProps) {
-  const [images, setImages] = useState<ProductImage[]>(initialImages)
+  const [images, setImages] = useState<string[]>(initialImages)
   const [draggedIndex, setDraggedIndex] = useState<number | null>(null)
   const [isDeleting, setIsDeleting] = useState<string | null>(null)
 
-  const updateImages = (newImages: ProductImage[]) => {
+  const updateImages = (newImages: string[]) => {
     // Re-order based on index
-    const reorderedImages = newImages.map((img, idx) => ({
-      ...img,
-      order: idx,
-    }))
-    setImages(reorderedImages)
-    onImagesChange(reorderedImages)
+    setImages(newImages)
+    onImagesChange(newImages)
   }
 
   const handleAddImage = (url: string) => {
-    const newImage: ProductImage = {
-      url,
-      order: images.length,
-    }
-    const newImages = [...images, newImage]
+    const newImages = [...images, url]
     updateImages(newImages)
     toast.success("Image added successfully")
   }
 
   const handleDeleteImage = async (index: number) => {
-    const imageUrl = images[index].url
+    const imageUrl = images[index]
     setIsDeleting(imageUrl)
 
     try {
@@ -74,9 +61,19 @@ export function ProductImageManager({
           }),
         })
 
+        const result = await response.json()
+
         if (!response.ok) {
-          const error = await response.json()
-          throw new Error(error.error || "Failed to delete image")
+          throw new Error(result.error || "Failed to delete image")
+        }
+
+        if (!result.success) {
+          throw new Error(result.error || "Failed to delete image")
+        }
+
+        if (result.blobDeleted === false) {
+          // Blob cleanup failed on server (e.g., missing token). Remove reference but warn admin.
+          toast.warning(result.warning || "Image reference removed but blob deletion failed")
         }
       }
 
@@ -125,7 +122,7 @@ export function ProductImageManager({
         {images.length > 0 ? (
           images.map((image, index) => (
             <div
-              key={`${image.url}-${index}`}
+              key={image}
               draggable
               onDragStart={() => handleDragStart(index)}
               onDragOver={(e) => handleDragOver(e, index)}
@@ -140,7 +137,7 @@ export function ProductImageManager({
               {/* Image Thumbnail */}
               <div className="relative h-16 w-16 flex-shrink-0 overflow-hidden rounded border">
                 <Image
-                  src={image.url}
+                  src={image}
                   alt={`Product image ${index + 1}`}
                   fill
                   className="object-cover"
@@ -153,7 +150,7 @@ export function ProductImageManager({
                 <p className="text-sm font-medium truncate">{`Image ${index + 1}${
                   index === 0 ? " (Primary)" : index === 1 ? " (Hover)" : ""
                 }`}</p>
-                <p className="text-xs text-muted-foreground truncate">{image.url}</p>
+                <p className="text-xs text-muted-foreground truncate">{image}</p>
               </div>
 
               {/* Delete Button */}
@@ -161,7 +158,7 @@ export function ProductImageManager({
                 variant="outline-destructive"
                 size="sm"
                 onClick={() => handleDeleteImage(index)}
-                disabled={isDeleting === image.url}
+                disabled={isDeleting === image}
                 aria-label={`Delete image ${index + 1}`}
               >
                 <X className="h-4 w-4" />
@@ -174,7 +171,7 @@ export function ProductImageManager({
       </div>
 
       {/* Add Image Actions */}
-      <div className="grid gap-3 md:grid-cols-2">
+      <div className="flex gap-6">
         {/* Upload Image */}
         <div>
           <ImageUpload
@@ -184,6 +181,8 @@ export function ProductImageManager({
             slug={slug}
             label="Upload Image"
             showLabel={false}
+            multiple
+            addRandomSuffix
           />
         </div>
 

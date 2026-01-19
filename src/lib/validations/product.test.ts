@@ -7,7 +7,7 @@ describe("productSchema (form validation)", () => {
     name: "Red Roses",
     slug: "red-roses",
     description: "Beautiful red roses",
-    image: "https://example.com/roses.jpg",
+    images: ["https://example.com/roses.jpg"],
     price: "49.99",
     colors: ["red", "crimson"],
     collectionIds: ["collection-1", "collection-2"],
@@ -21,10 +21,10 @@ describe("productSchema (form validation)", () => {
       expect(result.success).toBe(true)
     })
 
-    it("should reject product without colors array", () => {
+    it("should accept product without colors array", () => {
       const { colors, ...productWithoutColors } = validProduct
       const result = productSchema.safeParse(productWithoutColors)
-      expect(result.success).toBe(false)
+      expect(result.success).toBe(true)
     })
 
     it("should accept product with empty colors array", () => {
@@ -106,10 +106,10 @@ describe("productSchema (form validation)", () => {
       expect(result.success).toBe(false)
     })
 
-    it("should reject missing collectionIds", () => {
+    it("should accept missing collectionIds", () => {
       const { collectionIds, ...noCollections } = validProduct
       const result = productSchema.safeParse(noCollections)
-      expect(result.success).toBe(false)
+      expect(result.success).toBe(true)
     })
 
     it("should reject invalid productType", () => {

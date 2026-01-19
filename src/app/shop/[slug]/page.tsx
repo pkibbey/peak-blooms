@@ -47,18 +47,18 @@ export default async function ProductDetailPage({ params }: ProductDetailPagePro
 
           {/* Product Detail Grid */}
           <div className="grid grid-cols-1 gap-12 md:grid-cols-2">
-            {/* Product Image */}
+            {/* Product Image Gallery */}
             <div className="flex items-start justify-center">
               <div className="relative w-full aspect-square overflow-hidden rounded-xs bg-zinc-200">
-                {product.image && (
+                {product.images && product.images.length > 0 ? (
                   <Image
-                    src={product.image}
+                    src={product.images[0]}
                     alt={product.name}
                     fill
                     sizes="(max-width: 768px) 100vw, 50vw"
                     className="object-cover"
                   />
-                )}
+                ) : null}
               </div>
             </div>
 

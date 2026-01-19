@@ -184,7 +184,7 @@ export async function createOrderAction(
           where: { id: item.id },
           data: {
             productNameSnapshot: item.product?.name || null,
-            productImageSnapshot: item.product?.image || null,
+            productImageSnapshot: item.product?.images?.[0] || null, // Capture first image (featured)
             // Capture current product price (or 0 if market-priced)
             // 0 indicates market-priced item to be set by admin later
             price: adjustPrice(item.product?.price ?? 0, priceMultiplier),

@@ -80,7 +80,7 @@ function categoryToProductType(category: string): ProductType {
 // Helper function to read and parse price-list.csv format
 function readProductsFromPriceList(): Array<{
   name: string
-  price: number | null
+  price: number
   type: ProductType
   quantity: number
   description: string
@@ -100,7 +100,7 @@ function readProductsFromPriceList(): Array<{
 
   const products: Array<{
     name: string
-    price: number | null
+    price: number
     type: ProductType
     quantity: number
     description: string
@@ -153,7 +153,7 @@ function readProductsFromPriceList(): Array<{
 // Helper function to read and parse CSV file (legacy price-list.csv format)
 function readProductsFromCSV(): Array<{
   name: string
-  price: number | null
+  price: number
   type: ProductType
   quantity: number
   description: string
@@ -174,7 +174,7 @@ function readProductsFromCSV(): Array<{
 
   const products: Array<{
     name: string
-    price: number | null
+    price: number
     type: ProductType
     quantity: number
     description: string
@@ -242,20 +242,14 @@ async function seedProducts() {
       // Create collections first (used for product associations)
       const collections = [
         {
-          name: "Flowers",
-          slug: "flowers",
-          image: "/collection-images/flowers.png",
-          description: "Beautiful fresh flowers for all occasions",
-        },
-        {
-          name: "Classic Roses",
-          slug: "classic-roses",
+          name: "Roses",
+          slug: "roses",
           image: "/collection-images/classic-roses.png",
           description: "Timeless and elegant roses in various colors",
         },
         {
-          name: "Exotic Blooms",
-          slug: "exotic-blooms",
+          name: "Exotic",
+          slug: "exotic",
           image: "/collection-images/exotic-blooms.png",
           description: "Unique and rare flowers from around the world",
         },
@@ -266,8 +260,8 @@ async function seedProducts() {
           description: "Greenery and filler materials for arrangements",
         },
         {
-          name: "Seasonal Wildflowers",
-          slug: "seasonal-wildflowers",
+          name: "Wildflowers",
+          slug: "wildflowers",
           image: "/collection-images/seasonal-wildflowers.png",
           description: "Fresh seasonal wildflowers with natural charm",
         },
@@ -296,7 +290,7 @@ async function seedProducts() {
       // Try to read price-list.csv first, fall back to price-list.csv if not found
       let csvProducts: Array<{
         name: string
-        price: number | null
+        price: number
         type: ProductType
         quantity: number
         description: string
@@ -349,7 +343,7 @@ async function seedProducts() {
               description: csvProduct.description,
               productType: csvProduct.type,
               colors: csvProduct.colors,
-              image: csvProduct.image || null,
+              images: csvProduct.image ? [csvProduct.image] : [],
               price: csvProduct.price,
               featured: false,
             },
@@ -359,7 +353,7 @@ async function seedProducts() {
               description: csvProduct.description,
               productType: csvProduct.type,
               colors: csvProduct.colors,
-              image: csvProduct.image || null,
+              images: csvProduct.image ? [csvProduct.image] : [],
               price: csvProduct.price,
             },
           })
@@ -397,7 +391,7 @@ async function seedProducts() {
               description: csvProduct.description,
               productType: csvProduct.type,
               colors: csvProduct.colors,
-              image: csvProduct.image || null,
+              images: csvProduct.image ? [csvProduct.image] : [],
               price: csvProduct.price,
               featured: false,
             },
@@ -407,7 +401,7 @@ async function seedProducts() {
               description: csvProduct.description,
               productType: csvProduct.type,
               colors: csvProduct.colors,
-              image: csvProduct.image || null,
+              images: csvProduct.image ? [csvProduct.image] : [],
               price: csvProduct.price,
             },
           })

@@ -29,7 +29,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
             <AdminSidebar />
           </aside>
 
-          <main className="lg:col-span-3 bg-primary-foreground border border-border px-6 py-4 rounded-sm">
+          <main className="lg:col-span-3 bg-primary-foreground border border-border px-6 py-4 rounded-sm overflow-hidden">
             {children}
           </main>
         </div>

@@ -11,8 +11,7 @@ import {
   updateProductAction,
 } from "@/app/actions/products"
 import { GenerateDescriptionButton } from "@/components/admin/GenerateDescriptionButton"
-import { ImageUpload } from "@/components/admin/ImageUpload"
-import { ProductImageGeneratorInline } from "@/components/admin/ProductImageGeneratorInline"
+import { ProductImageManager } from "@/components/admin/ProductImageManager"
 import SlugInput from "@/components/admin/SlugInput"
 import { ColorSelector } from "@/components/site/ColorSelector"
 import { Button } from "@/components/ui/button"
@@ -49,7 +48,7 @@ interface ProductFormProps {
     name: string
     slug: string
     description: string | null
-    image: string | null
+    images: string[]
     price: number
     colors?: string[] | null
     collectionIds: string[]
@@ -62,8 +61,6 @@ export default function ProductForm({ collections, product }: ProductFormProps) 
   const router = useRouter()
   const isEditing = !!product
 
-  // Track original image URL to clean up old blob when image changes
-  const [originalImage] = useState(product?.image || "")
   const [isDeleting, setIsDeleting] = useState(false)
 
   const form = useForm<ProductFormData>({
@@ -72,7 +69,7 @@ export default function ProductForm({ collections, product }: ProductFormProps) 
       name: product?.name || "",
       slug: product?.slug || "",
       description: product?.description || "",
-      image: product?.image || "",
+      images: product?.images || [],
       price: product?.price?.toString() || "",
       colors: product?.colors || [],
       collectionIds: product?.collectionIds || [],
@@ -86,7 +83,7 @@ export default function ProductForm({ collections, product }: ProductFormProps) 
     name: product?.name || "",
     slug: product?.slug || "",
     description: product?.description || "",
-    image: product?.image || "",
+    images: product?.images || [],
     price: product?.price?.toString() || "",
     colors: product?.colors || [],
     collectionIds: product?.collectionIds || [],
@@ -266,59 +263,47 @@ export default function ProductForm({ collections, product }: ProductFormProps) 
           )}
         />
 
-        <div className="flex gap-6 md:grid-cols-3 items-start">
-          {/* Image */}
-          <div className="flex-1 flex flex-col gap-2">
-            <ImageUpload
-              value={form.watch("image")}
-              onChange={(url) => {
-                form.setValue("image", url)
-                handleBlur()
-              }}
-              folder="products"
-              slug={watchedSlug}
-              previousUrl={originalImage}
-              label="Image"
-            />
-            {form.formState.errors.image && (
-              <div className="text-sm text-destructive">{form.formState.errors.image.message}</div>
-            )}
-          </div>
-
-          {/* Generate Product Image */}
-          <ProductImageGeneratorInline
+        {/* Image */}
+        <div className="flex flex-col gap-2">
+          <ProductImageManager
+            productId={product?.id}
+            slug={watchedSlug}
             productName={form.watch("name") || product?.name || "Product"}
             productType={form.watch("productType") || ProductType.FLOWER}
             productDescription={form.watch("description")}
-            onImageSaved={(imageUrl) => {
-              form.setValue("image", imageUrl)
+            initialImages={form.watch("images") || []}
+            onImagesChange={(images) => {
+              form.setValue("images", images)
               handleBlur()
             }}
           />
-
-          {/* Color */}
-          <FormField
-            control={form.control}
-            name="colors"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Color</FormLabel>
-                <div className="flex flex-col gap-4">
-                  {/* Color Swatches */}
-                  <ColorSelector
-                    selectedColors={Array.isArray(field.value) ? field.value : []}
-                    onChange={(colors) => {
-                      form.setValue("colors", colors)
-                      handleBlur()
-                    }}
-                    showLabel={false}
-                  />
-                </div>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+          {form.formState.errors.images && (
+            <div className="text-sm text-destructive">{form.formState.errors.images.message}</div>
+          )}
         </div>
+
+        {/* Color */}
+        <FormField
+          control={form.control}
+          name="colors"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Color</FormLabel>
+              <div className="flex flex-col gap-4">
+                {/* Color Swatches */}
+                <ColorSelector
+                  selectedColors={Array.isArray(field.value) ? field.value : []}
+                  onChange={(colors) => {
+                    form.setValue("colors", colors)
+                    handleBlur()
+                  }}
+                  showLabel={false}
+                />
+              </div>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
 
         {/* Product Type */}
         <FormField

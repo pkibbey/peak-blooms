@@ -19,9 +19,9 @@ export function ShopProductTableRow({ product, user }: ShopProductTableRowProps)
       {/* Image */}
       <TableCell>
         <div className="relative h-12 w-12 overflow-hidden rounded-sm bg-muted">
-          {product.image ? (
+          {product.images && product.images.length > 0 ? (
             <Image
-              src={product.image}
+              src={product.images[0]}
               alt={product.name}
               fill
               className="object-cover"

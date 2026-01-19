@@ -38,7 +38,7 @@ export async function searchProducts(
       id: product.id,
       name: product.name,
       slug: product.slug,
-      image: product.image,
+      image: product.images?.[0] || null,
       price: product.price,
     }))
 

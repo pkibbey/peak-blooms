@@ -164,7 +164,7 @@ export function mockProductBasic(overrides?: Partial<ProductBasic>): ProductBasi
     id: "test-product-id",
     name: "Test Product",
     slug: "test-product",
-    image: "/images/test-product.jpg",
+    images: ["/images/test-product.jpg"],
     price: 50.0,
     description: "A test product",
     colors: [],

@@ -49,14 +49,25 @@ export function ProductItem({
         {/* Image Container */}
         <Link prefetch={false} href={`/shop/${product.slug}`}>
           <div className="shadow-2xs hover:shadow-lg transition-shadow relative aspect-square overflow-hidden bg-zinc-200">
-            {product.image && (
-              <Image
-                src={product.image}
-                alt={product.name}
-                fill
-                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
-                className="object-cover transition-transform duration-300 group-hover:scale-105"
-              />
+            {product.images && product.images.length > 0 && (
+              <>
+                <Image
+                  src={product.images[0]}
+                  alt={product.name}
+                  fill
+                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
+                  className="object-cover transition-transform duration-300 group-hover:scale-105 absolute inset-0 z-10"
+                />
+                {product.images.length > 1 && (
+                  <Image
+                    src={product.images[1]}
+                    alt={product.name}
+                    fill
+                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
+                    className="object-cover transition-opacity duration-300 opacity-0 group-hover:opacity-100 absolute inset-0 z-20"
+                  />
+                )}
+              </>
             )}
             {/* Colors Display - Bottom Left */}
             {product.colors && product.colors.length > 0 && (
@@ -89,7 +100,7 @@ export function ProductItem({
 
   return (
     <div
-      className={`flex md:flex-row flex-col bg-background rounded-xs shadow-sm border transition-opacity ${
+      className={`group flex md:flex-row flex-col bg-background rounded-xs shadow-sm border transition-opacity ${
         isUpdating ? "opacity-60" : ""
       }`}
     >
@@ -99,14 +110,25 @@ export function ProductItem({
         href={`/shop/${product.slug}`}
         className={`relative ${sizeConfig.container} shrink-0 overflow-hidden`}
       >
-        {product.image ? (
-          <Image
-            src={product.image}
-            alt={product.name}
-            fill
-            className="object-cover md:rounded-l-sm rounded-t-sm md:rounded-t-none"
-            sizes={sizeConfig.size}
-          />
+        {product.images && product.images.length > 0 ? (
+          <>
+            <Image
+              src={product.images[0]}
+              alt={product.name}
+              fill
+              sizes={sizeConfig.size}
+              className="object-cover md:rounded-l-sm rounded-t-sm md:rounded-t-none absolute inset-0 z-10"
+            />
+            {product.images.length > 1 && (
+              <Image
+                src={product.images[1]}
+                alt={product.name}
+                fill
+                sizes={sizeConfig.size}
+                className="object-cover md:rounded-l-sm rounded-t-sm md:rounded-t-none absolute inset-0 z-20 opacity-0 transition-opacity duration-300 group-hover:opacity-100"
+              />
+            )}
+          </>
         ) : (
           <div className="h-full w-full bg-muted" />
         )}

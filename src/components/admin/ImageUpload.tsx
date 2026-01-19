@@ -24,6 +24,8 @@ interface ImageUploadProps {
   required?: boolean
   aspectRatio?: "square" | "16:9" | "4:1" // Default is square (1:1)
   className?: string
+  multiple?: boolean // Allow selecting multiple files at once
+  addRandomSuffix?: boolean // When true, generate unique filenames to avoid overwrites
 }
 
 export function ImageUpload({
@@ -37,6 +39,8 @@ export function ImageUpload({
   required = false,
   aspectRatio = "square",
   className,
+  multiple = false,
+  addRandomSuffix = false,
 }: ImageUploadProps) {
   const [isUploading, setIsUploading] = useState(false)
   const [uploadProgress, setUploadProgress] = useState(0)
@@ -86,7 +90,7 @@ export function ImageUpload({
       const blob = await upload(pathname, file, {
         access: "public",
         handleUploadUrl: "/api/upload",
-        clientPayload: JSON.stringify({ folder, slug, extension }),
+        clientPayload: JSON.stringify({ folder, slug, extension, unique: addRandomSuffix }),
         onUploadProgress: (progress) => {
           setUploadProgress(progress.percentage)
         },
@@ -104,9 +108,11 @@ export function ImageUpload({
       onChange(blob.url)
       setImageError(false)
       toast.success("Image uploaded successfully")
+      return blob.url
     } catch (error) {
       const message = error instanceof Error ? error.message : "Upload failed"
       toast.error(message)
+      return null
     } finally {
       setIsUploading(false)
       setUploadProgress(0)
@@ -117,15 +123,21 @@ export function ImageUpload({
   }
 
   const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0]
-    if (file) handleFile(file)
+    const files = Array.from(e.target.files || [])
+    if (files.length === 0) return
+    for (const file of files) {
+      await handleFile(file)
+    }
   }
 
   const handleDrop = async (e: React.DragEvent) => {
     e.preventDefault()
     setIsDragging(false)
-    const file = e.dataTransfer.files?.[0]
-    if (file) handleFile(file)
+    const files = Array.from(e.dataTransfer.files || [])
+    if (files.length === 0) return
+    for (const file of files) {
+      await handleFile(file)
+    }
   }
 
   const handleDragOver = (e: React.DragEvent) => {
@@ -165,6 +177,7 @@ export function ImageUpload({
         accept="image/jpeg,image/png,image/webp"
         onChange={handleFileSelect}
         className="sr-only"
+        multiple={multiple}
       />
 
       {/* Unified drop zone / preview area */}

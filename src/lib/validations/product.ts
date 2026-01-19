@@ -6,7 +6,7 @@ export const productSchema = z.object({
   name: z.string().min(1, "Product name is required"),
   slug: z.string().min(1, "Slug is required"),
   description: z.string(),
-  image: z.string(),
+  images: z.array(z.string()), // Array of image URLs, ordered by display preference
   price: z
     .string()
     .optional()
@@ -16,9 +16,9 @@ export const productSchema = z.object({
         message: "Price must be a valid number 0 or greater",
       }
     ),
-  colors: z.array(z.string()).nullable(),
-  collectionIds: z.array(z.string()).nullable(),
-  productType: z.nativeEnum(ProductType),
+  colors: z.array(z.string()).nullable().optional(),
+  collectionIds: z.array(z.string()).nullable().optional(),
+  productType: z.enum(ProductType),
   featured: z.boolean(),
 })
 
@@ -29,11 +29,11 @@ const createProductSchema = z.object({
   name: z.string().min(1, "Product name is required"),
   slug: z.string().min(1, "Slug is required"),
   description: z.string().nullable(),
-  image: z.string().nullable(),
+  images: z.array(z.string()).default([]), // Array of image URLs
   price: z.number().min(0, "Price must be a non-negative number"),
   colors: z.array(z.string()).nullable(),
   collectionIds: z.array(z.string()).nullable(),
-  productType: z.nativeEnum(ProductType).default(ProductType.FLOWER),
+  productType: z.enum(ProductType).default(ProductType.FLOWER),
   featured: z.boolean().default(false),
 })
 
@@ -89,7 +89,7 @@ export const createProductFormSchema = z.object({
   name: z.string().min(1, "Product name is required"),
   slug: z.string().min(1, "Slug is required"),
   description: z.string().nullable(),
-  image: z.string().nullable(),
+  images: z.array(z.string()).default([]), // Array of image URLs
   price: z
     .string()
     .optional()
@@ -101,7 +101,7 @@ export const createProductFormSchema = z.object({
     ),
   colors: z.array(z.string()).nullable(),
   collectionIds: z.array(z.string()).nullable(),
-  productType: z.nativeEnum(ProductType).default(ProductType.FLOWER),
+  productType: z.enum(ProductType).default(ProductType.FLOWER),
   featured: z.boolean().default(false),
 })
 

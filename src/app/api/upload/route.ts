@@ -25,21 +25,21 @@ export async function POST(request: Request): Promise<NextResponse> {
           throw new Error("Not authorized - admin access required")
         }
 
-        // Parse client payload for folder, slug, and extension
+        // Parse client payload for folder, slug, extension, and unique filename flag
         const payload = clientPayload ? JSON.parse(clientPayload) : {}
-        const { folder = "general", slug, extension = "jpg" } = payload
+        const { folder = "general", slug, extension = "jpg", unique = false, filename } = payload
 
-        if (!slug) {
+        if (!slug && !filename) {
           throw new Error("Slug is required for upload")
         }
 
-        const finalPath = `${folder}/${slug}.${extension}`
+        const finalPath = filename ? filename : `${folder}/${slug}.${extension}`
 
         return {
           allowedContentTypes: ALLOWED_CONTENT_TYPES,
           maximumSizeInBytes: MAX_FILE_SIZE,
-          addRandomSuffix: false,
-          allowOverwrite: true,
+          addRandomSuffix: !!unique,
+          allowOverwrite: !unique,
           pathname: finalPath,
           tokenPayload: JSON.stringify({
             userId: session.user.id,

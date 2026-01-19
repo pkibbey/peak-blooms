@@ -18,14 +18,14 @@ interface OrderItemProps {
 export function OrderItem({ item }: OrderItemProps) {
   // Use snapshot data if available (for historical accuracy), otherwise fallback to live product data
   const productName = item.productNameSnapshot ?? item.product?.name ?? "Unknown Product"
-  const productImage = item.productImageSnapshot ?? item.product?.image ?? null
+  const productImage = item.productImageSnapshot ?? item.product?.images?.[0] ?? null
 
   return (
     <ProductItem
       product={{
         id: item.product?.id ?? "",
         name: productName,
-        image: productImage,
+        images: productImage ? [productImage] : [],
         price: item.price,
         slug: item.product?.slug ?? "",
         description: item.product?.description ?? null,

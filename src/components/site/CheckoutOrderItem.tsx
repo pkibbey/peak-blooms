@@ -14,9 +14,9 @@ export function CheckoutOrderItem({ item }: CheckoutOrderItemProps) {
   return (
     <div className="flex gap-3">
       <div className="relative h-16 w-16 shrink-0 rounded-xs">
-        {item.product.image ? (
+        {item.product.images && item.product.images.length > 0 ? (
           <Image
-            src={item.product.image}
+            src={item.product.images[0]}
             alt={item.product.name}
             fill
             className="object-cover rounded-xs"

@@ -17,6 +17,7 @@ vi.mock("./logger", () => ({
   ),
 }))
 
+import type { ProductModel } from "@/generated/models"
 import { db } from "@/lib/db"
 import {
   getFeaturedProducts,
@@ -31,12 +32,12 @@ describe("Products Data Access Layer", () => {
   })
 
   const now = new Date()
-  const mockProduct = {
+  const mockProduct: ProductModel = {
     id: "prod-1",
     name: "Red Roses",
     slug: "red-roses",
     description: "Beautiful red roses",
-    image: "roses.jpg",
+    images: ["roses.jpg"],
     price: 50,
     colors: ["red"],
     productType: ProductType.FLOWER,
@@ -44,7 +45,6 @@ describe("Products Data Access Layer", () => {
     deletedAt: null,
     createdAt: now,
     updatedAt: now,
-    productCollections: [],
   }
 
   const mockProductWithCollections = {
