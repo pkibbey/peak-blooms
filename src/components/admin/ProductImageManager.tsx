@@ -4,8 +4,8 @@ import { GripVertical, X } from "lucide-react"
 import Image from "next/image"
 import { useState } from "react"
 import { toast } from "sonner"
-import { ImageUpload } from "@/components/admin/ImageUpload"
 import { ImageSearchPicker } from "@/components/admin/ImageSearchPicker"
+import { ImageUpload } from "@/components/admin/ImageUpload"
 import { ProductImageGeneratorInline } from "@/components/admin/ProductImageGeneratorInline"
 import { Button } from "@/components/ui/button"
 import { Label } from "@/components/ui/label"
@@ -187,13 +187,6 @@ export function ProductImageManager({
           />
         </div>
 
-        {/* Search for Image from APIs */}
-        <ImageSearchPicker
-          productName={productName}
-          productType={productType}
-          onImageSelected={handleAddImage}
-        />
-
         {/* Generate Image with AI */}
         <ProductImageGeneratorInline
           productName={productName}
@@ -203,6 +196,13 @@ export function ProductImageManager({
           buttonLabel="Generate Image"
         />
       </div>
+
+      {/* Search for Image from APIs */}
+      <ImageSearchPicker
+        productName={productName}
+        productType={productType}
+        onImageSelected={handleAddImage}
+      />
 
       {/* Max Images Warning */}
       {images.length >= 10 && (

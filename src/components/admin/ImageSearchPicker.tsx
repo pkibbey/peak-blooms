@@ -166,18 +166,12 @@ function ImageSourceSection({ title, images, onSelectImage }: ImageSourceSection
       <h3 className="text-sm font-semibold text-foreground">{title}</h3>
       <div className="grid grid-cols-3 gap-3">
         {images.map((image) => (
-          <div
+          <button
             key={image.url}
+            type="button"
             className="group relative aspect-square overflow-hidden rounded-lg border cursor-pointer hover:border-primary transition-colors"
             onClick={() => onSelectImage(image)}
-            onKeyDown={(e) => {
-              if (e.key === "Enter" || e.key === " ") {
-                e.preventDefault()
-                onSelectImage(image)
-              }
-            }}
-            role="button"
-            tabIndex={0}
+            aria-label={`Select ${image.attribution}`}
           >
             <Image
               src={image.url}
@@ -201,7 +195,7 @@ function ImageSourceSection({ title, images, onSelectImage }: ImageSourceSection
                 <Search className="h-3 w-3" />
               </div>
             </div>
-          </div>
+          </button>
         ))}
       </div>
     </div>
