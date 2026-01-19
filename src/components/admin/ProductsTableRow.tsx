@@ -1,5 +1,6 @@
 "use client"
 
+import { AlertCircle, Check } from "lucide-react"
 import Image from "next/image"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
@@ -99,6 +100,21 @@ export default function ProductsTableRow({ product }: ProductRowProps) {
             aria-label={`Toggle featured for ${product.name}`}
           />
         </div>
+      </TableCell>
+
+      {/* Description */}
+      <TableCell className="hidden lg:table-cell">
+        {product.description?.trim() ? (
+          <div className="flex items-center gap-2 text-green-600">
+            <Check className="h-4 w-4" />
+            <span className="text-xs">Yes</span>
+          </div>
+        ) : (
+          <div className="flex items-center gap-2 text-amber-600">
+            <AlertCircle className="h-4 w-4" />
+            <span className="text-xs">Missing</span>
+          </div>
+        )}
       </TableCell>
 
       {/* Colors */}

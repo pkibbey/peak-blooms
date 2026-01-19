@@ -45,6 +45,9 @@ export async function getProducts(
     priceMin?: number
     priceMax?: number
     search?: string
+    filterDescription?: "has" | "missing"
+    filterImages?: "has" | "missing"
+    productType?: string
     limit?: number
     offset?: number
     sort?: string
@@ -84,6 +87,26 @@ export async function getProducts(
         { name: { contains: options.search, mode: "insensitive" } },
         { description: { contains: options.search, mode: "insensitive" } },
       ]
+    }
+
+    // Filter by description status
+    if (options.filterDescription === "has") {
+      where.AND = [{ description: { not: null } }, { description: { not: "" } }]
+    } else if (options.filterDescription === "missing") {
+      where.OR = [{ description: null }, { description: "" }]
+    }
+
+    // Filter by image status
+    if (options.filterImages === "has") {
+      where.images = { isEmpty: false }
+    } else if (options.filterImages === "missing") {
+      where.images = { isEmpty: true }
+    }
+
+    // Filter by specific product type
+    if (options.productType) {
+      const ProductType = require("@/generated/client").ProductType
+      where.productType = ProductType[options.productType as keyof typeof ProductType]
     }
 
     // Price filtering on the product itself

@@ -28,8 +28,8 @@ export function generateDescriptionPrompt(
   const typeContext = PRODUCT_TYPE_CONTEXT[productType] || "Cut flower"
 
   if (existingDescription) {
-    return `Concise visual description of the ${typeContext} "${productName}": ${existingDescription}. Refine to focus on color, form, and visual distinctiveness in 100 words as plain text.`
+    return `Concise visual description of the ${typeContext} "${productName}": ${existingDescription}. Refine to focus ONLY on visual characteristics - color, form, texture, petal arrangement, and appearance. Do not mention scent, fragrance, smell, uses, or potential applications. Maximum 70 words as plain text.`
   }
 
-  return `Describe the ${typeContext} "${productName}" visually in up to 100 words as plain text: color, bloom form, and distinctive characteristics.`
+  return `Describe the ${typeContext} "${productName}" visually in up to 70 words as plain text. Focus ONLY on visual characteristics: color, bloom form, texture, petal arrangement, size, and distinctive visual appearance. Do NOT mention scent, fragrance, smell, uses, meanings, or potential applications.`
 }

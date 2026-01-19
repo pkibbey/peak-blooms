@@ -110,6 +110,14 @@ function readProductsFromPriceList(): Array<{
     image?: string
   }> = []
 
+  // Helper to remove only outer CSV quotes from a field
+  const stripCsvQuotes = (field: string): string => {
+    if (field.startsWith('"') && field.endsWith('"')) {
+      return field.slice(1, -1).trim()
+    }
+    return field.trim()
+  }
+
   // Skip header row (line 0)
   for (let i = 1; i < lines.length; i++) {
     const line = lines[i].trim()
@@ -119,16 +127,16 @@ function readProductsFromPriceList(): Array<{
     const match = line.match(/"([^"]*)"|([^,]+)/g) || []
     if (match.length < 3) continue
 
-    const category = (match[0] || "").replace(/"/g, "").trim()
-    const name = (match[1] || "").replace(/"/g, "").trim()
-    const priceStr = (match[2] || "").replace(/"/g, "").trim()
+    const category = stripCsvQuotes(match[0] || "")
+    const name = stripCsvQuotes(match[1] || "")
+    const priceStr = stripCsvQuotes(match[2] || "")
 
     const price = parsePrice(priceStr)
     const quantity = getQuantity(priceStr)
     const type = categoryToProductType(category)
 
     // Parse optional colors column if present (some price-lists include a colors column)
-    const colorsStr = (match[3] || "").replace(/"/g, "").trim()
+    const colorsStr = stripCsvQuotes(match[3] || "")
     const rawColors = colorsStr
       ? colorsStr
           .split("|")
@@ -194,6 +202,14 @@ function readProductsFromCSV(): Array<{
     image?: string
   }> = []
 
+  // Helper to remove only outer CSV quotes from a field
+  const stripCsvQuotes = (field: string): string => {
+    if (field.startsWith('"') && field.endsWith('"')) {
+      return field.slice(1, -1).trim()
+    }
+    return field.trim()
+  }
+
   // Skip header row (line 0)
   for (let i = 1; i < lines.length; i++) {
     const line = lines[i].trim()
@@ -203,12 +219,12 @@ function readProductsFromCSV(): Array<{
     const match = line.match(/"([^"]*)"|([^,]+)/g) || []
     if (match.length < 4) continue
 
-    const name = (match[0] || "").replace(/"/g, "").trim()
-    const priceStr = (match[1] || "").replace(/"/g, "").trim()
-    const typeStr = (match[2] || "").replace(/"/g, "").trim()
-    const description = (match[3] || "").replace(/"/g, "").trim()
-    const colorsStr = (match[4] || "").replace(/"/g, "").trim()
-    const imageStr = (match[5] || "").replace(/"/g, "").trim()
+    const name = stripCsvQuotes(match[0] || "")
+    const priceStr = stripCsvQuotes(match[1] || "")
+    const typeStr = stripCsvQuotes(match[2] || "")
+    const description = stripCsvQuotes(match[3] || "")
+    const colorsStr = stripCsvQuotes(match[4] || "")
+    const imageStr = stripCsvQuotes(match[5] || "")
 
     const price = parsePrice(priceStr)
     const quantity = getQuantity(priceStr)

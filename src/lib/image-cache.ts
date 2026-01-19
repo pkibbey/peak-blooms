@@ -10,7 +10,7 @@ let redisClient: ReturnType<typeof createClient> | null = null
 /**
  * Get or create Redis client
  */
-export async function getRedisClient() {
+async function getRedisClient() {
   if (redisClient) {
     return redisClient
   }
@@ -119,21 +119,6 @@ export async function getCachedApiQuota(source: string): Promise<ApiQuotaInfo | 
   } catch (err) {
     console.error("err: ", err)
     return null
-  }
-}
-
-/**
- * Clear all image search caches (for development/testing)
- */
-export async function clearImageCache() {
-  try {
-    const client = await getRedisClient()
-    const keys = await client.keys("image-search:*")
-    if (keys.length > 0) {
-      await client.del(keys)
-    }
-  } catch (err) {
-    console.error("err: ", err)
   }
 }
 

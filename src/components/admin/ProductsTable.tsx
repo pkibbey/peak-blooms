@@ -8,13 +8,22 @@ interface ProductsTableProps {
   sort?: string | null
   order?: "asc" | "desc" | null
   headerUrl: string
+  hasActiveFilters?: boolean
 }
 
-export default function ProductsTable({ products, sort, order, headerUrl }: ProductsTableProps) {
+export default function ProductsTable({
+  products,
+  sort,
+  order,
+  headerUrl,
+  hasActiveFilters,
+}: ProductsTableProps) {
   if (products.length === 0) {
     return (
       <p className="text-muted-foreground">
-        No products found. Add your first product to get started.
+        {hasActiveFilters
+          ? "No products match your filters. Try adjusting or clearing your filters."
+          : "No products found. Add your first product to get started."}
       </p>
     )
   }
@@ -49,6 +58,7 @@ export default function ProductsTable({ products, sort, order, headerUrl }: Prod
               className="hidden md:table-cell"
             />
             <TableHead>Featured</TableHead>
+            <TableHead className="hidden lg:table-cell">Description</TableHead>
             <TableHead className="hidden lg:table-cell">Colors</TableHead>
           </TableRow>
         </TableHeader>

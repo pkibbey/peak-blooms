@@ -84,7 +84,7 @@ export function ProductItem({
             )}
             {/* Colors Display - Bottom Left */}
             {product.colors && product.colors.length > 0 && (
-              <div className="z-10 absolute bottom-2 left-2 bg-background/90 rounded-md px-2 py-1">
+              <div className="z-20 absolute bottom-2 left-2 bg-background/90 rounded-md px-2 py-1">
                 <ColorsMiniDisplay colorIds={product.colors} />
               </div>
             )}
