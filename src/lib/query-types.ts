@@ -335,7 +335,7 @@ export type Metric = Omit<MetricGetPayload<true>, "id" | "createdAt">
  * Use when: Returning search results from searchProducts action
  */
 export type SearchProductsResult = {
-  products: Array<Pick<ProductBasic, "id" | "name" | "slug" | "image" | "price">>
+  products: Array<Pick<ProductBasic, "id" | "name" | "slug" | "price">>
 }
 
 /**

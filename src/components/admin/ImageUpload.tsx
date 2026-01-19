@@ -20,6 +20,7 @@ interface ImageUploadProps {
   slug: string // Required - used for predictable blob pathname
   previousUrl?: string // Original image URL for cleanup when slug changes
   label?: string
+  showLabel?: boolean // Whether to display the label (default: true)
   required?: boolean
   aspectRatio?: "square" | "16:9" | "4:1" // Default is square (1:1)
   className?: string
@@ -32,6 +33,7 @@ export function ImageUpload({
   slug,
   previousUrl,
   label = "Image",
+  showLabel = true,
   required = false,
   aspectRatio = "square",
   className,
@@ -150,10 +152,12 @@ export function ImageUpload({
 
   return (
     <div className={cn("space-y-2", className)}>
-      <Label>
-        {label}
-        {required && <span className="text-destructive ml-1">*</span>}
-      </Label>
+      {showLabel && (
+        <Label>
+          {label}
+          {required && <span className="text-destructive ml-1">*</span>}
+        </Label>
+      )}
 
       <input
         ref={inputRef}

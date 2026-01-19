@@ -5,8 +5,6 @@
 
 export type ProductType = "FLOWER" | "ROSE" | "FILLER" | "FOLIAGE" | "PLANT"
 
-const SYSTEM_PROMPT = `You are a florist. Write concise, vivid visual descriptions of flowers and plants in plain text (no markdown, no special formatting). Keep it to 100 words max. Focus on: color, bloom form, petal characteristics, and texture. Mention fragrance only if notable.`
-
 const PRODUCT_TYPE_CONTEXT: Record<ProductType, string> = {
   FLOWER: "Cut flower",
   ROSE: "Rose variety",

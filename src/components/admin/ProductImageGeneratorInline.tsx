@@ -21,6 +21,7 @@ interface ProductImageGeneratorInlineProps {
   productType: ProductType
   productDescription?: string | null
   onImageSaved: (imageUrl: string) => void
+  buttonLabel?: string
 }
 
 export function ProductImageGeneratorInline({
@@ -28,6 +29,7 @@ export function ProductImageGeneratorInline({
   productType,
   productDescription,
   onImageSaved,
+  buttonLabel = "Generate Image",
 }: ProductImageGeneratorInlineProps) {
   const [selectedStyle, setSelectedStyle] = useState<StyleTemplate>("botanical")
   const [isGenerating, setIsGenerating] = useState(false)
@@ -147,7 +149,7 @@ export function ProductImageGeneratorInline({
           ) : (
             <>
               <Zap className="mr-2 h-4 w-4" />
-              Generate Image
+              {buttonLabel}
             </>
           )}
         </Button>
