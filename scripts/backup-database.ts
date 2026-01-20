@@ -6,6 +6,7 @@ interface BackupData {
   metadata: {
     timestamp: string
     exportedAt: Date
+    environment?: string
     recordCounts: Record<string, number>
   }
   tables: {
@@ -34,10 +35,16 @@ async function backupDatabase(): Promise<void> {
   }
 
   const timestamp = new Date().toISOString().replace(/[:.]/g, "-")
-  const backupPath = path.join(backupDir, `backup-${timestamp}.json`)
+
+  const dbUrl = process.env.DATABASE_URL
+  const envFromDbUrl = dbUrl && /(localhost|127\.0\.0\.1|dev)/i.test(dbUrl) ? "dev" : dbUrl ? "prod" : undefined
+  const env = (envFromDbUrl || "dev").toLowerCase()
+
+  const backupPath = path.join(backupDir, `backup-${env}-${timestamp}.json`)
 
   try {
     console.log("🔄 Starting database backup...")
+    console.log(`🏷️ Environment: ${env}`)
     console.log(`📁 Backup destination: ${backupPath}\n`)
 
     // Export all tables in dependency order
@@ -71,10 +78,11 @@ async function backupDatabase(): Promise<void> {
       db.metric.findMany(),
     ])
 
-    const backup: BackupData = {
+    const backup: BackupData & { metadata: { environment?: string } } = {
       metadata: {
         timestamp,
         exportedAt: new Date(),
+        environment: env,
         recordCounts: {
           user: user.length,
           account: account.length,
