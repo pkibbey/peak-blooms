@@ -1,6 +1,7 @@
 import Link from "next/link"
 import { AdminPagination } from "@/components/admin/AdminPagination"
 import { BatchGenerateDescriptionsButton } from "@/components/admin/BatchGenerateDescriptionsButton"
+import { BatchGenerateImagesButton } from "@/components/admin/BatchGenerateImagesButton"
 import { ProductFilters } from "@/components/admin/ProductFilters"
 import ProductsTable from "@/components/admin/ProductsTable"
 import BackLink from "@/components/site/BackLink"
@@ -71,6 +72,19 @@ export default async function AdminProductsPage({ searchParams }: AdminProductsP
   )
   const productsMissingDescriptions = countResult.total
 
+  // Count products without images (respect current filters)
+  const countResultImages = await getProductsForCount(
+    {
+      // Apply filters to count (only missing images)
+      filterImages: "missing",
+      filterDescription,
+      types,
+      limit: 999999,
+    },
+    1.0
+  )
+  const productsMissingImages = countResultImages.total
+
   // Apply client-side sorting for description only (price is now server-side)
   const products = [...result.products]
   if (sort === "description") {
@@ -102,13 +116,24 @@ export default async function AdminProductsPage({ searchParams }: AdminProductsP
             Manage your product catalog ({result.total} total)
           </p>
         </div>
-        <div className="flex flex-col gap-2 sm:flex-row">
+        <div className="flex flex-col flex-wrap justify-end gap-2 sm:flex-row">
           {productsMissingDescriptions > 0 && (
             <BatchGenerateDescriptionsButton
               remainingCount={productsMissingDescriptions}
               filters={{
                 filterDescription: "missing",
                 filterImages,
+                types,
+              }}
+            />
+          )}
+
+          {productsMissingImages > 0 && (
+            <BatchGenerateImagesButton
+              remainingCount={productsMissingImages}
+              filters={{
+                filterDescription,
+                filterImages: "missing",
                 types,
               }}
             />

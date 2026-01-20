@@ -45,7 +45,7 @@ export async function POST(request: Request) {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          model: `${model}:nscale`,
+          model: model,
           messages: [{ role: "user", content: userPrompt }],
           max_tokens: 500,
           temperature: 0.7,

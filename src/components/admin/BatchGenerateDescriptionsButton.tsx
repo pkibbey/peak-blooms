@@ -19,6 +19,8 @@ interface BatchGenerateDescriptionsButtonProps {
   filters?: ProductFilters
 }
 
+const BATCH_COUNT = 10
+
 export function BatchGenerateDescriptionsButton({
   remainingCount,
   filters,
@@ -26,7 +28,7 @@ export function BatchGenerateDescriptionsButton({
   const [isPending, startTransition] = useTransition()
   const router = useRouter()
 
-  const totalToGenerate = remainingCount < 10 ? remainingCount : 10
+  const totalToGenerate = remainingCount < BATCH_COUNT ? remainingCount : BATCH_COUNT
 
   const handleBatchGenerate = () => {
     if (remainingCount === 0) return
@@ -68,7 +70,7 @@ export function BatchGenerateDescriptionsButton({
       ) : (
         <>
           <Sparkles className="mr-2 h-4 w-4" />
-          Generate Next {totalToGenerate} Description{totalToGenerate !== 1 && "s"}
+          Next {totalToGenerate} Description{totalToGenerate !== 1 && "s"}
         </>
       )}
     </Button>
