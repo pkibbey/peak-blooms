@@ -24,17 +24,14 @@ export default function NavLink({
 }: NavLinkProps) {
   const pathname = usePathname()
   const active = typeof href === "string" && pathname === href
+  const nonActiveHover =
+    variant === "default" ? "hover:bg-primary/50" : "hover:bg-secondary/50 hover:text-foreground"
 
   return (
     <Button
       variant={variant}
       size={size}
-      className={cn(
-        active
-          ? "bg-secondary text-secondary-foreground hover:bg-secondary/80 hover:text-secondary-foreground"
-          : "hover:bg-secondary/50 hover:text-foreground",
-        className
-      )}
+      className={cn(active ? "bg-secondary text-secondary-foreground" : nonActiveHover, className)}
       nativeButton={false}
       render={
         <Link prefetch={false} href={href} aria-current={active ? "page" : undefined} {...props}>

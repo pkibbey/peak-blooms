@@ -124,6 +124,21 @@ describe("Products Data Access Layer", () => {
       )
     })
 
+    it("should filter by product types", async () => {
+      vi.mocked(db.product.count).mockResolvedValueOnce(1)
+      vi.mocked(db.product.findMany).mockResolvedValueOnce([mockProductWithCollections])
+
+      await getProducts({ types: [ProductType.FLOWER, ProductType.PLANT] }, 1.0)
+
+      expect(db.product.findMany).toHaveBeenCalledWith(
+        expect.objectContaining({
+          where: expect.objectContaining({
+            productType: { in: [ProductType.FLOWER, ProductType.PLANT] },
+          }),
+        })
+      )
+    })
+
     it("should search by name", async () => {
       vi.mocked(db.product.count).mockResolvedValueOnce(1)
       vi.mocked(db.product.findMany).mockResolvedValueOnce([mockProductWithCollections])

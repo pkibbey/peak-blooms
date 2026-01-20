@@ -23,28 +23,30 @@ export const createOrderSchema = z.object({
 export type CreateOrderInput = z.infer<typeof createOrderSchema>
 // Cart operation schemas
 export const addToCartSchema = z.object({
-  productId: z.string().uuid("Invalid product ID"),
+  productId: z.string().min(1, "Invalid product ID"),
   quantity: z.number().int().min(1).max(999).default(1),
 })
 
 export type AddToCartInput = z.infer<typeof addToCartSchema>
 
 export const updateCartItemSchema = z.object({
-  itemId: z.string().uuid("Invalid item ID"),
+  itemId: z.string().min(1, "Invalid item ID"),
   quantity: z.number().int().min(0).max(999),
 })
 
 export type UpdateCartItemInput = z.infer<typeof updateCartItemSchema>
 
 export const removeFromCartSchema = z.object({
-  itemId: z.string().uuid("Invalid item ID"),
+  itemId: z.string().min(1, "Invalid item ID"),
 })
 
 export type RemoveFromCartInput = z.infer<typeof removeFromCartSchema>
 
 export const batchAddToCartSchema = z
   .object({
-    productIds: z.array(z.string().uuid()).min(1, "At least one product is required"),
+    productIds: z
+      .array(z.string().min(1, "Invalid product ID"))
+      .min(1, "At least one product is required"),
     quantities: z
       .union([z.number().int().min(1).max(999), z.array(z.number().int().min(1).max(999))])
       .optional(),
@@ -64,22 +66,22 @@ export type BatchAddToCartInput = z.infer<typeof batchAddToCartSchema>
 
 // Order operation schemas
 export const cancelOrderSchema = z.object({
-  orderId: z.string().uuid("Invalid order ID"),
+  orderId: z.uuid("Invalid order ID"),
   convertToCart: z.boolean().optional(),
 })
 
 export type CancelOrderInput = z.infer<typeof cancelOrderSchema>
 
 export const updateOrderStatusSchema = z.object({
-  orderId: z.string().uuid("Invalid order ID"),
+  orderId: z.uuid("Invalid order ID"),
   status: z.enum(OrderStatus),
 })
 
 export type UpdateOrderStatusInput = z.infer<typeof updateOrderStatusSchema>
 
 export const updateOrderItemPriceSchema = z.object({
-  orderId: z.string().uuid("Invalid order ID"),
-  itemId: z.string().uuid("Invalid item ID"),
+  orderId: z.uuid("Invalid order ID"),
+  itemId: z.uuid("Invalid item ID"),
   price: z.number().nonnegative("Price must be non-negative"),
 })
 

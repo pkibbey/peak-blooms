@@ -112,7 +112,12 @@ describe("Cart Actions", () => {
       if (result.success) {
         expect(result.data.id).toBe(CART_ID)
       }
-      expect(db.orderItem.update).toHaveBeenCalled()
+      expect(db.orderItem.update).toHaveBeenCalledWith(
+        expect.objectContaining({
+          where: { id: ITEM_ID_1 },
+          data: { quantity: existingItem.quantity + 5 },
+        })
+      )
     })
 
     it("should handle createCart and default multiplier", async () => {
@@ -169,7 +174,7 @@ describe("Cart Actions", () => {
       const result = await addToCartAction({ productId: "not-a-uuid", quantity: 1 })
       expect(result.success).toBe(false)
       if (!result.success) {
-        expect(result.code).toBe("VALIDATION_ERROR")
+        expect(result.code).toBe("NOT_FOUND")
       }
     })
 
@@ -373,7 +378,7 @@ describe("Cart Actions", () => {
       const result = await removeFromCartAction({ itemId: "invalid" })
       expect(result.success).toBe(false)
       if (!result.success) {
-        expect(result.code).toBe("VALIDATION_ERROR")
+        expect(result.code).toBe("NOT_FOUND")
       }
     })
   })
@@ -420,7 +425,9 @@ describe("Cart Actions", () => {
 
       const result = await batchAddToCartAction({ productIds: [PRODUCT_ID_1], quantities: [5] })
       expect(result.success).toBe(true)
-      expect(db.orderItem.update).toHaveBeenCalled()
+      expect(db.orderItem.update).toHaveBeenCalledWith(
+        expect.objectContaining({ where: { id: "existing" }, data: { quantity: 6 } })
+      )
     })
 
     it("should work when quantities is a number", async () => {

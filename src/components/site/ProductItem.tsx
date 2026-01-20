@@ -8,6 +8,7 @@ import { ProductControls } from "@/components/site/ProductControls"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { ColorsMiniDisplay } from "@/components/ui/ColorsMiniDisplay"
+import { ImageFrame } from "@/components/ui/ImageFrame"
 import { IconTrash } from "@/components/ui/icons"
 import { QuantityStepper } from "@/components/ui/QuantityStepper"
 import type { ProductModel } from "@/generated/models"
@@ -23,6 +24,8 @@ interface ProductItemProps {
   showQuantityControl?: boolean
   showSimilarLink?: boolean
   user?: SessionUser | null
+  currentCartQuantity?: number
+  cartItemId?: string
   onQuantityChange?: (newQuantity: number) => void
   onRemove?: () => void
   isUpdating?: boolean
@@ -42,6 +45,8 @@ export function ProductItem({
   showQuantityControl = false,
   showSimilarLink = false,
   user,
+  currentCartQuantity = 0,
+  cartItemId,
   onQuantityChange,
   onRemove,
   isUpdating = false,
@@ -61,7 +66,7 @@ export function ProductItem({
       <div className="group flex flex-col overflow-hidden rounded-xs transition-shadow border border-border">
         {/* Image Container */}
         <Link prefetch={false} href={`/shop/${product.slug}`}>
-          <div className="shadow-2xs hover:shadow-lg transition-shadow relative aspect-square overflow-hidden bg-zinc-200">
+          <ImageFrame className="aspect-square">
             {product.images && product.images.length > 0 && (
               <>
                 <Image
@@ -100,15 +105,23 @@ export function ProductItem({
                 <Pencil className="p-0.5" />
               </Button>
             )}
-          </div>
+          </ImageFrame>
         </Link>
 
         {/* Card Content */}
         <div className="flex flex-col justify-between bg-background p-4 gap-2 grow">
           <div className="min-w-0">
             <div className="flex items-center gap-2">
-              <Link prefetch={false} href={`/shop/${product.slug}`} className="min-w-0">
-                <h3 className="text-lg font-semibold text-secondary-foreground truncate">
+              <Link
+                prefetch={false}
+                href={`/shop/${product.slug}`}
+                className="min-w-0 flex-1"
+                title={product.name}
+              >
+                <h3
+                  title={product.name}
+                  className="text-lg font-semibold text-secondary-foreground truncate"
+                >
                   {product.name}
                 </h3>
               </Link>
@@ -118,7 +131,13 @@ export function ProductItem({
             </div>
           </div>
 
-          <ProductControls product={product} user={user} mode="card" />
+          <ProductControls
+            product={product}
+            user={user}
+            mode="card"
+            currentCartQuantity={currentCartQuantity}
+            cartItemId={cartItemId}
+          />
         </div>
       </div>
     )
@@ -168,13 +187,14 @@ export function ProductItem({
 
       {/* Product Details */}
       <div className="flex flex-1 flex-col px-4 py-3">
-        <div className="flex justify-between items-start">
-          <div className="min-w-0">
-            <div className="flex items-center gap-2">
+        <div className="flex flex-col lg:flex-row justify-between items-start">
+          <div className="min-w-0 flex-1">
+            <div className="flex flex-col gap-2">
               <Link
                 prefetch={false}
                 href={`/shop/${product.slug}`}
-                className="font-semibold hover:text-primary transition-colors truncate"
+                className="font-semibold hover:text-primary transition-colors block truncate"
+                title={product.name}
               >
                 {product.name}
               </Link>

@@ -63,10 +63,6 @@ export const COLORS: ProductColor[] = [
   { id: "other", label: "Other", hex: "#808080" },
 ]
 
-type ColorId = (typeof COLOR_IDS)[number]
-
-const COLOR_ID_SET = new Set<string>(COLOR_IDS as readonly string[])
-
 // Map for efficient color lookup by ID
 export const COLOR_MAP = new Map(COLORS.map((color) => [color.id, color]))
 

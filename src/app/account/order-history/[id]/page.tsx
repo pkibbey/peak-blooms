@@ -20,13 +20,8 @@ export default async function OrderDetailPage({ params }: OrderDetailPageProps) 
   const { id } = await params
   const user = await getCurrentUser()
 
-  // Redirect to sign in if not authenticated
-  if (!user) {
-    redirect(`/auth/signin?callbackUrl=/account/order-history/${id}`)
-  }
-
   // Redirect to pending approval if not approved
-  if (!user.approved) {
+  if (!user?.approved) {
     redirect("/pending-approval")
   }
 

@@ -24,7 +24,11 @@ export default function AddressCard({ address, onEdit }: AddressCardProps) {
 
     setIsDeleting(true)
     try {
-      await deleteAddressAction({ addressId: address.id })
+      const res = await deleteAddressAction({ addressId: address.id })
+      if (!res.success) {
+        toast.error(res.error || "Failed to delete address")
+        return
+      }
       toast.success("Address deleted")
       router.refresh()
     } catch (error) {
@@ -39,7 +43,11 @@ export default function AddressCard({ address, onEdit }: AddressCardProps) {
 
     setIsSettingDefault(true)
     try {
-      await updateAddressAction(address.id, { isDefault: true })
+      const res = await updateAddressAction(address.id, { isDefault: true })
+      if (!res.success) {
+        toast.error(res.error || "Failed to set default address")
+        return
+      }
       toast.success("Default address updated")
       router.refresh()
     } catch (error) {

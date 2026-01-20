@@ -23,10 +23,6 @@ export function ColorSelector({
     onChange(updated)
   }
 
-  const handleClear = () => {
-    onChange([])
-  }
-
   return (
     <div className="flex flex-col gap-2">
       {showLabel && <span className="text-sm font-medium">Colors</span>}
@@ -51,17 +47,6 @@ export function ColorSelector({
             />
           )
         })}
-        {/* Clear button */}
-        <button
-          type="button"
-          onClick={handleClear}
-          className={cn(
-            "rounded-md border flex items-center text-sm text-muted-foreground hover:text-foreground transition-colors",
-            compact ? "h-6 px-1.5" : "h-8 px-2"
-          )}
-        >
-          Clear
-        </button>
       </div>
     </div>
   )

@@ -21,13 +21,13 @@ export default async function Nav() {
   const user = await getCurrentUser()
   const isApproved = user?.approved === true
 
-  // Fetch cart count for approved users (count of unique items, not total quantity)
+  // Fetch cart count for approved users (sum of item quantities, not unique item count)
   // Only get the cart if it exists - don't create one just for displaying the count
   let cartCount = 0
   if (isApproved) {
     const cartResult = await getCartAction()
     if (cartResult?.success && cartResult.data?.items) {
-      cartCount = cartResult.data.items.length
+      cartCount = cartResult.data.items.reduce((sum, item) => sum + (item.quantity ?? 0), 0)
     }
   }
 

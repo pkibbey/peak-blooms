@@ -38,6 +38,19 @@ export default async function ProductDetailPage({ params }: ProductDetailPagePro
     notFound()
   }
 
+  // Fetch current cart quantity and item ID for this product
+  let currentCartQuantity = 0
+  let cartItemId: string | undefined
+  if (user) {
+    const cart = await db.order.findFirst({
+      where: { userId: user.id, status: "CART" },
+      include: { items: true },
+    })
+    const cartItem = cart?.items?.find((item) => item.productId === product.id)
+    currentCartQuantity = cartItem?.quantity ?? 0
+    cartItemId = cartItem?.id
+  }
+
   return (
     <>
       <div className="flex flex-col items-center justify-start py-12 font-sans">
@@ -87,7 +100,13 @@ export default async function ProductDetailPage({ params }: ProductDetailPagePro
                 <ColorsMiniDisplay colorIds={product.colors} size="md" />
               </div>
               {/* Product Controls */}
-              <ProductControls product={product} user={user} mode="detail" />
+              <ProductControls
+                product={product}
+                user={user}
+                mode="detail"
+                currentCartQuantity={currentCartQuantity}
+                cartItemId={cartItemId}
+              />
             </div>
           </div>
 

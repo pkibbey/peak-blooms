@@ -3,6 +3,7 @@
  * Centralized data fetching with automatic price multiplier application and logging
  */
 
+import { ProductType } from "@/generated/enums"
 import type { ProductWhereInput } from "@/generated/models"
 import { ITEMS_PER_PAGE } from "@/lib/consts"
 import { db } from "@/lib/db"
@@ -48,6 +49,7 @@ export async function getProducts(
     filterDescription?: "has" | "missing"
     filterImages?: "has" | "missing"
     productType?: string
+    types?: string[]
     limit?: number
     offset?: number
     sort?: string
@@ -103,9 +105,12 @@ export async function getProducts(
       where.images = { isEmpty: true }
     }
 
-    // Filter by specific product type
-    if (options.productType) {
-      const ProductType = require("@/generated/client").ProductType
+    // Filter by specific product type(s)
+    if (options.types && options.types.length > 0) {
+      where.productType = {
+        in: options.types.map((t: string) => ProductType[t as keyof typeof ProductType]),
+      }
+    } else if (options.productType) {
       where.productType = ProductType[options.productType as keyof typeof ProductType]
     }
 

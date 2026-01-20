@@ -55,9 +55,12 @@ export function ImageUpload({
     if (!oldUrl.includes("blob.vercel-storage.com")) return
 
     try {
-      await deleteBlobAction({ url: oldUrl })
+      const res = await deleteBlobAction({ url: oldUrl })
+      if (!res.success) {
+        console.warn("Failed to delete old blob:", res.error)
+      }
     } catch (error) {
-      console.log("error: ", error)
+      console.warn("Failed to delete old blob:", error)
       // cleanup failed
     }
   }

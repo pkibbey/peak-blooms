@@ -1,10 +1,8 @@
 ## 🛠️ Website To-Do List
 
 ## Meeting notes
-- Add unit tests and e2e tests to ensure complete site functionality
-- Get new products in there
-- Add in the stem length selector for roses
-- Talk about box lot user journey
+- Add e2e tests to ensure complete site functionality
+- Add the ability to backup data that is saved on the prod database into a json file that be used to restore from
 
 ### 🌟 Next Steps
 
@@ -12,7 +10,6 @@
 - Create subdomains
 - Create splash screen for www.
 - Upload test site to dev.
-- Configure email server
 - Plan site launch
 - Maintenence and updates performed on feature branches, tested on dev, and then released
 
@@ -20,8 +17,6 @@
 
 - Perform a design review with either humans, or AI, or both
 - Update logos with proper graphics
-- Try out different colour schemes (https://www.styleglide.ai/themes)
-- Add correct product images
 - Review text content
 
 ### 🛍️ Tracking / Marketing

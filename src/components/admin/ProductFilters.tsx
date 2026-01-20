@@ -1,20 +1,23 @@
 "use client"
 
-import { X } from "lucide-react"
-import { useRouter, useSearchParams } from "next/navigation"
-import { useState } from "react"
+import { useCallback, useState } from "react"
+import { FilterSection } from "@/components/filters/FilterSection"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Label } from "@/components/ui/label"
 import type { ProductType } from "@/generated/enums"
 import { PRODUCT_TYPE_LABELS } from "@/lib/product-types"
+import { useFilterState } from "@/lib/useFilterState"
 
 interface ProductFiltersProps {
   productTypes: ProductType[]
 }
 
 export function ProductFilters({ productTypes }: ProductFiltersProps) {
-  const router = useRouter()
-  const searchParams = useSearchParams()
+  const { searchParams, navigateWithParams, getParamsWithFilters, clearAllFilters } =
+    useFilterState({
+      basePath: "/admin/products",
+      searchParamNames: {},
+    })
 
   const [filterDescription, setFilterDescription] = useState<"all" | "has" | "missing">(
     searchParams.get("filterDescription") === "has"
@@ -34,46 +37,43 @@ export function ProductFilters({ productTypes }: ProductFiltersProps) {
     new Set(searchParams.get("types")?.split(",").filter(Boolean) || [])
   )
 
-  const applyFilters = (
-    description: typeof filterDescription,
-    images: typeof filterImages,
-    types: Set<string>
-  ) => {
-    const params = new URLSearchParams(searchParams.toString())
+  const applyFilters = useCallback(
+    (description: typeof filterDescription, images: typeof filterImages, types: Set<string>) => {
+      const updates: Record<string, string | null> = {}
 
-    // Set description filter
-    if (description !== "all") {
-      params.set("filterDescription", description)
-    } else {
-      params.delete("filterDescription")
-    }
+      // Set description filter
+      if (description !== "all") {
+        updates.filterDescription = description
+      } else {
+        updates.filterDescription = null
+      }
 
-    // Set image filter
-    if (images !== "all") {
-      params.set("filterImages", images)
-    } else {
-      params.delete("filterImages")
-    }
+      // Set image filter
+      if (images !== "all") {
+        updates.filterImages = images
+      } else {
+        updates.filterImages = null
+      }
 
-    // Set type filters
-    if (types.size > 0) {
-      params.set("types", Array.from(types).join(","))
-    } else {
-      params.delete("types")
-    }
+      // Set type filters
+      if (types.size > 0) {
+        updates.types = Array.from(types).join(",")
+      } else {
+        updates.types = null
+      }
 
-    // Reset to page 1 when filters change
-    params.delete("page")
+      const params = getParamsWithFilters(updates)
+      navigateWithParams(params)
+    },
+    [navigateWithParams, getParamsWithFilters]
+  )
 
-    router.push(`/admin/products?${params.toString()}`)
-  }
-
-  const handleClearFilters = () => {
+  const handleClearFilters = useCallback(() => {
     setFilterDescription("all")
     setFilterImages("all")
     setSelectedTypes(new Set())
-    router.push("/admin/products")
-  }
+    clearAllFilters()
+  }, [clearAllFilters])
 
   const hasActiveFilters =
     filterDescription !== "all" || filterImages !== "all" || selectedTypes.size > 0
@@ -88,7 +88,6 @@ export function ProductFilters({ productTypes }: ProductFiltersProps) {
             onClick={handleClearFilters}
             className="text-xs text-blue-600 hover:underline flex items-center gap-1"
           >
-            <X className="h-3 w-3" />
             Clear all
           </button>
         )}
@@ -96,8 +95,7 @@ export function ProductFilters({ productTypes }: ProductFiltersProps) {
 
       <div className="space-y-4">
         {/* Description Filter */}
-        <div className="space-y-2">
-          <p className="text-xs font-medium text-gray-700">Description</p>
+        <FilterSection title="Description">
           <div className="space-y-2">
             <div className="flex items-center gap-2">
               <Checkbox
@@ -139,11 +137,10 @@ export function ProductFilters({ productTypes }: ProductFiltersProps) {
               </Label>
             </div>
           </div>
-        </div>
+        </FilterSection>
 
         {/* Image Filter */}
-        <div className="space-y-2">
-          <p className="text-xs font-medium text-gray-700">Images</p>
+        <FilterSection title="Images">
           <div className="space-y-2">
             <div className="flex items-center gap-2">
               <Checkbox
@@ -185,12 +182,24 @@ export function ProductFilters({ productTypes }: ProductFiltersProps) {
               </Label>
             </div>
           </div>
-        </div>
+        </FilterSection>
 
         {/* Product Type Filter */}
-        <div className="space-y-2">
-          <p className="text-xs font-medium text-gray-700">Product Type</p>
+        <FilterSection title="Product Type">
           <div className="space-y-2">
+            <div className="flex items-center gap-2">
+              <Checkbox
+                id="type-all"
+                checked={selectedTypes.size === 0}
+                onCheckedChange={() => {
+                  setSelectedTypes(new Set())
+                  applyFilters(filterDescription, filterImages, new Set())
+                }}
+              />
+              <Label htmlFor="type-all" className="text-sm font-normal cursor-pointer">
+                All
+              </Label>
+            </div>
             {productTypes.map((type) => (
               <div key={type} className="flex items-center gap-2">
                 <Checkbox
@@ -213,7 +222,7 @@ export function ProductFilters({ productTypes }: ProductFiltersProps) {
               </div>
             ))}
           </div>
-        </div>
+        </FilterSection>
       </div>
     </div>
   )

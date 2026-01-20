@@ -25,9 +25,9 @@ export default async function FeaturedProducts() {
           Explore our handpicked selection of premium flowers
         </p>
 
-        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3">
           {products.map((product) => (
-            <ProductItem key={product.slug} product={product} user={user} />
+            <ProductItem key={product.slug} product={product} user={user} layout="grid" />
           ))}
         </div>
       </div>

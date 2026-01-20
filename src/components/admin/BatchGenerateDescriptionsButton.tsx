@@ -11,7 +11,7 @@ import { IconRefresh } from "@/components/ui/icons"
 interface ProductFilters {
   filterDescription?: "has" | "missing"
   filterImages?: "has" | "missing"
-  productType?: string
+  types?: string[]
 }
 
 interface BatchGenerateDescriptionsButtonProps {

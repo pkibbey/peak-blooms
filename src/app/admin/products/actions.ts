@@ -6,7 +6,7 @@ import { getSession } from "@/lib/auth"
 interface ProductFilters {
   filterDescription?: "has" | "missing"
   filterImages?: "has" | "missing"
-  productType?: string
+  types?: string[]
 }
 
 interface BatchGenerateResult {
@@ -35,7 +35,7 @@ export async function batchGenerateDescriptionsAction(
   const queryParams = new URLSearchParams()
   if (filters?.filterDescription) queryParams.set("filterDescription", filters.filterDescription)
   if (filters?.filterImages) queryParams.set("filterImages", filters.filterImages)
-  if (filters?.productType) queryParams.set("productType", filters.productType)
+  if (filters?.types && filters.types.length > 0) queryParams.set("types", filters.types.join(","))
 
   // Call the API route
   const response = await fetch(

@@ -17,7 +17,7 @@ interface QuantityStepperProps {
 export function QuantityStepper({
   value,
   onChange,
-  min = 1,
+  min = 0,
   max = 999,
   disabled = false,
   size = "sm",
@@ -66,36 +66,59 @@ export function QuantityStepper({
 
   const config = sizeConfig[size]
 
+  const handleAddBox = () => {
+    const newValue = Math.min(max, Math.floor(value / 10) * 10 + 10)
+    if (newValue !== value) {
+      onChange(newValue)
+    }
+  }
+
   return (
-    <div className={cn("flex items-center", config.gap)}>
+    <div className="flex gap-3">
+      <div className={cn("flex items-center", config.gap)}>
+        <Button
+          type="button"
+          variant="outline"
+          size={size === "xs" ? "icon-xs" : "icon-sm"}
+          onClick={handleDecrement}
+          disabled={disabled || value <= min}
+          aria-label="Decrease quantity"
+        >
+          <IconMinus className={config.iconSize} />
+        </Button>
+        <Input
+          type="number"
+          min={min}
+          max={max}
+          value={value}
+          onChange={handleInputChange}
+          disabled={disabled}
+          className={cn(
+            "text-center font-medium border border-input rounded-xs",
+            config.inputClass
+          )}
+        />
+        <Button
+          type="button"
+          variant="outline"
+          size={size === "xs" ? "icon-xs" : "icon-sm"}
+          onClick={handleIncrement}
+          disabled={disabled || value >= max}
+          aria-label="Increase quantity"
+        >
+          <IconPlus className={config.iconSize} />
+        </Button>
+      </div>
       <Button
         type="button"
-        variant="outline"
+        variant="secondary"
         size={size === "xs" ? "icon-xs" : "icon-sm"}
-        onClick={handleDecrement}
-        disabled={disabled || value <= min}
-        aria-label="Decrease quantity"
-      >
-        <IconMinus className={config.iconSize} />
-      </Button>
-      <Input
-        type="number"
-        min={min}
-        max={max}
-        value={value}
-        onChange={handleInputChange}
-        disabled={disabled}
-        className={cn("text-center font-medium border border-input rounded-xs", config.inputClass)}
-      />
-      <Button
-        type="button"
-        variant="outline"
-        size={size === "xs" ? "icon-xs" : "icon-sm"}
-        onClick={handleIncrement}
+        onClick={handleAddBox}
         disabled={disabled || value >= max}
-        aria-label="Increase quantity"
+        aria-label="Add box of 10"
+        className="md:w-auto px-3"
       >
-        <IconPlus className={config.iconSize} />
+        + 10
       </Button>
     </div>
   )

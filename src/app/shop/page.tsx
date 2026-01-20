@@ -11,6 +11,7 @@ import { Table, TableBody, TableHead, TableHeader, TableRow } from "@/components
 import { ITEMS_PER_PAGE } from "@/lib/consts"
 import { getCurrentUser } from "@/lib/current-user"
 import { getProducts, getShopFilterOptions } from "@/lib/data"
+import { db } from "@/lib/db"
 
 interface ShopPageProps {
   searchParams: Promise<Record<string, string | string[] | undefined>>
@@ -28,6 +29,20 @@ export default async function ShopPage({ searchParams }: ShopPageProps) {
 
   // Fetch available filter options
   const filterOptions = await getShopFilterOptions()
+
+  // Fetch current cart to get product quantities
+  let cartItemMap: Record<string, { quantity: number; itemId: string }> = {}
+  if (user) {
+    const cart = await db.order.findFirst({
+      where: { userId: user.id, status: "CART" },
+      include: { items: true },
+    })
+    if (cart) {
+      cartItemMap = Object.fromEntries(
+        cart.items.map((item) => [item.productId, { quantity: item.quantity, itemId: item.id }])
+      )
+    }
+  }
 
   // Parse filter parameters
   const collectionIds =
@@ -210,9 +225,19 @@ export default async function ShopPage({ searchParams }: ShopPageProps) {
             ) : (
               <>
                 <div className="grid grid-cols-2 gap-4 sm:gap-6 md:grid-cols-3 mb-8">
-                  {products.map((product) => (
-                    <ProductItem key={product.slug} product={product} user={user} layout="grid" />
-                  ))}
+                  {products.map((product) => {
+                    const cartData = cartItemMap[product.id] || { quantity: 0, itemId: undefined }
+                    return (
+                      <ProductItem
+                        key={product.slug}
+                        product={product}
+                        user={user}
+                        layout="grid"
+                        currentCartQuantity={cartData.quantity}
+                        cartItemId={cartData.itemId}
+                      />
+                    )
+                  })}
                 </div>
 
                 {/* Pagination */}

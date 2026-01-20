@@ -2,6 +2,7 @@ import Image from "next/image"
 import Link from "next/link"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
+import { ImageFrame } from "@/components/ui/ImageFrame"
 import { IconArrowRight } from "@/components/ui/icons"
 import type { InspirationBasic } from "@/lib/query-types"
 
@@ -17,15 +18,15 @@ export function InspirationCard({ inspiration }: InspirationCardProps) {
   const productCount = inspiration._count?.products ?? 0
 
   return (
-    <div className="group flex flex-row overflow-hidden rounded-xs shadow-md transition-shadow hover:shadow-lg bg-background border border-border">
+    <div className="group flex flex-row overflow-hidden rounded-xs transition-shadow bg-background border border-border">
       {/* Image Container */}
-      <div className="relative w-2/5 shrink-0 overflow-hidden bg-zinc-200">
+      <ImageFrame className="w-2/5 shrink-0">
         <Image
           src={inspiration.image}
           alt={inspiration.name}
           fill
           sizes="(max-width: 768px) 40vw, (max-width: 1200px) 20vw, 15vw"
-          className="object-cover transition-transform duration-300 group-hover:scale-105"
+          className="object-cover absolute inset-0 z-10 transition-transform duration-300 group-hover:scale-105"
         />
         {productCount > 0 && (
           <Badge
@@ -35,10 +36,10 @@ export function InspirationCard({ inspiration }: InspirationCardProps) {
             {productCount} {productCount === 1 ? "Product" : "Products"}
           </Badge>
         )}
-      </div>
+      </ImageFrame>
 
       {/* Content Container */}
-      <div className="flex flex-col justify-between p-6 grow">
+      <div className="flex flex-col justify-between items-start p-6 grow">
         <div>
           <Link prefetch={false} href={`/inspirations/${inspiration.slug}`} className="group/link">
             <h3 className="text-xl font-bold group-hover/link:text-primary transition-colors font-serif">
@@ -52,7 +53,7 @@ export function InspirationCard({ inspiration }: InspirationCardProps) {
         </div>
 
         <Button
-          className="mt-4 w-full"
+          className="mt-4"
           nativeButton={false}
           render={
             <Link

@@ -28,12 +28,6 @@ export default function AddAllToCartButton({
   const [error, setError] = useState<string | null>(null)
 
   const handleAddAllToCart = async () => {
-    if (!session && !user) {
-      // If session isn't available client-side and server didn't pass a user, redirect to signin
-      router.push(`/auth/signin?callbackUrl=${window.location.pathname}`)
-      return
-    }
-
     if (!Array.isArray(productIds) || productIds.length === 0) {
       setError("No products to add to cart")
       toast.error("No products to add to cart")

@@ -166,7 +166,14 @@ export default function ProductForm({ collections, product }: ProductFormProps) 
 
     setIsDeleting(true)
     try {
-      await deleteProductAction({ id: product.id })
+      const result = await deleteProductAction({ id: product.id })
+      if (!result.success) {
+        form.setError("root", {
+          message: result.error || "Failed to delete product. Please try again.",
+        })
+        return
+      }
+
       toast.success("Product deleted successfully")
       router.push("/admin/products")
       router.refresh()

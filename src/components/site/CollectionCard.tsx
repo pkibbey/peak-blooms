@@ -2,6 +2,7 @@ import Image from "next/image"
 import Link from "next/link"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
+import { ImageFrame } from "@/components/ui/ImageFrame"
 import { IconArrowRight } from "@/components/ui/icons"
 import type { CollectionBasic } from "@/lib/query-types"
 
@@ -13,17 +14,17 @@ export function CollectionCard({ collection }: CollectionCardProps) {
   const productCount = collection._count.productCollections
 
   return (
-    <div className="group flex flex-col overflow-hidden rounded-xs shadow-md transition-shadow hover:shadow-lg border border-border">
+    <div className="group flex flex-col overflow-hidden rounded-xs transition-shadow border border-border">
       {/* Image Container */}
       <Link prefetch={false} href={`/collections/${collection.slug}`} className="group/link">
-        <div className="relative aspect-square overflow-hidden bg-zinc-200">
+        <ImageFrame className="aspect-square">
           {collection.image && (
             <Image
               src={collection.image}
               alt={collection.name}
               fill
               sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
-              className="object-cover transition-transform duration-300 group-hover:scale-105"
+              className="object-cover absolute inset-0 z-10 transition-transform duration-300 group-hover:scale-105"
             />
           )}
           {productCount > 0 && (
@@ -34,7 +35,7 @@ export function CollectionCard({ collection }: CollectionCardProps) {
               {productCount} {productCount === 1 ? "Product" : "Products"}
             </Badge>
           )}
-        </div>
+        </ImageFrame>
       </Link>
 
       {/* Card Content */}

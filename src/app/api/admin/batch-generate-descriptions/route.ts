@@ -22,6 +22,8 @@ export async function POST(request: Request): Promise<Response> {
     const url = new URL(request.url)
     const filterDescription = url.searchParams.get("filterDescription") as "has" | "missing" | null
     const filterImages = url.searchParams.get("filterImages") as "has" | "missing" | null
+    const typesParam = url.searchParams.get("types")
+    const types = typesParam ? typesParam.split(",").filter(Boolean) : null
     const productType = url.searchParams.get("productType")
 
     // Check that Hugging Face API key is configured
@@ -51,9 +53,13 @@ export async function POST(request: Request): Promise<Response> {
       whereClause.images = { isEmpty: true }
     }
 
-    // Filter by specific product type
-    if (productType) {
-      const ProductTypeEnum = require("@/generated/client").ProductType
+    // Filter by specific product type(s)
+    const ProductTypeEnum = require("@/generated/client").ProductType
+    if (types && types.length > 0) {
+      whereClause.productType = {
+        in: types.map((t) => ProductTypeEnum[t as keyof typeof ProductTypeEnum]),
+      }
+    } else if (productType) {
       whereClause.productType = ProductTypeEnum[productType as keyof typeof ProductTypeEnum]
     }
 

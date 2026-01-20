@@ -9,12 +9,12 @@ import { useCallback, useEffect, useRef } from "react"
  * - Keeps a ref to the latest callback so closures don't go stale
  * - Cleans up the timeout on unmount
  */
-export function useDebouncedCallback<T extends (...args: readonly unknown[]) => void>(
-  callback: T,
+export function useDebouncedCallback<Args extends readonly unknown[], R>(
+  callback: (...args: Args) => R,
   delay: number
-) {
-  const timeoutRef = useRef<NodeJS.Timeout | null>(null)
-  const callbackRef = useRef<T>(callback)
+): (...args: Args) => void {
+  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const callbackRef = useRef<(...args: Args) => R>(callback)
 
   // keep callback ref fresh
   useEffect(() => {
@@ -31,14 +31,14 @@ export function useDebouncedCallback<T extends (...args: readonly unknown[]) => 
   }, [])
 
   return useCallback(
-    (...args: Parameters<T>) => {
+    (...args: Args) => {
       if (timeoutRef.current) {
         clearTimeout(timeoutRef.current)
       }
       timeoutRef.current = setTimeout(() => {
-        // callbackRef.current is typed as T, which accepts Parameters<T>
+        // callbackRef.current is typed as (...args: Args) => R
         // We can call it directly with the captured args.
-        callbackRef.current(...(args as Parameters<T>))
+        ;(callbackRef.current as (...args: Args) => R)(...args)
       }, delay)
     },
     [delay]

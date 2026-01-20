@@ -112,16 +112,18 @@ export async function addToCartAction(input: unknown): Promise<AppResult<CartRes
     })
 
     if (existingItem) {
+      // Increment existing item quantity instead of replacing it. Also ensure quantity is at least 1.
+      const newQuantity = Math.max(1, existingItem.quantity + (quantity ?? 1))
       await db.orderItem.update({
         where: { id: existingItem.id },
-        data: { quantity },
+        data: { quantity: newQuantity },
       })
     } else {
       await db.orderItem.create({
         data: {
           orderId: cart.id,
           productId,
-          quantity,
+          quantity: Math.max(1, quantity ?? 1),
           price: 0,
         },
       })
@@ -523,16 +525,18 @@ export async function batchAddToCartAction(input: unknown): Promise<AppResult<Ca
         })
 
         if (existingItem) {
+          // Increment existing item quantity instead of replacing it. Also ensure quantity is at least 1.
+          const newQuantity = Math.max(1, existingItem.quantity + (quantity ?? 1))
           await tx.orderItem.update({
             where: { id: existingItem.id },
-            data: { quantity },
+            data: { quantity: newQuantity },
           })
         } else {
           await tx.orderItem.create({
             data: {
               orderId: cart.id,
               productId,
-              quantity,
+              quantity: Math.max(1, quantity ?? 1),
               price: 0,
             },
           })

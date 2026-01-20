@@ -45,7 +45,7 @@ export default function OrderStatusForm({ orderId, currentStatus }: OrderStatusF
     setIsSubmitting(true)
 
     try {
-      await updateOrderStatusAction({
+      const res = await updateOrderStatusAction({
         orderId,
         status: status as
           | "CART"
@@ -55,6 +55,12 @@ export default function OrderStatusForm({ orderId, currentStatus }: OrderStatusF
           | "DELIVERED"
           | "CANCELLED",
       })
+
+      if (!res.success) {
+        toast.error(res.error || "Failed to update status")
+        return
+      }
+
       toast.success("Order status updated")
       router.refresh()
     } catch (error) {

@@ -34,7 +34,14 @@ export default function ProfileForm({ user }: ProfileFormProps) {
 
   const onSubmit = async (data: ProfileFormData) => {
     try {
-      await updateProfileAction(data)
+      const res = await updateProfileAction(data)
+      if (!res.success) {
+        form.setError("root", {
+          message: res.error || "Failed to update profile. Please try again.",
+        })
+        return
+      }
+
       toast.success("Profile updated successfully")
       router.refresh()
     } catch (err) {

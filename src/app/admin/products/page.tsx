@@ -27,10 +27,12 @@ export default async function AdminProductsPage({ searchParams }: AdminProductsP
   // Parse filter params
   const filterDescription = params?.filterDescription as "has" | "missing" | undefined
   const filterImages = params?.filterImages as "has" | "missing" | undefined
-  const productType = params?.productType
-    ? typeof params.productType === "string"
-      ? params.productType
-      : params.productType[0]
+  const types = params?.types
+    ? typeof params.types === "string"
+      ? params.types.split(",").filter(Boolean)
+      : Array.isArray(params.types)
+        ? params.types
+        : [params.types[0]]
     : undefined
 
   // Use the DAL to fetch a page of products with counts
@@ -48,7 +50,7 @@ export default async function AdminProductsPage({ searchParams }: AdminProductsP
       // Pass filter options
       filterDescription,
       filterImages,
-      productType,
+      types,
     },
     1.0
   )
@@ -61,7 +63,7 @@ export default async function AdminProductsPage({ searchParams }: AdminProductsP
       // Apply filters to count (only missing descriptions)
       filterDescription: "missing",
       filterImages,
-      productType,
+      types,
       // No pagination for count
       limit: 999999,
     },
@@ -85,7 +87,7 @@ export default async function AdminProductsPage({ searchParams }: AdminProductsP
   const headerUrl = `${baseUrl}?sort=${sort || ""}&order=${order || ""}`
 
   // Check if any filters are active
-  const hasActiveFilters = !!(filterDescription || filterImages || productType)
+  const hasActiveFilters = !!(filterDescription || filterImages || (types && types.length > 0))
 
   // Get all product types for filter options
   const allProductTypes = Object.values(ProductType).sort()
@@ -107,7 +109,7 @@ export default async function AdminProductsPage({ searchParams }: AdminProductsP
               filters={{
                 filterDescription: "missing",
                 filterImages,
-                productType,
+                types,
               }}
             />
           )}
