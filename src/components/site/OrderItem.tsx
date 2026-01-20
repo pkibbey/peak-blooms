@@ -1,4 +1,4 @@
-import { ProductItem } from "@/components/site/ProductItem"
+import { ProductCard } from "@/components/site/ProductCard"
 import { ProductType } from "@/generated/enums"
 import type { OrderItemModel, ProductModel } from "@/generated/models"
 
@@ -21,7 +21,7 @@ export function OrderItem({ item }: OrderItemProps) {
   const productImage = item.productImageSnapshot ?? item.product?.images?.[0] ?? null
 
   return (
-    <ProductItem
+    <ProductCard
       product={{
         id: item.product?.id ?? "",
         name: productName,

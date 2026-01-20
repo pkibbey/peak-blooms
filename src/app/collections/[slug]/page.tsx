@@ -2,7 +2,7 @@ import { notFound } from "next/navigation"
 import BackLink from "@/components/site/BackLink"
 import { DeliveryBanner } from "@/components/site/DeliveryBanner"
 import { PageHeader } from "@/components/site/PageHeader"
-import { ProductItem } from "@/components/site/ProductItem"
+import { ProductCard } from "@/components/site/ProductCard"
 import { getCurrentUser } from "@/lib/current-user"
 import { getCollectionBySlug } from "@/lib/data"
 import { db } from "@/lib/db"
@@ -57,7 +57,7 @@ export default async function CollectionDetailPage({ params }: CollectionDetailP
             ) : (
               <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
                 {collection.productCollections.map((pc) => (
-                  <ProductItem
+                  <ProductCard
                     key={pc.product.slug}
                     product={pc.product}
                     user={user}

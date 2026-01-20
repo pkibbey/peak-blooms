@@ -1,7 +1,7 @@
 import { Suspense } from "react"
 import { DeliveryBanner } from "@/components/site/DeliveryBanner"
 import { PageHeader } from "@/components/site/PageHeader"
-import { ProductItem } from "@/components/site/ProductItem"
+import { ProductCard } from "@/components/site/ProductCard"
 import { ShopFilters } from "@/components/site/ShopFilters"
 import { ShopPagination } from "@/components/site/ShopPagination"
 import { ShopProductTableRow } from "@/components/site/ShopProductTableRow"
@@ -83,6 +83,9 @@ export default async function ShopPage({ searchParams }: ShopPageProps) {
       priceMin: priceMin !== undefined && !Number.isNaN(priceMin) ? priceMin : undefined,
       priceMax: priceMax !== undefined && !Number.isNaN(priceMax) ? priceMax : undefined,
       search: search || undefined,
+      // Hide products without images or description from public shop listings
+      filterDescription: "has",
+      filterImages: "has",
       limit: ITEMS_PER_PAGE,
       offset,
       // Pass sort to data layer only for database-sortable fields
@@ -228,7 +231,7 @@ export default async function ShopPage({ searchParams }: ShopPageProps) {
                   {products.map((product) => {
                     const cartData = cartItemMap[product.id] || { quantity: 0, itemId: undefined }
                     return (
-                      <ProductItem
+                      <ProductCard
                         key={product.slug}
                         product={product}
                         user={user}

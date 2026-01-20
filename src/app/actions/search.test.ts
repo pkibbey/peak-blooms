@@ -121,6 +121,8 @@ describe("Search Actions", () => {
         {
           search: "roses",
           limit: 10,
+          filterDescription: "has",
+          filterImages: "has",
         },
         1.0
       )
@@ -157,6 +159,8 @@ describe("Search Actions", () => {
         {
           search: "roses",
           limit: 10,
+          filterDescription: "has",
+          filterImages: "has",
         },
         1.5
       )
@@ -177,6 +181,8 @@ describe("Search Actions", () => {
         {
           search: "roses",
           limit: 10,
+          filterDescription: "has",
+          filterImages: "has",
         },
         1.0
       )

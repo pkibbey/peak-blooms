@@ -133,12 +133,14 @@ export function ProductControls({
       {isSignedIn && !isApproved && mode === "detail" && (
         <Button
           nativeButton={false}
+          variant="outline"
+          size="sm"
+          className="text-xs"
           render={
             <Link prefetch={false} href="/auth/signin">
               Sign in for pricing
             </Link>
           }
-          size="sm"
         />
       )}
 
@@ -146,13 +148,14 @@ export function ProductControls({
       {!isSignedIn && (
         <Button
           nativeButton={false}
-          // variant="outline"
+          variant="outline"
+          size="sm"
+          className="text-xs"
           render={
             <Link prefetch={false} href="/auth/signin">
               Sign in for pricing
             </Link>
           }
-          size="sm"
         />
       )}
 

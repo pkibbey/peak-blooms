@@ -176,7 +176,11 @@ export async function getFeaturedProducts(
   priceMultiplier = 1.0,
   limit?: number
 ): Promise<ProductWithCollections[]> {
-  const result = await getProducts({ featured: true, limit }, priceMultiplier)
+  // Featured lists should only show complete products (have images and description)
+  const result = await getProducts(
+    { featured: true, limit, filterDescription: "has", filterImages: "has" },
+    priceMultiplier
+  )
   return result.products
 }
 
@@ -235,9 +239,16 @@ export async function getShopFilterOptions(): Promise<{
   collections: Array<{ id: string; name: string }>
 }> {
   return withTiming("getShopFilterOptions", {}, async () => {
-    // Get all unique color IDs from active (non-deleted) products
+    // Get all unique color IDs from visible (active + complete) products
     const products = await db.product.findMany({
-      where: { deletedAt: null },
+      where: {
+        deletedAt: null,
+        AND: [
+          { description: { not: null } },
+          { description: { not: "" } },
+          { images: { isEmpty: false } },
+        ],
+      },
       select: { colors: true },
     })
     const colorIdsSet = new Set<string>()

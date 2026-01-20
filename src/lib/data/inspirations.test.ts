@@ -31,7 +31,7 @@ describe("Inspirations Data Access Layer", () => {
     name: "Red Roses",
     slug: "red-roses",
     description: "Beautiful red roses",
-    image: "roses.jpg",
+    images: ["roses.jpg"],
     price: 50,
     colors: ["red"],
     productType: ProductType.FLOWER,
@@ -173,6 +173,32 @@ describe("Inspirations Data Access Layer", () => {
       }
 
       vi.mocked(db.inspiration.findUnique).mockResolvedValueOnce(inspirationNoProducts)
+
+      const result = await getInspirationBySlug("wedding-bouquet", 1.0)
+
+      expect(result?.products).toHaveLength(0)
+    })
+
+    it("should filter out products missing description or images", async () => {
+      const inspirationWithIncomplete = {
+        ...mockInspiration,
+        products: [
+          {
+            productId: "prod-1",
+            inspirationId: "insp-1",
+            quantity: 1,
+            product: { ...mockProduct, description: null },
+          },
+          {
+            productId: "prod-2",
+            inspirationId: "insp-1",
+            quantity: 1,
+            product: { ...mockProduct, id: "prod-2", images: [] },
+          },
+        ],
+      }
+
+      vi.mocked(db.inspiration.findUnique).mockResolvedValueOnce(inspirationWithIncomplete)
 
       const result = await getInspirationBySlug("wedding-bouquet", 1.0)
 

@@ -1,6 +1,6 @@
 "use client"
 
-import { ProductItem } from "@/components/site/ProductItem"
+import { ProductCard } from "@/components/site/ProductCard"
 import type { OrderItemModel, ProductModel } from "@/generated/models"
 
 /**
@@ -24,7 +24,7 @@ interface CartItemProps {
 
 export function CartItem({ item, isUpdating, onUpdateQuantity, onRemove }: CartItemProps) {
   return (
-    <ProductItem
+    <ProductCard
       product={item.product}
       quantity={item.quantity}
       imageSize="md"

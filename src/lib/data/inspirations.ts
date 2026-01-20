@@ -69,7 +69,20 @@ export async function getInspirationBySlug(
       })
 
       if (!inspiration) return null
-      return applyMultiplierToInspiration(inspiration, priceMultiplier)
+
+      // Filter out products that are soft-deleted or incomplete (no images or description)
+      const filteredInspiration = {
+        ...inspiration,
+        products: inspiration.products.filter((p) => {
+          const prod = p.product
+          const hasDescription = prod.description !== null && prod.description !== ""
+          const hasImages =
+            Array.isArray(prod.images) && prod.images.length > 0 && prod.images.some((img) => !!img)
+          return prod.deletedAt === null && hasDescription && hasImages
+        }),
+      }
+
+      return applyMultiplierToInspiration(filteredInspiration, priceMultiplier)
     },
     { logNotFound: true }
   )

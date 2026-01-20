@@ -81,12 +81,16 @@ export async function getCollectionBySlug(
 
       if (!collection) return null
 
-      // Filter out productCollections where the product is soft-deleted
+      // Filter out productCollections where the product is soft-deleted or incomplete
       const filteredCollection = {
         ...collection,
-        productCollections: collection.productCollections.filter(
-          (pc) => pc.product.deletedAt === null
-        ),
+        productCollections: collection.productCollections.filter((pc) => {
+          const p = pc.product
+          const hasDescription = p.description !== null && p.description !== ""
+          const hasImages =
+            Array.isArray(p.images) && p.images.length > 0 && p.images.some((img) => !!img)
+          return p.deletedAt === null && hasDescription && hasImages
+        }),
       }
 
       return applyMultiplierToCollection(filteredCollection, priceMultiplier)

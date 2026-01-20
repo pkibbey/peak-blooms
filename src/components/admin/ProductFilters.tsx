@@ -79,7 +79,7 @@ export function ProductFilters({ productTypes }: ProductFiltersProps) {
     filterDescription !== "all" || filterImages !== "all" || selectedTypes.size > 0
 
   return (
-    <div className="rounded-lg border bg-white p-4">
+    <div className="rounded-lg border bg-white p-4 flex-1">
       <div className="mb-4 flex items-center justify-between">
         <h3 className="font-semibold text-sm">Filters</h3>
         {hasActiveFilters && (

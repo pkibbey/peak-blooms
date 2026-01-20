@@ -45,7 +45,7 @@ describe("Collections Data Access Layer", () => {
     name: "Red Roses",
     slug: "red-roses",
     description: "Beautiful red roses",
-    image: "roses.jpg",
+    images: ["roses.jpg"],
     price: 50,
     colors: ["red"],
     productType: ProductType.FLOWER,
@@ -246,6 +246,32 @@ describe("Collections Data Access Layer", () => {
       const result = await getCollectionBySlug("romantic", 1.0)
 
       expect(result?.productCollections).toHaveLength(2)
+    })
+
+    it("should filter out products missing description or images", async () => {
+      const incompleteProducts = {
+        ...mockCollectionWithProducts,
+        productCollections: [
+          {
+            productId: "prod-1",
+            collectionId: "coll-1",
+            createdAt: now,
+            product: { ...mockProduct, description: null },
+          },
+          {
+            productId: "prod-2",
+            collectionId: "coll-1",
+            createdAt: now,
+            product: { ...mockProduct, id: "prod-2", images: [] },
+          },
+        ],
+      }
+
+      vi.mocked(db.collection.findUnique).mockResolvedValueOnce(incompleteProducts)
+
+      const result = await getCollectionBySlug("romantic", 1.0)
+
+      expect(result?.productCollections).toHaveLength(0)
     })
   })
 })

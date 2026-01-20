@@ -1,7 +1,7 @@
 import Link from "next/link"
 import { getCurrentUser } from "@/lib/current-user"
 import { getFeaturedProducts } from "@/lib/data"
-import { ProductItem } from "./ProductItem"
+import { ProductCard } from "./ProductCard"
 
 export default async function FeaturedProducts() {
   const user = await getCurrentUser()
@@ -27,7 +27,7 @@ export default async function FeaturedProducts() {
 
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3">
           {products.map((product) => (
-            <ProductItem key={product.slug} product={product} user={user} layout="grid" />
+            <ProductCard key={product.slug} product={product} user={user} layout="grid" />
           ))}
         </div>
       </div>

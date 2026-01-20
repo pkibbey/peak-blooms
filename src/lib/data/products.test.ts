@@ -240,6 +240,25 @@ describe("Products Data Access Layer", () => {
       expect(result.total).toBe(0)
     })
 
+    it("should filter by images and description when requested", async () => {
+      vi.mocked(db.product.count).mockResolvedValueOnce(1)
+      vi.mocked(db.product.findMany).mockResolvedValueOnce([mockProductWithCollections])
+
+      await getProducts({ filterImages: "has", filterDescription: "has" }, 1.0)
+
+      expect(db.product.findMany).toHaveBeenCalledWith(
+        expect.objectContaining({
+          where: expect.objectContaining({
+            AND: expect.arrayContaining([
+              expect.objectContaining({ description: { not: null } }),
+              expect.objectContaining({ description: { not: "" } }),
+            ]),
+            images: { isEmpty: false },
+          }),
+        })
+      )
+    })
+
     it("should use default limit from ITEMS_PER_PAGE when not specified", async () => {
       vi.mocked(db.product.count).mockResolvedValueOnce(1)
       vi.mocked(db.product.findMany).mockResolvedValueOnce([mockProductWithCollections])
@@ -277,7 +296,7 @@ describe("Products Data Access Layer", () => {
   })
 
   describe("getFeaturedProducts", () => {
-    it("should return featured products with multiplier", async () => {
+    it("should return featured products with multiplier and only complete products", async () => {
       vi.mocked(db.product.count).mockResolvedValueOnce(1)
       vi.mocked(db.product.findMany).mockResolvedValueOnce([
         { ...mockProductWithCollections, featured: true },
@@ -287,6 +306,20 @@ describe("Products Data Access Layer", () => {
 
       expect(result).toHaveLength(1)
       expect(result[0].price).toBe(100) // 50 * 2.0
+
+      // Ensure the DB query included filters for featured + complete products
+      expect(db.product.findMany).toHaveBeenCalledWith(
+        expect.objectContaining({
+          where: expect.objectContaining({
+            featured: true,
+            AND: expect.arrayContaining([
+              expect.objectContaining({ description: { not: null } }),
+              expect.objectContaining({ description: { not: "" } }),
+            ]),
+            images: { isEmpty: false },
+          }),
+        })
+      )
     })
   })
 
@@ -403,6 +436,19 @@ describe("Products Data Access Layer", () => {
       expect(result.colorIds).toContain("white")
       expect(result.colorIds).toContain("pink")
       expect(result.collections).toHaveLength(1)
+
+      // Ensure we only gathered colors from visible (complete) products
+      expect(db.product.findMany).toHaveBeenCalledWith(
+        expect.objectContaining({
+          where: expect.objectContaining({
+            AND: expect.arrayContaining([
+              expect.objectContaining({ description: { not: null } }),
+              expect.objectContaining({ description: { not: "" } }),
+              expect.objectContaining({ images: { isEmpty: false } }),
+            ]),
+          }),
+        })
+      )
     })
 
     it("should return unique sorted color IDs", async () => {
@@ -426,10 +472,19 @@ describe("Products Data Access Layer", () => {
 
       await getShopFilterOptions()
 
-      expect(db.product.findMany).toHaveBeenCalledWith({
-        where: { deletedAt: null },
-        select: { colors: true },
-      })
+      expect(db.product.findMany).toHaveBeenCalledWith(
+        expect.objectContaining({
+          where: expect.objectContaining({
+            deletedAt: null,
+            AND: expect.arrayContaining([
+              expect.objectContaining({ description: { not: null } }),
+              expect.objectContaining({ description: { not: "" } }),
+              expect.objectContaining({ images: { isEmpty: false } }),
+            ]),
+          }),
+          select: { colors: true },
+        })
+      )
     })
   })
 })

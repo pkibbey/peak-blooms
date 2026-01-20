@@ -25,10 +25,13 @@ export async function searchProducts(
     const user = await getCurrentUser()
     const multiplier = user?.priceMultiplier ?? 1.0
 
+    // Exclude incomplete products from search results
     const result = await getProducts(
       {
         search: trimmedTerm,
         limit: 10,
+        filterDescription: "has",
+        filterImages: "has",
       },
       multiplier
     )

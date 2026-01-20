@@ -2,7 +2,7 @@
 
 import { useState } from "react"
 import AddAllToCartButton from "@/components/site/AddAllToCartButton"
-import { ProductItem } from "@/components/site/ProductItem"
+import { ProductCard } from "@/components/site/ProductCard"
 import type { ProductModel } from "@/generated/models"
 import type { SessionUser } from "@/lib/query-types"
 
@@ -28,7 +28,7 @@ export function InspirationProductTable({ products, setName, user }: Inspiration
       {/* Product List */}
       <div className="grid gap-2">
         {products.map((product, index) => (
-          <ProductItem
+          <ProductCard
             key={product.slug}
             product={product}
             quantity={quantities[index]}
