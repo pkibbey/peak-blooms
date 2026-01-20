@@ -161,13 +161,27 @@ if (!fs.existsSync(imageDir)) {
 }
 
 // Parse CSV file
-function readCSV(filePath: string): ProductBasic[] {
+function readCSV(filePath: string): Array<{
+  name: string
+  price: number
+  productType: string
+  description: string | null
+  colors: string[]
+  images: string[]
+}> {
   const content = fs.readFileSync(filePath, "utf-8")
   const lines = content.split("\n")
 
   // Parse header
   const headers = parseCSVLine(lines[0])
-  const products: ProductBasic[] = []
+  const products: Array<{
+    name: string
+    price: number
+    productType: string
+    description: string | null
+    colors: string[]
+    images: string[]
+  }> = []
 
   for (let i = 1; i < lines.length; i++) {
     const line = lines[i].trim()
@@ -176,13 +190,13 @@ function readCSV(filePath: string): ProductBasic[] {
     const values = parseCSVLine(line)
     if (values.length < headers.length) continue
 
-    const row: ProductBasic = {
+    const row = {
       name: values[0] || "",
-      price: values[1] || "",
-      type: values[2] || "",
-      description: values[3] || "",
-      colors: values[4] || "",
-      image: values[5] || "",
+      price: parseInt(values[1]) || 0,
+      productType: values[2] || "",
+      description: values[3] || null,
+      colors: values[4] ? values[4].split(";").map(c => c.trim()).filter(Boolean) : [],
+      images: values[5] ? values[5].split(";").map(i => i.trim()).filter(Boolean) : [],
     }
 
     if (row.name) {
@@ -385,7 +399,17 @@ async function downloadImageFromPixabay(query: string, filename: string): Promis
 }
 
 // Write CSV file
-function writeCSV(filePath: string, products: ProductBasic[]): void {
+function writeCSV(
+  filePath: string,
+  products: Array<{
+    name: string
+    price: number
+    productType: string
+    description: string | null
+    colors: string[]
+    images: string[]
+  }>,
+): void {
   const headers = [
     "Product Name",
     "Price per bunch",
@@ -400,11 +424,11 @@ function writeCSV(filePath: string, products: ProductBasic[]): void {
   for (const product of products) {
     const fields = [
       product.name,
-      product.price,
-      product.type,
-      product.description,
-      product.colors,
-      product.image || "",
+      String(product.price),
+      product.productType,
+      product.description || "",
+      product.colors.join(";"),
+      product.images.join(";"),
     ]
     lines.push(fields.map((f) => escapeCSVField(f)).join(","))
   }
@@ -490,10 +514,10 @@ async function main() {
   const productsForCSV = finalProducts.map((p) => ({
     name: p.name,
     price: p.price,
-    type: p.type,
+    productType: p.productType,
     description: p.description,
     colors: p.colors,
-    image: p.image,
+    images: p.image ? [p.image] : [],
   }))
 
   writeCSV(csvPath, productsForCSV)

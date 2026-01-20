@@ -27,6 +27,10 @@
     "db:seed:prod": "dotenv -e .env.prod -- prisma db seed",
     "db:studio:dev": "dotenv -e .env.local -- prisma studio",
     "db:studio:prod": "dotenv -e .env.prod -- prisma studio",
+    "db:backup:dev": "dotenv -e .env.local -- tsx scripts/backup-database.ts",
+    "db:backup:prod": "dotenv -e .env.prod -- tsx scripts/backup-database.ts",
+    "db:restore:dev": "dotenv -e .env.local -- tsx scripts/restore-database.ts",
+    "db:restore:prod": "dotenv -e .env.prod -- tsx scripts/restore-database.ts",
     "generate:schema": "tsx scripts/generate-api-schema.ts",
     "prepare": "husky"
   },

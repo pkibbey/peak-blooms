@@ -41,7 +41,7 @@
   },
   "overrides": [
     {
-      "includes": ["src/generated/**", ".next/**", "coverage/**"],
+      "includes": ["src/generated/**", ".next/**", "coverage/**", "scripts/**"],
       "linter": {
         "enabled": false
       },
