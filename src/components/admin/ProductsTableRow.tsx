@@ -11,6 +11,7 @@ import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
 import { TableCell, TableRow } from "@/components/ui/table"
 import type { ProductModel } from "@/generated/models"
+import { pickRandomFirstStyle } from "@/lib/ai-prompt-templates"
 import { PRODUCT_TYPE_LABELS } from "@/lib/product-types"
 import { cn, formatPrice } from "@/lib/utils"
 import { ColorsMiniDisplay } from "../ui/ColorsMiniDisplay"
@@ -30,38 +31,40 @@ export default function ProductsTableRow({ product }: ProductRowProps) {
 
   const handleGenerateImage = async () => {
     try {
+      // First image: randomly pick editorial|botanical|garden (mapped to 'lifestyle')
       setIsGenerating(true)
+      const firstStyle = pickRandomFirstStyle()
 
-      // Step 1: Request server-side generation for this product (server will build prompt)
-      const genResp = await fetch("/api/admin/generate-product-image", {
+      // Request server-side generation for first image
+      const firstGenResp = await fetch("/api/admin/generate-product-image", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ productId: product.id, styleTemplate: "botanical" }),
+        body: JSON.stringify({ productId: product.id, styleTemplate: firstStyle }),
       })
 
-      if (!genResp.ok) {
-        const err = await genResp.json()
-        toast.error(err.error || "Failed to generate image")
+      if (!firstGenResp.ok) {
+        const err = await firstGenResp.json()
+        toast.error(err.error || "Failed to generate first image")
         setIsGenerating(false)
         return
       }
 
-      const genData = await genResp.json()
-      const generatedImageUrl = genData.imageUrl
+      const firstGenData = await firstGenResp.json()
+      const firstGeneratedImageUrl = firstGenData.imageUrl
 
       setIsGenerating(false)
       setIsUploading(true)
 
-      // Step 2: Convert data URL to blob and upload to Vercel Blob
-      const response = await fetch(generatedImageUrl)
-      if (!response.ok) throw new Error("Failed to fetch generated data URL")
-      const blob = await response.blob()
+      // Upload first image
+      const firstResponse = await fetch(firstGeneratedImageUrl)
+      if (!firstResponse.ok) throw new Error("Failed to fetch generated data URL for first image")
+      const firstBlob = await firstResponse.blob()
 
       const { upload } = await import("@vercel/blob/client")
-      const timestamp = Date.now()
-      const filename = `generated_${product.name.toLowerCase().replace(/\s+/g, "_")}_${timestamp}.jpg`
+      const firstTimestamp = Date.now()
+      const firstFilename = `generated_${product.name.toLowerCase().replace(/\s+/g, "_")}_${firstTimestamp}.jpg`
 
-      const uploadedBlob = await upload(filename, blob, {
+      const firstUploadedBlob = await upload(firstFilename, firstBlob, {
         access: "public",
         handleUploadUrl: "/api/upload",
         clientPayload: JSON.stringify({
@@ -71,21 +74,81 @@ export default function ProductsTableRow({ product }: ProductRowProps) {
         }),
       })
 
-      // Step 3: Append image to product images via admin route
-      const appendResp = await fetch("/api/admin/append-product-image", {
+      // Append first image to product
+      const firstAppendResp = await fetch("/api/admin/append-product-image", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ productId: product.id, imageUrl: uploadedBlob.url }),
+        body: JSON.stringify({ productId: product.id, imageUrl: firstUploadedBlob.url }),
       })
 
-      if (!appendResp.ok) {
-        const err = await appendResp.json()
-        toast.error(err.error || "Failed to save image to product")
+      if (!firstAppendResp.ok) {
+        const err = await firstAppendResp.json()
+        toast.error(err.error || "Failed to save first image to product")
         setIsUploading(false)
         return
       }
 
-      toast.success("Image generated and saved")
+      toast.success("First image generated and saved")
+
+      // Stop spinner briefly to show first image completed
+      setIsUploading(false)
+      await new Promise((resolve) => setTimeout(resolve, 300))
+
+      // Second image: always realistic
+      setIsGenerating(true)
+
+      const secondGenResp = await fetch("/api/admin/generate-product-image", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ productId: product.id, styleTemplate: "realistic" }),
+      })
+
+      if (!secondGenResp.ok) {
+        const err = await secondGenResp.json()
+        toast.error(err.error || "Failed to generate second image")
+        setIsGenerating(false)
+        return
+      }
+
+      const secondGenData = await secondGenResp.json()
+      const secondGeneratedImageUrl = secondGenData.imageUrl
+
+      setIsGenerating(false)
+      setIsUploading(true)
+
+      // Upload second image
+      const secondResponse = await fetch(secondGeneratedImageUrl)
+      if (!secondResponse.ok) throw new Error("Failed to fetch generated data URL for second image")
+      const secondBlob = await secondResponse.blob()
+
+      const secondTimestamp = Date.now()
+      const secondFilename = `generated_${product.name.toLowerCase().replace(/\s+/g, "_")}_${secondTimestamp}.jpg`
+
+      const secondUploadedBlob = await upload(secondFilename, secondBlob, {
+        access: "public",
+        handleUploadUrl: "/api/upload",
+        clientPayload: JSON.stringify({
+          folder: "products/generated",
+          slug: product.name.toLowerCase().replace(/\s+/g, "-"),
+          extension: "jpg",
+        }),
+      })
+
+      // Append second image to product
+      const secondAppendResp = await fetch("/api/admin/append-product-image", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ productId: product.id, imageUrl: secondUploadedBlob.url }),
+      })
+
+      if (!secondAppendResp.ok) {
+        const err = await secondAppendResp.json()
+        toast.error(err.error || "Failed to save second image to product")
+        setIsUploading(false)
+        return
+      }
+
+      toast.success("Second image generated and saved")
       setIsUploading(false)
       router.refresh()
     } catch (err) {

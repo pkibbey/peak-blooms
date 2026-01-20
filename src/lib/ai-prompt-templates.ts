@@ -191,3 +191,12 @@ export function getAvailableTemplates(): Array<{
     },
   ]
 }
+
+/**
+ * Pick the first style for two-image generation.
+ * Randomly selects one of: editorial, botanical, or garden (mapped to 'lifestyle')
+ */
+export function pickRandomFirstStyle(): StyleTemplate {
+  const pool: StyleTemplate[] = ["editorial", "botanical", "lifestyle"]
+  return pool[Math.floor(Math.random() * pool.length)]
+}
