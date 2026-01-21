@@ -4,7 +4,11 @@ import { toast } from "sonner"
 import { Button } from "@/components/ui/button"
 import { signOut } from "@/lib/auth-client"
 
-export default function SignOutButton() {
+type Props = {
+  onDone?: () => void
+}
+
+export default function SignOutButton({ onDone }: Props) {
   return (
     <Button
       variant="ghost"
@@ -13,6 +17,7 @@ export default function SignOutButton() {
           fetchOptions: {
             onSuccess: () => {
               toast.success("Signed out successfully")
+              onDone?.()
             },
           },
         })

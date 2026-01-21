@@ -116,7 +116,7 @@ export function QuantityStepper({
         onClick={handleAddBox}
         disabled={disabled || value >= max}
         aria-label="Add box of 10"
-        className="md:w-auto px-3"
+        className="w-auto px-3"
       >
         + 10
       </Button>

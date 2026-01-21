@@ -187,7 +187,7 @@ export function ProductCard({
 
       {/* Product Details */}
       <div className="flex flex-1 flex-col px-4 py-3">
-        <div className="flex flex-col lg:flex-row justify-between items-start">
+        <div className="flex flex-col sm:flex-row justify-between items-start gap-3">
           <div className="min-w-0 flex-1">
             <div className="flex flex-col gap-2">
               <Link
@@ -217,7 +217,7 @@ export function ProductCard({
             )}
           </div>
           {/* Right Side: Price & Controls */}
-          <div className="flex flex-col items-end justify-end gap-2">
+          <div className="flex flex-col sm:items-end w-full sm:w-auto sm:justify-end gap-3">
             <p className="text-xl font-medium text-foreground">{formatPrice(lineTotal)}</p>
             {showQuantityControl ? (
               <div className="flex flex-col items-end gap-4">
