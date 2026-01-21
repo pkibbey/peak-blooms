@@ -72,7 +72,7 @@ export function GenerateDescriptionButton({
       size="sm"
       onClick={handleGenerateDescription}
       disabled={disabled || isLoading || !productName.trim()}
-      className="w-full sm:w-auto"
+      className="w-auto"
     >
       {isLoading ? (
         <>
