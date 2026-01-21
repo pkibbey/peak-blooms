@@ -23,6 +23,21 @@ export function calculateCartTotal(cartItems: CartItemForTotal[]) {
   return Math.round(total * 100) / 100
 }
 
+/**
+ * Calculate a validation-only total where market-priced items (price === 0)
+ * are treated as $10 each for the purpose of enforcing minimum order rules.
+ * This does NOT change the displayed subtotal elsewhere in the app.
+ */
+export function calculateMinimumTotal(cartItems: CartItemForTotal[]) {
+  const total = cartItems.reduce((sum, item) => {
+    // Support either `item.price` (orderItem) or `item.product?.price` (cart item)
+    const rawPrice = (item as any).price ?? item.product?.price ?? 0
+    const effectivePrice = rawPrice === 0 ? 10 : rawPrice
+    return sum + effectivePrice * item.quantity
+  }, 0)
+  return Math.round(total * 100) / 100
+}
+
 // Helper to apply price multiplier
 function adjustPriceMultiplier(price: number, multiplier: number): number {
   return Math.round(price * multiplier * 100) / 100

@@ -280,7 +280,7 @@ describe("Order Actions", () => {
           id: VALID_UUID_3,
           productId: VALID_UUID_2,
           quantity: 2,
-          product: { id: VALID_UUID_2, name: "Roses", image: "roses.jpg", price: 50 },
+          product: { id: VALID_UUID_2, name: "Roses", image: "roses.jpg", price: 150 },
         },
       ],
     }

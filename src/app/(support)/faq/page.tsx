@@ -22,7 +22,7 @@ const faqs: FAQItem[] = [
   {
     question: "Is there a minimum order amount?",
     answer:
-      "We offer flexible ordering to meet businesses of all sizes. While we don't enforce a strict minimum, most florists find that ordering stems by the bunch or pre-made bouquets aligns well with how they source flowers. Our sales team can discuss volume options that work for your specific needs.",
+      "Yes. We require a minimum order subtotal of $200. Contact our sales team if you need assistance with bulk ordering.",
   },
   {
     question: "What's your return policy?",

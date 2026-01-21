@@ -46,7 +46,7 @@ export default async function Nav() {
               className="inline-flex items-center gap-3 text-lg font-semibold"
             >
               <Image
-                src="/logos/peak-blooms.png"
+                src="/logos/peak-blooms-black.png"
                 alt="Peak Blooms logo"
                 width={880}
                 height={202}

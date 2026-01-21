@@ -1,6 +1,6 @@
 "use client"
 
-import { Sparkles, X } from "lucide-react"
+import { Sparkles } from "lucide-react"
 import { useRouter } from "next/navigation"
 import { useState, useTransition } from "react"
 import { toast } from "sonner"
@@ -175,7 +175,7 @@ export function BatchGenerateImagesButton({
             }))
 
             // Refresh UI after each product
-            router.refresh()
+            startTransition(() => router.refresh())
           } catch (err) {
             const msg = err instanceof Error ? err.message : String(err)
             toast.error(`Error processing ${product.name}: ${msg}`)
@@ -246,6 +246,7 @@ export function BatchGenerateImagesButton({
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-xl font-bold tracking-tight">
                 {"Generating Images".split("").map((char, i) => (
+                  // biome-ignore lint/suspicious/noArrayIndexKey: Animation
                   <span key={i} className="glow-char" style={{ animationDelay: `${i * 0.08}s` }}>
                     {char === " " ? "\u00A0" : char}
                   </span>

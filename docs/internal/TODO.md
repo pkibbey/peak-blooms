@@ -2,7 +2,7 @@
 
 ## Meeting notes
 - Add e2e tests to ensure complete site functionality
-- Add the ability to backup data that is saved on the prod database into a json file that be used to restore from
+- make sure user flow for sign up works
 
 ### 🌟 Next Steps
 

@@ -30,7 +30,7 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
-import { calculateCartTotal } from "@/lib/cart-utils"
+import { calculateCartTotal, calculateMinimumTotal } from "@/lib/cart-utils"
 import type { CartResponse } from "@/lib/query-types"
 import { emptyAddress } from "@/lib/validations/address"
 import { type CheckoutFormData, checkoutSchema } from "@/lib/validations/checkout"
@@ -62,6 +62,8 @@ export default function CheckoutForm({ cart, savedAddresses }: CheckoutFormProps
     savedAddresses.length > 0 ? savedAddresses[0].id : "new"
   )
   const total = calculateCartTotal(cart.items)
+  const minimumTotal = calculateMinimumTotal(cart.items)
+  const isBelowMinimum = minimumTotal < 200
 
   const getInitialDeliveryAddress = () => {
     if (savedAddresses.length > 0) {
@@ -346,9 +348,20 @@ export default function CheckoutForm({ cart, savedAddresses }: CheckoutFormProps
               <MarketPriceIndicator items={cart.items} total={total} size="sm" />
             </div>
 
-            <Button type="submit" size="lg" className="w-full" disabled={isSubmitting}>
+            <Button
+              type="submit"
+              size="lg"
+              className="w-full"
+              disabled={isSubmitting || isBelowMinimum}
+            >
               {isSubmitting ? "Placing Order..." : "Place Order"}
             </Button>
+
+            {isBelowMinimum && (
+              <div className="text-sm text-muted-foreground mt-2 text-center">
+                Minimum order amount is $200.
+              </div>
+            )}
 
             <div className="mt-4">
               <Button

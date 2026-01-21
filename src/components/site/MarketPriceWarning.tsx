@@ -13,16 +13,16 @@ export function MarketPriceWarning({ showWarning, className = "" }: MarketPriceW
   if (!showWarning) return null
 
   return (
-    <div className={`rounded-lg border border-orange-200 bg-orange-50 p-4 ${className}`}>
-      <div className="flex gap-3">
-        <AlertCircle className="h-5 w-5 text-orange-600 flex-shrink-0 mt-0.5" />
-        <div>
-          <h3 className="font-semibold text-orange-900">Market Price Items in Your Cart</h3>
-          <p className="text-sm text-orange-800 mt-1">
-            Your cart contains items with market-based pricing. The final total will be confirmed at
-            the time of delivery and may be higher than the subtotal shown above.
-          </p>
+    <div className={`rounded-md border border-muted-foreground/50 p-3 ${className}`}>
+      <div className="flex flex-col gap-1">
+        <div className="flex gap-2 items-center">
+          <AlertCircle className="h-4 w-4 text-green-700/70 flex-shrink-0" />
+          <h3 className="text-sm font-semibold text-muted-foreground">Market Price Items</h3>
         </div>
+        <p className="text-xs text-muted-foreground leading-normal">
+          Your cart contains items with market-based pricing. The final total will be confirmed at
+          before your order is dispatched.
+        </p>
       </div>
     </div>
   )

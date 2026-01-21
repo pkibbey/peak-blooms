@@ -11,7 +11,7 @@ import { MarketPriceIndicator } from "@/components/site/MarketPriceIndicator"
 import { MarketPriceWarning } from "@/components/site/MarketPriceWarning"
 import { Button } from "@/components/ui/button"
 import { IconShoppingBag } from "@/components/ui/icons"
-import { calculateCartTotal } from "@/lib/cart-utils"
+import { calculateCartTotal, calculateMinimumTotal } from "@/lib/cart-utils"
 import type { CartResponse } from "@/lib/query-types"
 import { useDebouncedCallback } from "@/lib/useDebouncedCallback"
 
@@ -152,6 +152,8 @@ export default function Cart({ initialCart }: CartProps) {
   }
 
   const total = calculateCartTotal(cart.items)
+  const minimumTotal = calculateMinimumTotal(cart.items)
+  const isBelowMinimum = minimumTotal < 200
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -173,11 +175,6 @@ export default function Cart({ initialCart }: CartProps) {
         <div className="bg-background rounded-xs shadow-sm border p-6 sticky top-24">
           <h2 className="heading-3 mb-4 font-serif">Order Summary</h2>
 
-          <MarketPriceWarning
-            showWarning={cart.items.some((item) => item.product?.price === 0)}
-            className="mb-4"
-          />
-
           <div className="space-y-2 text-sm">
             <div className="flex justify-between">
               <span className="text-muted-foreground">
@@ -191,33 +188,39 @@ export default function Cart({ initialCart }: CartProps) {
             </div>
           </div>
 
-          {/* Cart Total */}
-          <div className="bg-neutral-50 rounded-xs p-4 mt-4">
-            <div className="flex justify-between items-center">
-              <span className="font-semibold">Total:</span>
-              <span className="text-lg font-bold text-primary">
-                <MarketPriceIndicator items={cart.items} total={total} />
-              </span>
-            </div>
-          </div>
-
           <div className="border-t my-4" />
 
-          <div className="flex justify-between font-semibold text-lg mb-6">
+          <div className="flex justify-between font-semibold text-lg mb-4">
             <span>Total</span>
             <MarketPriceIndicator items={cart.items} total={total} size="sm" />
           </div>
 
-          <Button
-            size="lg"
-            className="w-full"
-            nativeButton={false}
-            render={
-              <Link prefetch={false} href="/checkout">
-                Proceed to Checkout
-              </Link>
-            }
+          <MarketPriceWarning
+            showWarning={cart.items.some((item) => item.product?.price === 0)}
+            className="mb-4"
           />
+
+          {isBelowMinimum ? (
+            <div className="grid gap-3">
+              <div className="text-sm text-muted-foreground text-center">
+                Minimum order amount is $200.
+              </div>
+              <Button size="lg" className="w-full" disabled>
+                Proceed to Checkout
+              </Button>
+            </div>
+          ) : (
+            <Button
+              size="lg"
+              className="w-full"
+              nativeButton={false}
+              render={
+                <Link prefetch={false} href="/checkout">
+                  Proceed to Checkout
+                </Link>
+              }
+            />
+          )}
 
           <div className="mt-4">
             <Button

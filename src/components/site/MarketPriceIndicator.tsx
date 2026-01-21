@@ -12,14 +12,5 @@ interface MarketPriceIndicatorProps {
 }
 
 export function MarketPriceIndicator({ items, total, size = "xs" }: MarketPriceIndicatorProps) {
-  const hasMarketPricedItems = items.some((item) => item.product?.price === 0)
-  const sizeClass =
-    size === "sm" ? "text-muted-foreground text-sm" : "text-muted-foreground text-xs"
-
-  return (
-    <span>
-      {formatPrice(total)}
-      {hasMarketPricedItems && <span className={sizeClass}> + market items</span>}
-    </span>
-  )
+  return <span>{formatPrice(total)}</span>
 }

@@ -1,6 +1,7 @@
 "use server"
 
 import { revalidatePath } from "next/cache"
+import { calculateMinimumTotal } from "@/lib/cart-utils"
 import { getCurrentUser } from "@/lib/current-user"
 import { db } from "@/lib/db"
 import { toAppError } from "@/lib/error-utils"
@@ -193,6 +194,8 @@ export async function createOrderAction(
       )
     )
 
+    // (minimum enforcement moved below so delivery address validation runs first)
+
     // Handle delivery address
     let finalDeliveryAddressId: string
 
@@ -238,6 +241,24 @@ export async function createOrderAction(
       return {
         success: false,
         error: "Delivery address is required",
+        code: "VALIDATION_ERROR",
+      }
+    }
+
+    // Enforce minimum order amount for finalization.
+    // For validation we treat market-priced items (price === 0) as $10 each.
+    const minimumTotal = calculateMinimumTotal(
+      cart.items.map((it) => ({
+        price: adjustPrice(it.product?.price ?? 0, priceMultiplier),
+        quantity: it.quantity,
+      }))
+    )
+
+    if (minimumTotal < 200) {
+      return {
+        success: false,
+        error:
+          "Order subtotal does not meet minimum required amount of $200 (market items counted as $10 each).",
         code: "VALIDATION_ERROR",
       }
     }
