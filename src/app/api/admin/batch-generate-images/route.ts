@@ -66,11 +66,19 @@ export const POST = wrapRoute(async function POST(request: Request): Promise<Res
   // Filter by specific product type(s)
   const ProductTypeEnum = require("@/generated/client").ProductType
   if (types && types.length > 0) {
-    whereClause.productType = {
-      in: types.map((t) => ProductTypeEnum[t as keyof typeof ProductTypeEnum]),
+    const mappedTypes = types
+      .map((t) => ProductTypeEnum[t as keyof typeof ProductTypeEnum])
+      .filter((t: unknown): t is string => t !== undefined)
+    if (mappedTypes.length > 0) {
+      whereClause.productType = {
+        in: mappedTypes,
+      }
     }
   } else if (productType) {
-    whereClause.productType = ProductTypeEnum[productType as keyof typeof ProductTypeEnum]
+    const mappedType = ProductTypeEnum[productType as keyof typeof ProductTypeEnum]
+    if (mappedType !== undefined) {
+      whereClause.productType = mappedType
+    }
   }
 
   const productsToProcess = await db.product.findMany({

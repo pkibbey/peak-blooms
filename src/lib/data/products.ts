@@ -107,11 +107,19 @@ export async function getProducts(
 
     // Filter by specific product type(s)
     if (options.types && options.types.length > 0) {
-      where.productType = {
-        in: options.types.map((t: string) => ProductType[t as keyof typeof ProductType]),
+      const mappedTypes = options.types
+        .map((t: string) => ProductType[t as keyof typeof ProductType])
+        .filter((t): t is (typeof ProductType)[keyof typeof ProductType] => t !== undefined)
+      if (mappedTypes.length > 0) {
+        where.productType = {
+          in: mappedTypes,
+        }
       }
     } else if (options.productType) {
-      where.productType = ProductType[options.productType as keyof typeof ProductType]
+      const mappedType = ProductType[options.productType as keyof typeof ProductType]
+      if (mappedType !== undefined) {
+        where.productType = mappedType
+      }
     }
 
     // Price filtering on the product itself
