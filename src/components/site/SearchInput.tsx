@@ -5,6 +5,9 @@ import { useRouter, useSearchParams } from "next/navigation"
 import { useState } from "react"
 import { useDebouncedCallback } from "@/lib/useDebouncedCallback"
 import { cn } from "@/lib/utils"
+import { Button } from "../ui/button"
+import { Input } from "../ui/input"
+import { Label } from "../ui/label"
 
 export function SearchInput() {
   const searchParams = useSearchParams()
@@ -45,15 +48,15 @@ export function SearchInput() {
 
   return (
     <div className="mb-6">
-      <label htmlFor="search" className="text-sm font-medium mb-2 block">
+      <Label htmlFor="search" className="text-xs font-medium text-gray-700 mb-2 block">
         Search
-      </label>
+      </Label>
       <div className="relative">
         <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground pointer-events-none" />
-        <input
+        <Input
           id="search"
           type="text"
-          placeholder="Search by name or description"
+          placeholder="Search by keyword"
           value={searchTerm}
           onChange={(e) => onInputChange(e.target.value)}
           className={cn(
@@ -65,14 +68,14 @@ export function SearchInput() {
           aria-label="Search products"
         />
         {searchTerm && (
-          <button
+          <Button
             onClick={clearSearch}
             className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
             aria-label="Clear search"
             type="button"
           >
             <X className="h-4 w-4" />
-          </button>
+          </Button>
         )}
       </div>
     </div>

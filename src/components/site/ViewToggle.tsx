@@ -53,6 +53,7 @@ export function ViewToggle({ defaultView = "grid" }: ViewToggleProps) {
           )}
         </span>
       </Button>
+      <span className="text-sm">Grid</span>
       <Button
         variant={isTableView ? "default" : "outline"}
         size="sm"
@@ -70,6 +71,7 @@ export function ViewToggle({ defaultView = "grid" }: ViewToggleProps) {
           )}
         </span>
       </Button>
+      <span className="text-sm">Table</span>
     </div>
   )
 }

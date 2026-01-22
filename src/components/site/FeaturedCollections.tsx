@@ -2,8 +2,20 @@ import Link from "next/link"
 import { CollectionCard } from "@/components/site/CollectionCard"
 import { getFeaturedCollections } from "@/lib/data/collections"
 
+import type { CollectionBasic } from "@/lib/query-types"
+
 export default async function FeaturedCollections() {
-  const collections = await getFeaturedCollections()
+  let collections: CollectionBasic[] = []
+  try {
+    collections = await getFeaturedCollections()
+  } catch (error) {
+    // Log server-side error and continue with empty list to avoid crashing the page
+    // withTiming already logs the DAL error at error level, but we log here for clarity
+    // and to make sure rendering still proceeds.
+    // eslint-disable-next-line no-console
+    console.error("Failed to load featured collections:", error)
+    collections = []
+  }
 
   return (
     <div className="flex flex-col items-center justify-start bg-background py-16 font-sans">
@@ -22,9 +34,15 @@ export default async function FeaturedCollections() {
         </p>
 
         <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
-          {collections.map((collection) => (
-            <CollectionCard key={collection.slug} collection={collection} />
-          ))}
+          {collections.length === 0 ? (
+            <div className="text-center text-muted-foreground">
+              No featured collections available.
+            </div>
+          ) : (
+            collections.map((collection) => (
+              <CollectionCard key={collection.slug} collection={collection} />
+            ))
+          )}
         </div>
       </div>
     </div>

@@ -1,5 +1,4 @@
 import Link from "next/link"
-import { Suspense } from "react"
 import { InspirationCard } from "@/components/site/InspirationCard"
 import { Button } from "@/components/ui/button"
 import { IconMail } from "@/components/ui/icons"
@@ -71,9 +70,7 @@ export default async function PendingApprovalPage() {
           </div>
         </div>
 
-        <Suspense fallback={null}>
-          <InspirationsList />
-        </Suspense>
+        <InspirationsList />
 
         <div className="text-center">
           <Button

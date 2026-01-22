@@ -1,11 +1,9 @@
-import { Suspense } from "react"
 import { DeliveryBanner } from "@/components/site/DeliveryBanner"
 import { PageHeader } from "@/components/site/PageHeader"
 import { ProductCard } from "@/components/site/ProductCard"
 import { ShopFilters } from "@/components/site/ShopFilters"
 import { ShopPagination } from "@/components/site/ShopPagination"
 import { ShopProductTableRow } from "@/components/site/ShopProductTableRow"
-import { ViewToggle } from "@/components/site/ViewToggle"
 import { SortableTableHead } from "@/components/ui/SortableTableHead"
 import { Table, TableBody, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { ITEMS_PER_PAGE } from "@/lib/consts"
@@ -90,10 +88,24 @@ export default async function ShopPage({ searchParams }: ShopPageProps) {
   const priceMax = typeof params.priceMax === "string" ? parseFloat(params.priceMax) : undefined
   const search = typeof params.search === "string" ? params.search : undefined
   const viewMode = typeof params.view === "string" ? params.view : "grid"
+  const types =
+    typeof params.types === "string" && params.types !== ""
+      ? params.types
+          .split(",")
+          .map((t) => t.trim())
+          .filter(Boolean)
+      : Array.isArray(params.types)
+        ? params.types
+        : typeof params.productType === "string" && params.productType !== ""
+          ? [params.productType]
+          : undefined
+
   const productType =
-    typeof params.productType === "string" && params.productType !== ""
-      ? params.productType
-      : undefined
+    types && types.length === 1
+      ? types[0]
+      : typeof params.productType === "string" && params.productType !== ""
+        ? params.productType
+        : undefined
   const page = typeof params.page === "string" ? parseInt(params.page, 10) : 1
   const offset = Math.max(0, (page - 1) * ITEMS_PER_PAGE)
 
@@ -107,6 +119,7 @@ export default async function ShopPage({ searchParams }: ShopPageProps) {
       collectionIds: collectionIds || undefined,
       colors: colors,
       // Optional product type filter (maps to Prisma enum in data layer)
+      types: types || undefined,
       productType: productType || undefined,
       priceMin: priceMin !== undefined && !Number.isNaN(priceMin) ? priceMin : undefined,
       priceMax: priceMax !== undefined && !Number.isNaN(priceMax) ? priceMax : undefined,
@@ -150,35 +163,20 @@ export default async function ShopPage({ searchParams }: ShopPageProps) {
         <div className="flex gap-6 lg:gap-8">
           {/* Sidebar Filters */}
           <aside className="hidden lg:block w-64 shrink-0">
-            <div className="sticky top-20">
-              <Suspense fallback={null}>
+            <ShopFilters
+              availableColorIds={filterOptions.colorIds}
+              availableCollections={filterOptions.collections}
+            />
+          </aside>
+
+          <div className="flex-1">
+            {/* Mobile Filters */}
+            <div className="flex flex-wrap gap-4 items-center justify-between">
+              <div className="flex flex-wrap gap-4 items-center flex-1 lg:hidden">
                 <ShopFilters
                   availableColorIds={filterOptions.colorIds}
                   availableCollections={filterOptions.collections}
                 />
-              </Suspense>
-            </div>
-          </aside>
-
-          <div className="flex-1">
-            {/* Mobile Filters + View Toggle */}
-            <div className="flex flex-col gap-4 mb-8">
-              <div className="flex flex-wrap gap-4 items-center justify-between">
-                <div className="flex flex-wrap gap-4 items-center flex-1 lg:hidden">
-                  <Suspense fallback={null}>
-                    <ShopFilters
-                      availableColorIds={filterOptions.colorIds}
-                      availableCollections={filterOptions.collections}
-                    />
-                  </Suspense>
-                </div>
-              </div>
-
-              {/* Boxlot Filter + Message */}
-              <div className="flex flex-wrap gap-4 items-center justify-end">
-                <Suspense fallback={null}>
-                  <ViewToggle />
-                </Suspense>
               </div>
             </div>
 

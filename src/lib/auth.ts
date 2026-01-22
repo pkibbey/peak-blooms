@@ -4,7 +4,7 @@ import { nextCookies } from "better-auth/next-js"
 import { headers } from "next/headers"
 import { db } from "./db"
 
-export const auth = betterAuth({
+const auth = betterAuth({
   database: prismaAdapter(db, {
     provider: "postgresql",
   }),
@@ -46,14 +46,21 @@ export const auth = betterAuth({
   },
 })
 
+export { auth }
+
 /**
  * Get the current session on the server side
  * For server components and route handlers
  */
 export async function getSession() {
-  return auth.api.getSession({
-    headers: await headers(),
-  })
+  try {
+    return await auth.api.getSession({
+      headers: await headers(),
+    })
+  } catch (error) {
+    console.error("❌ Failed to get session:", error instanceof Error ? error.message : error)
+    throw error
+  }
 }
 
 /**
@@ -62,7 +69,15 @@ export async function getSession() {
  * The user will need to sign in again to get a new session with updated permissions.
  */
 export async function invalidateUserSessions(userId: string) {
-  await db.session.deleteMany({
-    where: { userId },
-  })
+  try {
+    await db.session.deleteMany({
+      where: { userId },
+    })
+  } catch (error) {
+    console.error(
+      "❌ Failed to invalidate user sessions:",
+      error instanceof Error ? error.message : error
+    )
+    throw error
+  }
 }

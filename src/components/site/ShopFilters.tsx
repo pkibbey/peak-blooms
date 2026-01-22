@@ -1,22 +1,15 @@
 "use client"
 
 import { X } from "lucide-react"
-import { useCallback, useEffect, useState } from "react"
+import { useCallback, useState } from "react"
 import { FilterSection } from "@/components/filters/FilterSection"
 import { ColorSelector } from "@/components/site/ColorSelector"
 import { SearchInput } from "@/components/site/SearchInput"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Label } from "@/components/ui/label"
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectPositioner,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select"
 import { PRODUCT_TYPE_LABELS, PRODUCT_TYPES } from "@/lib/product-types"
 import { useFilterState } from "@/lib/useFilterState"
+import { ViewToggle } from "./ViewToggle"
 
 interface ShopFiltersProps {
   availableColorIds?: string[]
@@ -45,16 +38,7 @@ export function ShopFilters({
   const [selectedCollectionIds, setSelectedCollectionIds] = useState<string[]>(currentCollectionIds)
   const [priceMin, setPriceMin] = useState<string>(currentPriceMin)
   const [priceMax, setPriceMax] = useState<string>(currentPriceMax)
-  const [productType, setProductType] = useState<string>(currentProductType)
-
-  // Keep productType in sync when URL search params change (e.g., on initial load)
-  useEffect(() => {
-    const p = searchParams.get("productType") || ""
-    if (p !== productType) {
-      setProductType(p)
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [searchParams, productType])
+  const [selectedProductType, setSelectedProductType] = useState<string>(currentProductType)
 
   // Check if any filters are active
   const hasActiveFilters =
@@ -62,7 +46,7 @@ export function ShopFilters({
     selectedCollectionIds.length > 0 ||
     !!priceMin ||
     !!priceMax ||
-    !!productType
+    !!selectedProductType
 
   // Helper to update all filters at once
   const updateFilters = useCallback(
@@ -71,7 +55,7 @@ export function ShopFilters({
       collectionIds: string[],
       priceMinVal: string,
       priceMaxVal: string,
-      productTypeVal: string
+      productType: string
     ) => {
       const updates: Record<string, string | null> = {}
 
@@ -99,8 +83,8 @@ export function ShopFilters({
         updates.priceMax = null
       }
 
-      if (productTypeVal) {
-        updates.productType = productTypeVal
+      if (productType) {
+        updates.productType = productType
       } else {
         updates.productType = null
       }
@@ -115,9 +99,9 @@ export function ShopFilters({
   const handleColorsChange = useCallback(
     (colors: string[]) => {
       setSelectedColors(colors)
-      updateFilters(colors, selectedCollectionIds, priceMin, priceMax, productType)
+      updateFilters(colors, selectedCollectionIds, priceMin, priceMax, selectedProductType)
     },
-    [selectedCollectionIds, priceMin, priceMax, updateFilters, productType]
+    [selectedCollectionIds, priceMin, priceMax, updateFilters, selectedProductType]
   )
 
   // Handle collection toggle - add/remove from selection
@@ -127,36 +111,59 @@ export function ShopFilters({
         ? selectedCollectionIds.filter((id) => id !== collectionId)
         : [...selectedCollectionIds, collectionId]
       setSelectedCollectionIds(newCollectionIds)
-      updateFilters(selectedColors, newCollectionIds, priceMin, priceMax, productType)
+      updateFilters(selectedColors, newCollectionIds, priceMin, priceMax, selectedProductType)
     },
-    [selectedColors, selectedCollectionIds, priceMin, priceMax, updateFilters, productType]
+    [selectedColors, selectedCollectionIds, priceMin, priceMax, updateFilters, selectedProductType]
   )
+
+  // Handle product type toggle - select/deselect
+  const toggleProductType = useCallback(
+    (type: string) => {
+      const newProductType = selectedProductType === type ? "" : type
+      setSelectedProductType(newProductType)
+      updateFilters(selectedColors, selectedCollectionIds, priceMin, priceMax, newProductType)
+    },
+    [selectedProductType, selectedColors, selectedCollectionIds, priceMin, priceMax, updateFilters]
+  )
+
+  // Clear all product types
+  const clearProductTypes = useCallback(() => {
+    setSelectedProductType("")
+    updateFilters(selectedColors, selectedCollectionIds, priceMin, priceMax, "")
+  }, [selectedColors, selectedCollectionIds, priceMin, priceMax, updateFilters])
 
   // Clear all collections
   const clearCollections = useCallback(() => {
     setSelectedCollectionIds([])
-    updateFilters(selectedColors, [], priceMin, priceMax, productType)
-  }, [selectedColors, priceMin, priceMax, updateFilters, productType])
+    updateFilters(selectedColors, [], priceMin, priceMax, selectedProductType)
+  }, [selectedColors, priceMin, priceMax, updateFilters, selectedProductType])
 
   // Apply filters for numeric inputs (blur/Enter)
   const applyFilters = useCallback(() => {
-    updateFilters(selectedColors, selectedCollectionIds, priceMin, priceMax, productType)
-  }, [selectedColors, selectedCollectionIds, priceMin, priceMax, updateFilters, productType])
+    updateFilters(selectedColors, selectedCollectionIds, priceMin, priceMax, selectedProductType)
+  }, [
+    selectedColors,
+    selectedCollectionIds,
+    priceMin,
+    priceMax,
+    updateFilters,
+    selectedProductType,
+  ])
 
   // Clear all filters
   const handleClearAllFilters = useCallback(() => {
     setSelectedColors([])
     setSelectedCollectionIds([])
     setPriceMin("")
-    setProductType("")
+    setSelectedProductType("")
     setPriceMax("")
     clearAllFilters()
   }, [clearAllFilters])
 
   return (
     <div className="rounded-lg border bg-white p-4 flex-1">
+      <h3 className="font-semibold text-sm">Filters</h3>
       <div className="mb-4 flex items-center justify-between">
-        <h3 className="font-semibold text-sm">Filters</h3>
         {hasActiveFilters && (
           <button
             type="button"
@@ -178,7 +185,7 @@ export function ShopFilters({
           <div>
             <div className="grid grid-cols-2 gap-2">
               <div>
-                <label htmlFor="price-min" className="text-xs font-medium block mb-1">
+                <label htmlFor="price-min" className="text-xs font-medium text-gray-700 block mb-1">
                   Minimum
                 </label>
                 <input
@@ -197,7 +204,7 @@ export function ShopFilters({
                 />
               </div>
               <div>
-                <label htmlFor="price-max" className="text-xs font-medium block mb-1">
+                <label htmlFor="price-max" className="text-xs font-medium text-gray-700 block mb-1">
                   Maximum
                 </label>
                 <input
@@ -221,31 +228,32 @@ export function ShopFilters({
 
         {/* Product Type Filter */}
         <FilterSection title="Product Type">
-          <div>
-            <Select
-              value={productType || ""}
-              itemToStringLabel={(str) => str.charAt(0).toUpperCase() + str.slice(1).toLowerCase()}
-              onValueChange={(value) => {
-                const v = value as string
-                setProductType(v)
-                // apply immediately with new product type
-                updateFilters(selectedColors, selectedCollectionIds, priceMin, priceMax, v)
-              }}
-            >
-              <SelectTrigger id="product-type" className="w-full">
-                <SelectValue placeholder="All types" />
-              </SelectTrigger>
-              <SelectPositioner alignItemWithTrigger>
-                <SelectContent>
-                  <SelectItem value="">All</SelectItem>
-                  {PRODUCT_TYPES.map((type) => (
-                    <SelectItem key={type} value={type}>
-                      {PRODUCT_TYPE_LABELS[type as keyof typeof PRODUCT_TYPE_LABELS]}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </SelectPositioner>
-            </Select>
+          <div className="space-y-2">
+            <div className="flex items-center gap-2">
+              <Checkbox
+                id="product-type-all"
+                checked={selectedProductType === ""}
+                onCheckedChange={clearProductTypes}
+              />
+              <Label htmlFor="product-type-all" className="text-sm font-normal cursor-pointer">
+                All Types
+              </Label>
+            </div>
+            {PRODUCT_TYPES.map((type) => (
+              <div key={type} className="flex items-center gap-2">
+                <Checkbox
+                  id={`product-type-${type}`}
+                  checked={selectedProductType === type}
+                  onCheckedChange={() => toggleProductType(type)}
+                />
+                <Label
+                  htmlFor={`product-type-${type}`}
+                  className="text-sm font-normal cursor-pointer"
+                >
+                  {PRODUCT_TYPE_LABELS[type as keyof typeof PRODUCT_TYPE_LABELS]}
+                </Label>
+              </div>
+            ))}
           </div>
         </FilterSection>
 
@@ -293,6 +301,13 @@ export function ShopFilters({
             />
           </FilterSection>
         )}
+
+        <div className="gap-4 items-center">
+          <Label htmlFor="collection-all" className="text-xs font-medium text-gray-700 mb-2">
+            Layout
+          </Label>
+          <ViewToggle />
+        </div>
       </div>
     </div>
   )
