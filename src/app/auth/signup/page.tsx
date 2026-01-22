@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation"
 import { useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { authClient, useSession } from "@/lib/auth-client"
-import { toAppError } from "@/lib/error-utils"
+import { toAppErrorClient } from "@/lib/error-utils"
 
 export default function SignUpPage() {
   const router = useRouter()
@@ -25,7 +25,7 @@ export default function SignUpPage() {
         callbackURL: "/",
       })
     } catch (error) {
-      toAppError(error, "Error during Google sign-up")
+      toAppErrorClient(error, "Error during Google sign-up")
     }
   }
 
@@ -46,7 +46,7 @@ export default function SignUpPage() {
         <div className="space-y-3 text-center text-sm">
           <p className="text-muted-foreground">
             Already have an account?{" "}
-            <Link prefetch={false} href="/auth/signin" className="font-medium hover:underline">
+            <Link href="/auth/signin" className="font-medium hover:underline">
               Sign In
             </Link>
           </p>

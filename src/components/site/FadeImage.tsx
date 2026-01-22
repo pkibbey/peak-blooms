@@ -1,7 +1,7 @@
 "use client"
 
 import Image from "next/image"
-import { useEffect, useRef, useState } from "react"
+import { useCallback, useEffect, useRef, useState } from "react"
 
 interface FadeImageProps {
   src: string
@@ -10,6 +10,7 @@ interface FadeImageProps {
   className?: string
   sizes?: string
   duration?: number
+  onLoadComplete?: (src: string) => void
 }
 
 export default function FadeImage({
@@ -19,12 +20,23 @@ export default function FadeImage({
   className = "",
   sizes,
   duration = 200,
+  onLoadComplete,
 }: FadeImageProps) {
   const [activeSrc, setActiveSrc] = useState(src)
   const [prevSrc, setPrevSrc] = useState<string | null>(null)
   const [showIncoming, setShowIncoming] = useState(false)
   const [prefersReducedMotion, setPrefersReducedMotion] = useState(false)
   const mounted = useRef(false)
+  const lastNotifiedRef = useRef<string | null>(null)
+
+  const notifyLoadComplete = useCallback(
+    (s: string) => {
+      if (lastNotifiedRef.current === s) return
+      lastNotifiedRef.current = s
+      onLoadComplete?.(s)
+    },
+    [onLoadComplete]
+  )
 
   useEffect(() => {
     mounted.current = true
@@ -44,6 +56,7 @@ export default function FadeImage({
       setActiveSrc(src)
       setPrevSrc(null)
       setShowIncoming(false)
+      notifyLoadComplete(src)
       return
     }
 
@@ -64,11 +77,12 @@ export default function FadeImage({
           setTimeout(() => {
             setPrevSrc(null)
             setShowIncoming(false)
+            notifyLoadComplete(src)
           }, duration)
         })
       })
     }
-  }, [src, activeSrc, prefersReducedMotion, duration])
+  }, [src, activeSrc, prefersReducedMotion, duration, notifyLoadComplete])
 
   const topOpacityClass = prevSrc ? (showIncoming ? "opacity-100" : "opacity-0") : "opacity-100"
   const bottomOpacityClass = prevSrc ? (showIncoming ? "opacity-0" : "opacity-100") : "opacity-0"
@@ -96,6 +110,10 @@ export default function FadeImage({
         priority={priority}
         className={`object-cover transition-opacity motion-reduce:transition-none ${topOpacityClass}`}
         style={transitionStyle}
+        onLoadingComplete={() => {
+          // If there was no previous image (no crossfade), notify load complete for initial/instant cases
+          if (!prevSrc) notifyLoadComplete(activeSrc)
+        }}
       />
     </div>
   )

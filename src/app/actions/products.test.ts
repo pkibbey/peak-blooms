@@ -15,6 +15,7 @@ vi.mock("next/cache", () => ({
 }))
 
 import { ProductType } from "@/generated/enums"
+import type { CollectionModel } from "@/generated/models"
 import { getSession } from "@/lib/auth"
 import { db } from "@/lib/db"
 // Now import the modules
@@ -579,17 +580,23 @@ describe("Product Actions", () => {
       })
     })
 
-    it("should filter by boxlot only", async () => {
+    it("should filter by collection slug (roses)", async () => {
       vi.mocked(db.product.count).mockResolvedValueOnce(5)
+      vi.mocked(db.collection.findMany).mockResolvedValueOnce([
+        { id: "collection-roses" } as CollectionModel,
+      ])
 
-      const result = await getProductCountAction({ boxlotOnly: true })
+      const result = await getProductCountAction({ collection: "roses" })
 
       expect(result.success).toBe(true)
       if (result.success) {
         expect(result.data).toBe(5)
       }
       expect(db.product.count).toHaveBeenCalledWith({
-        where: { deletedAt: null, productType: "ROSE" },
+        where: {
+          deletedAt: null,
+          productCollections: { some: { collectionId: { in: ["collection-roses"] } } },
+        },
       })
     })
 
@@ -605,10 +612,13 @@ describe("Product Actions", () => {
       expect(db.product.count).toHaveBeenCalled()
     })
 
-    it("should filter by both boxlot and query", async () => {
+    it("should filter by both collection slug and query", async () => {
       vi.mocked(db.product.count).mockResolvedValueOnce(1)
+      vi.mocked(db.collection.findMany).mockResolvedValueOnce([
+        { id: "collection-roses" } as CollectionModel,
+      ])
 
-      const result = await getProductCountAction({ boxlotOnly: true, query: "rose" })
+      const result = await getProductCountAction({ collection: "roses", query: "rose" })
 
       expect(result.success).toBe(true)
       if (result.success) {

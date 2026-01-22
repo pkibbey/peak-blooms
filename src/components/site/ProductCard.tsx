@@ -63,9 +63,9 @@ export function ProductCard({
   // Grid Layout - renders as a product card
   if (layout === "grid") {
     return (
-      <div className="group flex flex-col overflow-hidden rounded-xs transition-shadow border border-border">
+      <div className="group flex flex-col overflow-hidden rounded-xs border border-border">
         {/* Image Container */}
-        <Link prefetch={false} href={`/shop/${product.slug}`}>
+        <Link href={`/shop/${product.slug}`}>
           <ImageFrame className="aspect-square">
             {product.images && product.images.length > 0 && (
               <>
@@ -88,7 +88,7 @@ export function ProductCard({
               </>
             )}
             {/* Colors Display - Bottom Left */}
-            {product.colors && product.colors.length > 0 && (
+            {product.colors.length > 0 && (
               <div className="z-20 absolute bottom-2 left-2 bg-background/90 rounded-md px-2 py-1">
                 <ColorsMiniDisplay colorIds={product.colors} />
               </div>
@@ -112,12 +112,7 @@ export function ProductCard({
         <div className="flex flex-col justify-between bg-background p-4 gap-2 grow">
           <div className="min-w-0">
             <div className="flex items-center gap-2">
-              <Link
-                prefetch={false}
-                href={`/shop/${product.slug}`}
-                className="min-w-0 flex-1"
-                title={product.name}
-              >
+              <Link href={`/shop/${product.slug}`} className="min-w-0 flex-1" title={product.name}>
                 <h3
                   title={product.name}
                   className="text-lg font-semibold text-secondary-foreground truncate"
@@ -157,7 +152,6 @@ export function ProductCard({
     >
       {/* Product Image */}
       <Link
-        prefetch={false}
         href={`/shop/${product.slug}`}
         className={`relative ${sizeConfig.container} shrink-0 overflow-hidden`}
       >
@@ -189,9 +183,8 @@ export function ProductCard({
       <div className="flex flex-1 flex-col px-4 py-3">
         <div className="flex flex-col sm:flex-row justify-between items-start gap-3">
           <div className="min-w-0 flex-1">
-            <div className="flex flex-col gap-2">
+            <div className="flex sm:flex-col gap-2">
               <Link
-                prefetch={false}
                 href={`/shop/${product.slug}`}
                 className="font-semibold hover:text-primary transition-colors block truncate"
                 title={product.name}
@@ -206,18 +199,14 @@ export function ProductCard({
             {/* View Options Link */}
             {showSimilarLink && (
               <div className="mt-2">
-                <Link
-                  prefetch={false}
-                  href={`/shop/${product.slug}`}
-                  className="text-sm text-primary underline"
-                >
+                <Link href={`/shop/${product.slug}`} className="text-sm text-primary underline">
                   View similar options →
                 </Link>
               </div>
             )}
           </div>
           {/* Right Side: Price & Controls */}
-          <div className="flex flex-col sm:items-end w-full sm:w-auto sm:justify-end gap-3">
+          <div className="flex sm:flex-col sm:items-end w-full sm:w-auto justify-between sm:justify-end gap-3">
             <p className="text-xl font-medium text-foreground">{formatPrice(lineTotal)}</p>
             {showQuantityControl ? (
               <div className="flex flex-col items-end gap-4">

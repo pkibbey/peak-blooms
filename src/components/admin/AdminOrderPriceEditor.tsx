@@ -5,7 +5,7 @@ import { toast } from "sonner"
 import { updateOrderItemPriceAction } from "@/app/actions/orders"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { toAppError } from "@/lib/error-utils"
+import { toAppErrorClient } from "@/lib/error-utils"
 import type { OrderWithItems } from "@/lib/query-types"
 import { formatPrice } from "@/lib/utils"
 
@@ -64,8 +64,7 @@ export function AdminOrderPriceEditor({ order, onPriceUpdated }: AdminOrderPrice
 
       toast.success("Price updated successfully")
     } catch (error) {
-      toAppError(error, "Failed to update price")
-      toast.error("Failed to update price")
+      toAppErrorClient(error, "Failed to update price")
     } finally {
       setIsSaving(false)
     }

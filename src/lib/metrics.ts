@@ -14,7 +14,7 @@ import { toAppError } from "./error-utils"
  * @param name - A descriptive name for this metric
  * @param duration - The duration in milliseconds
  */
-export async function captureMetric(
+export async function captureSeedMetric(
   type: MetricType,
   name: string,
   duration: number

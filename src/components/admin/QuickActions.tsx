@@ -8,43 +8,24 @@ export default function QuickActions() {
       <p className="text-sm text-muted-foreground mb-4">Common admin tasks for fast access</p>
 
       <div className="flex flex-wrap gap-3">
+        <Button nativeButton={false} render={<Link href="/admin/products/new">Add product</Link>} />
+
         <Button
+          variant="outline"
           nativeButton={false}
-          render={
-            <Link prefetch={false} href="/admin/products/new">
-              Add product
-            </Link>
-          }
+          render={<Link href="/admin/orders?status=PENDING">View pending orders</Link>}
         />
 
         <Button
           variant="outline"
           nativeButton={false}
-          render={
-            <Link prefetch={false} href="/admin/orders?status=PENDING">
-              View pending orders
-            </Link>
-          }
+          render={<Link href="/admin/users">Review users</Link>}
         />
 
         <Button
           variant="outline"
           nativeButton={false}
-          render={
-            <Link prefetch={false} href="/admin/users">
-              Review users
-            </Link>
-          }
-        />
-
-        <Button
-          variant="outline"
-          nativeButton={false}
-          render={
-            <Link prefetch={false} href="/admin/collections/new">
-              New collection
-            </Link>
-          }
+          render={<Link href="/admin/collections/new">New collection</Link>}
         />
       </div>
     </div>

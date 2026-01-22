@@ -2,23 +2,21 @@
 
 import { revalidatePath } from "next/cache"
 import { db } from "@/lib/db"
-import { toAppError } from "@/lib/error-utils"
-import type { AppResult } from "@/lib/query-types"
+
 import { newsletterSubscribeSchema } from "@/lib/validations/newsletter"
+import { wrapAction } from "@/server/error-handler"
 
 /**
  * Subscribe to newsletter
  * Creates a SUBSCRIBER user account (silently succeeds if email already exists)
  */
-export async function subscribeToNewsletterAction(
-  email: string
-): Promise<AppResult<{ userId?: string }>> {
-  try {
+export const subscribeToNewsletterAction = wrapAction(
+  async (email: string): Promise<{ userId?: string }> => {
     // Validate email
     const validation = newsletterSubscribeSchema.safeParse({ email })
     if (!validation.success) {
       // Silently succeed to prevent email enumeration
-      return { success: true, data: {} }
+      return {}
     }
 
     // Check if user already exists
@@ -28,7 +26,7 @@ export async function subscribeToNewsletterAction(
 
     // Silently succeed even if user exists (prevents email enumeration attacks)
     if (existingUser) {
-      return { success: true, data: {} }
+      return {}
     }
 
     // Create new newsletter subscriber user
@@ -42,8 +40,6 @@ export async function subscribeToNewsletterAction(
     })
 
     revalidatePath("/")
-    return { success: true, data: { userId: user.id } }
-  } catch (err) {
-    return toAppError(err, "Error while subscribing to newsletter")
+    return { userId: user.id }
   }
-}
+)

@@ -31,6 +31,7 @@ export function ImageGallery({ images, productName, fallbackImage }: ImageGaller
         : []
   const [currentImageIndex, setCurrentImageIndex] = useState(0)
   const [hoverIndex, setHoverIndex] = useState<number | null>(null)
+  const [isLoading, setIsLoading] = useState(true)
 
   if (imageList.length === 0) {
     return (
@@ -45,10 +46,14 @@ export function ImageGallery({ images, productName, fallbackImage }: ImageGaller
   const hasMultipleImages = imageList.length > 1
 
   const goToPrevious = () => {
+    if (isLoading) return
+    setIsLoading(true)
     setCurrentImageIndex((prev) => (prev === 0 ? imageList.length - 1 : prev - 1))
   }
 
   const goToNext = () => {
+    if (isLoading) return
+    setIsLoading(true)
     setCurrentImageIndex((prev) => (prev === imageList.length - 1 ? 0 : prev + 1))
   }
 
@@ -69,6 +74,7 @@ export function ImageGallery({ images, productName, fallbackImage }: ImageGaller
         tabIndex={hasMultipleImages ? 0 : undefined}
         role="region"
         aria-label={`Image gallery showing ${currentImageIndex + 1} of ${imageList.length} images`}
+        aria-busy={isLoading}
       >
         <FadeImage
           src={currentImage.url}
@@ -77,6 +83,9 @@ export function ImageGallery({ images, productName, fallbackImage }: ImageGaller
           priority={currentImageIndex === 0}
           duration={200}
           className="absolute inset-0"
+          onLoadComplete={(src) => {
+            if (src === currentImage.url) setIsLoading(false)
+          }}
         />
 
         {/* Navigation Controls - Only show if multiple images */}
@@ -89,6 +98,7 @@ export function ImageGallery({ images, productName, fallbackImage }: ImageGaller
               onClick={goToPrevious}
               className={`${NAV_BUTTON_BASE_CLASS} left-2`}
               aria-label="Previous image"
+              disabled={isLoading}
             >
               <ChevronLeft className="h-4 w-4" />
             </Button>
@@ -100,6 +110,7 @@ export function ImageGallery({ images, productName, fallbackImage }: ImageGaller
               onClick={goToNext}
               className={`${NAV_BUTTON_BASE_CLASS} right-2`}
               aria-label="Next image"
+              disabled={isLoading}
             >
               <ChevronRight className="h-4 w-4" />
             </Button>
@@ -122,8 +133,12 @@ export function ImageGallery({ images, productName, fallbackImage }: ImageGaller
           {imageList.map((image, index) => (
             <Button
               key={image.url}
-              onClick={() => setCurrentImageIndex(index)}
-              onMouseEnter={() => setHoverIndex(index)}
+              onClick={() => {
+                if (isLoading) return
+                setIsLoading(true)
+                setCurrentImageIndex(index)
+              }}
+              onMouseEnter={() => !isLoading && setHoverIndex(index)}
               onMouseLeave={() => setHoverIndex(null)}
               className={`relative flex-shrink-0 ${THUMBNAIL_SIZE} rounded border-2 overflow-hidden transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary ${
                 index === displayIndex
@@ -132,6 +147,7 @@ export function ImageGallery({ images, productName, fallbackImage }: ImageGaller
               }`}
               aria-label={`Go to image ${index + 1}`}
               aria-current={index === currentImageIndex}
+              disabled={isLoading}
             >
               <Image
                 src={image.url}

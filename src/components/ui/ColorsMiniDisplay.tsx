@@ -4,7 +4,7 @@ import { COLOR_MAP } from "@/lib/colors"
 import { cn } from "@/lib/utils"
 
 interface ColorsMiniDisplayProps {
-  colorIds?: string[] | null
+  colorIds: string[]
   className?: string
   /**
    * Maximum number of colors to display before showing a count
@@ -25,10 +25,6 @@ export function ColorsMiniDisplay({
   maxDisplay = 5,
   size = "sm",
 }: ColorsMiniDisplayProps) {
-  if (!colorIds || colorIds.length === 0) {
-    return <span className="text-muted-foreground text-xs">No colors</span>
-  }
-
   const displayedColors = colorIds.slice(0, maxDisplay)
   const remainingCount = colorIds.length - maxDisplay
 

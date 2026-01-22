@@ -50,7 +50,7 @@ export function ShopPagination({ currentPage, totalPages, searchParams }: ShopPa
               <ChevronLeft className="w-4 h-4" />
             </button>
           ) : (
-            <Link prefetch={false} href={buildUrl(currentPage - 1)}>
+            <Link href={buildUrl(currentPage - 1)}>
               <ChevronLeft className="w-4 h-4" />
             </Link>
           )
@@ -80,11 +80,7 @@ export function ShopPagination({ currentPage, totalPages, searchParams }: ShopPa
               variant={page === currentPage ? "default" : "outline"}
               size="sm"
               nativeButton={false}
-              render={
-                <Link prefetch={false} href={buildUrl(page as number)}>
-                  {page}
-                </Link>
-              }
+              render={<Link href={buildUrl(page as number)}>{page}</Link>}
             />
           )
         })}
@@ -103,7 +99,7 @@ export function ShopPagination({ currentPage, totalPages, searchParams }: ShopPa
               <ChevronRight className="w-4 h-4" />
             </button>
           ) : (
-            <Link prefetch={false} href={buildUrl(currentPage + 1)}>
+            <Link href={buildUrl(currentPage + 1)}>
               <ChevronRight className="w-4 h-4" />
             </Link>
           )

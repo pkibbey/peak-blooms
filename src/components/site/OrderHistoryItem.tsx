@@ -25,7 +25,6 @@ export default function OrderHistoryItem({ order }: OrderHistoryItemProps) {
         {/* Order Identifier & Date */}
         <div className="flex flex-col min-w-[120px]">
           <Link
-            prefetch={false}
             href={`/account/order-history/${order.id}`}
             className="font-semibold text-sm hover:underline truncate"
           >
@@ -83,7 +82,6 @@ export default function OrderHistoryItem({ order }: OrderHistoryItemProps) {
         <div className="flex items-center gap-2">
           <ReorderButton order={order} />
           <Link
-            prefetch={false}
             href={`/account/order-history/${order.id}`}
             className="text-muted-foreground hover:text-foreground p-1 transition-colors sm:block hidden"
           >

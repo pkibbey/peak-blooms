@@ -9,7 +9,6 @@ interface BackLinkProps extends Omit<LinkProps, "href"> {
 export default function BackLink({ href, label, className, ...props }: BackLinkProps) {
   return (
     <Link
-      prefetch={false}
       href={href}
       className={`text-sm text-primary inline-block mb-4 ${className || ""}`.trim()}
       {...props}

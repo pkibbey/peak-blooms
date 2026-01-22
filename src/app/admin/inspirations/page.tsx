@@ -58,11 +58,7 @@ export default async function AdminInspirationsPage({ searchParams }: AdminInspi
         </div>
         <Button
           nativeButton={false}
-          render={
-            <Link prefetch={false} href="/admin/inspirations/new">
-              Add New Inspiration
-            </Link>
-          }
+          render={<Link href="/admin/inspirations/new">Add New Inspiration</Link>}
         />
       </div>
 

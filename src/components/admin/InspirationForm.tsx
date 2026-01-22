@@ -26,8 +26,9 @@ import { IconTrash } from "@/components/ui/icons"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import type { ProductModel } from "@/generated/models"
-import { toAppError } from "@/lib/error-utils"
+import { toAppErrorClient } from "@/lib/error-utils"
 import { saveOnBlur } from "@/lib/saveOnBlur"
+import { useDebouncedCallback } from "@/lib/useDebouncedCallback"
 import {
   createInspirationSchema,
   type InspirationFormData,
@@ -134,14 +135,28 @@ export default function InspirationForm({ products, inspiration }: InspirationFo
 
   const handleFieldBlur = async () => {
     if (isEditing) {
-      startTransition(async () => {
-        await saveOnBlur({
-          form,
-          originalValues,
-          onSave: saveForm,
-        })
+      await saveOnBlur({
+        form,
+        originalValues,
+        onSave: saveForm,
       })
     }
+  }
+
+  const debouncedSave = useDebouncedCallback(async () => {
+    if (isEditing) {
+      await saveForm(form.getValues())
+    }
+  }, 500)
+
+  const handleProductIdsChange = (ids: string[]) => {
+    setSelectedProductIds(ids)
+    debouncedSave()
+  }
+
+  const handleSelectionsChange = (selections: ProductSelection[]) => {
+    setProductSelections(selections)
+    debouncedSave()
   }
 
   const handleDelete = async () => {
@@ -169,8 +184,7 @@ export default function InspirationForm({ products, inspiration }: InspirationFo
       router.push("/admin/inspirations")
       router.refresh()
     } catch (err) {
-      toAppError(err, "Failed to delete inspiration")
-      toast.error("Failed to delete inspiration. Please try again.")
+      toAppErrorClient(err, "Failed to delete inspiration")
       setIsDeleting(false)
     }
   }
@@ -313,15 +327,9 @@ export default function InspirationForm({ products, inspiration }: InspirationFo
           <ProductMultiSelect
             products={products}
             selectedIds={selectedProductIds}
-            onChange={(ids) => {
-              setSelectedProductIds(ids)
-              handleFieldBlur()
-            }}
+            onChange={handleProductIdsChange}
             productSelections={productSelections}
-            onSelectionsChange={(selections) => {
-              setProductSelections(selections)
-              handleFieldBlur()
-            }}
+            onSelectionsChange={handleSelectionsChange}
           />
         </div>
 

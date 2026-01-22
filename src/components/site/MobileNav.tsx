@@ -40,7 +40,6 @@ export default function MobileNav({ user, isApproved, links, cartCount }: Props)
             nativeButton={false}
             render={
               <Link
-                prefetch={false}
                 href="/cart"
                 className="inline-flex items-center gap-2 px-4 py-2"
                 onClick={() => setOpen(false)}

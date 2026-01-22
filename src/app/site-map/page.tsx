@@ -103,11 +103,7 @@ export default function SitemapPage() {
                 <ul className="space-y-3">
                   {section.links.map((link) => (
                     <li key={link.href}>
-                      <Link
-                        prefetch={false}
-                        href={link.href}
-                        className="text-[#B45F68] hover:underline font-medium"
-                      >
+                      <Link href={link.href} className="text-[#B45F68] hover:underline font-medium">
                         {link.label}
                       </Link>
                       {link.description && (
@@ -124,11 +120,11 @@ export default function SitemapPage() {
             <h2 className="text-lg font-semibold mb-3">Need Help?</h2>
             <p className="text-base text-foreground">
               Can't find what you're looking for? Visit our{" "}
-              <Link prefetch={false} href="/contact" className="text-[#B45F68] hover:underline">
+              <Link href="/contact" className="text-[#B45F68] hover:underline">
                 Contact page
               </Link>{" "}
               or{" "}
-              <Link prefetch={false} href="/faq" className="text-[#B45F68] hover:underline">
+              <Link href="/faq" className="text-[#B45F68] hover:underline">
                 FAQ
               </Link>
               .

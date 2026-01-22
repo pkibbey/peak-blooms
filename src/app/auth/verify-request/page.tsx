@@ -30,11 +30,7 @@ export default function VerifyRequestPage() {
           variant="outline"
           className="w-full"
           nativeButton={false}
-          render={
-            <Link prefetch={false} href="/">
-              Return to home
-            </Link>
-          }
+          render={<Link href="/">Return to home</Link>}
         />
       </div>
     </div>

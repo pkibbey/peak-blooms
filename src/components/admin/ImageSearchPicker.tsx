@@ -1,6 +1,6 @@
 "use client"
 
-import { Search } from "lucide-react"
+import { LoaderCircle, Search } from "lucide-react"
 import Image from "next/image"
 import { useCallback, useEffect, useState } from "react"
 import { toast } from "sonner"
@@ -13,7 +13,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog"
-import { toAppError } from "@/lib/error-utils"
+import { toAppErrorClient } from "@/lib/error-utils"
 import type { ImageSearchResult } from "@/lib/image-cache"
 
 interface ImageSearchPickerProps {
@@ -51,8 +51,7 @@ export function ImageSearchPicker({
         pexels: result.data?.pexels.images || [],
       })
     } catch (error) {
-      toAppError(error, "Failed to search for images")
-      toast.error("Failed to search for images")
+      toAppErrorClient(error, "Failed to search for images")
     } finally {
       setLoading(false)
     }
@@ -70,8 +69,7 @@ export function ImageSearchPicker({
       setSearchResults(null)
       toast.success("Image selected successfully")
     } catch (error) {
-      toAppError(error, "Failed to select image")
-      toast.error("Failed to select image")
+      toAppErrorClient(error, "Failed to select image")
     }
   }
 
@@ -103,7 +101,7 @@ export function ImageSearchPicker({
             <div className="flex items-center justify-center py-12">
               {loading ? (
                 <div className="text-center space-y-2">
-                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
+                  <LoaderCircle className="mr-2 h-4 w-4 animate-spin" aria-hidden="true" />
                   <p className="text-sm text-muted-foreground">Searching images...</p>
                 </div>
               ) : (

@@ -7,7 +7,7 @@ import { cancelOrderAction } from "@/app/actions/orders"
 import { Button } from "@/components/ui/button"
 import { IconRefresh, IconTrash } from "@/components/ui/icons"
 import type { Order } from "@/generated/client"
-import { toAppError } from "@/lib/error-utils"
+import { toAppErrorClient } from "@/lib/error-utils"
 
 interface CancelOrderButtonProps {
   order: Order
@@ -37,8 +37,7 @@ export function CancelOrderButton({ order }: CancelOrderButtonProps) {
         toast.error(result.error || "Failed to cancel order")
       }
     } catch (_error) {
-      toAppError(_error, "Failed to cancel order")
-      toast.error("Failed to cancel order")
+      toAppErrorClient(_error, "Failed to cancel order")
     } finally {
       setIsLoading(false)
     }

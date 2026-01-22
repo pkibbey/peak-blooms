@@ -1,7 +1,6 @@
 "use server"
 
 import { getSession } from "@/lib/auth"
-import { toAppError } from "@/lib/error-utils"
 import {
   type ApiQuotaInfo,
   cacheApiQuota,
@@ -10,7 +9,8 @@ import {
   getCachedImageSearchResults,
   type ImageSearchResult,
 } from "@/lib/image-cache"
-import type { AppResult } from "@/lib/query-types"
+
+import { wrapAction } from "@/server/error-handler"
 
 const PIXABAY_API_KEY = process.env.PIXABAY_API_KEY
 const UNSPLASH_API_KEY = process.env.UNSPLASH_API_KEY
@@ -21,18 +21,11 @@ const PEXELS_API_KEY = process.env.PEXELS_API_KEY
  * Queries Pixabay, Unsplash, and Pexels in parallel
  * Returns results with quota information for each API
  */
-export async function searchProductImages(
-  productName: string,
-  productType: string
-): Promise<AppResult<ImageSearchResults>> {
-  try {
+export const searchProductImages = wrapAction(
+  async (productName: string, productType: string): Promise<ImageSearchResults> => {
     const session = await getSession()
     if (!session?.user || session.user.role !== "ADMIN") {
-      return {
-        success: false,
-        error: "You must be an admin to search for images",
-        code: "UNAUTHORIZED",
-      }
+      throw new Error("You must be an admin to search for images")
     }
 
     const searchQuery = `${productName} ${productType} flower plant`
@@ -51,17 +44,12 @@ export async function searchProductImages(
     ])
 
     return {
-      success: true,
-      data: {
-        pixabay: pixabayResults,
-        unsplash: unsplashResults,
-        pexels: pexelsResults,
-      },
+      pixabay: pixabayResults,
+      unsplash: unsplashResults,
+      pexels: pexelsResults,
     }
-  } catch (err) {
-    return toAppError(err, "Failed to search for images")
   }
-}
+)
 
 /**
  * Search Pixabay API
@@ -139,7 +127,7 @@ async function searchPixabay(
 
     return { images, quota }
   } catch (err) {
-    toAppError(err, "Pixabay Search failed")
+    console.error("Pixabay search error:", err)
     return {
       images: [],
       quota: {
@@ -227,7 +215,7 @@ async function searchUnsplash(
 
     return { images, quota }
   } catch (err) {
-    toAppError(err, "Unsplash Search failed")
+    console.error("Unsplash search error:", err)
     return {
       images: [],
       quota: {
@@ -312,7 +300,7 @@ async function searchPexels(
 
     return { images, quota }
   } catch (err) {
-    toAppError(err, "Pexels Search failed")
+    console.error("Pexels search error:", err)
     return {
       images: [],
       quota: {
@@ -392,24 +380,17 @@ interface ImageSearchResults {
  * Required by Unsplash ToS when a photo is downloaded/used
  * This logs the download and credits the photographer
  */
-export async function triggerUnsplashDownload(downloadUrl: string): Promise<AppResult<null>> {
-  try {
-    const session = await getSession()
-    if (!session?.user) {
-      throw new Error("Unauthorized")
-    }
-
-    // Trigger the download endpoint as required by Unsplash ToS
-    await fetch(downloadUrl, {
-      method: "GET",
-      signal: AbortSignal.timeout(5000),
-    })
-
-    return {
-      success: true,
-      data: null,
-    }
-  } catch (err) {
-    return toAppError(err, "Failed to trigger download tracking")
+export const triggerUnsplashDownload = wrapAction(async (downloadUrl: string): Promise<null> => {
+  const session = await getSession()
+  if (!session?.user) {
+    throw new Error("Unauthorized")
   }
-}
+
+  // Trigger the download endpoint as required by Unsplash ToS
+  await fetch(downloadUrl, {
+    method: "GET",
+    signal: AbortSignal.timeout(5000),
+  })
+
+  return null
+})

@@ -10,7 +10,7 @@ import { ProductImageGeneratorInline } from "@/components/admin/ProductImageGene
 import { Button } from "@/components/ui/button"
 import { Label } from "@/components/ui/label"
 import type { ProductType } from "@/generated/enums"
-import { toAppError } from "@/lib/error-utils"
+import { toAppErrorClient } from "@/lib/error-utils"
 
 interface ProductImageManagerProps {
   productId?: string
@@ -83,8 +83,7 @@ export function ProductImageManager({
       updateImages(newImages)
       toast.success("Image removed successfully")
     } catch (error) {
-      toAppError(error, "Failed to delete image")
-      toast.error("Failed to delete image")
+      toAppErrorClient(error, "Failed to delete image")
     } finally {
       setIsDeleting(null)
     }

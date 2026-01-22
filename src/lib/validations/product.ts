@@ -78,7 +78,7 @@ export const toggleProductFeaturedSchema = z.object({
 export type ToggleProductFeaturedInput = z.infer<typeof toggleProductFeaturedSchema>
 
 export const getProductCountSchema = z.object({
-  boxlotOnly: z.boolean().optional(),
+  collection: z.union([z.string(), z.array(z.string())]).optional(),
   query: z.string().max(255).optional(),
 })
 

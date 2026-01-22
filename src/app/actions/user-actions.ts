@@ -4,8 +4,7 @@ import { revalidatePath } from "next/cache"
 import type { Address } from "@/generated/client"
 import { getSession } from "@/lib/auth"
 import { db } from "@/lib/db"
-import { toAppError } from "@/lib/error-utils"
-import type { AppResult, UserProfileResponse } from "@/lib/query-types"
+import type { UserProfileResponse } from "@/lib/query-types"
 import {
   type AddressFormData,
   addressSchema,
@@ -13,23 +12,18 @@ import {
   deleteAddressSchema,
 } from "@/lib/validations/address"
 import { type ProfileFormData, profileSchema } from "@/lib/validations/auth"
+import { wrapAction } from "@/server/error-handler"
 
 /**
  * Update current user's profile (name only)
  * Email cannot be changed - it's verified by Google OAuth
  */
-export async function updateProfileAction(
-  data: ProfileFormData
-): Promise<AppResult<UserProfileResponse>> {
-  try {
+export const updateProfileAction = wrapAction(
+  async (data: ProfileFormData): Promise<UserProfileResponse> => {
     const session = await getSession()
 
     if (!session?.user?.id) {
-      return {
-        success: false,
-        error: "You must be logged in to update your profile",
-        code: "UNAUTHORIZED",
-      }
+      throw new Error("Unauthorized: You must be logged in to update your profile")
     }
 
     const validatedData = profileSchema.parse(data)
@@ -51,30 +45,19 @@ export async function updateProfileAction(
     })
 
     revalidatePath("/account")
-    return {
-      success: true,
-      data: user,
-    }
-  } catch (error) {
-    return toAppError(error, "Failed to update profile")
+    return user
   }
-}
+)
 
 /**
  * Create a new address for the current user
  */
-export async function createAddressAction(
-  data: AddressFormData & { isDefault?: boolean }
-): Promise<AppResult<Address>> {
-  try {
+export const createAddressAction = wrapAction(
+  async (data: AddressFormData & { isDefault?: boolean }): Promise<Address> => {
     const session = await getSession()
 
     if (!session?.user?.id) {
-      return {
-        success: false,
-        error: "You must be logged in to create an address",
-        code: "UNAUTHORIZED",
-      }
+      throw new Error("Unauthorized: You must be logged in to create an address")
     }
 
     const validatedData = addressSchema.parse(data)
@@ -106,31 +89,22 @@ export async function createAddressAction(
     })
 
     revalidatePath("/account")
-    return {
-      success: true,
-      data: address,
-    }
-  } catch (error) {
-    return toAppError(error, "Failed to create address")
+    return address
   }
-}
+)
 
 /**
  * Update an address for the current user
  */
-export async function updateAddressAction(
-  addressId: string,
-  data: Partial<AddressFormData & { isDefault?: boolean }>
-): Promise<AppResult<Address>> {
-  try {
+export const updateAddressAction = wrapAction(
+  async (
+    addressId: string,
+    data: Partial<AddressFormData & { isDefault?: boolean }>
+  ): Promise<Address> => {
     const session = await getSession()
 
     if (!session?.user?.id) {
-      return {
-        success: false,
-        error: "You must be logged in to update an address",
-        code: "UNAUTHORIZED",
-      }
+      throw new Error("Unauthorized: You must be logged in to update an address")
     }
 
     // Verify ownership
@@ -139,11 +113,7 @@ export async function updateAddressAction(
     })
 
     if (!existingAddress || existingAddress.userId !== session.user.id) {
-      return {
-        success: false,
-        error: "Address not found",
-        code: "NOT_FOUND",
-      }
+      throw new Error("Address not found")
     }
 
     // Only validate if data contains address fields
@@ -181,31 +151,20 @@ export async function updateAddressAction(
     })
 
     revalidatePath("/account")
-    return {
-      success: true,
-      data: address,
-    }
-  } catch (error) {
-    return toAppError(error, "Failed to update address")
+    return address
   }
-}
+)
 
 /**
  * Delete an address for the current user
  */
-export async function deleteAddressAction(
-  input: DeleteAddressInput
-): Promise<AppResult<{ id: string }>> {
-  try {
+export const deleteAddressAction = wrapAction(
+  async (input: DeleteAddressInput): Promise<{ id: string }> => {
     const { addressId } = deleteAddressSchema.parse(input)
     const session = await getSession()
 
     if (!session?.user?.id) {
-      return {
-        success: false,
-        error: "You must be logged in to delete an address",
-        code: "UNAUTHORIZED",
-      }
+      throw new Error("Unauthorized: You must be logged in to delete an address")
     }
 
     // Verify ownership
@@ -214,11 +173,7 @@ export async function deleteAddressAction(
     })
 
     if (!address || address.userId !== session.user.id) {
-      return {
-        success: false,
-        error: "Address not found",
-        code: "NOT_FOUND",
-      }
+      throw new Error("Address not found")
     }
 
     await db.address.delete({
@@ -226,11 +181,6 @@ export async function deleteAddressAction(
     })
 
     revalidatePath("/account")
-    return {
-      success: true,
-      data: { id: addressId },
-    }
-  } catch (error) {
-    return toAppError(error, "Failed to delete address")
+    return { id: addressId }
   }
-}
+)

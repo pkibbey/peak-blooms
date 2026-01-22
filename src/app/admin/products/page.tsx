@@ -140,11 +140,7 @@ export default async function AdminProductsPage({ searchParams }: AdminProductsP
           )}
           <Button
             nativeButton={false}
-            render={
-              <Link prefetch={false} href="/admin/products/new">
-                Add New Product
-              </Link>
-            }
+            render={<Link href="/admin/products/new">Add New Product</Link>}
           />
         </div>
       </div>

@@ -131,7 +131,7 @@ export default function ProductMultiSelect({
 
       <Input
         type="text"
-        placeholder="Search products..."
+        placeholder="Search products and types..."
         value={searchTerm}
         onChange={(e) => setSearchTerm(e.target.value)}
         className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm"

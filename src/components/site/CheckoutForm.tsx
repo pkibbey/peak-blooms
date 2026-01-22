@@ -31,7 +31,7 @@ import {
 } from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
 import { calculateCartTotal, calculateMinimumTotal } from "@/lib/cart-utils"
-import { toAppError } from "@/lib/error-utils"
+import { toAppErrorClient } from "@/lib/error-utils"
 import type { CartResponse } from "@/lib/query-types"
 import { emptyAddress } from "@/lib/validations/address"
 import { type CheckoutFormData, checkoutSchema } from "@/lib/validations/checkout"
@@ -196,7 +196,7 @@ export default function CheckoutForm({ cart, savedAddresses }: CheckoutFormProps
       // This ensures the cart badge is cleared and order history is updated
       router.push("/account/order-history")
     } catch (err) {
-      toAppError(err, "Unable to save cart changes")
+      toAppErrorClient(err, "Unable to save cart changes")
       form.setError("root", { message: "Unable to save cart changes" })
     } finally {
       setIsSubmitting(false)
@@ -367,11 +367,7 @@ export default function CheckoutForm({ cart, savedAddresses }: CheckoutFormProps
                 variant="outline"
                 className="w-full"
                 nativeButton={false}
-                render={
-                  <Link prefetch={false} href="/cart">
-                    Return to Cart
-                  </Link>
-                }
+                render={<Link href="/cart">Return to Cart</Link>}
               />
             </div>
 

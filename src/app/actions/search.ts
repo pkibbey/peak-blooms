@@ -2,24 +2,22 @@
 
 import { getCurrentUser } from "@/lib/current-user"
 import { getProducts } from "@/lib/data"
-import { toAppError } from "@/lib/error-utils"
-import type { AppResult, SearchProductsResult } from "@/lib/query-types"
+import type { SearchProductsResult } from "@/lib/query-types"
 import { type SearchProductsInput, searchProductsSchema } from "@/lib/validations/search"
+import { wrapAction } from "@/server/error-handler"
 
 /**
  * Server action for searching products with debouncing on client
  * Returns search results with user's price multiplier applied
  */
-export async function searchProducts(
-  input: SearchProductsInput
-): Promise<AppResult<SearchProductsResult>> {
-  try {
+export const searchProducts = wrapAction(
+  async (input: SearchProductsInput): Promise<SearchProductsResult> => {
     const { searchTerm } = searchProductsSchema.parse(input)
     const trimmedTerm = searchTerm.trim()
 
     // Return empty results if search term is whitespace-only
     if (!trimmedTerm) {
-      return { success: true, data: { products: [] } }
+      return { products: [] }
     }
 
     const user = await getCurrentUser()
@@ -45,11 +43,6 @@ export async function searchProducts(
       price: product.price,
     }))
 
-    return {
-      success: true,
-      data: { products },
-    }
-  } catch (error) {
-    return toAppError(error, "Failed to search products")
+    return { products }
   }
-}
+)

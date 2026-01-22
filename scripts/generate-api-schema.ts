@@ -529,10 +529,11 @@ const openApiSpec = createDocument({
         description: "Get the total count of products with optional filters",
         parameters: [
           {
-            name: "boxlotOnly",
+            name: "collection",
             in: "query",
-            schema: { type: "boolean" },
-            description: "Filter to only ROSE type products",
+            schema: { type: "string" },
+            description:
+              "Filter by collection slug(s). Accepts a comma-separated list or repeated keys (e.g. collection=roses or collection=roses,tulips).",
           },
           {
             name: "query",

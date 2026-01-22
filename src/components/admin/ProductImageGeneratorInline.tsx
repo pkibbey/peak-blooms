@@ -15,7 +15,7 @@ import {
 } from "@/components/ui/select"
 import type { ProductType } from "@/generated/enums"
 import { getAvailableTemplates, type StyleTemplate } from "@/lib/ai-prompt-templates"
-import { toAppError } from "@/lib/error-utils"
+import { toAppErrorClient } from "@/lib/error-utils"
 
 interface ProductImageGeneratorInlineProps {
   productName: string
@@ -97,8 +97,7 @@ export function ProductImageGeneratorInline({
       setIsUploading(false)
       toast.success("Image generated and saved successfully")
     } catch (error) {
-      toAppError(error, "Failed to generate and save image")
-      toast.error(`Failed to generate and save image`)
+      toAppErrorClient(error, "Failed to generate and save image")
       setStatusMessage("")
       setIsGenerating(false)
       setIsUploading(false)

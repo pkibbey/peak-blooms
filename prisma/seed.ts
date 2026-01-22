@@ -19,7 +19,7 @@ const adapter = new PrismaPg(pool)
 const prisma = new PrismaClient({ adapter })
 
 // Helper function to capture metrics directly to database
-async function captureMetric(type: MetricType, name: string, duration: number): Promise<void> {
+async function captureSeedMetric(type: MetricType, name: string, duration: number): Promise<void> {
   // Skip metrics if they are not enabled
   if (process.env.ENABLE_METRICS !== "true") return
 
@@ -110,7 +110,11 @@ async function main() {
           approvedCustomer = createdUser
         }
       }
-      await captureMetric(MetricType.SEED, "batch create users", performance.now() - start_users)
+      await captureSeedMetric(
+        MetricType.SEED,
+        "batch create users",
+        performance.now() - start_users
+      )
       console.log(`✅ Created/updated ${testUsers.length} test users`)
 
       // First create the inspirations without products
@@ -205,7 +209,7 @@ async function main() {
           where: { slug: inspiration.slug },
           update: inspiration,
         })
-        await captureMetric(
+        await captureSeedMetric(
           MetricType.SEED,
           `upsert inspiration`,
           performance.now() - start_upsertInspiration
@@ -283,7 +287,7 @@ async function main() {
         select: { id: true, slug: true },
       })
 
-      await captureMetric(
+      await captureSeedMetric(
         MetricType.SEED,
         "batch fetch inspiration and product data",
         performance.now() - start_fetchInspirationData
@@ -324,7 +328,7 @@ async function main() {
           )
         }
       }
-      await captureMetric(
+      await captureSeedMetric(
         MetricType.SEED,
         "batch upsert inspiration products",
         performance.now() - start_upsertInspirationProducts
@@ -338,14 +342,18 @@ async function main() {
         const start_resetOrders = performance.now()
         // Delete all orders (order items will be cascaded)
         await tx.order.deleteMany({})
-        await captureMetric(MetricType.SEED, "reset orders", performance.now() - start_resetOrders)
+        await captureSeedMetric(
+          MetricType.SEED,
+          "reset orders",
+          performance.now() - start_resetOrders
+        )
 
         // Get the first 3 available products to use in sample orders
         const start_findProducts = performance.now()
         const firstThreeProducts = await tx.product.findMany({
           take: 3,
         })
-        await captureMetric(
+        await captureSeedMetric(
           MetricType.SEED,
           "find first 3 products",
           performance.now() - start_findProducts
@@ -389,7 +397,7 @@ async function main() {
             },
           }),
         ])
-        await captureMetric(
+        await captureSeedMetric(
           MetricType.SEED,
           "create delivery addresses",
           performance.now() - start_createAddresses

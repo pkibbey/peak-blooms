@@ -21,7 +21,7 @@ import {
   IconUser,
 } from "@/components/ui/icons"
 import { authClient, signOut } from "@/lib/auth-client"
-import { toAppError } from "@/lib/error-utils"
+import { toAppErrorClient } from "@/lib/error-utils"
 import type { SessionUser } from "@/lib/query-types"
 
 interface UserMenuProps {
@@ -38,8 +38,7 @@ export default function UserMenu({ user }: UserMenuProps) {
         provider: "google",
       })
     } catch (_error) {
-      toAppError(_error, "Failed to sign in")
-      toast.error("Failed to sign in")
+      toAppErrorClient(_error, "Failed to sign in")
     }
   }
 
@@ -98,7 +97,7 @@ export default function UserMenu({ user }: UserMenuProps) {
                 className="focus:bg-secondary/50 focus:text-secondary-foreground"
                 nativeButton={false}
                 render={
-                  <Link prefetch={false} href="/admin" className="flex items-center gap-2">
+                  <Link href="/admin" className="flex items-center gap-2">
                     <IconSettings aria-hidden="true" />
                     <span>Admin Dashboard</span>
                   </Link>
@@ -110,7 +109,7 @@ export default function UserMenu({ user }: UserMenuProps) {
               className="focus:bg-secondary/50 focus:text-secondary-foreground"
               nativeButton={false}
               render={
-                <Link prefetch={false} href="/account" className="flex items-center gap-2">
+                <Link href="/account" className="flex items-center gap-2">
                   <IconUser aria-hidden="true" />
                   <span>Account settings</span>
                 </Link>

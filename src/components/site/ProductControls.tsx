@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button"
 import { QuantityStepper } from "@/components/ui/QuantityStepper"
 import type { ProductModel } from "@/generated/models"
 import { useSession } from "@/lib/auth-client"
-import { toAppError } from "@/lib/error-utils"
+import { toAppErrorClient } from "@/lib/error-utils"
 import type { SessionUser } from "@/lib/query-types"
 import { useDebouncedCallback } from "@/lib/useDebouncedCallback"
 import { cn, formatPrice } from "@/lib/utils"
@@ -107,7 +107,7 @@ export function ProductControls({
 
         router.refresh()
       } catch (err) {
-        toAppError(err, "Failed to update cart")
+        toAppErrorClient(err, "Failed to update cart")
         setError("Failed to update cart")
         toast.error("Failed to update cart")
       }
@@ -137,11 +137,7 @@ export function ProductControls({
           variant="outline"
           size="sm"
           className="text-xs"
-          render={
-            <Link prefetch={false} href="/auth/signin">
-              Sign in for pricing
-            </Link>
-          }
+          render={<Link href="/auth/signin">Sign in for pricing</Link>}
         />
       )}
 
@@ -152,11 +148,7 @@ export function ProductControls({
           variant="outline"
           size="sm"
           className="text-xs"
-          render={
-            <Link prefetch={false} href="/auth/signin">
-              Sign in for pricing
-            </Link>
-          }
+          render={<Link href="/auth/signin">Sign in for pricing</Link>}
         />
       )}
 

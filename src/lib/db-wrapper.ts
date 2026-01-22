@@ -6,7 +6,7 @@
 
 import type { PrismaClient } from "@/generated/client"
 import type { MetricType } from "@/generated/enums"
-import { captureMetric } from "@/lib/metrics"
+import { captureSeedMetric } from "@/lib/metrics"
 
 /**
  * Creates a wrapped Prisma client that tracks database operations.
@@ -62,7 +62,7 @@ export function createTrackedDb(
                     const duration = performance.now() - startTime
                     const operationName = `${String(prop)}.${String(method)}`
                     // Fire and forget - don't await to avoid slowing down queries
-                    captureMetric(metricType as MetricType, operationName, duration)
+                    captureSeedMetric(metricType as MetricType, operationName, duration)
                   }
 
                   return result
@@ -72,7 +72,7 @@ export function createTrackedDb(
                     const duration = performance.now() - startTime
                     const operationName = `${String(prop)}.${String(method)} (error)`
                     // Fire and forget
-                    captureMetric(metricType as MetricType, operationName, duration)
+                    captureSeedMetric(metricType as MetricType, operationName, duration)
                   }
                   throw error
                 }

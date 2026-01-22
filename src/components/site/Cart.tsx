@@ -12,7 +12,7 @@ import { MarketPriceWarning } from "@/components/site/MarketPriceWarning"
 import { Button } from "@/components/ui/button"
 import { IconShoppingBag } from "@/components/ui/icons"
 import { calculateCartTotal, calculateMinimumTotal } from "@/lib/cart-utils"
-import { toAppError } from "@/lib/error-utils"
+import { toAppErrorClient } from "@/lib/error-utils"
 import type { CartResponse } from "@/lib/query-types"
 import { useDebouncedCallback } from "@/lib/useDebouncedCallback"
 
@@ -41,7 +41,7 @@ export default function Cart({ initialCart }: CartProps) {
         toast.error(result.error || "Failed to update quantity")
       }
     } catch (error) {
-      toAppError(error, "Failed to update quantity")
+      toAppErrorClient(error, "Failed to update quantity")
       toast.error("Failed to update quantity")
     } finally {
       setUpdatingItems((prev) => {
@@ -89,7 +89,7 @@ export default function Cart({ initialCart }: CartProps) {
         router.refresh()
       }
     } catch (error) {
-      toAppError(error, "Failed to remove item")
+      toAppErrorClient(error, "Failed to remove item")
       toast.error("Failed to remove item")
       // Refresh to revert on error
       router.refresh()
@@ -124,7 +124,7 @@ export default function Cart({ initialCart }: CartProps) {
         setCart(previousCart)
       }
     } catch (err) {
-      toAppError(err, "Failed to clear cart")
+      toAppErrorClient(err, "Failed to clear cart")
       toast.error("Failed to clear cart")
       // revert
       setCart(previousCart)
@@ -139,14 +139,7 @@ export default function Cart({ initialCart }: CartProps) {
         title="Your cart is empty"
         description={"Looks like you haven't added any flowers to your cart yet."}
         primaryAction={
-          <Button
-            nativeButton={false}
-            render={
-              <Link prefetch={false} href="/shop">
-                Browse Products
-              </Link>
-            }
-          />
+          <Button nativeButton={false} render={<Link href="/shop">Browse Products</Link>} />
         }
       />
     )
@@ -215,11 +208,7 @@ export default function Cart({ initialCart }: CartProps) {
               size="lg"
               className="w-full"
               nativeButton={false}
-              render={
-                <Link prefetch={false} href="/checkout">
-                  Proceed to Checkout
-                </Link>
-              }
+              render={<Link href="/checkout">Proceed to Checkout</Link>}
             />
           )}
 
@@ -228,11 +217,7 @@ export default function Cart({ initialCart }: CartProps) {
               variant="outline"
               className="w-full"
               nativeButton={false}
-              render={
-                <Link prefetch={false} href="/shop">
-                  Continue Shopping
-                </Link>
-              }
+              render={<Link href="/shop">Continue Shopping</Link>}
             />
             <div className="mt-3">
               <Button

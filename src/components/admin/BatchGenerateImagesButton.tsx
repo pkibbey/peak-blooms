@@ -1,11 +1,11 @@
 "use client"
 
-import { Sparkles } from "lucide-react"
+import { LoaderCircle, Sparkles } from "lucide-react"
 import { useRouter } from "next/navigation"
 import { useState, useTransition } from "react"
 import { toast } from "sonner"
 import { Button } from "@/components/ui/button"
-import { toAppError } from "@/lib/error-utils"
+import { toAppErrorClient } from "@/lib/error-utils"
 
 interface ProductFilters {
   filterDescription?: "has" | "missing"
@@ -159,8 +159,7 @@ export function BatchGenerateImagesButton({
                   productSuccess = false
                 }
               } catch (err) {
-                toAppError(err, `Failed to upload image for ${product.name}`)
-                toast.error(`Failed to upload image for ${product.name}`)
+                toAppErrorClient(err, `Failed to upload image for ${product.name}`)
                 productSuccess = false
               }
             }
@@ -178,8 +177,7 @@ export function BatchGenerateImagesButton({
             // Refresh UI after each product
             startTransition(() => router.refresh())
           } catch (err) {
-            toAppError(err, `Error processing ${product.name}`)
-            toast.error(`Error processing ${product.name}`)
+            toAppErrorClient(err, `Error processing ${product.name}`)
             setProgress((p) => ({
               ...p,
               processed: p.processed + 1,
@@ -190,8 +188,7 @@ export function BatchGenerateImagesButton({
         toast.success(`Generated and saved images for ${successCount} products`)
         setProgress((p) => ({ ...p, isRunning: false }))
       } catch (error) {
-        toAppError(error, "Failed to generate and save images")
-        toast.error("Failed to generate and save images")
+        toAppErrorClient(error, "Failed to generate and save images")
         setProgress((p) => ({ ...p, isRunning: false }))
       }
     })()
@@ -208,7 +205,7 @@ export function BatchGenerateImagesButton({
       >
         {isPending || progress.isRunning ? (
           <>
-            <span className="mr-2 animate-spin">⟳</span>
+            <LoaderCircle className="h-4 w-4 animate-spin mr-2" aria-hidden="true" />
             Generating images...
           </>
         ) : (

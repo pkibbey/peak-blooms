@@ -78,7 +78,7 @@ export default function OrderHistoryCard({
                       <ChevronLeft className="w-4 h-4" />
                     </button>
                   ) : (
-                    <Link prefetch={false} href={buildUrl(currentPage - 1)}>
+                    <Link href={buildUrl(currentPage - 1)}>
                       <ChevronLeft className="w-4 h-4" />
                     </Link>
                   )
@@ -105,11 +105,7 @@ export default function OrderHistoryCard({
                       variant={page === currentPage ? "default" : "outline"}
                       size="sm"
                       nativeButton={false}
-                      render={
-                        <Link prefetch={false} href={buildUrl(page as number)}>
-                          {page}
-                        </Link>
-                      }
+                      render={<Link href={buildUrl(page as number)}>{page}</Link>}
                     />
                   )
                 })}
@@ -127,7 +123,7 @@ export default function OrderHistoryCard({
                       <ChevronRight className="w-4 h-4" />
                     </button>
                   ) : (
-                    <Link prefetch={false} href={buildUrl(currentPage + 1)}>
+                    <Link href={buildUrl(currentPage + 1)}>
                       <ChevronRight className="w-4 h-4" />
                     </Link>
                   )
@@ -140,14 +136,7 @@ export default function OrderHistoryCard({
         <div className="text-center py-12">
           <IconPackage className="h-12 w-12 mx-auto text-muted-foreground mb-3" />
           <p className="text-muted-foreground mb-4">No orders yet</p>
-          <Button
-            nativeButton={false}
-            render={
-              <Link prefetch={false} href="/shop">
-                Browse Products
-              </Link>
-            }
-          />
+          <Button nativeButton={false} render={<Link href="/shop">Browse Products</Link>} />
         </div>
       )}
     </div>

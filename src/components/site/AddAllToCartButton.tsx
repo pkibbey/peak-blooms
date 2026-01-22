@@ -7,7 +7,7 @@ import { toast } from "sonner"
 import { batchAddToCartAction } from "@/app/actions/cart"
 import { Button } from "@/components/ui/button"
 import { useSession } from "@/lib/auth-client"
-import { toAppError } from "@/lib/error-utils"
+import { toAppErrorClient } from "@/lib/error-utils"
 import type { SessionUser } from "@/lib/query-types"
 
 interface AddAllToCartButtonProps {
@@ -47,12 +47,11 @@ export default function AddAllToCartButton({
           : `Added ${productIds.length} items to your cart!`
       )
 
-      // Refresh the page to update cart count and other server components
-      router.refresh()
+      // Navigate to cart
+      router.push("/cart")
     } catch (err) {
-      toAppError(err, "Failed to add items to cart")
+      toAppErrorClient(err, "Failed to add items to cart")
       setError("Failed to add items to cart")
-      toast.error("Failed to add items to cart")
     } finally {
       setLoading(false)
     }
@@ -69,11 +68,7 @@ export default function AddAllToCartButton({
           size="lg"
           className="w-full"
           nativeButton={false}
-          render={
-            <Link prefetch={false} href="/auth/signin">
-              Sign in to purchase all
-            </Link>
-          }
+          render={<Link href="/auth/signin">Sign in to purchase all</Link>}
         />
         {error ? <p className="mt-2 text-sm text-destructive">{error}</p> : null}
       </>
@@ -93,12 +88,7 @@ export default function AddAllToCartButton({
 
   return (
     <>
-      <Button
-        size="lg"
-        className="w-full md:w-auto"
-        onClick={handleAddAllToCart}
-        disabled={loading}
-      >
+      <Button size="lg" className="w-auto" onClick={handleAddAllToCart} disabled={loading}>
         Add All to Cart
       </Button>
       {error ? <p className="mt-2 text-sm text-destructive">{error}</p> : null}

@@ -47,11 +47,7 @@ export default async function UnauthorizedPage() {
               <Button
                 className="w-full"
                 nativeButton={false}
-                render={
-                  <Link prefetch={false} href="/">
-                    Return to home
-                  </Link>
-                }
+                render={<Link href="/">Return to home</Link>}
               />
             </div>
           </>
@@ -66,21 +62,13 @@ export default async function UnauthorizedPage() {
                 variant="outline"
                 className="w-full"
                 nativeButton={false}
-                render={
-                  <Link prefetch={false} href="/auth/signin?callbackUrl=/admin">
-                    Sign in to Admin
-                  </Link>
-                }
+                render={<Link href="/auth/signin?callbackUrl=/admin">Sign in to Admin</Link>}
               />
 
               <Button
                 className="w-full"
                 nativeButton={false}
-                render={
-                  <Link prefetch={false} href="/">
-                    Return to home
-                  </Link>
-                }
+                render={<Link href="/">Return to home</Link>}
               />
             </div>
           </>

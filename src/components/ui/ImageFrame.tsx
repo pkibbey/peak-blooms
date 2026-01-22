@@ -10,7 +10,8 @@ export function ImageFrame({ className, children }: ImageFrameProps) {
   return (
     <div
       className={clsx(
-        "shadow-2xs group-hover:shadow-2xl transition-shadow relative overflow-hidden bg-zinc-200",
+        "shadow-2xs group-hover:shadow-lg shadow-secondary transition-shadow",
+        "relative overflow-hidden bg-zinc-200",
         className
       )}
     >

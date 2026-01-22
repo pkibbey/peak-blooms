@@ -1,13 +1,12 @@
 "use client"
 
-import { Sparkles } from "lucide-react"
+import { LoaderCircle, Sparkles } from "lucide-react"
 import { useRouter } from "next/navigation"
 import { useTransition } from "react"
 import { toast } from "sonner"
 import { batchGenerateDescriptionsAction } from "@/app/admin/products/actions"
 import { Button } from "@/components/ui/button"
-import { IconRefresh } from "@/components/ui/icons"
-import { toAppError } from "@/lib/error-utils"
+import { toAppErrorClient } from "@/lib/error-utils"
 
 interface ProductFilters {
   filterDescription?: "has" | "missing"
@@ -49,8 +48,7 @@ export function BatchGenerateDescriptionsButton({
           toast.error("Batch generation failed")
         }
       } catch (error) {
-        toAppError(error, "Failed to generate description")
-        toast.error("Failed to generate description")
+        toAppErrorClient(error, "Failed to generate description")
       }
     })
   }
@@ -65,7 +63,7 @@ export function BatchGenerateDescriptionsButton({
     >
       {isPending ? (
         <>
-          <IconRefresh className="mr-2 animate-spin" />
+          <LoaderCircle className="mr-2 h-4 w-4 animate-spin" aria-hidden="true" />
           Generating...
         </>
       ) : (

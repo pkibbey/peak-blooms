@@ -4,8 +4,7 @@ import { revalidatePath } from "next/cache"
 import type { ProductWhereInput } from "@/generated/models"
 import { getSession } from "@/lib/auth"
 import { db } from "@/lib/db"
-import { toAppError } from "@/lib/error-utils"
-import type { AppResult, ProductBasic } from "@/lib/query-types"
+import type { ProductBasic } from "@/lib/query-types"
 import {
   type CreateProductFormData,
   createProductFormSchema,
@@ -18,21 +17,16 @@ import {
   type UpdateProductInput,
   updateProductSchema,
 } from "@/lib/validations/product"
+import { wrapAction } from "@/server/error-handler"
 
-export async function createProductAction(
-  data: CreateProductFormData
-): Promise<AppResult<ProductBasic>> {
-  try {
+export const createProductAction = wrapAction(
+  async (data: CreateProductFormData): Promise<ProductBasic> => {
     const validatedData = createProductFormSchema.parse(data)
 
     const session = await getSession()
 
     if (!session?.user || session.user.role !== "ADMIN") {
-      return {
-        success: false,
-        error: "You must be an admin to create products",
-        code: "UNAUTHORIZED",
-      }
+      throw new Error("Unauthorized: You must be an admin to create products")
     }
 
     const product = await db.product.create({
@@ -54,28 +48,17 @@ export async function createProductAction(
     })
 
     revalidatePath("/admin/products")
-    return {
-      success: true,
-      data: product,
-    }
-  } catch (error) {
-    return toAppError(error, "Failed to create product")
+    return product
   }
-}
+)
 
-export async function updateProductAction(
-  input: UpdateProductInput
-): Promise<AppResult<ProductBasic>> {
-  try {
+export const updateProductAction = wrapAction(
+  async (input: UpdateProductInput): Promise<ProductBasic> => {
     const { id, ...data } = updateProductSchema.parse(input)
     const session = await getSession()
 
     if (!session?.user || session.user.role !== "ADMIN") {
-      return {
-        success: false,
-        error: "You must be an admin to update products",
-        code: "UNAUTHORIZED",
-      }
+      throw new Error("Unauthorized: You must be an admin to update products")
     }
 
     const product = await db.product.update({
@@ -102,27 +85,16 @@ export async function updateProductAction(
     })
 
     revalidatePath("/admin/products")
-    return {
-      success: true,
-      data: product,
-    }
-  } catch (error) {
-    return toAppError(error, "Failed to update product")
+    return product
   }
-}
+)
 
-export async function deleteProductAction(
-  input: DeleteProductInput
-): Promise<AppResult<{ id: string }>> {
-  try {
+export const deleteProductAction = wrapAction(
+  async (input: DeleteProductInput): Promise<{ id: string }> => {
     const { id } = deleteProductSchema.parse(input)
     const session = await getSession()
     if (!session?.user || session.user.role !== "ADMIN") {
-      return {
-        success: false,
-        error: "You must be an admin to delete products",
-        code: "UNAUTHORIZED",
-      }
+      throw new Error("Unauthorized: You must be an admin to delete products")
     }
 
     await db.product.delete({
@@ -130,27 +102,16 @@ export async function deleteProductAction(
     })
 
     revalidatePath("/admin/products")
-    return {
-      success: true,
-      data: { id },
-    }
-  } catch (error) {
-    return toAppError(error, "Failed to delete product")
+    return { id }
   }
-}
+)
 
-export async function toggleProductFeaturedAction(
-  input: ToggleProductFeaturedInput
-): Promise<AppResult<{ id: string; featured: boolean }>> {
-  try {
+export const toggleProductFeaturedAction = wrapAction(
+  async (input: ToggleProductFeaturedInput): Promise<{ id: string; featured: boolean }> => {
     const { id, featured } = toggleProductFeaturedSchema.parse(input)
     const session = await getSession()
     if (!session?.user || session.user.role !== "ADMIN") {
-      return {
-        success: false,
-        error: "You must be an admin to update products",
-        code: "UNAUTHORIZED",
-      }
+      throw new Error("Unauthorized: You must be an admin to update products")
     }
 
     const product = await db.product.update({
@@ -159,30 +120,34 @@ export async function toggleProductFeaturedAction(
     })
 
     revalidatePath("/admin/products")
-    return {
-      success: true,
-      data: { id: product.id, featured: product.featured },
-    }
-  } catch (error) {
-    return toAppError(error, "Failed to update product")
+    return { id: product.id, featured: product.featured }
   }
-}
+)
 
 /**
  * Server action to get product count with optional filters
  * Used for pagination calculations
  */
-export async function getProductCountAction(
-  input?: GetProductCountInput
-): Promise<AppResult<number>> {
-  try {
+export const getProductCountAction = wrapAction(
+  async (input?: GetProductCountInput): Promise<number> => {
     const params = input ? getProductCountSchema.parse(input) : {}
 
     // Build the where clause dynamically
     const where: ProductWhereInput = { deletedAt: null }
 
-    if (params?.boxlotOnly) {
-      where.productType = "ROSE"
+    // Support filtering by collection slug(s) via `collection` param (e.g. collection=roses)
+    if (params?.collection) {
+      const slugs = Array.isArray(params.collection)
+        ? params.collection
+        : params.collection.split(",")
+      const collections = await db.collection.findMany({
+        where: { slug: { in: slugs } },
+        select: { id: true },
+      })
+      const collectionIds = collections.map((c) => c.id)
+      if (collectionIds.length > 0) {
+        where.productCollections = { some: { collectionId: { in: collectionIds } } }
+      }
     }
 
     if (params?.query) {
@@ -193,11 +158,6 @@ export async function getProductCountAction(
     }
 
     const count = await db.product.count({ where })
-    return {
-      success: true,
-      data: count,
-    }
-  } catch (error) {
-    return toAppError(error, "Failed to get product count")
+    return count
   }
-}
+)

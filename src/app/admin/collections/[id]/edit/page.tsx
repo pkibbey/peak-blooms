@@ -67,9 +67,7 @@ export default async function EditCollectionPage({ params }: EditCollectionPageP
               size="sm"
               nativeButton={false}
               render={
-                <Link prefetch={false} href={`/admin/collections/${previousCollection.id}/edit`}>
-                  ← Previous
-                </Link>
+                <Link href={`/admin/collections/${previousCollection.id}/edit`}>← Previous</Link>
               }
             />
           ) : (
@@ -82,11 +80,7 @@ export default async function EditCollectionPage({ params }: EditCollectionPageP
               variant="outline"
               size="sm"
               nativeButton={false}
-              render={
-                <Link prefetch={false} href={`/admin/collections/${nextCollection.id}/edit`}>
-                  Next →
-                </Link>
-              }
+              render={<Link href={`/admin/collections/${nextCollection.id}/edit`}>Next →</Link>}
             />
           ) : (
             <Button variant="outline" size="sm" disabled>

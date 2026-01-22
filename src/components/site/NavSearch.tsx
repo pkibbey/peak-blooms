@@ -98,7 +98,6 @@ export default function NavSearch({ featuredProducts }: { featuredProducts: Prod
                   <Link
                     href={`/shop/${result.slug}`}
                     className="flex w-full gap-3 py-2 px-3 hover:bg-gray-50"
-                    prefetch={false}
                   >
                     {result.image && (
                       <div className="relative w-10 h-10 flex-shrink-0">

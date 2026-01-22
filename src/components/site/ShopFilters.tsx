@@ -1,12 +1,21 @@
 "use client"
 
 import { X } from "lucide-react"
-import { useCallback, useState } from "react"
+import { useCallback, useEffect, useState } from "react"
 import { FilterSection } from "@/components/filters/FilterSection"
 import { ColorSelector } from "@/components/site/ColorSelector"
 import { SearchInput } from "@/components/site/SearchInput"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Label } from "@/components/ui/label"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectPositioner,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
+import { PRODUCT_TYPE_LABELS, PRODUCT_TYPES } from "@/lib/product-types"
 import { useFilterState } from "@/lib/useFilterState"
 
 interface ShopFiltersProps {
@@ -29,20 +38,41 @@ export function ShopFilters({
   const currentCollectionIds = searchParams.get("collectionIds")?.split(",").filter(Boolean) || []
   const currentPriceMin = searchParams.get("priceMin") || ""
   const currentPriceMax = searchParams.get("priceMax") || ""
+  const currentProductType = searchParams.get("productType") || ""
 
   // Local state for filters
   const [selectedColors, setSelectedColors] = useState<string[]>(currentColors)
   const [selectedCollectionIds, setSelectedCollectionIds] = useState<string[]>(currentCollectionIds)
   const [priceMin, setPriceMin] = useState<string>(currentPriceMin)
   const [priceMax, setPriceMax] = useState<string>(currentPriceMax)
+  const [productType, setProductType] = useState<string>(currentProductType)
+
+  // Keep productType in sync when URL search params change (e.g., on initial load)
+  useEffect(() => {
+    const p = searchParams.get("productType") || ""
+    if (p !== productType) {
+      setProductType(p)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchParams, productType])
 
   // Check if any filters are active
   const hasActiveFilters =
-    selectedColors.length > 0 || selectedCollectionIds.length > 0 || !!priceMin || !!priceMax
+    selectedColors.length > 0 ||
+    selectedCollectionIds.length > 0 ||
+    !!priceMin ||
+    !!priceMax ||
+    !!productType
 
   // Helper to update all filters at once
   const updateFilters = useCallback(
-    (colors: string[], collectionIds: string[], priceMinVal: string, priceMaxVal: string) => {
+    (
+      colors: string[],
+      collectionIds: string[],
+      priceMinVal: string,
+      priceMaxVal: string,
+      productTypeVal: string
+    ) => {
       const updates: Record<string, string | null> = {}
 
       if (colors.length > 0) {
@@ -69,6 +99,12 @@ export function ShopFilters({
         updates.priceMax = null
       }
 
+      if (productTypeVal) {
+        updates.productType = productTypeVal
+      } else {
+        updates.productType = null
+      }
+
       const params = getParamsWithFilters(updates)
       navigateWithParams(params)
     },
@@ -79,9 +115,9 @@ export function ShopFilters({
   const handleColorsChange = useCallback(
     (colors: string[]) => {
       setSelectedColors(colors)
-      updateFilters(colors, selectedCollectionIds, priceMin, priceMax)
+      updateFilters(colors, selectedCollectionIds, priceMin, priceMax, productType)
     },
-    [selectedCollectionIds, priceMin, priceMax, updateFilters]
+    [selectedCollectionIds, priceMin, priceMax, updateFilters, productType]
   )
 
   // Handle collection toggle - add/remove from selection
@@ -91,27 +127,28 @@ export function ShopFilters({
         ? selectedCollectionIds.filter((id) => id !== collectionId)
         : [...selectedCollectionIds, collectionId]
       setSelectedCollectionIds(newCollectionIds)
-      updateFilters(selectedColors, newCollectionIds, priceMin, priceMax)
+      updateFilters(selectedColors, newCollectionIds, priceMin, priceMax, productType)
     },
-    [selectedColors, selectedCollectionIds, priceMin, priceMax, updateFilters]
+    [selectedColors, selectedCollectionIds, priceMin, priceMax, updateFilters, productType]
   )
 
   // Clear all collections
   const clearCollections = useCallback(() => {
     setSelectedCollectionIds([])
-    updateFilters(selectedColors, [], priceMin, priceMax)
-  }, [selectedColors, priceMin, priceMax, updateFilters])
+    updateFilters(selectedColors, [], priceMin, priceMax, productType)
+  }, [selectedColors, priceMin, priceMax, updateFilters, productType])
 
   // Apply filters for numeric inputs (blur/Enter)
   const applyFilters = useCallback(() => {
-    updateFilters(selectedColors, selectedCollectionIds, priceMin, priceMax)
-  }, [selectedColors, selectedCollectionIds, priceMin, priceMax, updateFilters])
+    updateFilters(selectedColors, selectedCollectionIds, priceMin, priceMax, productType)
+  }, [selectedColors, selectedCollectionIds, priceMin, priceMax, updateFilters, productType])
 
   // Clear all filters
   const handleClearAllFilters = useCallback(() => {
     setSelectedColors([])
     setSelectedCollectionIds([])
     setPriceMin("")
+    setProductType("")
     setPriceMax("")
     clearAllFilters()
   }, [clearAllFilters])
@@ -136,17 +173,81 @@ export function ShopFilters({
         {/* Search Filter */}
         <SearchInput />
 
-        {/* Colors Filter */}
-        {availableColorIds.length > 0 && (
-          <FilterSection title="Color">
-            <ColorSelector
-              selectedColors={selectedColors}
-              onChange={handleColorsChange}
-              showLabel={false}
-              compact
-            />
-          </FilterSection>
-        )}
+        {/* Price Filter */}
+        <FilterSection title="Price">
+          <div>
+            <div className="grid grid-cols-2 gap-2">
+              <div>
+                <label htmlFor="price-min" className="text-xs font-medium block mb-1">
+                  Minimum
+                </label>
+                <input
+                  id="price-min"
+                  type="number"
+                  min="0"
+                  step="1"
+                  value={priceMin}
+                  onChange={(e) => setPriceMin(e.target.value)}
+                  onBlur={applyFilters}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") applyFilters()
+                  }}
+                  placeholder="$0"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm"
+                />
+              </div>
+              <div>
+                <label htmlFor="price-max" className="text-xs font-medium block mb-1">
+                  Maximum
+                </label>
+                <input
+                  id="price-max"
+                  type="number"
+                  min="0"
+                  step="1"
+                  value={priceMax}
+                  onChange={(e) => setPriceMax(e.target.value)}
+                  onBlur={applyFilters}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") applyFilters()
+                  }}
+                  placeholder="No limit"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm"
+                />
+              </div>
+            </div>
+          </div>
+        </FilterSection>
+
+        {/* Product Type Filter */}
+        <FilterSection title="Product Type">
+          <div>
+            <Select
+              value={productType || ""}
+              itemToStringLabel={(str) => str.charAt(0).toUpperCase() + str.slice(1).toLowerCase()}
+              onValueChange={(value) => {
+                const v = value as string
+                setProductType(v)
+                // apply immediately with new product type
+                updateFilters(selectedColors, selectedCollectionIds, priceMin, priceMax, v)
+              }}
+            >
+              <SelectTrigger id="product-type" className="w-full">
+                <SelectValue placeholder="All types" />
+              </SelectTrigger>
+              <SelectPositioner alignItemWithTrigger>
+                <SelectContent>
+                  <SelectItem value="">All</SelectItem>
+                  {PRODUCT_TYPES.map((type) => (
+                    <SelectItem key={type} value={type}>
+                      {PRODUCT_TYPE_LABELS[type as keyof typeof PRODUCT_TYPE_LABELS]}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </SelectPositioner>
+            </Select>
+          </div>
+        </FilterSection>
 
         {/* Collection Filter */}
         {availableCollections.length > 0 && (
@@ -181,49 +282,17 @@ export function ShopFilters({
           </FilterSection>
         )}
 
-        {/* Price Filter */}
-        <FilterSection title="Price">
-          <div className="space-y-3">
-            <div>
-              <label htmlFor="price-min" className="text-xs font-medium block mb-1">
-                Minimum
-              </label>
-              <input
-                id="price-min"
-                type="number"
-                min="0"
-                step="1"
-                value={priceMin}
-                onChange={(e) => setPriceMin(e.target.value)}
-                onBlur={applyFilters}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter") applyFilters()
-                }}
-                placeholder="$0"
-                className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm"
-              />
-            </div>
-            <div>
-              <label htmlFor="price-max" className="text-xs font-medium block mb-1">
-                Maximum
-              </label>
-              <input
-                id="price-max"
-                type="number"
-                min="0"
-                step="1"
-                value={priceMax}
-                onChange={(e) => setPriceMax(e.target.value)}
-                onBlur={applyFilters}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter") applyFilters()
-                }}
-                placeholder="No limit"
-                className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm"
-              />
-            </div>
-          </div>
-        </FilterSection>
+        {/* Colors Filter */}
+        {availableColorIds.length > 0 && (
+          <FilterSection title="Color">
+            <ColorSelector
+              selectedColors={selectedColors}
+              onChange={handleColorsChange}
+              showLabel={false}
+              compact
+            />
+          </FilterSection>
+        )}
       </div>
     </div>
   )

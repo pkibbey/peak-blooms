@@ -27,8 +27,7 @@
                 "properties": {
                   "productId": {
                     "type": "string",
-                    "format": "uuid",
-                    "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                    "minLength": 1
                   },
                   "quantity": {
                     "default": 1,
@@ -69,12 +68,11 @@
                 "properties": {
                   "itemId": {
                     "type": "string",
-                    "format": "uuid",
-                    "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                    "minLength": 1
                   },
                   "quantity": {
                     "type": "integer",
-                    "minimum": 1,
+                    "minimum": 0,
                     "maximum": 999
                   }
                 },
@@ -110,8 +108,7 @@
                 "properties": {
                   "itemId": {
                     "type": "string",
-                    "format": "uuid",
-                    "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                    "minLength": 1
                   }
                 },
                 "required": ["itemId"]
@@ -149,12 +146,10 @@
                     "type": "array",
                     "items": {
                       "type": "string",
-                      "format": "uuid",
-                      "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                      "minLength": 1
                     }
                   },
                   "quantities": {
-                    "default": [],
                     "anyOf": [
                       {
                         "type": "integer",
@@ -345,12 +340,14 @@
                     "nullable": true,
                     "type": "string"
                   },
-                  "image": {
-                    "nullable": true,
-                    "type": "string"
+                  "images": {
+                    "default": [],
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
                   },
                   "price": {
-                    "nullable": true,
                     "type": "number",
                     "minimum": 0
                   },
@@ -379,15 +376,13 @@
                   },
                   "id": {
                     "type": "string",
-                    "format": "uuid",
-                    "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                    "minLength": 1
                   }
                 },
                 "required": [
                   "name",
                   "slug",
                   "description",
-                  "image",
                   "price",
                   "colors",
                   "collectionIds",
@@ -424,8 +419,7 @@
                 "properties": {
                   "id": {
                     "type": "string",
-                    "format": "uuid",
-                    "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                    "minLength": 1
                   }
                 },
                 "required": ["id"]
@@ -460,8 +454,7 @@
                 "properties": {
                   "id": {
                     "type": "string",
-                    "format": "uuid",
-                    "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                    "minLength": 1
                   },
                   "featured": {
                     "type": "boolean"
@@ -492,12 +485,12 @@
         "description": "Get the total count of products with optional filters",
         "parameters": [
           {
-            "name": "boxlotOnly",
+            "name": "collection",
             "in": "query",
             "schema": {
-              "type": "boolean"
+              "type": "string"
             },
-            "description": "Filter to only ROSE type products"
+            "description": "Filter by collection slug(s). Accepts a comma-separated list or repeated keys (e.g. collection=roses or collection=roses,tulips)."
           },
           {
             "name": "query",
@@ -549,9 +542,7 @@
                     "default": [],
                     "type": "array",
                     "items": {
-                      "type": "string",
-                      "format": "uuid",
-                      "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                      "type": "string"
                     }
                   }
                 },
@@ -606,15 +597,12 @@
                     "default": [],
                     "type": "array",
                     "items": {
-                      "type": "string",
-                      "format": "uuid",
-                      "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                      "type": "string"
                     }
                   },
                   "id": {
                     "type": "string",
-                    "format": "uuid",
-                    "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                    "minLength": 1
                   }
                 },
                 "required": ["name", "slug", "image", "description", "featured", "id"]
@@ -649,8 +637,7 @@
                 "properties": {
                   "id": {
                     "type": "string",
-                    "format": "uuid",
-                    "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                    "minLength": 1
                   }
                 },
                 "required": ["id"]
@@ -685,8 +672,7 @@
                 "properties": {
                   "id": {
                     "type": "string",
-                    "format": "uuid",
-                    "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                    "minLength": 1
                   },
                   "featured": {
                     "type": "boolean"
@@ -845,8 +831,7 @@
                   },
                   "id": {
                     "type": "string",
-                    "format": "uuid",
-                    "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                    "minLength": 1
                   }
                 },
                 "required": [
@@ -890,8 +875,7 @@
                 "properties": {
                   "id": {
                     "type": "string",
-                    "format": "uuid",
-                    "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                    "minLength": 1
                   }
                 },
                 "required": ["id"]
@@ -1195,7 +1179,7 @@
     }
   },
   "x-validation": {
-    "timestamp": "2026-01-16T07:30:00.841Z",
+    "timestamp": "2026-01-22T05:46:31.131Z",
     "schemasValidated": 7,
     "schemaToTypeMappings": {
       "addToCartSchema → CartResponse": {

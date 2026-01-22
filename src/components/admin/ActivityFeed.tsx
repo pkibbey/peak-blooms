@@ -41,11 +41,7 @@ export default function ActivityFeed({ items }: ActivityFeedProps) {
                 <div>{new Date(it.createdAt).toLocaleString()}</div>
                 {it.href && (
                   <div className="mt-1">
-                    <Link
-                      prefetch={false}
-                      href={it.href}
-                      className="text-primary text-xs hover:underline"
-                    >
+                    <Link href={it.href} className="text-primary text-xs hover:underline">
                       View
                     </Link>
                   </div>

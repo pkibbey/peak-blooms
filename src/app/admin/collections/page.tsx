@@ -58,11 +58,7 @@ export default async function AdminCollectionsPage({ searchParams }: AdminCollec
         </div>
         <Button
           nativeButton={false}
-          render={
-            <Link prefetch={false} href="/admin/collections/new">
-              Add New Collection
-            </Link>
-          }
+          render={<Link href="/admin/collections/new">Add New Collection</Link>}
         />
       </div>
 

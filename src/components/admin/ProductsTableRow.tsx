@@ -12,7 +12,7 @@ import { Checkbox } from "@/components/ui/checkbox"
 import { TableCell, TableRow } from "@/components/ui/table"
 import type { ProductModel } from "@/generated/models"
 import { pickRandomFirstStyle } from "@/lib/ai-prompt-templates"
-import { toAppError } from "@/lib/error-utils"
+import { toAppErrorClient } from "@/lib/error-utils"
 import { PRODUCT_TYPE_LABELS } from "@/lib/product-types"
 import { cn, formatPrice } from "@/lib/utils"
 import { ColorsMiniDisplay } from "../ui/ColorsMiniDisplay"
@@ -44,8 +44,7 @@ export default function ProductsTableRow({ product }: ProductRowProps) {
       })
 
       if (!firstGenResp.ok) {
-        const err = await firstGenResp.json()
-        toast.error(err.error || "Failed to generate first image")
+        toast.error("Failed to generate first image")
         setIsGenerating(false)
         return
       }
@@ -153,8 +152,7 @@ export default function ProductsTableRow({ product }: ProductRowProps) {
       setIsUploading(false)
       router.refresh()
     } catch (err) {
-      toAppError(err, "Failed to generate image")
-      toast.error("Failed to generate image")
+      toAppErrorClient(err, "Failed to generate image")
       setIsGenerating(false)
       setIsUploading(false)
     }
@@ -199,7 +197,6 @@ export default function ProductsTableRow({ product }: ProductRowProps) {
       {/* Name */}
       <TableCell className="max-w-40 truncate">
         <Link
-          prefetch={false}
           href={`/admin/products/${product.id}/edit`}
           className="text-primary font-medium hover:underline"
         >
@@ -242,9 +239,8 @@ export default function ProductsTableRow({ product }: ProductRowProps) {
                   )
                   router.refresh()
                 } catch (_err) {
-                  toAppError(_err, "Failed to update product")
+                  toAppErrorClient(_err, "Failed to update product")
                   setFeatured(previous)
-                  toast.error("Failed to update product")
                 }
               })
             }}

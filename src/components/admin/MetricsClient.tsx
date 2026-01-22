@@ -13,7 +13,7 @@ import {
   TableRow,
 } from "@/components/ui/table"
 import type { MetricType } from "@/generated/client"
-import { toAppError } from "@/lib/error-utils"
+import { toAppErrorClient } from "@/lib/error-utils"
 import type { Metric } from "@/lib/query-types"
 
 interface MetricsClientProps {
@@ -52,8 +52,7 @@ export default function MetricsClient({ types }: MetricsClientProps) {
         toast.success("Metrics cleared")
       }
     } catch (error) {
-      toAppError(error, "Failed to clear metrics")
-      toast.error("Failed to clear metrics")
+      toAppErrorClient(error, "Failed to clear metrics")
     } finally {
       setIsClearing(false)
     }
@@ -101,8 +100,7 @@ export default function MetricsClient({ types }: MetricsClientProps) {
         }
         calculateSummaries(res.data)
       } catch (error) {
-        toAppError(error, "Failed to fetch metrics")
-        toast.error("Failed to fetch metrics")
+        toAppErrorClient(error, "Failed to fetch metrics")
       } finally {
         setIsLoading(false)
       }

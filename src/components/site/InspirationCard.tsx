@@ -18,7 +18,7 @@ export function InspirationCard({ inspiration }: InspirationCardProps) {
   const productCount = inspiration._count?.products ?? 0
 
   return (
-    <div className="group flex flex-row overflow-hidden rounded-xs transition-shadow bg-background border border-border">
+    <div className="group flex flex-row overflow-hidden rounded-xs bg-background border border-border">
       {/* Image Container */}
       <ImageFrame className="w-2/5 shrink-0">
         <Image
@@ -31,7 +31,7 @@ export function InspirationCard({ inspiration }: InspirationCardProps) {
         {productCount > 0 && (
           <Badge
             variant="secondary"
-            className="absolute bottom-3 left-3 bg-background/90 text-gray-700 backdrop-blur-sm"
+            className="absolute z-10 bottom-3 left-3 bg-background/90 text-gray-700 backdrop-blur-sm"
           >
             {productCount} {productCount === 1 ? "Product" : "Products"}
           </Badge>
@@ -41,12 +41,12 @@ export function InspirationCard({ inspiration }: InspirationCardProps) {
       {/* Content Container */}
       <div className="flex flex-col justify-between items-start p-6 grow">
         <div>
-          <Link prefetch={false} href={`/inspirations/${inspiration.slug}`} className="group/link">
+          <Link href={`/inspirations/${inspiration.slug}`} className="group/link">
             <h3 className="text-xl font-bold group-hover/link:text-primary transition-colors font-serif">
               {inspiration.name}
             </h3>
           </Link>
-          <p className="mt-1 text-sm text-muted-foreground">{inspiration.subtitle}</p>
+          <p className="mt-1 text-sm text-muted-foreground/80">{inspiration.subtitle}</p>
           <p className="mt-3 text-sm leading-relaxed text-gray-700 line-clamp-3">
             {inspiration.excerpt}
           </p>
@@ -57,7 +57,6 @@ export function InspirationCard({ inspiration }: InspirationCardProps) {
           nativeButton={false}
           render={
             <Link
-              prefetch={false}
               href={`/inspirations/${inspiration.slug}`}
               className="inline-flex items-center justify-center gap-2"
             >

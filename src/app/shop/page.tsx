@@ -45,15 +45,37 @@ export default async function ShopPage({ searchParams }: ShopPageProps) {
   }
 
   // Parse filter parameters
+  // Accept `collection` as slug(s) (e.g. ?collection=roses) and resolve to DB ids,
+  // falling back to `collectionIds` query param if provided.
+  const collectionSlugs =
+    typeof params.collection === "string"
+      ? params.collection
+          .split(",")
+          .map((c) => c.trim())
+          .filter(Boolean)
+      : Array.isArray(params.collection)
+        ? params.collection
+        : undefined
+
+  let collectionIdsFromSlug: string[] | undefined
+  if (collectionSlugs && collectionSlugs.length > 0) {
+    const collections = await db.collection.findMany({
+      where: { slug: { in: collectionSlugs } },
+      select: { id: true },
+    })
+    collectionIdsFromSlug = collections.map((c) => c.id)
+  }
+
   const collectionIds =
-    typeof params.collectionIds === "string"
+    collectionIdsFromSlug ??
+    (typeof params.collectionIds === "string"
       ? params.collectionIds
           .split(",")
           .map((c) => c.trim())
           .filter(Boolean)
       : Array.isArray(params.collectionIds)
         ? params.collectionIds
-        : undefined
+        : undefined)
   // Accept multiple colors passed as `colors` param (comma separated or repeated keys)
   const colors =
     typeof params.colors === "string"
@@ -68,6 +90,10 @@ export default async function ShopPage({ searchParams }: ShopPageProps) {
   const priceMax = typeof params.priceMax === "string" ? parseFloat(params.priceMax) : undefined
   const search = typeof params.search === "string" ? params.search : undefined
   const viewMode = typeof params.view === "string" ? params.view : "grid"
+  const productType =
+    typeof params.productType === "string" && params.productType !== ""
+      ? params.productType
+      : undefined
   const page = typeof params.page === "string" ? parseInt(params.page, 10) : 1
   const offset = Math.max(0, (page - 1) * ITEMS_PER_PAGE)
 
@@ -80,6 +106,8 @@ export default async function ShopPage({ searchParams }: ShopPageProps) {
     {
       collectionIds: collectionIds || undefined,
       colors: colors,
+      // Optional product type filter (maps to Prisma enum in data layer)
+      productType: productType || undefined,
       priceMin: priceMin !== undefined && !Number.isNaN(priceMin) ? priceMin : undefined,
       priceMax: priceMax !== undefined && !Number.isNaN(priceMax) ? priceMax : undefined,
       search: search || undefined,

@@ -65,9 +65,7 @@ export default async function EditInspirationPage({ params }: EditInspirationPag
               size="sm"
               nativeButton={false}
               render={
-                <Link prefetch={false} href={`/admin/inspirations/${previousInspiration.id}/edit`}>
-                  ← Previous
-                </Link>
+                <Link href={`/admin/inspirations/${previousInspiration.id}/edit`}>← Previous</Link>
               }
             />
           ) : (
@@ -80,11 +78,7 @@ export default async function EditInspirationPage({ params }: EditInspirationPag
               variant="outline"
               size="sm"
               nativeButton={false}
-              render={
-                <Link prefetch={false} href={`/admin/inspirations/${nextInspiration.id}/edit`}>
-                  Next →
-                </Link>
-              }
+              render={<Link href={`/admin/inspirations/${nextInspiration.id}/edit`}>Next →</Link>}
             />
           ) : (
             <Button variant="outline" size="sm" disabled>

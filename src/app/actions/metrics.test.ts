@@ -7,13 +7,12 @@ vi.mock("@/lib/auth", () => ({
 
 vi.mock("@/lib/metrics", () => ({
   getAllMetrics: vi.fn(),
-  captureMetric: vi.fn(),
   clearMetrics: vi.fn(),
 }))
 
 import { getSession } from "@/lib/auth"
-import { captureMetric, clearMetrics, getAllMetrics } from "@/lib/metrics"
-import { clearMetricsAction, getMetricsAction, recordMetricAction } from "./metrics"
+import { clearMetrics, getAllMetrics } from "@/lib/metrics"
+import { clearMetricsAction, getMetricsAction } from "./metrics"
 
 describe("Metrics Actions", () => {
   beforeEach(() => {
@@ -128,127 +127,6 @@ describe("Metrics Actions", () => {
     })
   })
 
-  describe("recordMetricAction", () => {
-    it("should return UNAUTHORIZED if user not authenticated", async () => {
-      vi.mocked(getSession).mockResolvedValueOnce(null)
-
-      const result = await recordMetricAction({ type: "QUERY", name: "test", duration: 100 })
-      expect(result).toMatchObject({
-        success: false,
-        code: "UNAUTHORIZED",
-      })
-    })
-
-    it("should return UNAUTHORIZED if user is not admin", async () => {
-      vi.mocked(getSession).mockResolvedValueOnce({
-        ...mockAdminSession,
-        user: {
-          ...mockAdminSession.user,
-          role: "USER",
-        },
-      })
-
-      const result = await recordMetricAction({ type: "QUERY", name: "test", duration: 100 })
-      expect(result).toMatchObject({
-        success: false,
-        code: "UNAUTHORIZED",
-      })
-    })
-
-    it("should return VALIDATION_ERROR if type is invalid", async () => {
-      vi.mocked(getSession).mockResolvedValueOnce(mockAdminSession)
-
-      const result = await recordMetricAction({
-        type: "" as unknown as "QUERY",
-        name: "test",
-        duration: 100,
-      })
-      expect(result).toMatchObject({
-        success: false,
-        code: "VALIDATION_ERROR",
-      })
-    })
-
-    it("should return VALIDATION_ERROR if name is invalid", async () => {
-      vi.mocked(getSession).mockResolvedValueOnce(mockAdminSession)
-
-      const result = await recordMetricAction({ type: "QUERY", name: "", duration: 100 })
-      expect(result).toMatchObject({
-        success: false,
-        code: "VALIDATION_ERROR",
-      })
-    })
-
-    it("should return VALIDATION_ERROR if duration is invalid", async () => {
-      vi.mocked(getSession).mockResolvedValueOnce(mockAdminSession)
-
-      // Test with null which should fail the number check
-      const result = await recordMetricAction({
-        type: "QUERY",
-        name: "test",
-        duration: null as unknown as number,
-      })
-      expect(result).toMatchObject({
-        success: false,
-        code: "VALIDATION_ERROR",
-      })
-    })
-
-    it("should return VALIDATION_ERROR if duration is not a number", async () => {
-      vi.mocked(getSession).mockResolvedValueOnce(mockAdminSession)
-
-      const result = await recordMetricAction({
-        type: "QUERY",
-        name: "test",
-        duration: "100" as unknown as number,
-      })
-      expect(result).toMatchObject({
-        success: false,
-        code: "VALIDATION_ERROR",
-      })
-    })
-
-    it("should successfully record metric with valid data", async () => {
-      vi.mocked(getSession).mockResolvedValueOnce(mockAdminSession)
-      vi.mocked(captureMetric).mockResolvedValueOnce(undefined)
-
-      const result = await recordMetricAction({
-        type: "QUERY",
-        name: "get_products",
-        duration: 150,
-      })
-
-      expect(result).toEqual({
-        success: true,
-        data: undefined,
-      })
-      expect(captureMetric).toHaveBeenCalledWith("QUERY", "get_products", 150)
-    })
-
-    it("should return SERVER_ERROR for database errors", async () => {
-      vi.mocked(getSession).mockResolvedValueOnce(mockAdminSession)
-      vi.mocked(captureMetric).mockRejectedValueOnce(new Error("Database error"))
-
-      const result = await recordMetricAction({ type: "QUERY", name: "test", duration: 100 })
-      expect(result).toMatchObject({
-        success: false,
-        code: "SERVER_ERROR",
-        error: "Database error",
-      })
-    })
-
-    it("should return SERVER_ERROR for unknown errors", async () => {
-      vi.mocked(getSession).mockRejectedValueOnce("String error")
-
-      const result = await recordMetricAction({ type: "QUERY", name: "test", duration: 100 })
-      expect(result).toMatchObject({
-        success: false,
-        code: "SERVER_ERROR",
-        error: "String error",
-      })
-    })
-  })
-
   describe("clearMetricsAction", () => {
     it("should return UNAUTHORIZED if user not authenticated", async () => {
       vi.mocked(getSession).mockResolvedValueOnce(null)
@@ -284,7 +162,7 @@ describe("Metrics Actions", () => {
 
       expect(result).toEqual({
         success: true,
-        data: { success: true, message: "All metrics cleared" },
+        data: { message: "All metrics cleared" },
       })
       expect(clearMetrics).toHaveBeenCalled()
     })

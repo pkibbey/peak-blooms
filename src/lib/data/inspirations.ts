@@ -29,10 +29,20 @@ function applyMultiplierToInspiration(
 
 /**
  * Get all inspirations with product counts
+ * Only returns inspirations that contain products with complete data (non-empty image and description)
  */
 export async function getInspirationsWithCounts(): Promise<InspirationBasic[]> {
   return withTiming("getInspirationsWithCounts", {}, async () => {
     return db.inspiration.findMany({
+      where: {
+        products: {
+          every: {
+            product: {
+              AND: [{ description: { not: null } }, { images: { isEmpty: false } }],
+            },
+          },
+        },
+      },
       include: {
         _count: {
           select: { products: true },
@@ -70,16 +80,16 @@ export async function getInspirationBySlug(
 
       if (!inspiration) return null
 
-      // Filter out products that are soft-deleted or incomplete (no images or description)
+      // Filter out soft-deleted products and products with missing description or images
       const filteredInspiration = {
         ...inspiration,
-        products: inspiration.products.filter((p) => {
-          const prod = p.product
-          const hasDescription = prod.description !== null && prod.description !== ""
-          const hasImages =
-            Array.isArray(prod.images) && prod.images.length > 0 && prod.images.some((img) => !!img)
-          return prod.deletedAt === null && hasDescription && hasImages
-        }),
+        products: inspiration.products.filter(
+          (p) =>
+            p.product.deletedAt === null &&
+            p.product.description !== null &&
+            p.product.description !== "" &&
+            p.product.images.length > 0
+        ),
       }
 
       return applyMultiplierToInspiration(filteredInspiration, priceMultiplier)

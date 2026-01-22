@@ -14,7 +14,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
-import { toAppError } from "@/lib/error-utils"
+import { toAppErrorClient } from "@/lib/error-utils"
 
 interface OrderStatusFormProps {
   orderId: string
@@ -65,8 +65,7 @@ export default function OrderStatusForm({ orderId, currentStatus }: OrderStatusF
       toast.success("Order status updated")
       router.refresh()
     } catch (error) {
-      toAppError(error, "Failed to update status")
-      toast.error("Failed to update status")
+      toAppErrorClient(error, "Failed to update status")
     } finally {
       setIsSubmitting(false)
     }

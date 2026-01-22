@@ -10,9 +10,16 @@ interface SlugInputProps {
   slug: string
   onSlugChange: (slug: string) => void
   disabled?: boolean
+  onBlur?: () => void
 }
 
-export default function SlugInput({ name, slug, onSlugChange, disabled = false }: SlugInputProps) {
+export default function SlugInput({
+  name,
+  slug,
+  onSlugChange,
+  onBlur,
+  disabled = false,
+}: SlugInputProps) {
   const [isManualEdit, setIsManualEdit] = useState(false)
 
   // Auto-generate slug from name if not manually edited
@@ -59,6 +66,7 @@ export default function SlugInput({ name, slug, onSlugChange, disabled = false }
           type="text"
           value={slug}
           onChange={(e) => handleSlugChange(e.target.value)}
+          onBlur={() => onBlur?.()}
           disabled={disabled}
           className="flex-1"
           placeholder="auto-generated-slug"

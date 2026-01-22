@@ -7,12 +7,12 @@ vi.mock("@/lib/db", () => ({
 }))
 
 vi.mock("@/lib/metrics", () => ({
-  captureMetric: vi.fn().mockResolvedValue(undefined),
+  captureSeedMetric: vi.fn().mockResolvedValue(undefined),
 }))
 
 import { ProductType, Role } from "@/generated/enums"
 import { db } from "@/lib/db"
-import { captureMetric } from "@/lib/metrics"
+import { captureSeedMetric } from "@/lib/metrics"
 import { createTrackedDb } from "./db-wrapper"
 
 describe("Database Wrapper", () => {
@@ -45,7 +45,7 @@ describe("Database Wrapper", () => {
 
       // Metric capture is fire-and-forget, so it will be called in development
       if (process.env.NODE_ENV === "development") {
-        expect(captureMetric).toHaveBeenCalledWith(
+        expect(captureSeedMetric).toHaveBeenCalledWith(
           "ADMIN_QUERY",
           expect.stringContaining("user.findMany"),
           expect.any(Number)
@@ -61,7 +61,7 @@ describe("Database Wrapper", () => {
       await trackedDb.product.findUnique({ where: { id: "prod-1" } })
 
       if (process.env.NODE_ENV === "development") {
-        expect(captureMetric).toHaveBeenCalledWith(
+        expect(captureSeedMetric).toHaveBeenCalledWith(
           "USER_QUERY",
           expect.stringContaining("product.findUnique"),
           expect.any(Number)
@@ -77,7 +77,7 @@ describe("Database Wrapper", () => {
       await trackedDb.order.findFirst({ where: { id: "order-1" } })
 
       if (process.env.NODE_ENV === "development") {
-        expect(captureMetric).toHaveBeenCalledWith(
+        expect(captureSeedMetric).toHaveBeenCalledWith(
           "ADMIN_QUERY",
           expect.stringContaining("order.findFirst"),
           expect.any(Number)
@@ -106,7 +106,7 @@ describe("Database Wrapper", () => {
       await trackedDb.user.create({ data: { email: "test@example.com" } })
 
       if (process.env.NODE_ENV === "development") {
-        expect(captureMetric).toHaveBeenCalledWith(
+        expect(captureSeedMetric).toHaveBeenCalledWith(
           "USER_QUERY",
           expect.stringContaining("user.create"),
           expect.any(Number)
@@ -135,7 +135,7 @@ describe("Database Wrapper", () => {
       await trackedDb.product.update({ where: { id: "prod-1" }, data: { featured: true } })
 
       if (process.env.NODE_ENV === "development") {
-        expect(captureMetric).toHaveBeenCalledWith(
+        expect(captureSeedMetric).toHaveBeenCalledWith(
           "ADMIN_QUERY",
           expect.stringContaining("product.update"),
           expect.any(Number)
@@ -160,7 +160,7 @@ describe("Database Wrapper", () => {
       await trackedDb.collection.delete({ where: { id: "coll-1" } })
 
       if (process.env.NODE_ENV === "development") {
-        expect(captureMetric).toHaveBeenCalledWith(
+        expect(captureSeedMetric).toHaveBeenCalledWith(
           "ADMIN_QUERY",
           expect.stringContaining("collection.delete"),
           expect.any(Number)
@@ -176,7 +176,7 @@ describe("Database Wrapper", () => {
       await trackedDb.product.count({ where: { featured: true } })
 
       if (process.env.NODE_ENV === "development") {
-        expect(captureMetric).toHaveBeenCalledWith(
+        expect(captureSeedMetric).toHaveBeenCalledWith(
           "USER_QUERY",
           expect.stringContaining("product.count"),
           expect.any(Number)
@@ -193,7 +193,7 @@ describe("Database Wrapper", () => {
       await expect(trackedDb.user.create({ data: { email: "test@example.com" } })).rejects.toThrow()
 
       if (process.env.NODE_ENV === "development") {
-        expect(captureMetric).toHaveBeenCalledWith(
+        expect(captureSeedMetric).toHaveBeenCalledWith(
           "ADMIN_QUERY",
           expect.stringContaining("user.create"),
           expect.any(Number)
@@ -227,7 +227,7 @@ describe("Database Wrapper", () => {
       await adminTrackedDb.product.findMany({})
 
       if (process.env.NODE_ENV === "development") {
-        const calls = vi.mocked(captureMetric).mock.calls
+        const calls = vi.mocked(captureSeedMetric).mock.calls
         expect(calls.some((call) => call[0] === "USER_QUERY")).toBe(true)
         expect(calls.some((call) => call[0] === "ADMIN_QUERY")).toBe(true)
       }
@@ -248,8 +248,8 @@ describe("Database Wrapper", () => {
       await trackedDb.product.findMany({})
 
       if (process.env.NODE_ENV === "development") {
-        expect(captureMetric).toHaveBeenCalled()
-        const duration = vi.mocked(captureMetric).mock.calls[0]?.[2]
+        expect(captureSeedMetric).toHaveBeenCalled()
+        const duration = vi.mocked(captureSeedMetric).mock.calls[0]?.[2]
         // Duration should be at least 50ms (may be more due to execution overhead)
         expect(typeof duration).toBe("number")
         expect(duration).toBeGreaterThan(0)
@@ -269,7 +269,7 @@ describe("Database Wrapper", () => {
       await trackedDb.orderItem.deleteMany({ where: { orderId: "order-1" } })
 
       if (process.env.NODE_ENV === "development") {
-        expect(captureMetric).toHaveBeenCalledWith(
+        expect(captureSeedMetric).toHaveBeenCalledWith(
           "ADMIN_QUERY",
           expect.stringContaining("orderItem.deleteMany"),
           expect.any(Number)
@@ -293,7 +293,7 @@ describe("Database Wrapper", () => {
       })
 
       if (process.env.NODE_ENV === "development") {
-        expect(captureMetric).toHaveBeenCalledWith(
+        expect(captureSeedMetric).toHaveBeenCalledWith(
           "ADMIN_QUERY",
           expect.stringContaining("product.updateMany"),
           expect.any(Number)
@@ -306,7 +306,7 @@ describe("Database Wrapper", () => {
       const consoleErrorSpy = vi.spyOn(console, "error").mockImplementation(() => {})
 
       vi.mocked(db.user.findMany).mockResolvedValueOnce([])
-      vi.mocked(captureMetric).mockRejectedValueOnce(new Error("Metric capture failed"))
+      vi.mocked(captureSeedMetric).mockRejectedValueOnce(new Error("Metric capture failed"))
 
       // Should not throw, just handle the error silently
       await expect(trackedDb.user.findMany({})).resolves.toEqual([])
@@ -324,7 +324,7 @@ describe("Database Wrapper", () => {
 
       const error = new Error("Operation failed")
       vi.mocked(db.product.update).mockRejectedValueOnce(error)
-      vi.mocked(captureMetric).mockRejectedValueOnce(new Error("Metric capture failed"))
+      vi.mocked(captureSeedMetric).mockRejectedValueOnce(new Error("Metric capture failed"))
 
       await expect(trackedDb.product.update({ where: { id: "1" }, data: {} })).rejects.toThrow()
 
@@ -387,7 +387,7 @@ describe("Database Wrapper", () => {
       })
 
       if (process.env.NODE_ENV === "development") {
-        expect(captureMetric).toHaveBeenCalledWith(
+        expect(captureSeedMetric).toHaveBeenCalledWith(
           "USER_QUERY",
           expect.stringContaining("product.upsert"),
           expect.any(Number)
@@ -424,7 +424,7 @@ describe("Database Wrapper", () => {
       await trackedDb.order.aggregate({ _count: true })
 
       if (process.env.NODE_ENV === "development") {
-        expect(captureMetric).toHaveBeenCalledWith(
+        expect(captureSeedMetric).toHaveBeenCalledWith(
           "USER_QUERY",
           expect.stringContaining("order.aggregate"),
           expect.any(Number)
@@ -445,7 +445,7 @@ describe("Database Wrapper", () => {
       await trackedDb.orderItem.groupBy({ by: ["productId"] })
 
       if (process.env.NODE_ENV === "development") {
-        expect(captureMetric).toHaveBeenCalledWith(
+        expect(captureSeedMetric).toHaveBeenCalledWith(
           "ADMIN_QUERY",
           expect.stringContaining("orderItem.groupBy"),
           expect.any(Number)
@@ -477,11 +477,11 @@ describe("Database Wrapper", () => {
         const trackedDb = createTrackedDb(db, "ADMIN_QUERY")
 
         vi.mocked(db.user.findMany).mockResolvedValueOnce([])
-        vi.mocked(captureMetric).mockClear()
+        vi.mocked(captureSeedMetric).mockClear()
 
         await trackedDb.user.findMany({ where: {} })
 
-        expect(captureMetric).toHaveBeenCalledWith(
+        expect(captureSeedMetric).toHaveBeenCalledWith(
           "ADMIN_QUERY",
           expect.stringContaining("user.findMany"),
           expect.any(Number)
@@ -502,7 +502,7 @@ describe("Database Wrapper", () => {
 
         const error = new Error("Database constraint violated")
         vi.mocked(db.product.create).mockRejectedValueOnce(error)
-        vi.mocked(captureMetric).mockClear()
+        vi.mocked(captureSeedMetric).mockClear()
 
         await expect(
           trackedDb.product.create({
@@ -517,7 +517,7 @@ describe("Database Wrapper", () => {
           })
         ).rejects.toThrow("Database constraint violated")
 
-        expect(captureMetric).toHaveBeenCalledWith(
+        expect(captureSeedMetric).toHaveBeenCalledWith(
           "USER_QUERY",
           expect.stringContaining("product.create (error)"),
           expect.any(Number)
@@ -537,11 +537,11 @@ describe("Database Wrapper", () => {
         const trackedDb = createTrackedDb(db, "ADMIN_QUERY")
 
         vi.mocked(db.user.findMany).mockResolvedValueOnce([])
-        vi.mocked(captureMetric).mockClear()
+        vi.mocked(captureSeedMetric).mockClear()
 
         await trackedDb.user.findMany({ where: {} })
 
-        expect(captureMetric).not.toHaveBeenCalled()
+        expect(captureSeedMetric).not.toHaveBeenCalled()
       } finally {
         // @ts-expect-error NODE_ENV is read-only but we need to override it for testing
         process.env.NODE_ENV = originalEnv

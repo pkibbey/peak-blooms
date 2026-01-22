@@ -33,21 +33,13 @@ export default async function ErrorPage({
           <Button
             className="w-full"
             nativeButton={false}
-            render={
-              <Link prefetch={false} href="/auth/signin">
-                Try signing in again
-              </Link>
-            }
+            render={<Link href="/auth/signin">Try signing in again</Link>}
           />
           <Button
             variant="outline"
             className="w-full"
             nativeButton={false}
-            render={
-              <Link prefetch={false} href="/">
-                Return to home
-              </Link>
-            }
+            render={<Link href="/">Return to home</Link>}
           />
         </div>
       </div>

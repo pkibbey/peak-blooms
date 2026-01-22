@@ -8,7 +8,7 @@ import { toast } from "sonner"
 import { deleteBlobAction } from "@/app/actions/blob"
 import { Button } from "@/components/ui/button"
 import { Label } from "@/components/ui/label"
-import { toAppError } from "@/lib/error-utils"
+import { toAppErrorClient } from "@/lib/error-utils"
 import { cn } from "@/lib/utils"
 
 const MAX_FILE_SIZE = 5 * 1024 * 1024 // 5 MB
@@ -111,8 +111,7 @@ export function ImageUpload({
       toast.success("Image uploaded successfully")
       return blob.url
     } catch (error) {
-      toAppError(error, "Image upload failed")
-      toast.error("Image upload failed")
+      toAppErrorClient(error, "Image upload failed")
       return null
     } finally {
       setIsUploading(false)

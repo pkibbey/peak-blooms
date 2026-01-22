@@ -17,6 +17,9 @@ export default async function AdminSidebar() {
   // lightweight counts for nav badges
   const pendingOrders = await db.order.count({ where: { status: "PENDING" } })
   const pendingApprovals = await db.user.count({ where: { approved: false } })
+  const productCount = await db.product.count({ where: { deletedAt: null } })
+  const collectionCount = await db.collection.count()
+  const inspirationCount = await db.inspiration.count()
 
   return (
     <div className="space-y-4">
@@ -26,7 +29,6 @@ export default async function AdminSidebar() {
         <ul className="space-y-2 text-sm">
           <li>
             <Link
-              prefetch={false}
               href="/admin"
               className="flex items-center justify-between w-full hover:underline"
             >
@@ -38,7 +40,6 @@ export default async function AdminSidebar() {
 
           <li>
             <Link
-              prefetch={false}
               href="/admin/orders"
               className="flex items-center justify-between w-full hover:underline"
             >
@@ -51,43 +52,42 @@ export default async function AdminSidebar() {
 
           <li>
             <Link
-              prefetch={false}
               href="/admin/products"
               className="flex items-center justify-between w-full hover:underline"
             >
               <span className="flex items-center gap-2">
                 <IconPackage className="h-4 w-4 text-muted-foreground" /> Products
               </span>
+              {productCount > 0 && <Badge variant="secondary">{productCount}</Badge>}
             </Link>
           </li>
 
           <li>
             <Link
-              prefetch={false}
               href="/admin/collections"
               className="flex items-center justify-between w-full hover:underline"
             >
               <span className="flex items-center gap-2">
                 <IconShoppingCart className="h-4 w-4 text-muted-foreground" /> Collections
               </span>
+              {collectionCount > 0 && <Badge variant="secondary">{collectionCount}</Badge>}
             </Link>
           </li>
 
           <li>
             <Link
-              prefetch={false}
               href="/admin/inspirations"
               className="flex items-center justify-between w-full hover:underline"
             >
               <span className="flex items-center gap-2">
                 <IconStar className="h-4 w-4 text-muted-foreground" /> Inspirations
               </span>
+              {inspirationCount > 0 && <Badge variant="secondary">{inspirationCount}</Badge>}
             </Link>
           </li>
 
           <li>
             <Link
-              prefetch={false}
               href="/admin/users"
               className="flex items-center justify-between w-full hover:underline"
             >
@@ -101,7 +101,6 @@ export default async function AdminSidebar() {
           {process.env.NODE_ENV === "development" && (
             <li>
               <Link
-                prefetch={false}
                 href="/admin/metrics"
                 className="flex items-center justify-between w-full hover:underline"
               >

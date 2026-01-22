@@ -23,7 +23,7 @@ const adapter = new PrismaPg(pool)
 const prisma = new PrismaClient({ adapter })
 
 // Helper function to capture metrics directly to database
-async function captureMetric(type: MetricType, name: string, duration: number): Promise<void> {
+async function captureSeedMetric(type: MetricType, name: string, duration: number): Promise<void> {
   // Skip metrics if they are not enabled
   if (process.env.ENABLE_METRICS !== "true") return
 
@@ -309,7 +309,7 @@ async function seedProducts() {
           update: collection,
         })
       }
-      await captureMetric(
+      await captureSeedMetric(
         MetricType.SEED,
         "batch create collections",
         performance.now() - start_collections
@@ -344,7 +344,11 @@ async function seedProducts() {
         throw new Error("Neither price-list.csv nor price-list.csv found in prisma directory")
       }
 
-      await captureMetric(MetricType.SEED, "read products CSV", performance.now() - start_readCSV)
+      await captureSeedMetric(
+        MetricType.SEED,
+        "read products CSV",
+        performance.now() - start_readCSV
+      )
       console.log(`📦 Found ${csvProducts.length} CSV products - starting bulk upsert...`)
 
       // Process products in batches with optimized queries
@@ -397,7 +401,7 @@ async function seedProducts() {
           productsSkipped++
         }
       }
-      await captureMetric(
+      await captureSeedMetric(
         MetricType.SEED,
         "upsert non-rose products",
         performance.now() - start_upsertNonRoseProducts
@@ -445,7 +449,7 @@ async function seedProducts() {
           productsSkipped++
         }
       }
-      await captureMetric(
+      await captureSeedMetric(
         MetricType.SEED,
         "upsert rose products",
         performance.now() - start_upsertRoseProducts
@@ -464,7 +468,7 @@ async function seedProducts() {
         tx.collection.findUnique({ where: { slug: "flowers" } }),
         tx.collection.findUnique({ where: { slug: "fillers" } }),
       ])
-      await captureMetric(
+      await captureSeedMetric(
         MetricType.SEED,
         "batch fetch collections",
         performance.now() - start_collections_lookup
@@ -486,7 +490,7 @@ async function seedProducts() {
           },
           select: { id: true, slug: true },
         })
-        await captureMetric(
+        await captureSeedMetric(
           MetricType.SEED,
           "batch fetch products for collections",
           performance.now() - start_productLookup
@@ -518,7 +522,7 @@ async function seedProducts() {
             collectionId: collectionId,
           })
         }
-        await captureMetric(
+        await captureSeedMetric(
           MetricType.SEED,
           "build collection associations",
           performance.now() - start_buildAssociations
@@ -542,7 +546,7 @@ async function seedProducts() {
             console.warn(`⚠️  Failed to add product to collection: ${(error as Error).message}`)
           }
         }
-        await captureMetric(
+        await captureSeedMetric(
           MetricType.SEED,
           "batch upsert product collections",
           performance.now() - start_upsertAssociations
@@ -559,7 +563,7 @@ async function seedProducts() {
         where: { slug: { in: featuredSlugs } },
         data: { featured: true },
       })
-      await captureMetric(
+      await captureSeedMetric(
         MetricType.SEED,
         "update featured products",
         performance.now() - start_updateFeaturedProducts
@@ -576,7 +580,7 @@ async function seedProducts() {
         where: { slug: { in: featuredCollectionSlugs } },
         data: { featured: true },
       })
-      await captureMetric(
+      await captureSeedMetric(
         MetricType.SEED,
         "update featured collections",
         performance.now() - start_updateFeaturedCollections
@@ -608,7 +612,7 @@ async function seedProducts() {
           where: { slug: { in: exoticProductSlugs } },
           select: { id: true },
         })
-        await captureMetric(
+        await captureSeedMetric(
           MetricType.SEED,
           "fetch exotic products",
           performance.now() - start_fetchExoticProducts
@@ -635,7 +639,7 @@ async function seedProducts() {
             console.warn(`⚠️  Failed to add product to Exotic: ${(error as Error).message}`)
           }
         }
-        await captureMetric(
+        await captureSeedMetric(
           MetricType.SEED,
           "batch upsert exotic associations",
           performance.now() - start_exoticUpserts

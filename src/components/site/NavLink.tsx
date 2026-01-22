@@ -34,7 +34,7 @@ export default function NavLink({
       className={cn(active ? "bg-secondary text-secondary-foreground" : nonActiveHover, className)}
       nativeButton={false}
       render={
-        <Link prefetch={false} href={href} aria-current={active ? "page" : undefined} {...props}>
+        <Link href={href} aria-current={active ? "page" : undefined} {...props}>
           {icon ? (
             <span className="inline-flex items-center" aria-hidden="true">
               {icon}

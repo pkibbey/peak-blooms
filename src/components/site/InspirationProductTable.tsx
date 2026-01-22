@@ -42,7 +42,7 @@ export function InspirationProductTable({ products, setName, user }: Inspiration
       </div>
 
       {/* Add All to Cart Button */}
-      <div className="flex justify-end">
+      <div className="grid justify-end">
         <AddAllToCartButton
           productIds={products.map((p) => p.id)}
           quantities={quantities}

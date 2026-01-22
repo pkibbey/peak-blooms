@@ -20,9 +20,15 @@ export default function ProductMultiSelectSimple({
 }: ProductMultiSelectSimpleProps) {
   const [searchTerm, setSearchTerm] = useState("")
 
-  const filteredProducts = products.filter((product) =>
-    product.name.toLowerCase().includes(searchTerm.toLowerCase())
-  )
+  const filteredProducts = products.filter((product) => {
+    const term = searchTerm.trim().toLowerCase()
+    if (!term) return true
+    const nameMatch = product.name?.toLowerCase().includes(term)
+    const typeMatch = String(product.productType ?? "")
+      .toLowerCase()
+      .includes(term)
+    return nameMatch || typeMatch
+  })
 
   const handleToggle = (productId: string) => {
     if (disabled) return
@@ -80,7 +86,7 @@ export default function ProductMultiSelectSimple({
 
       <Input
         type="text"
-        placeholder="Search products..."
+        placeholder="Search products and types..."
         value={searchTerm}
         onChange={(e) => setSearchTerm(e.target.value)}
         className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm"
@@ -104,6 +110,9 @@ export default function ProductMultiSelectSimple({
                   />
                   <div className="min-w-0 flex-1">
                     <p className="truncate font-medium">{product.name}</p>
+                    <p className="text-xs text-muted-foreground/80 uppercase">
+                      {product.productType}
+                    </p>
                   </div>
                 </label>
               </li>

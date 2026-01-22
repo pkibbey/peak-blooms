@@ -15,7 +15,7 @@ import {
   FormMessage,
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
-import { toAppError } from "@/lib/error-utils"
+import { toAppErrorClient } from "@/lib/error-utils"
 import type { SessionUser } from "@/lib/query-types"
 import { type ProfileFormData, profileSchema } from "@/lib/validations/auth"
 
@@ -46,7 +46,7 @@ export default function ProfileForm({ user }: ProfileFormProps) {
       toast.success("Profile updated successfully")
       router.refresh()
     } catch (err) {
-      toAppError(err, "Unable to save profile changes")
+      toAppErrorClient(err, "Unable to save profile changes")
       form.setError("root", { message: "Unable to save profile changes" })
     }
   }

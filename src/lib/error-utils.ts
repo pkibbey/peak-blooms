@@ -5,6 +5,7 @@
  * error patterns across server actions and API routes.
  */
 
+import { toast } from "sonner"
 import { ZodError } from "zod"
 import type { AppError } from "@/lib/query-types"
 
@@ -58,18 +59,19 @@ export function toAppError(
   if (isErrorObject(error)) {
     // Try to extract structured error info if available
     const message = error.message || defaultMessage
+    const messageLower = message.toLowerCase()
 
-    // Check for specific error patterns and map to codes
-    if (message.includes("Unauthorized")) {
+    // Check for specific error patterns and map to codes (case-insensitive)
+    if (messageLower.includes("unauthorized")) {
       return { success: false, error: isProd ? defaultMessage : message, code: "UNAUTHORIZED" }
     }
-    if (message.includes("Forbidden")) {
+    if (messageLower.includes("forbidden")) {
       return { success: false, error: isProd ? defaultMessage : message, code: "FORBIDDEN" }
     }
-    if (message.includes("not found")) {
+    if (messageLower.includes("not found")) {
       return { success: false, error: isProd ? defaultMessage : message, code: "NOT_FOUND" }
     }
-    if (message.includes("already exists")) {
+    if (messageLower.includes("conflict") || messageLower.includes("already exists")) {
       return { success: false, error: isProd ? defaultMessage : message, code: "CONFLICT" }
     }
 
@@ -83,4 +85,15 @@ export function toAppError(
     error: isProd ? defaultMessage : message,
     code: "SERVER_ERROR",
   }
+}
+
+export function toAppErrorClient(
+  error: unknown,
+  defaultMessage: string = "An unexpected error occurred"
+): AppError {
+  // Always show toast of just the default message
+  toast.error(defaultMessage)
+
+  // Return app error object
+  return toAppError(error, defaultMessage)
 }

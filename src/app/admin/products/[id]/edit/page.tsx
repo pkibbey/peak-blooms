@@ -57,11 +57,7 @@ export default async function EditProductPage({ params }: EditProductPageProps) 
               variant="outline"
               size="sm"
               nativeButton={false}
-              render={
-                <Link prefetch={false} href={`/admin/products/${previousProduct.id}/edit`}>
-                  ← Previous
-                </Link>
-              }
+              render={<Link href={`/admin/products/${previousProduct.id}/edit`}>← Previous</Link>}
             />
           ) : (
             <Button variant="outline" size="sm" disabled>
@@ -73,11 +69,7 @@ export default async function EditProductPage({ params }: EditProductPageProps) 
               variant="outline"
               size="sm"
               nativeButton={false}
-              render={
-                <Link prefetch={false} href={`/admin/products/${nextProduct.id}/edit`}>
-                  Next →
-                </Link>
-              }
+              render={<Link href={`/admin/products/${nextProduct.id}/edit`}>Next →</Link>}
             />
           ) : (
             <Button variant="outline" size="sm" disabled>

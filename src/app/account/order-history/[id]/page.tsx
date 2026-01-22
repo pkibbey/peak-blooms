@@ -129,14 +129,7 @@ export default async function OrderDetailPage({ params }: OrderDetailPageProps) 
       {/* Actions */}
       <div className="mt-8 space-y-4">
         <div className="flex gap-4">
-          <Button
-            nativeButton={false}
-            render={
-              <Link prefetch={false} href="/shop">
-                Continue Shopping
-              </Link>
-            }
-          />
+          <Button nativeButton={false} render={<Link href="/shop">Continue Shopping</Link>} />
         </div>
 
         {/* Cancel Order Section - Only show for PENDING orders */}

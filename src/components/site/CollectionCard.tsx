@@ -14,9 +14,9 @@ export function CollectionCard({ collection }: CollectionCardProps) {
   const productCount = collection._count.productCollections
 
   return (
-    <div className="group flex flex-col overflow-hidden rounded-xs transition-shadow border border-border">
+    <div className="group flex flex-col overflow-hidden rounded-xs border border-border">
       {/* Image Container */}
-      <Link prefetch={false} href={`/collections/${collection.slug}`} className="group/link">
+      <Link href={`/collections/${collection.slug}`} className="group/link">
         <ImageFrame className="aspect-square">
           {collection.image && (
             <Image
@@ -41,7 +41,7 @@ export function CollectionCard({ collection }: CollectionCardProps) {
       {/* Card Content */}
       <div className="flex flex-col justify-between items-start bg-background p-6 grow">
         <div>
-          <Link prefetch={false} href={`/collections/${collection.slug}`} className="group/link">
+          <Link href={`/collections/${collection.slug}`} className="group/link">
             <h3 className="text-xl font-bold group-hover/link:text-primary transition-colors font-serif">
               {collection.name}
             </h3>
@@ -56,7 +56,6 @@ export function CollectionCard({ collection }: CollectionCardProps) {
           nativeButton={false}
           render={
             <Link
-              prefetch={false}
               href={`/collections/${collection.slug}`}
               className="inline-flex items-center justify-center gap-2"
             >

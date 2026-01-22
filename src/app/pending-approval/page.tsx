@@ -79,11 +79,7 @@ export default async function PendingApprovalPage() {
           <Button
             variant="outline"
             nativeButton={false}
-            render={
-              <Link prefetch={false} href="/">
-                Return to home
-              </Link>
-            }
+            render={<Link href="/">Return to home</Link>}
           />
         </div>
       </div>

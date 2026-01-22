@@ -27,7 +27,8 @@ import { IconTrash } from "@/components/ui/icons"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import type { CollectionModel, ProductModel } from "@/generated/models"
-import { toAppError } from "@/lib/error-utils"
+import { toAppErrorClient } from "@/lib/error-utils"
+import { useDebouncedCallback } from "@/lib/useDebouncedCallback"
 import { saveOnBlur } from "@/lib/saveOnBlur"
 import { type CollectionFormData, collectionSchema } from "@/lib/validations/collection"
 
@@ -114,14 +115,23 @@ export default function CollectionForm({ collection, products = [] }: Collection
 
   const handleFieldBlur = async () => {
     if (isEditing) {
-      startTransition(async () => {
-        await saveOnBlur({
-          form,
-          originalValues,
-          onSave: saveForm,
-        })
+      await saveOnBlur({
+        form,
+        originalValues,
+        onSave: saveForm,
       })
     }
+  }
+
+  const debouncedSave = useDebouncedCallback(async () => {
+    if (isEditing) {
+      await saveForm(form.getValues())
+    }
+  }, 500)
+
+  const handleProductChange = (ids: string[]) => {
+    setSelectedProductIds(ids)
+    debouncedSave()
   }
 
   const handleDelete = async () => {
@@ -149,8 +159,7 @@ export default function CollectionForm({ collection, products = [] }: Collection
       router.push("/admin/collections")
       router.refresh()
     } catch (err) {
-      toAppError(err, "Failed to delete collection")
-      toast.error("Failed to delete collection. Please try again.")
+      toAppErrorClient(err, "Failed to delete collection")
     } finally {
       setIsDeleting(false)
     }
@@ -196,6 +205,7 @@ export default function CollectionForm({ collection, products = [] }: Collection
             name={form.watch("name")}
             slug={form.watch("slug")}
             onSlugChange={(slug) => form.setValue("slug", slug)}
+            onBlur={() => handleFieldBlur()}
           />
         </div>
 
@@ -268,7 +278,7 @@ export default function CollectionForm({ collection, products = [] }: Collection
             <ProductMultiSelectSimple
               products={products}
               selectedIds={selectedProductIds}
-              onChange={setSelectedProductIds}
+              onChange={handleProductChange}
             />
           </div>
         )}

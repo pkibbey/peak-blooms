@@ -83,6 +83,7 @@ export function QuantityStepper({
           onClick={handleDecrement}
           disabled={disabled || value <= min}
           aria-label="Decrease quantity"
+          className="hidden sm:flex"
         >
           <IconMinus className={config.iconSize} />
         </Button>
@@ -105,20 +106,21 @@ export function QuantityStepper({
           onClick={handleIncrement}
           disabled={disabled || value >= max}
           aria-label="Increase quantity"
+          className="hidden sm:flex"
         >
           <IconPlus className={config.iconSize} />
         </Button>
       </div>
       <Button
         type="button"
-        variant="secondary"
+        variant="outline"
         size={size === "xs" ? "icon-xs" : "icon-sm"}
         onClick={handleAddBox}
         disabled={disabled || value >= max}
         aria-label="Add box of 10"
-        className="w-auto px-3"
+        className="w-auto px-3 font-bold text-muted-foreground text-xs"
       >
-        + 10
+        Add 10
       </Button>
     </div>
   )

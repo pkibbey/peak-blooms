@@ -1,12 +1,11 @@
 "use client"
 
-import { Sparkles } from "lucide-react"
+import { LoaderCircle, Sparkles } from "lucide-react"
 import { useState } from "react"
 import { toast } from "sonner"
 import { Button } from "@/components/ui/button"
-import { IconRefresh } from "@/components/ui/icons"
 import type { ProductType } from "@/generated/enums"
-import { toAppError } from "@/lib/error-utils"
+import { toAppErrorClient } from "@/lib/error-utils"
 
 interface GenerateDescriptionButtonProps {
   productName: string
@@ -58,8 +57,7 @@ export function GenerateDescriptionButton({
         throw new Error("No description generated")
       }
     } catch (error) {
-      toAppError(error, "Failed to generate description")
-      toast.error("Failed to generate description")
+      toAppErrorClient(error, "Failed to generate description")
     } finally {
       setIsLoading(false)
     }
@@ -76,7 +74,7 @@ export function GenerateDescriptionButton({
     >
       {isLoading ? (
         <>
-          <IconRefresh className="mr-2 animate-spin" />
+          <LoaderCircle className="h-4 w-4 animate-spin mr-2" aria-hidden="true" />
           Generating...
         </>
       ) : (

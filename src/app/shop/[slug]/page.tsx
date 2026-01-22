@@ -71,14 +71,13 @@ export default async function ProductDetailPage({ params }: ProductDetailPagePro
             <div className="flex flex-col justify-start gap-6">
               {/* Breadcrumb */}
               <div className="text-sm text-muted-foreground">
-                <Link prefetch={false} href="/shop" className="hover:underline">
+                <Link href="/shop" className="hover:underline">
                   Shop
                 </Link>
                 {product.productCollections.length > 0 && (
                   <>
                     <span className="mx-2">/</span>
                     <Link
-                      prefetch={false}
                       href={`/collections/${product.productCollections[0].collection.slug}`}
                       className="hover:underline"
                     >
@@ -95,10 +94,12 @@ export default async function ProductDetailPage({ params }: ProductDetailPagePro
                 {/* Description */}
                 <p className="text-lg text-muted-foreground">{product.description}</p>
               </div>
-              <div className="grid gap-2">
-                <Label>Colors</Label>
-                <ColorsMiniDisplay colorIds={product.colors} size="md" />
-              </div>
+              {product.colors.length > 0 && (
+                <div className="grid gap-2">
+                  <Label>Colors</Label>
+                  <ColorsMiniDisplay colorIds={product.colors} size="md" />
+                </div>
+              )}
               {/* Product Controls */}
               <ProductControls
                 product={product}

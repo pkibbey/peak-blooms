@@ -10,7 +10,7 @@ import { Form, FormControl, FormField, FormItem, FormMessage } from "@/component
 import { IconX } from "@/components/ui/icons"
 import { Input } from "@/components/ui/input"
 import { useSession } from "@/lib/auth-client"
-import { toAppError } from "@/lib/error-utils"
+import { toAppErrorClient } from "@/lib/error-utils"
 import {
   type NewsletterSubscribeFormData,
   newsletterSubscribeSchema,
@@ -56,8 +56,7 @@ export function NewsletterBanner() {
         handleDismiss()
       }, 3000)
     } catch (_error) {
-      toAppError(_error, "Image upload failed")
-      toast.error("Something went wrong. Please try again.")
+      toAppErrorClient(_error, "Image upload failed")
     } finally {
       setIsSubmitting(false)
     }

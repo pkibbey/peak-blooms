@@ -4,8 +4,7 @@ import { revalidatePath } from "next/cache"
 import { calculateMinimumTotal } from "@/lib/cart-utils"
 import { getCurrentUser } from "@/lib/current-user"
 import { db } from "@/lib/db"
-import { toAppError } from "@/lib/error-utils"
-import type { AppResult, CancelOrderResponse, OrderWithItems } from "@/lib/query-types"
+import type { CancelOrderResponse, OrderWithItems } from "@/lib/query-types"
 import { adjustPrice } from "@/lib/utils"
 import {
   type CancelOrderInput,
@@ -17,23 +16,18 @@ import {
   updateOrderItemPriceSchema,
   updateOrderStatusSchema,
 } from "@/lib/validations/checkout"
+import { wrapAction } from "@/server/error-handler"
 
 /**
  * Server action to cancel a PENDING order
  * Can optionally convert it back to CART status
  */
-export async function cancelOrderAction(
-  input: CancelOrderInput
-): Promise<AppResult<CancelOrderResponse>> {
-  try {
+export const cancelOrderAction = wrapAction(
+  async (input: CancelOrderInput): Promise<CancelOrderResponse> => {
     const { orderId, convertToCart } = cancelOrderSchema.parse(input)
     const user = await getCurrentUser()
     if (!user) {
-      return {
-        success: false,
-        error: "You must be logged in to cancel an order",
-        code: "UNAUTHORIZED",
-      }
+      throw new Error("Unauthorized: You must be logged in to cancel an order")
     }
 
     // Fetch the order
@@ -52,20 +46,12 @@ export async function cancelOrderAction(
     })
 
     if (!order) {
-      return {
-        success: false,
-        error: "The order you are trying to cancel does not exist or does not belong to you",
-        code: "NOT_FOUND",
-      }
+      throw new Error("The order you are trying to cancel does not exist or does not belong to you")
     }
 
     // Only PENDING orders can be cancelled
     if (order.status !== "PENDING") {
-      return {
-        success: false,
-        error: "Only PENDING orders can be cancelled",
-        code: "CONFLICT",
-      }
+      throw new Error("Conflict: Only PENDING orders can be cancelled")
     }
 
     if (convertToCart) {
@@ -94,11 +80,8 @@ export async function cancelOrderAction(
       revalidatePath(`/account/order-history/${orderId}`)
 
       return {
-        success: true,
-        data: {
-          ...updatedOrder,
-          items: order.items,
-        },
+        ...updatedOrder,
+        items: order.items,
       }
     } else {
       // Simply transition to CANCELLED
@@ -113,42 +96,27 @@ export async function cancelOrderAction(
       revalidatePath("/account/order-history")
 
       return {
-        success: true,
-        data: {
-          ...cancelledOrder,
-          items: order.items,
-        },
+        ...cancelledOrder,
+        items: order.items,
       }
     }
-  } catch (error) {
-    return toAppError(error, "Failed to cancel order")
   }
-}
+)
 
 /**
  * Create/finalize an order - transition from CART to PENDING with checkout data
  * Approved users only
  */
-export async function createOrderAction(
-  data: CreateOrderInput
-): Promise<AppResult<OrderWithItems>> {
-  try {
+export const createOrderAction = wrapAction(
+  async (data: CreateOrderInput): Promise<OrderWithItems> => {
     const user = await getCurrentUser()
 
     if (!user) {
-      return {
-        success: false,
-        error: "You must be logged in",
-        code: "UNAUTHORIZED",
-      }
+      throw new Error("Unauthorized: You must be logged in")
     }
 
     if (!user.approved) {
-      return {
-        success: false,
-        error: "Your account is not approved for purchases",
-        code: "FORBIDDEN",
-      }
+      throw new Error("Forbidden: Your account is not approved for purchases")
     }
 
     const priceMultiplier = user.priceMultiplier
@@ -171,11 +139,7 @@ export async function createOrderAction(
     })
 
     if (!cart || cart.items.length === 0) {
-      return {
-        success: false,
-        error: "Your cart is empty",
-        code: "CONFLICT",
-      }
+      throw new Error("Conflict: Your cart is empty")
     }
 
     // Update order items with product snapshots and capture current prices at checkout time
@@ -209,11 +173,7 @@ export async function createOrderAction(
       })
 
       if (!existingAddress) {
-        return {
-          success: false,
-          error: "The delivery address does not belong to you or does not exist",
-          code: "NOT_FOUND",
-        }
+        throw new Error("Not found: The delivery address does not belong to you or does not exist")
       }
 
       finalDeliveryAddressId = deliveryAddressId
@@ -238,11 +198,7 @@ export async function createOrderAction(
 
       finalDeliveryAddressId = newAddress.id
     } else {
-      return {
-        success: false,
-        error: "Delivery address is required",
-        code: "VALIDATION_ERROR",
-      }
+      throw new Error("Delivery address is required")
     }
 
     // Enforce minimum order amount for finalization.
@@ -255,12 +211,9 @@ export async function createOrderAction(
     )
 
     if (minimumTotal < 200) {
-      return {
-        success: false,
-        error:
-          "Order subtotal does not meet minimum required amount of $200 (market items counted as $10 each).",
-        code: "VALIDATION_ERROR",
-      }
+      throw new Error(
+        "Order subtotal does not meet minimum required amount of $200 (market items counted as $10 each)."
+      )
     }
 
     // Transition the order from CART to PENDING
@@ -285,31 +238,20 @@ export async function createOrderAction(
     })
 
     revalidatePath("/account/order-history")
-    return {
-      success: true,
-      data: order,
-    }
-  } catch (error) {
-    return toAppError(error, "Failed to create order")
+    return order
   }
-}
+)
 
 /**
  * Server action to update order status (admin only)
  */
-export async function updateOrderStatusAction(
-  input: UpdateOrderStatusInput
-): Promise<AppResult<OrderWithItems>> {
-  try {
+export const updateOrderStatusAction = wrapAction(
+  async (input: UpdateOrderStatusInput): Promise<OrderWithItems> => {
     const { orderId, status } = updateOrderStatusSchema.parse(input)
     const user = await getCurrentUser()
 
     if (!user || user.role !== "ADMIN") {
-      return {
-        success: false,
-        error: "You must be an admin to update order status",
-        code: "UNAUTHORIZED",
-      }
+      throw new Error("Unauthorized: You must be an admin to update order status")
     }
 
     const validStatuses = [
@@ -321,11 +263,7 @@ export async function updateOrderStatusAction(
       "CANCELLED",
     ]
     if (!validStatuses.includes(status)) {
-      return {
-        success: false,
-        error: "Invalid status",
-        code: "VALIDATION_ERROR",
-      }
+      throw new Error("Invalid status")
     }
 
     // Fetch the order
@@ -334,11 +272,7 @@ export async function updateOrderStatusAction(
     })
 
     if (!order) {
-      return {
-        success: false,
-        error: "Order not found",
-        code: "NOT_FOUND",
-      }
+      throw new Error("Order not found")
     }
 
     // Update the order status
@@ -362,31 +296,22 @@ export async function updateOrderStatusAction(
     revalidatePath("/admin/orders")
     revalidatePath(`/admin/orders/${orderId}`)
 
-    return {
-      success: true,
-      data: updatedOrder,
-    }
-  } catch (error) {
-    return toAppError(error, "Failed to update order status")
+    return updatedOrder
   }
-}
+)
 
 /**
  * Server action to update order item price (admin only)
  */
-export async function updateOrderItemPriceAction(
-  input: UpdateOrderItemPriceInput
-): Promise<AppResult<{ id: string; price: number; orderTotal: number }>> {
-  try {
+export const updateOrderItemPriceAction = wrapAction(
+  async (
+    input: UpdateOrderItemPriceInput
+  ): Promise<{ id: string; price: number; orderTotal: number }> => {
     const { orderId, itemId, price } = updateOrderItemPriceSchema.parse(input)
     const user = await getCurrentUser()
 
     if (!user || user.role !== "ADMIN") {
-      return {
-        success: false,
-        error: "You must be an admin to update order item prices",
-        code: "UNAUTHORIZED",
-      }
+      throw new Error("You must be an admin to update order item prices")
     }
 
     // Fetch the order item
@@ -395,11 +320,7 @@ export async function updateOrderItemPriceAction(
     })
 
     if (!orderItem) {
-      return {
-        success: false,
-        error: "Order item not found",
-        code: "NOT_FOUND",
-      }
+      throw new Error("Order item not found")
     }
 
     // Update the order item price
@@ -424,14 +345,9 @@ export async function updateOrderItemPriceAction(
     revalidatePath(`/admin/orders/${orderId}`)
 
     return {
-      success: true,
-      data: {
-        id: itemId,
-        price,
-        orderTotal: Math.round(newOrderTotal * 100) / 100,
-      },
+      id: itemId,
+      price,
+      orderTotal: Math.round(newOrderTotal * 100) / 100,
     }
-  } catch (error) {
-    return toAppError(error, "Failed to update order item price")
   }
-}
+)

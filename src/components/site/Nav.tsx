@@ -41,18 +41,14 @@ export default async function Nav() {
       <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
         <div className="flex h-16 items-center gap-6">
           <div className="flex items-center gap-4">
-            <Link
-              prefetch={false}
-              href="/"
-              className="inline-flex items-center gap-3 text-lg font-semibold"
-            >
+            <Link href="/" className="inline-flex items-center gap-3 text-lg font-semibold">
               <Image
                 src="/logos/peak-blooms-black.png"
                 alt="Peak Blooms logo"
                 width={880}
                 height={202}
                 loading="eager"
-                className="h-8 w-auto shrink-0"
+                className="h-8 w-[147px] shrink-0"
               />
             </Link>
 
@@ -72,17 +68,14 @@ export default async function Nav() {
 
           <div className="flex items-center gap-4">
             {/* Search dialog trigger (works on desktop & mobile) */}
-            <SearchDialog featuredProducts={featuredProducts} />
 
             {isApproved && (
-              <div className="hidden md:block">
-                <Link prefetch={false} href="/cart" className="inline-flex items-center gap-2">
-                  <IconShoppingCart aria-hidden="true" />
-                  <span>Cart</span>
-                  {cartCount > 0 && <Badge variant="default">{cartCount}</Badge>}
-                </Link>
-              </div>
+              <Link href="/cart" className="inline-flex items-center gap-2">
+                <IconShoppingCart aria-hidden="true" />
+                {cartCount > 0 && <Badge variant="default">{cartCount}</Badge>}
+              </Link>
             )}
+            <SearchDialog featuredProducts={featuredProducts} />
 
             {/* Consolidated user/account/admin menu */}
             <UserMenu user={user} />

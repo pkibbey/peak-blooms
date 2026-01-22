@@ -3,8 +3,7 @@
 import { revalidatePath } from "next/cache"
 import { getSession } from "@/lib/auth"
 import { db } from "@/lib/db"
-import { toAppError } from "@/lib/error-utils"
-import type { AppResult, CollectionBasic } from "@/lib/query-types"
+import type { CollectionBasic } from "@/lib/query-types"
 import {
   type CreateCollectionInput,
   createCollectionSchema,
@@ -15,24 +14,23 @@ import {
   type UpdateCollectionInput,
   updateCollectionSchema,
 } from "@/lib/validations/collection"
+import { wrapAction } from "@/server/error-handler"
 
-export async function createCollectionAction(
-  input: CreateCollectionInput
-): Promise<
-  AppResult<
+export const createCollectionAction = wrapAction(
+  async (
+    input: CreateCollectionInput
+  ): Promise<
     Pick<
       CollectionBasic,
       "id" | "name" | "slug" | "image" | "description" | "featured" | "createdAt" | "updatedAt"
     >
-  >
-> {
-  const { productIds, ...data } = createCollectionSchema.parse(input)
-  const session = await getSession()
-  if (!session?.user || session.user.role !== "ADMIN") {
-    return { success: false, error: "Unauthorized", code: "UNAUTHORIZED" }
-  }
+  > => {
+    const { productIds, ...data } = createCollectionSchema.parse(input)
+    const session = await getSession()
+    if (!session?.user || session.user.role !== "ADMIN") {
+      throw new Error("Unauthorized")
+    }
 
-  try {
     const collection = await db.collection.create({
       data: {
         name: data.name,
@@ -49,29 +47,25 @@ export async function createCollectionAction(
     })
 
     revalidatePath("/admin/collections")
-    return { success: true, data: collection }
-  } catch (error) {
-    return toAppError(error, "Failed to create collection")
+    return collection
   }
-}
+)
 
-export async function updateCollectionAction(
-  input: UpdateCollectionInput
-): Promise<
-  AppResult<
+export const updateCollectionAction = wrapAction(
+  async (
+    input: UpdateCollectionInput
+  ): Promise<
     Pick<
       CollectionBasic,
       "id" | "name" | "slug" | "image" | "description" | "featured" | "createdAt" | "updatedAt"
     >
-  >
-> {
-  const { id, productIds, ...data } = updateCollectionSchema.parse(input)
-  const session = await getSession()
-  if (!session?.user || session.user.role !== "ADMIN") {
-    return { success: false, error: "Unauthorized", code: "UNAUTHORIZED" }
-  }
+  > => {
+    const { id, productIds, ...data } = updateCollectionSchema.parse(input)
+    const session = await getSession()
+    if (!session?.user || session.user.role !== "ADMIN") {
+      throw new Error("Unauthorized")
+    }
 
-  try {
     const collection = await db.collection.update({
       where: { id },
       data: {
@@ -90,51 +84,41 @@ export async function updateCollectionAction(
     })
 
     revalidatePath("/admin/collections")
-    return { success: true, data: collection }
-  } catch (error) {
-    return toAppError(error, "Failed to update collection")
+    return collection
   }
-}
+)
 
-export async function deleteCollectionAction(
-  input: DeleteCollectionInput
-): Promise<AppResult<{ id: string }>> {
-  const { id } = deleteCollectionSchema.parse(input)
-  const session = await getSession()
-  if (!session?.user || session.user.role !== "ADMIN") {
-    return { success: false, error: "Unauthorized", code: "UNAUTHORIZED" }
-  }
+export const deleteCollectionAction = wrapAction(
+  async (input: DeleteCollectionInput): Promise<{ id: string }> => {
+    const { id } = deleteCollectionSchema.parse(input)
+    const session = await getSession()
+    if (!session?.user || session.user.role !== "ADMIN") {
+      throw new Error("Unauthorized")
+    }
 
-  try {
     await db.collection.delete({
       where: { id },
     })
 
     revalidatePath("/admin/collections")
-    return { success: true, data: { id } }
-  } catch (error) {
-    return toAppError(error, "Failed to delete collection")
+    return { id }
   }
-}
+)
 
-export async function toggleCollectionFeaturedAction(
-  input: ToggleCollectionFeaturedInput
-): Promise<AppResult<{ id: string; featured: boolean }>> {
-  const { id, featured } = toggleCollectionFeaturedSchema.parse(input)
-  const session = await getSession()
-  if (!session?.user || session.user.role !== "ADMIN") {
-    return { success: false, error: "Unauthorized", code: "UNAUTHORIZED" }
-  }
+export const toggleCollectionFeaturedAction = wrapAction(
+  async (input: ToggleCollectionFeaturedInput): Promise<{ id: string; featured: boolean }> => {
+    const { id, featured } = toggleCollectionFeaturedSchema.parse(input)
+    const session = await getSession()
+    if (!session?.user || session.user.role !== "ADMIN") {
+      throw new Error("Unauthorized")
+    }
 
-  try {
     const collection = await db.collection.update({
       where: { id },
       data: { featured },
     })
 
     revalidatePath("/admin/collections")
-    return { success: true, data: { id, featured: collection.featured } }
-  } catch (error) {
-    return toAppError(error, "Failed to update collection")
+    return { id, featured: collection.featured }
   }
-}
+)

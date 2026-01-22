@@ -128,7 +128,6 @@ export default function OrdersTable({ orders, currentStatus, sort, order }: Orde
                   <TableRow key={order.id}>
                     <TableCell>
                       <Link
-                        prefetch={false}
                         href={`/admin/orders/${order.id}`}
                         className="font-medium text-primary hover:underline"
                       >
