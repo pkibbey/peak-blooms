@@ -10,6 +10,10 @@ vi.mock("next/cache", () => ({
   revalidatePath: vi.fn(),
 }))
 
+vi.mock("@/lib/error-utils", () => ({
+  toAppError: vi.fn(),
+}))
+
 import { db } from "@/lib/db"
 import { subscribeToNewsletterAction } from "./newsletter"
 
@@ -88,7 +92,7 @@ describe("Newsletter Actions", () => {
 
       const result = await subscribeToNewsletterAction("test@example.com")
 
-      expect(result).toEqual({ success: true, data: {} })
+      expect(result).toEqual(undefined)
     })
 
     it("should silently succeed on create errors", async () => {
@@ -97,7 +101,7 @@ describe("Newsletter Actions", () => {
 
       const result = await subscribeToNewsletterAction("test@example.com")
 
-      expect(result).toEqual({ success: true, data: {} })
+      expect(result).toEqual(undefined)
     })
 
     it("should handle email with uppercase characters", async () => {

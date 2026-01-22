@@ -31,6 +31,7 @@ import {
 } from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
 import { calculateCartTotal, calculateMinimumTotal } from "@/lib/cart-utils"
+import { toAppError } from "@/lib/error-utils"
 import type { CartResponse } from "@/lib/query-types"
 import { emptyAddress } from "@/lib/validations/address"
 import { type CheckoutFormData, checkoutSchema } from "@/lib/validations/checkout"
@@ -195,10 +196,8 @@ export default function CheckoutForm({ cart, savedAddresses }: CheckoutFormProps
       // This ensures the cart badge is cleared and order history is updated
       router.push("/account/order-history")
     } catch (err) {
-      console.error("Checkout error:", err)
-      form.setError("root", {
-        message: err instanceof Error ? err.message : "An error occurred. Please try again.",
-      })
+      toAppError(err, "Unable to save cart changes")
+      form.setError("root", { message: "Unable to save cart changes" })
     } finally {
       setIsSubmitting(false)
     }
@@ -333,7 +332,7 @@ export default function CheckoutForm({ cart, savedAddresses }: CheckoutFormProps
                 <span className="text-muted-foreground">
                   Subtotal ({cart.items.reduce((sum, item) => sum + item.quantity, 0)} items)
                 </span>
-                <MarketPriceIndicator items={cart.items} total={total} />
+                <MarketPriceIndicator total={total} />
               </div>
               <div className="flex justify-between">
                 <span className="text-muted-foreground">Delivery</span>
@@ -345,7 +344,7 @@ export default function CheckoutForm({ cart, savedAddresses }: CheckoutFormProps
 
             <div className="flex justify-between font-semibold text-lg mb-6">
               <span>Total</span>
-              <MarketPriceIndicator items={cart.items} total={total} size="sm" />
+              <MarketPriceIndicator total={total} />
             </div>
 
             <Button

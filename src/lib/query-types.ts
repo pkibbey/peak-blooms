@@ -276,7 +276,6 @@ export type InspirationForResponse = Omit<InspirationGetPayload<true>, "products
 /**
  * AppError: Standard error response from server actions
  * Use discriminated union pattern: check 'success' field to narrow type in error handlers
- * Example: if (!result.success) { console.error(result.error, result.code) }
  */
 export type AppError = {
   success: false

@@ -26,6 +26,7 @@ import { IconTrash } from "@/components/ui/icons"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import type { ProductModel } from "@/generated/models"
+import { toAppError } from "@/lib/error-utils"
 import { saveOnBlur } from "@/lib/saveOnBlur"
 import {
   createInspirationSchema,
@@ -120,10 +121,8 @@ export default function InspirationForm({ products, inspiration }: InspirationFo
         router.push("/admin/inspirations")
         router.refresh()
       }
-    } catch (err) {
-      const errorMessage = "An error occurred. Please try again."
-      form.setError("root", { message: errorMessage })
-      console.error(err)
+    } catch (_err) {
+      form.setError("root", { message: "An error occurred. Please try again." })
     }
   }
 
@@ -170,8 +169,8 @@ export default function InspirationForm({ products, inspiration }: InspirationFo
       router.push("/admin/inspirations")
       router.refresh()
     } catch (err) {
+      toAppError(err, "Failed to delete inspiration")
       toast.error("Failed to delete inspiration. Please try again.")
-      console.error(err)
       setIsDeleting(false)
     }
   }

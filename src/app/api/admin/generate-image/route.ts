@@ -1,6 +1,7 @@
 import { InferenceClient } from "@huggingface/inference"
 import { generateVariedPrompt, type StyleTemplate } from "@/lib/ai-prompt-templates"
 import { getSession } from "@/lib/auth"
+import { toAppError } from "@/lib/error-utils"
 
 export const maxDuration = 300 // Image generation can take time
 
@@ -9,7 +10,6 @@ export async function POST(request: Request) {
     // Check authentication
     const session = await getSession()
     if (!session?.user || session.user.role !== "ADMIN") {
-      console.error("[Generate Image API] Unauthorized - no session or not admin")
       return Response.json({ error: "Unauthorized" }, { status: 401 })
     }
 
@@ -22,7 +22,6 @@ export async function POST(request: Request) {
     }
 
     if (!productName || !styleTemplate) {
-      console.error("[Generate Image API] Missing required fields")
       return Response.json(
         { error: "Missing required fields: productName, styleTemplate" },
         { status: 400 }
@@ -35,7 +34,6 @@ export async function POST(request: Request) {
     // Initialize Hugging Face Inference client
     const apiKey = process.env.HUGGINGFACE_API_KEY
     if (!apiKey) {
-      console.error("[Generate Image API] HUGGINGFACE_API_KEY not configured")
       return Response.json({ error: "Hugging Face API key not configured" }, { status: 500 })
     }
 
@@ -59,8 +57,7 @@ export async function POST(request: Request) {
       styleTemplate,
     })
   } catch (err) {
-    const errorMessage = err instanceof Error ? err.message : String(err)
-    console.error("[Generate Image API] Error:", errorMessage, err)
-    return Response.json({ error: errorMessage }, { status: 500 })
+    const error = toAppError(err, "Generate Image failed")
+    return Response.json({ error }, { status: 500 })
   }
 }

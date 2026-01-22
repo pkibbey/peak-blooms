@@ -2,6 +2,7 @@ import { NextResponse } from "next/server"
 import { deleteBlobAction } from "@/app/actions/blob"
 import { getSession } from "@/lib/auth"
 import { db } from "@/lib/db"
+import { toAppError } from "@/lib/error-utils"
 import { deleteBlobSchema } from "@/lib/validations/blob"
 
 export async function DELETE(request: Request) {
@@ -25,12 +26,12 @@ export async function DELETE(request: Request) {
       if (!deleteRes.success) {
         blobDeleted = false
         blobError = deleteRes.error || "Failed to delete blob"
-        console.warn("Failed to delete blob:", blobError)
+        toAppError(new Error(blobError), "Failed to delete blob from storage")
       }
     } catch (err) {
       blobDeleted = false
       blobError = err instanceof Error ? err.message : String(err)
-      console.warn("Failed to delete blob:", blobError)
+      toAppError(err, "Failed to delete blob from storage")
     }
 
     // If productId provided, remove the image reference from product.images regardless of blob delete result

@@ -8,6 +8,7 @@ import { toast } from "sonner"
 import { deleteBlobAction } from "@/app/actions/blob"
 import { Button } from "@/components/ui/button"
 import { Label } from "@/components/ui/label"
+import { toAppError } from "@/lib/error-utils"
 import { cn } from "@/lib/utils"
 
 const MAX_FILE_SIZE = 5 * 1024 * 1024 // 5 MB
@@ -55,13 +56,10 @@ export function ImageUpload({
     if (!oldUrl.includes("blob.vercel-storage.com")) return
 
     try {
-      const res = await deleteBlobAction({ url: oldUrl })
-      if (!res.success) {
-        console.warn("Failed to delete old blob:", res.error)
-      }
-    } catch (error) {
-      console.warn("Failed to delete old blob:", error)
-      // cleanup failed
+      await deleteBlobAction({ url: oldUrl })
+      // cleanup completed silently
+    } catch (_error) {
+      // cleanup failed - errors are handled server-side
     }
   }
 
@@ -113,8 +111,8 @@ export function ImageUpload({
       toast.success("Image uploaded successfully")
       return blob.url
     } catch (error) {
-      const message = error instanceof Error ? error.message : "Upload failed"
-      toast.error(message)
+      toAppError(error, "Image upload failed")
+      toast.error("Image upload failed")
       return null
     } finally {
       setIsUploading(false)

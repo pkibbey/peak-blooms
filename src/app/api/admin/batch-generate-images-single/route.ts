@@ -6,6 +6,7 @@ import {
 } from "@/lib/ai-prompt-templates"
 import { getSession } from "@/lib/auth"
 import { db } from "@/lib/db"
+import { toAppError } from "@/lib/error-utils"
 
 export const maxDuration = 300
 
@@ -20,7 +21,6 @@ export async function POST(request: Request): Promise<Response> {
     // Auth check
     const session = await getSession()
     if (!session?.user || session.user.role !== "ADMIN") {
-      console.error("[Batch Generate Images Single API] Unauthorized - no session or not admin")
       return Response.json({ error: "Unauthorized" }, { status: 401 })
     }
 
@@ -28,7 +28,6 @@ export async function POST(request: Request): Promise<Response> {
     const { productId } = body as { productId: string }
 
     if (!productId) {
-      console.error("[Batch Generate Images Single API] Missing productId")
       return Response.json({ error: "Missing productId" }, { status: 400 })
     }
 
@@ -38,19 +37,13 @@ export async function POST(request: Request): Promise<Response> {
     })
 
     if (!product) {
-      console.error("[Batch Generate Images Single API] Product not found")
       return Response.json({ error: "Product not found" }, { status: 404 })
     }
 
     const hfApiKey = process.env.HUGGINGFACE_API_KEY
     if (!hfApiKey) {
-      console.error("[Batch Generate Images Single API] HUGGINGFACE_API_KEY not configured")
       return Response.json({ error: "Hugging Face API key not configured" }, { status: 500 })
     }
-
-    console.info(
-      `[Batch Generate Images Single API] Generating images for product: ${product.name} (${product.id})`
-    )
 
     const images: Array<{ imageUrl: string; prompt: string; styleTemplate: StyleTemplate }> = []
 
@@ -65,9 +58,6 @@ export async function POST(request: Request): Promise<Response> {
       product.description || undefined
     )
 
-    console.info(
-      `[Batch Generate Images Single API] Generating first image with style: ${firstStyle}`
-    )
     const firstBlob = await hf.textToImage({
       model: "black-forest-labs/FLUX.1-schnell",
       inputs: firstPrompt,
@@ -87,7 +77,6 @@ export async function POST(request: Request): Promise<Response> {
       product.description || undefined
     )
 
-    console.info("[Batch Generate Images Single API] Generating second image with style: realistic")
     const secondBlob = await hf.textToImage({
       model: "black-forest-labs/FLUX.1-schnell",
       inputs: secondPrompt,
@@ -98,10 +87,6 @@ export async function POST(request: Request): Promise<Response> {
 
     images.push({ imageUrl: secondDataUrl, prompt: secondPrompt, styleTemplate: secondStyle })
 
-    console.info(
-      `[Batch Generate Images Single API] Successfully generated images for ${product.name}`
-    )
-
     const result: SingleProductImageResult = {
       success: true,
       images,
@@ -109,8 +94,7 @@ export async function POST(request: Request): Promise<Response> {
 
     return Response.json(result)
   } catch (err) {
-    const errorMessage = err instanceof Error ? err.message : String(err)
-    console.error("[Batch Generate Images Single API] Error:", err)
-    return Response.json({ error: `Error: ${errorMessage}` }, { status: 500 })
+    const error = toAppError(err, "Batch Generate Images Single failed")
+    return Response.json({ error }, { status: 500 })
   }
 }

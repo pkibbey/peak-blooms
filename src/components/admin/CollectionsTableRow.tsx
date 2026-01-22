@@ -8,6 +8,7 @@ import { toast } from "sonner"
 import { toggleCollectionFeaturedAction } from "@/app/actions/collections"
 import { Checkbox } from "@/components/ui/checkbox"
 import { TableCell, TableRow } from "@/components/ui/table"
+import { toAppError } from "@/lib/error-utils"
 import type { CollectionBasic } from "@/lib/query-types"
 import { cn } from "@/lib/utils"
 
@@ -82,7 +83,8 @@ export default function CollectionsTableRow({ collection }: { collection: Collec
                     `${value ? "Marked featured" : "Removed featured"} - ${collection.name}`
                   )
                   router.refresh()
-                } catch (_err) {
+                } catch (err) {
+                  toAppError(err, "Failed to update collection")
                   setFeatured(previous)
                   toast.error("Failed to update collection")
                 }

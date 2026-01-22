@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button"
 import { QuantityStepper } from "@/components/ui/QuantityStepper"
 import type { ProductModel } from "@/generated/models"
 import { useSession } from "@/lib/auth-client"
+import { toAppError } from "@/lib/error-utils"
 import type { SessionUser } from "@/lib/query-types"
 import { useDebouncedCallback } from "@/lib/useDebouncedCallback"
 import { cn, formatPrice } from "@/lib/utils"
@@ -106,9 +107,9 @@ export function ProductControls({
 
         router.refresh()
       } catch (err) {
-        const message = err instanceof Error ? err.message : "Failed to update cart"
-        setError(message)
-        toast.error(message)
+        toAppError(err, "Failed to update cart")
+        setError("Failed to update cart")
+        toast.error("Failed to update cart")
       }
     })
   }, 500)

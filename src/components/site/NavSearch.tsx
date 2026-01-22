@@ -15,6 +15,7 @@ import {
   AutocompletePositioner,
   AutocompleteStatus,
 } from "@/components/ui/autocomplete"
+import type { ProductModel } from "@/generated/models"
 import { useDebouncedCallback } from "@/lib/useDebouncedCallback"
 import { formatPrice } from "@/lib/utils"
 
@@ -26,10 +27,16 @@ interface ProductHit {
   price: number
 }
 
-export default function NavSearch() {
+export default function NavSearch({ featuredProducts }: { featuredProducts: ProductModel[] }) {
   const [searchValue, setSearchValue] = React.useState("")
   const [searchResults, setSearchResults] = React.useState<ProductHit[]>([])
   const [isPending, startTransition] = useTransition()
+  const [placeholder, setPlaceholder] = React.useState(() =>
+    featuredProducts.length
+      ? (featuredProducts[Math.floor(Math.random() * featuredProducts.length)]?.name ??
+        "Search here")
+      : "Search here"
+  )
 
   const fetchResults = useDebouncedCallback((q: unknown) => {
     const term = typeof q === "string" ? q.trim() : ""
@@ -56,13 +63,23 @@ export default function NavSearch() {
     fetchResults(searchValue)
   }, [searchValue, fetchResults])
 
+  React.useEffect(() => {
+    if (!featuredProducts || featuredProducts.length === 0) {
+      setPlaceholder("Search here...")
+      return
+    }
+
+    const idx = Math.floor(Math.random() * featuredProducts.length)
+    setPlaceholder(featuredProducts[idx]?.name ?? "Search here...")
+  }, [featuredProducts])
+
   return (
     <div className="relative w-full max-w-md">
       <Autocomplete items={searchResults}>
         <div className="flex items-center gap-2 relative">
           <AutocompleteInput
             id="tags"
-            placeholder="Search products..."
+            placeholder={`${placeholder}...`}
             value={searchValue}
             onChange={(e) => setSearchValue(e.target.value)}
             className="bg-background/50 pe-8"

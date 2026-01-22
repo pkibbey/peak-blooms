@@ -1,4 +1,3 @@
-import type { CartResponse } from "@/lib/query-types"
 import { formatPrice } from "@/lib/utils"
 
 /**
@@ -6,11 +5,9 @@ import { formatPrice } from "@/lib/utils"
  * Shows formatted total price with market items indicator if applicable
  */
 interface MarketPriceIndicatorProps {
-  items: CartResponse["items"]
   total: number
-  size?: "xs" | "sm"
 }
 
-export function MarketPriceIndicator({ items, total, size = "xs" }: MarketPriceIndicatorProps) {
+export function MarketPriceIndicator({ total }: MarketPriceIndicatorProps) {
   return <span>{formatPrice(total)}</span>
 }

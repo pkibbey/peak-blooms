@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache"
 import { db } from "@/lib/db"
+import { toAppError } from "@/lib/error-utils"
 import type { AppResult } from "@/lib/query-types"
 import { newsletterSubscribeSchema } from "@/lib/validations/newsletter"
 
@@ -42,8 +43,7 @@ export async function subscribeToNewsletterAction(
 
     revalidatePath("/")
     return { success: true, data: { userId: user.id } }
-  } catch {
-    // Silently fail on error to not leak information
-    return { success: true, data: {} }
+  } catch (err) {
+    return toAppError(err, "Error while subscribing to newsletter")
   }
 }

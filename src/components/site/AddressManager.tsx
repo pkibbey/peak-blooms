@@ -11,6 +11,7 @@ import { Checkbox } from "@/components/ui/checkbox"
 import { IconPlus, IconX } from "@/components/ui/icons"
 import { Label } from "@/components/ui/label"
 import type { AddressModel } from "@/generated/models"
+import { toAppError } from "@/lib/error-utils"
 import { type AddressFormData, emptyAddress } from "@/lib/validations/address"
 
 interface AddressManagerProps {
@@ -88,7 +89,8 @@ export default function AddressManager({ addresses }: AddressManagerProps) {
       handleCancel()
       router.refresh()
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : "Failed to save address")
+      toAppError(error, "Failed to save address")
+      toast.error("Failed to save address")
     } finally {
       setIsSaving(false)
     }

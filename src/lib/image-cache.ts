@@ -1,4 +1,5 @@
 import { createClient } from "redis"
+import { toAppError } from "./error-utils"
 
 /**
  * Redis client for caching image search results
@@ -22,13 +23,12 @@ async function getRedisClient() {
   })
 
   // Optional: handle errors silently or via a proper logger in the future
-  // redisClient.on("error", () => {})
+  // redisClient.on("error", () =toAppError(error, "Redis connect error")> {})
 
   try {
     await redisClient.connect()
-  } catch (err) {
-    console.error("Redis connect error: ", err)
-    // Failed to connect; continue without Redis
+  } catch (error) {
+    toAppError(error, "Redis connect error")
   }
 
   return redisClient
@@ -68,7 +68,7 @@ export async function cacheImageSearchResults(
     const key = getCacheKey(productName, source)
     await client.setEx(key, ttlSeconds, JSON.stringify(results))
   } catch (err) {
-    console.log("err: ", err)
+    toAppError(err, "Failed to cache image search results")
   }
 }
 
@@ -85,7 +85,7 @@ export async function getCachedImageSearchResults(
     const cached = await client.get(key)
     return cached ? JSON.parse(cached) : null
   } catch (err) {
-    console.log("err: ", err)
+    toAppError(err, "Failed to retrieve cached image search results")
     return null
   }
 }
@@ -103,7 +103,7 @@ export async function cacheApiQuota(
     const key = getQuotaCacheKey(source)
     await client.setEx(key, ttlSeconds, JSON.stringify(quota))
   } catch (err) {
-    console.log("err: ", err)
+    toAppError(err, "Failed to cache API quota")
   }
 }
 
@@ -116,8 +116,8 @@ export async function getCachedApiQuota(source: string): Promise<ApiQuotaInfo | 
     const key = getQuotaCacheKey(source)
     const cached = await client.get(key)
     return cached ? JSON.parse(cached) : null
-  } catch (err) {
-    console.error("err: ", err)
+  } catch (error) {
+    toAppError(error, "Get cached api quota failed")
     return null
   }
 }

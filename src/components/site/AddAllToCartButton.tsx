@@ -7,6 +7,7 @@ import { toast } from "sonner"
 import { batchAddToCartAction } from "@/app/actions/cart"
 import { Button } from "@/components/ui/button"
 import { useSession } from "@/lib/auth-client"
+import { toAppError } from "@/lib/error-utils"
 import type { SessionUser } from "@/lib/query-types"
 
 interface AddAllToCartButtonProps {
@@ -49,9 +50,9 @@ export default function AddAllToCartButton({
       // Refresh the page to update cart count and other server components
       router.refresh()
     } catch (err) {
-      const message = err instanceof Error ? err.message : "Failed to add items to cart"
-      setError(message)
-      toast.error(message)
+      toAppError(err, "Failed to add items to cart")
+      setError("Failed to add items to cart")
+      toast.error("Failed to add items to cart")
     } finally {
       setLoading(false)
     }

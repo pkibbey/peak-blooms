@@ -1,5 +1,6 @@
 import { generateDescriptionPrompt, type ProductType } from "@/lib/ai-description-templates"
 import { db } from "@/lib/db"
+import { toAppError } from "@/lib/error-utils"
 
 export const maxDuration = 300
 
@@ -29,7 +30,6 @@ export async function POST(request: Request): Promise<Response> {
     // Check that Hugging Face API key is configured
     const hfApiKey = process.env.HUGGINGFACE_API_KEY
     if (!hfApiKey) {
-      console.error("[Batch Generate Descriptions API] HUGGINGFACE_API_KEY not configured")
       return Response.json({ error: "Hugging Face API key not configured" }, { status: 500 })
     }
 
@@ -64,7 +64,6 @@ export async function POST(request: Request): Promise<Response> {
     }
 
     // Fetch up to 10 products without descriptions (null or empty string)
-    console.info("[Batch Generate Descriptions API] Fetching next 10 products without descriptions")
     const productsToProcess = await db.product.findMany({
       where: whereClause,
       select: {
@@ -78,10 +77,6 @@ export async function POST(request: Request): Promise<Response> {
       take: 10,
     })
 
-    console.info(
-      `[Batch Generate Descriptions API] Processing ${productsToProcess.length} products`
-    )
-
     const result: BatchGenerateResult = {
       success: true,
       totalProcessed: productsToProcess.length,
@@ -93,10 +88,6 @@ export async function POST(request: Request): Promise<Response> {
     // Process each product sequentially
     for (const product of productsToProcess) {
       try {
-        console.info(
-          `[Batch Generate Descriptions API] Processing product: ${product.name} (${product.id})`
-        )
-
         // Generate the prompt for the LLM
         const userPrompt = generateDescriptionPrompt(
           product.name,
@@ -121,12 +112,7 @@ export async function POST(request: Request): Promise<Response> {
         })
 
         if (!hfResp.ok) {
-          const errorText = await hfResp.text()
           const errorMessage = `Hugging Face error: ${hfResp.status}`
-          console.error(
-            `[Batch Generate Descriptions API] Failed to generate for ${product.name}:`,
-            errorText
-          )
           result.failureCount++
           result.details.push({
             productId: product.id,
@@ -142,10 +128,6 @@ export async function POST(request: Request): Promise<Response> {
 
         if (!generated) {
           const errorMessage = "Hugging Face generated empty response"
-          console.error(
-            `[Batch Generate Descriptions API] Empty response for ${product.name}:`,
-            hfJson
-          )
           result.failureCount++
           result.details.push({
             productId: product.id,
@@ -157,7 +139,6 @@ export async function POST(request: Request): Promise<Response> {
         }
 
         // Update the product with the generated description
-        console.info(`[Batch Generate Descriptions API] Saving description for ${product.name}`)
         await db.product.update({
           where: { id: product.id },
           data: { description: generated },
@@ -169,11 +150,8 @@ export async function POST(request: Request): Promise<Response> {
           productName: product.name,
           success: true,
         })
-
-        console.info(`[Batch Generate Descriptions API] Successfully processed ${product.name}`)
       } catch (err) {
         const errorMessage = err instanceof Error ? err.message : String(err)
-        console.error(`[Batch Generate Descriptions API] Error processing ${product.name}:`, err)
         result.failureCount++
         result.details.push({
           productId: product.id,
@@ -184,14 +162,9 @@ export async function POST(request: Request): Promise<Response> {
       }
     }
 
-    console.info(
-      `[Batch Generate Descriptions API] Batch complete: ${result.successCount}/${result.totalProcessed} successful`
-    )
-
     return Response.json(result)
   } catch (err) {
-    const errorMessage = err instanceof Error ? err.message : String(err)
-    console.error("[Batch Generate Descriptions API] Unexpected error:", err)
-    return Response.json({ error: `Unexpected error: ${errorMessage}` }, { status: 500 })
+    const error = toAppError(err, "Batch Generate Descriptions failed")
+    return Response.json({ error }, { status: 500 })
   }
 }

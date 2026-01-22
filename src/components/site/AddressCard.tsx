@@ -7,6 +7,7 @@ import { deleteAddressAction, updateAddressAction } from "@/app/actions/user-act
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { IconEdit, IconStar, IconTrash } from "@/components/ui/icons"
+import { toAppError } from "@/lib/error-utils"
 import type { AddressFull } from "@/lib/query-types"
 
 interface AddressCardProps {
@@ -32,7 +33,8 @@ export default function AddressCard({ address, onEdit }: AddressCardProps) {
       toast.success("Address deleted")
       router.refresh()
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : "Failed to delete address")
+      toAppError(error, "Failed to delete address")
+      toast.error("Failed to delete address")
     } finally {
       setIsDeleting(false)
     }
@@ -51,7 +53,8 @@ export default function AddressCard({ address, onEdit }: AddressCardProps) {
       toast.success("Default address updated")
       router.refresh()
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : "Failed to set default address")
+      toAppError(error, "Failed to set default address")
+      toast.error("Failed to set default address")
     } finally {
       setIsSettingDefault(false)
     }

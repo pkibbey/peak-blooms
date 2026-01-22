@@ -3,6 +3,7 @@
 import { toast } from "sonner"
 import { Button } from "@/components/ui/button"
 import { authClient } from "@/lib/auth-client"
+import { toAppError } from "@/lib/error-utils"
 
 type Props = {
   onDone?: () => void
@@ -15,9 +16,9 @@ export default function SignInWithGoogle({ onDone }: Props) {
         provider: "google",
       })
       onDone?.()
-    } catch (error) {
+    } catch (_error) {
+      toAppError(_error, "Failed to sign in")
       toast.error("Failed to sign in")
-      console.error("[SignIn] Error during Google sign-in:", error)
     }
   }
 

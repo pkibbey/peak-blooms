@@ -7,6 +7,7 @@ import { toast } from "sonner"
 import { batchGenerateDescriptionsAction } from "@/app/admin/products/actions"
 import { Button } from "@/components/ui/button"
 import { IconRefresh } from "@/components/ui/icons"
+import { toAppError } from "@/lib/error-utils"
 
 interface ProductFilters {
   filterDescription?: "has" | "missing"
@@ -48,8 +49,8 @@ export function BatchGenerateDescriptionsButton({
           toast.error("Batch generation failed")
         }
       } catch (error) {
-        const errorMessage = error instanceof Error ? error.message : "An error occurred"
-        toast.error(errorMessage)
+        toAppError(error, "Failed to generate description")
+        toast.error("Failed to generate description")
       }
     })
   }

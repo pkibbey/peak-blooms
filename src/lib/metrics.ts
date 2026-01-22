@@ -6,6 +6,7 @@
 import type { Metric } from "@/generated/client"
 import type { MetricType } from "@/generated/enums"
 import { db } from "@/lib/db"
+import { toAppError } from "./error-utils"
 
 /**
  * Capture a metric by recording its type, name, and duration
@@ -26,8 +27,8 @@ export async function captureMetric(
         duration,
       },
     })
-  } catch (_error) {
-    // Silently fail if metrics can't be saved - don't break the app
+  } catch (error) {
+    toAppError(error, "Failed to save metric")
   }
 }
 
@@ -40,7 +41,7 @@ export async function getAllMetrics(): Promise<Metric[]> {
       orderBy: { createdAt: "desc" },
     })
   } catch (error) {
-    console.error("Failed to fetch metrics:", error)
+    toAppError(error, "Failed to fetch metrics")
     return []
   }
 }
@@ -52,6 +53,6 @@ export async function clearMetrics(): Promise<void> {
   try {
     await db.metric.deleteMany({})
   } catch (error) {
-    console.error("Failed to clear metrics:", error)
+    toAppError(error, "Failed to clear metrics")
   }
 }

@@ -10,6 +10,7 @@ import { Form, FormControl, FormField, FormItem, FormMessage } from "@/component
 import { IconX } from "@/components/ui/icons"
 import { Input } from "@/components/ui/input"
 import { useSession } from "@/lib/auth-client"
+import { toAppError } from "@/lib/error-utils"
 import {
   type NewsletterSubscribeFormData,
   newsletterSubscribeSchema,
@@ -54,8 +55,8 @@ export function NewsletterBanner() {
       setTimeout(() => {
         handleDismiss()
       }, 3000)
-    } catch (error) {
-      console.error("Newsletter subscribe error:", error)
+    } catch (_error) {
+      toAppError(_error, "Image upload failed")
       toast.error("Something went wrong. Please try again.")
     } finally {
       setIsSubmitting(false)

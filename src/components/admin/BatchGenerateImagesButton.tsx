@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation"
 import { useState, useTransition } from "react"
 import { toast } from "sonner"
 import { Button } from "@/components/ui/button"
+import { toAppError } from "@/lib/error-utils"
 
 interface ProductFilters {
   filterDescription?: "has" | "missing"
@@ -158,8 +159,8 @@ export function BatchGenerateImagesButton({
                   productSuccess = false
                 }
               } catch (err) {
-                const msg = err instanceof Error ? err.message : String(err)
-                toast.error(`Failed to upload image for ${product.name}: ${msg}`)
+                toAppError(err, `Failed to upload image for ${product.name}`)
+                toast.error(`Failed to upload image for ${product.name}`)
                 productSuccess = false
               }
             }
@@ -177,8 +178,8 @@ export function BatchGenerateImagesButton({
             // Refresh UI after each product
             startTransition(() => router.refresh())
           } catch (err) {
-            const msg = err instanceof Error ? err.message : String(err)
-            toast.error(`Error processing ${product.name}: ${msg}`)
+            toAppError(err, `Error processing ${product.name}`)
+            toast.error(`Error processing ${product.name}`)
             setProgress((p) => ({
               ...p,
               processed: p.processed + 1,
@@ -189,8 +190,8 @@ export function BatchGenerateImagesButton({
         toast.success(`Generated and saved images for ${successCount} products`)
         setProgress((p) => ({ ...p, isRunning: false }))
       } catch (error) {
-        const errorMessage = error instanceof Error ? error.message : "An error occurred"
-        toast.error(errorMessage)
+        toAppError(error, "Failed to generate and save images")
+        toast.error("Failed to generate and save images")
         setProgress((p) => ({ ...p, isRunning: false }))
       }
     })()

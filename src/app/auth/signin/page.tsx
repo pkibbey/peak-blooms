@@ -2,22 +2,11 @@
 
 import Link from "next/link"
 import { useSearchParams } from "next/navigation"
-import { Button } from "@/components/ui/button"
-import { authClient } from "@/lib/auth-client"
+import SignInWithGoogle from "@/components/site/SignInWithGoogle"
 
 export default function SignInPage() {
   const searchParams = useSearchParams()
   const error = searchParams.get("error")
-
-  const handleGoogleSignIn = async () => {
-    try {
-      await authClient.signIn.social({
-        provider: "google",
-      })
-    } catch (error) {
-      console.error("[SignIn] Error during Google sign-in:", error)
-    }
-  }
 
   return (
     <div className="flex items-center justify-center px-4 py-12">
@@ -36,9 +25,7 @@ export default function SignInPage() {
           </div>
         )}
 
-        <Button onClick={handleGoogleSignIn} className="w-full">
-          Sign in with Google
-        </Button>
+        <SignInWithGoogle />
 
         <p className="text-center text-xs text-muted-foreground">
           By signing in, you agree to our terms of service.

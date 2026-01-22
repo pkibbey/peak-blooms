@@ -27,6 +27,7 @@ import { IconTrash } from "@/components/ui/icons"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import type { CollectionModel, ProductModel } from "@/generated/models"
+import { toAppError } from "@/lib/error-utils"
 import { saveOnBlur } from "@/lib/saveOnBlur"
 import { type CollectionFormData, collectionSchema } from "@/lib/validations/collection"
 
@@ -99,10 +100,9 @@ export default function CollectionForm({ collection, products = [] }: Collection
         router.push("/admin/collections")
         router.refresh()
       }
-    } catch (err) {
+    } catch (_err) {
       const errorMessage = "An error occurred. Please try again."
       form.setError("root", { message: errorMessage })
-      console.error(err)
     }
   }
 
@@ -149,8 +149,8 @@ export default function CollectionForm({ collection, products = [] }: Collection
       router.push("/admin/collections")
       router.refresh()
     } catch (err) {
+      toAppError(err, "Failed to delete collection")
       toast.error("Failed to delete collection. Please try again.")
-      console.error(err)
     } finally {
       setIsDeleting(false)
     }

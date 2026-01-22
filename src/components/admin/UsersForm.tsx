@@ -24,6 +24,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
+import { toAppError } from "@/lib/error-utils"
 
 interface UsersFormValues {
   email: string
@@ -67,9 +68,9 @@ export function UsersForm() {
       toast.success("User created successfully")
       router.push("/admin/users")
       router.refresh()
-    } catch (error) {
+    } catch (_error) {
+      toAppError(_error, "Failed to create user")
       toast.error("Failed to create user")
-      console.error(error)
     } finally {
       setIsSubmitting(false)
     }

@@ -36,6 +36,8 @@ export function toAppError(
   error: unknown,
   defaultMessage: string = "An unexpected error occurred"
 ): AppError {
+  const isProd = process.env.NODE_ENV === "production"
+
   if (isZodError(error)) {
     // Extract first validation error for brief message
     const firstIssue = error.issues[0]
@@ -45,9 +47,11 @@ export function toAppError(
 
     return {
       success: false,
-      error: message,
+      error: isProd ? defaultMessage : message,
       code: "VALIDATION_ERROR",
-      details: error.flatten().fieldErrors as Record<string, string | string[]>,
+      details: isProd
+        ? undefined
+        : (error.flatten().fieldErrors as Record<string, string | string[]>),
     }
   }
 
@@ -55,28 +59,28 @@ export function toAppError(
     // Try to extract structured error info if available
     const message = error.message || defaultMessage
 
-    // Check for specific error patterns
+    // Check for specific error patterns and map to codes
     if (message.includes("Unauthorized")) {
-      return { success: false, error: message, code: "UNAUTHORIZED" }
+      return { success: false, error: isProd ? defaultMessage : message, code: "UNAUTHORIZED" }
     }
     if (message.includes("Forbidden")) {
-      return { success: false, error: message, code: "FORBIDDEN" }
+      return { success: false, error: isProd ? defaultMessage : message, code: "FORBIDDEN" }
     }
     if (message.includes("not found")) {
-      return { success: false, error: message, code: "NOT_FOUND" }
+      return { success: false, error: isProd ? defaultMessage : message, code: "NOT_FOUND" }
     }
     if (message.includes("already exists")) {
-      return { success: false, error: message, code: "CONFLICT" }
+      return { success: false, error: isProd ? defaultMessage : message, code: "CONFLICT" }
     }
 
-    return { success: false, error: message, code: "SERVER_ERROR" }
+    return { success: false, error: isProd ? defaultMessage : message, code: "SERVER_ERROR" }
   }
 
   const message = typeof error === "string" ? error : defaultMessage
 
   return {
     success: false,
-    error: message,
+    error: isProd ? defaultMessage : message,
     code: "SERVER_ERROR",
   }
 }

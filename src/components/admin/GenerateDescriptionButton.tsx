@@ -6,6 +6,7 @@ import { toast } from "sonner"
 import { Button } from "@/components/ui/button"
 import { IconRefresh } from "@/components/ui/icons"
 import type { ProductType } from "@/generated/enums"
+import { toAppError } from "@/lib/error-utils"
 
 interface GenerateDescriptionButtonProps {
   productName: string
@@ -57,9 +58,8 @@ export function GenerateDescriptionButton({
         throw new Error("No description generated")
       }
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : "An error occurred"
-      console.error("[GenerateDescriptionButton] Error:", errorMessage)
-      toast.error(errorMessage)
+      toAppError(error, "Failed to generate description")
+      toast.error("Failed to generate description")
     } finally {
       setIsLoading(false)
     }

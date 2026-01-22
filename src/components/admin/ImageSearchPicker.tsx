@@ -13,6 +13,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog"
+import { toAppError } from "@/lib/error-utils"
 import type { ImageSearchResult } from "@/lib/image-cache"
 
 interface ImageSearchPickerProps {
@@ -45,13 +46,13 @@ export function ImageSearchPicker({
       }
 
       setSearchResults({
-        pixabay: result.results?.pixabay.images || [],
-        unsplash: result.results?.unsplash.images || [],
-        pexels: result.results?.pexels.images || [],
+        pixabay: result.data?.pixabay.images || [],
+        unsplash: result.data?.unsplash.images || [],
+        pexels: result.data?.pexels.images || [],
       })
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : "Failed to search for images"
-      toast.error(errorMessage)
+      toAppError(error, "Failed to search for images")
+      toast.error("Failed to search for images")
     } finally {
       setLoading(false)
     }
@@ -69,8 +70,8 @@ export function ImageSearchPicker({
       setSearchResults(null)
       toast.success("Image selected successfully")
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : "Failed to select image"
-      toast.error(errorMessage)
+      toAppError(error, "Failed to select image")
+      toast.error("Failed to select image")
     }
   }
 

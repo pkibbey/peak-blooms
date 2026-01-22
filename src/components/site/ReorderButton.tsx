@@ -5,6 +5,7 @@ import { toast } from "sonner"
 import { batchAddToCartAction } from "@/app/actions/cart"
 import { Button } from "@/components/ui/button"
 import { IconRefresh } from "@/components/ui/icons"
+import { toAppError } from "@/lib/error-utils"
 import type { OrderWithItems } from "@/lib/query-types"
 
 interface ReorderButtonProps {
@@ -46,7 +47,8 @@ export default function ReorderButton({ order }: ReorderButtonProps) {
       // Use full page navigation to ensure cart state is updated on client and server
       window.location.href = "/cart"
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : "Failed to reorder")
+      toAppError(error, "Failed to reorder")
+      toast.error("Failed to reorder")
     } finally {
       setIsLoading(false)
     }

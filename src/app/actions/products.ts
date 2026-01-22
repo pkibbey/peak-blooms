@@ -28,7 +28,6 @@ export async function createProductAction(
     const session = await getSession()
 
     if (!session?.user || session.user.role !== "ADMIN") {
-      console.error("[createProductAction] Not authorized")
       return {
         success: false,
         error: "You must be an admin to create products",
@@ -60,8 +59,6 @@ export async function createProductAction(
       data: product,
     }
   } catch (error) {
-    const errorMessage = error instanceof Error ? error.message : String(error)
-    console.error("[createProductAction] Error:", errorMessage, error)
     return toAppError(error, "Failed to create product")
   }
 }
@@ -74,7 +71,6 @@ export async function updateProductAction(
     const session = await getSession()
 
     if (!session?.user || session.user.role !== "ADMIN") {
-      console.error("[updateProductAction] Not authorized")
       return {
         success: false,
         error: "You must be an admin to update products",

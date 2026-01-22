@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation"
 import { useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { authClient, useSession } from "@/lib/auth-client"
+import { toAppError } from "@/lib/error-utils"
 
 export default function SignUpPage() {
   const router = useRouter()
@@ -24,7 +25,7 @@ export default function SignUpPage() {
         callbackURL: "/",
       })
     } catch (error) {
-      console.error("[SignUp] Error during Google sign-up:", error)
+      toAppError(error, "Error during Google sign-up")
     }
   }
 

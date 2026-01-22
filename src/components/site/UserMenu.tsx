@@ -21,6 +21,7 @@ import {
   IconUser,
 } from "@/components/ui/icons"
 import { authClient, signOut } from "@/lib/auth-client"
+import { toAppError } from "@/lib/error-utils"
 import type { SessionUser } from "@/lib/query-types"
 
 interface UserMenuProps {
@@ -36,9 +37,9 @@ export default function UserMenu({ user }: UserMenuProps) {
       await authClient.signIn.social({
         provider: "google",
       })
-    } catch (error) {
+    } catch (_error) {
+      toAppError(_error, "Failed to sign in")
       toast.error("Failed to sign in")
-      console.error("[SignIn] Error during Google sign-in:", error)
     }
   }
 

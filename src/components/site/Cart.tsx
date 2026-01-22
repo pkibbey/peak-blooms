@@ -12,6 +12,7 @@ import { MarketPriceWarning } from "@/components/site/MarketPriceWarning"
 import { Button } from "@/components/ui/button"
 import { IconShoppingBag } from "@/components/ui/icons"
 import { calculateCartTotal, calculateMinimumTotal } from "@/lib/cart-utils"
+import { toAppError } from "@/lib/error-utils"
 import type { CartResponse } from "@/lib/query-types"
 import { useDebouncedCallback } from "@/lib/useDebouncedCallback"
 
@@ -40,8 +41,8 @@ export default function Cart({ initialCart }: CartProps) {
         toast.error(result.error || "Failed to update quantity")
       }
     } catch (error) {
-      console.error("Error updating quantity:", error)
-      toast.error(error instanceof Error ? error.message : "Failed to update quantity")
+      toAppError(error, "Failed to update quantity")
+      toast.error("Failed to update quantity")
     } finally {
       setUpdatingItems((prev) => {
         const next = new Set(prev)
@@ -88,8 +89,8 @@ export default function Cart({ initialCart }: CartProps) {
         router.refresh()
       }
     } catch (error) {
-      console.error("Error removing item:", error)
-      toast.error(error instanceof Error ? error.message : "Failed to remove item")
+      toAppError(error, "Failed to remove item")
+      toast.error("Failed to remove item")
       // Refresh to revert on error
       router.refresh()
     } finally {
@@ -123,8 +124,8 @@ export default function Cart({ initialCart }: CartProps) {
         setCart(previousCart)
       }
     } catch (err) {
-      console.error("Error clearing cart:", err)
-      toast.error(err instanceof Error ? err.message : "Failed to clear cart")
+      toAppError(err, "Failed to clear cart")
+      toast.error("Failed to clear cart")
       // revert
       setCart(previousCart)
     }
@@ -180,7 +181,7 @@ export default function Cart({ initialCart }: CartProps) {
               <span className="text-muted-foreground">
                 Subtotal ({cart.items.reduce((sum, item) => sum + item.quantity, 0)} items)
               </span>
-              <MarketPriceIndicator items={cart.items} total={total} />
+              <MarketPriceIndicator total={total} />
             </div>
             <div className="flex justify-between">
               <span className="text-muted-foreground">Delivery</span>
@@ -192,7 +193,7 @@ export default function Cart({ initialCart }: CartProps) {
 
           <div className="flex justify-between font-semibold text-lg mb-4">
             <span>Total</span>
-            <MarketPriceIndicator items={cart.items} total={total} size="sm" />
+            <MarketPriceIndicator total={total} />
           </div>
 
           <MarketPriceWarning

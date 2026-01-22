@@ -1,4 +1,5 @@
 import type { FieldValues, UseFormReturn } from "react-hook-form"
+import { toAppError } from "./error-utils"
 
 /**
  * Utility function to handle save-on-blur for form fields.
@@ -31,8 +32,7 @@ export async function saveOnBlur<T extends FieldValues>({
       try {
         await onSave(currentData)
       } catch (error) {
-        console.error(`Error saving ${fieldName || "field"}:`, error)
-        // Error handling (toasts, etc.) is done in the onSave callback
+        toAppError(error, `Error saving ${fieldName || "field"}`)
       }
     }
   }

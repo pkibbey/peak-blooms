@@ -3,12 +3,11 @@ import Link from "next/link"
 import { getCartAction } from "@/app/actions/cart"
 import NavLink from "@/components/site/NavLink"
 import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
-// import UserMenu from "@/components/site/UserMenu"
-import { IconSearch, IconShoppingCart } from "@/components/ui/icons"
+import { IconShoppingCart } from "@/components/ui/icons"
 import { getCurrentUser } from "@/lib/current-user"
+import { getFeaturedProducts } from "@/lib/data"
 import MobileNav from "./MobileNav"
-import NavSearch from "./NavSearch"
+import SearchDialog from "./SearchDialog"
 import UserMenu from "./UserMenu"
 
 const links = [
@@ -20,6 +19,8 @@ const links = [
 export default async function Nav() {
   const user = await getCurrentUser()
   const isApproved = user?.approved === true
+
+  const featuredProducts = await getFeaturedProducts(1, 3)
 
   // Fetch cart count for approved users (sum of item quantities, not unique item count)
   // Only get the cart if it exists - don't create one just for displaying the count
@@ -66,16 +67,12 @@ export default async function Nav() {
             </nav>
           </div>
 
-          {/* Nav search autocomplete */}
-          <div className="flex-1">
-            <NavSearch />
-          </div>
+          {/* Center spacer (search moved into dialog) */}
+          <div className="flex-1" />
 
           <div className="flex items-center gap-4">
-            {/* Mobile search button */}
-            <Button size="icon" variant="ghost" className="md:hidden" aria-label="Search products">
-              <IconSearch aria-hidden="true" />
-            </Button>
+            {/* Search dialog trigger (works on desktop & mobile) */}
+            <SearchDialog featuredProducts={featuredProducts} />
 
             {isApproved && (
               <div className="hidden md:block">

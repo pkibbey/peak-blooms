@@ -4,6 +4,7 @@
 - Add e2e tests to ensure complete site functionality
 - make sure user flow for sign up works
 
+
 ### 🌟 Next Steps
 
 - Setup domain

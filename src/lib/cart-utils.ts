@@ -31,7 +31,7 @@ export function calculateCartTotal(cartItems: CartItemForTotal[]) {
 export function calculateMinimumTotal(cartItems: CartItemForTotal[]) {
   const total = cartItems.reduce((sum, item) => {
     // Support either `item.price` (orderItem) or `item.product?.price` (cart item)
-    const rawPrice = (item as any).price ?? item.product?.price ?? 0
+    const rawPrice = item.product?.price || 0
     const effectivePrice = rawPrice === 0 ? 10 : rawPrice
     return sum + effectivePrice * item.quantity
   }, 0)

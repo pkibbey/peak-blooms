@@ -38,6 +38,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group"
 import { ProductType } from "@/generated/enums"
 import type { CollectionModel } from "@/generated/models"
+import { toAppError } from "@/lib/error-utils"
 import { PRODUCT_TYPE_LABELS, PRODUCT_TYPES } from "@/lib/product-types"
 import { type ProductFormData, productSchema } from "@/lib/validations/product"
 
@@ -124,10 +125,8 @@ export default function ProductForm({ collections, product }: ProductFormProps) 
         toast.success("Product created successfully")
       }
     } catch (err) {
-      const errorMessage =
-        err instanceof Error ? err.message : "An error occurred. Please try again."
-      form.setError("root", { message: errorMessage })
-      // error set on form state
+      toAppError(err, `Failed to save changes`)
+      form.setError("root", { message: `Failed to save changes` })
     }
   }
 
@@ -178,10 +177,8 @@ export default function ProductForm({ collections, product }: ProductFormProps) 
       router.push("/admin/products")
       router.refresh()
     } catch (err) {
-      const errorMessage =
-        err instanceof Error ? err.message : "Failed to delete product. Please try again."
-      form.setError("root", { message: errorMessage })
-      // error saved to form
+      toAppError(err, "Failed to delete product")
+      form.setError("root", { message: "Failed to delete product. Please try again." })
     } finally {
       setIsDeleting(false)
     }

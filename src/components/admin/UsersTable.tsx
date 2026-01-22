@@ -19,6 +19,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
+import { toAppError } from "@/lib/error-utils"
 import type { UserForAdmin } from "@/lib/query-types"
 import { formatDate, MAX_PRICE_MULTIPLIER, MIN_PRICE_MULTIPLIER } from "@/lib/utils"
 
@@ -62,8 +63,8 @@ export default function UsersTable({ users, sort, order }: UsersTableProps) {
       toast.success("Price multiplier updated")
       setEditingId(null)
       router.refresh()
-    } catch (error) {
-      console.error("Error updating multiplier:", error)
+    } catch (_error) {
+      toAppError(_error, "Failed to update price multiplier")
       toast.error("Failed to update price multiplier")
     } finally {
       setLoadingId(null)
@@ -80,8 +81,8 @@ export default function UsersTable({ users, sort, order }: UsersTableProps) {
       }
       toast.success("User approved")
       router.refresh()
-    } catch (error) {
-      console.error("Error approving user:", error)
+    } catch (_error) {
+      toAppError(_error, "Failed to approve user")
       toast.error("Failed to approve user")
     } finally {
       setLoadingId(null)
@@ -98,8 +99,8 @@ export default function UsersTable({ users, sort, order }: UsersTableProps) {
       }
       toast.success("User access revoked")
       router.refresh()
-    } catch (error) {
-      console.error("Error unapproving user:", error)
+    } catch (_error) {
+      toAppError(_error, "Failed to unapprove user")
       toast.error("Failed to unapprove user")
     } finally {
       setLoadingId(null)

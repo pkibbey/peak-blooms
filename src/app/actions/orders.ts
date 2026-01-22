@@ -249,7 +249,7 @@ export async function createOrderAction(
     // For validation we treat market-priced items (price === 0) as $10 each.
     const minimumTotal = calculateMinimumTotal(
       cart.items.map((it) => ({
-        price: adjustPrice(it.product?.price ?? 0, priceMultiplier),
+        product: { price: adjustPrice(it.product?.price ?? 0, priceMultiplier) },
         quantity: it.quantity,
       }))
     )
