@@ -12,9 +12,13 @@ describe("FeaturedCollections component", () => {
       new Error("DB error")
     )
 
+    // Suppress console errors for this intentional error test
+    const consoleSpy = vi.spyOn(console, "error").mockImplementation(() => {})
+
     const Comp = await FeaturedCollections()
     const { container } = render(Comp as ReactElement)
 
     expect(container).toHaveTextContent("No featured collections available.")
+    consoleSpy.mockRestore()
   })
 })

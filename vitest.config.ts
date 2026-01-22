@@ -6,6 +6,11 @@ export default defineConfig({
     environment: "jsdom",
     globals: true,
     setupFiles: ["./src/test/setup.ts"],
+    env: {
+      // Mock DATABASE_URL for tests to prevent "not set" errors
+      // The actual database is not used due to mocking in setup.ts
+      DATABASE_URL: "postgresql://test:test@localhost:5432/test",
+    },
     alias: {
       "@": path.resolve(__dirname, "./src"),
     },

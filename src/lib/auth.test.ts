@@ -124,7 +124,10 @@ describe("Auth Module", () => {
         new Error("Database connection failed")
       )
 
+      // Suppress console errors for this intentional error test
+      const consoleSpy = vi.spyOn(console, "error").mockImplementation(() => {})
       await expect(invalidateUserSessions("user-1")).rejects.toThrow("Database connection failed")
+      consoleSpy.mockRestore()
     })
 
     it("should handle concurrent invalidation calls", async () => {
