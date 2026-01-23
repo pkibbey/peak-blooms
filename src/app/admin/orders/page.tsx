@@ -1,5 +1,7 @@
+import Link from "next/link"
 import OrdersTable from "@/components/admin/OrdersTable"
 import BackLink from "@/components/site/BackLink"
+import { Button } from "@/components/ui/button"
 import { OrderStatus } from "@/generated/enums"
 import { calculateCartTotal } from "@/lib/cart-utils"
 import { getTrackedDb } from "@/lib/db"
@@ -81,7 +83,10 @@ export default async function AdminOrdersPage({ searchParams }: AdminOrdersPageP
 
   return (
     <>
-      <BackLink href="/admin" label="Dashboard" />
+      <div className="flex gap-2 justify-between">
+        <BackLink href="/admin" label="Dashboard" />
+        <Button nativeButton={false} render={<Link href="/admin/orders/new">New Order</Link>} />
+      </div>
       <div className="flex items-center justify-between mb-8">
         <div>
           <h1 className="heading-1">Orders</h1>

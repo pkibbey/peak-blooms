@@ -63,13 +63,13 @@ export function BatchGenerateDescriptionsButton({
     >
       {isPending ? (
         <>
-          <LoaderCircle className="mr-2 h-4 w-4 animate-spin" aria-hidden="true" />
+          <LoaderCircle className="h-4 w-4 animate-spin" aria-hidden="true" />
           Generating...
         </>
       ) : (
         <>
-          <Sparkles className="mr-2 h-4 w-4" />
-          Next {totalToGenerate} Description{totalToGenerate !== 1 && "s"}
+          <Sparkles className="h-4 w-4" />
+          Description{totalToGenerate !== 1 && "s"}
         </>
       )}
     </Button>

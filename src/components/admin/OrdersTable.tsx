@@ -110,6 +110,7 @@ export default function OrdersTable({ orders, currentStatus, sort, order }: Orde
                   currentSort={sort}
                   currentOrder={order}
                   href={headerUrl}
+                  className="hidden md:table-cell"
                 />
                 <SortableTableHead
                   label="Total"
@@ -117,7 +118,7 @@ export default function OrdersTable({ orders, currentStatus, sort, order }: Orde
                   currentSort={sort}
                   currentOrder={order}
                   href={headerUrl}
-                  className="text-right"
+                  className="hidden sm:table-cell text-right"
                 />
                 <TableHead>Actions</TableHead>
               </TableRow>
@@ -150,10 +151,10 @@ export default function OrdersTable({ orders, currentStatus, sort, order }: Orde
                     <TableCell className="hidden lg:table-cell text-muted-foreground">
                       {order._count.items}
                     </TableCell>
-                    <TableCell>
+                    <TableCell className="hidden md:table-cell">
                       <OrderStatusBadge status={order.status} />
                     </TableCell>
-                    <TableCell className="text-right font-medium">
+                    <TableCell className="hidden sm:table-cell text-right font-medium">
                       {formatPrice(calculateCartTotal(order.items))}
                     </TableCell>
                     <TableCell className="text-right">

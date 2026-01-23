@@ -21,6 +21,15 @@ export default async function AdminInspirationsPage({ searchParams }: AdminInspi
       _count: {
         select: { products: true },
       },
+      // include up to 4 related products (with images) so the table can render thumbnail previews
+      products: {
+        take: 4,
+        include: {
+          product: {
+            select: { id: true, name: true, images: true },
+          },
+        },
+      },
     },
     orderBy: {
       createdAt: "desc",
@@ -48,7 +57,14 @@ export default async function AdminInspirationsPage({ searchParams }: AdminInspi
 
   return (
     <>
-      <BackLink href="/admin" label="Dashboard" />
+      <div className="flex gap-2 justify-between">
+        <BackLink href="/admin" label="Dashboard" />
+        <Button
+          nativeButton={false}
+          render={<Link href="/admin/inspirations/new">New Inspiration</Link>}
+        />
+      </div>
+
       <div className="mb-8 flex items-center justify-between">
         <div>
           <h1 className="heading-1">Inspirations</h1>
@@ -56,10 +72,6 @@ export default async function AdminInspirationsPage({ searchParams }: AdminInspi
             Curate inspirations ({inspirations.length} total)
           </p>
         </div>
-        <Button
-          nativeButton={false}
-          render={<Link href="/admin/inspirations/new">Add New Inspiration</Link>}
-        />
       </div>
 
       {/* Inspirations Table */}

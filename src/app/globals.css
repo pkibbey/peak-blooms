@@ -137,4 +137,14 @@
   .heading-6 {
     @apply font-serif text-sm md:text-base lg:text-lg font-medium leading-snug tracking-wide;
   }
+
+  /* Subtle repeating, rotated icon pattern for admin sidebar */
+  .bg-admin-pattern {
+    /* rotated star polygon, low-opacity fill matching --primary */
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><g transform='rotate(-20 12 12)'><polygon points='12,2 15,9 22,9 17,14 19,21 12,17 5,21 7,14 2,9 9,9' fill='%23708B6C' fill-opacity='0.02'/></g></svg>");
+    background-repeat: repeat;
+    /* size controls spacing / padding around each icon */
+    background-size: 70px 70px;
+    background-position: 12px 12px;
+  }
 }

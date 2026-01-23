@@ -108,14 +108,8 @@ export default async function AdminProductsPage({ searchParams }: AdminProductsP
 
   return (
     <>
-      <BackLink href="/admin" label="Dashboard" />
-      <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <h1 className="heading-1">Products</h1>
-          <p className="mt-2 text-muted-foreground">
-            Manage your product catalog ({result.total} total)
-          </p>
-        </div>
+      <div className="flex gap-2 justify-between items-center">
+        <BackLink href="/admin" label="Dashboard" />
         <div className="flex flex-col flex-wrap justify-end gap-2 sm:flex-row">
           {productsMissingDescriptions > 0 && (
             <BatchGenerateDescriptionsButton
@@ -140,19 +134,25 @@ export default async function AdminProductsPage({ searchParams }: AdminProductsP
           )}
           <Button
             nativeButton={false}
-            render={<Link href="/admin/products/new">Add New Product</Link>}
+            render={<Link href="/admin/products/new">New Product</Link>}
           />
         </div>
       </div>
-
-      <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-        {/* Filters Sidebar */}
-        <div className="lg:col-span-1">
-          <ProductFilters productTypes={allProductTypes as ProductType[]} />
+      <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <h1 className="heading-1">Products</h1>
+          <p className="mt-2 text-muted-foreground">
+            Manage your product catalog ({result.total} total)
+          </p>
         </div>
+      </div>
+
+      <div className="grid sm:grid-cols-[236px_1fr] gap-6 items-start">
+        {/* Filters Sidebar */}
+        <ProductFilters productTypes={allProductTypes as ProductType[]} />
 
         {/* Products Section */}
-        <div className="lg:col-span-3">
+        <div>
           {/* Summary + Pagination */}
           {products.length > 0 && (
             <div className="flex items-center justify-between mb-4">

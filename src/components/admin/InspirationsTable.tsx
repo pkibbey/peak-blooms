@@ -4,8 +4,13 @@ import { SortableTableHead } from "@/components/ui/SortableTableHead"
 import { Table, TableBody, TableCell, TableHeader, TableRow } from "@/components/ui/table"
 import type { InspirationBasic } from "@/lib/query-types"
 
+// Allow optional product previews to be passed (first few products with images)
+type InspirationRow = InspirationBasic & {
+  products?: { product: { id: string; name?: string; images: string[] } }[]
+}
+
 interface InspirationsTableProps {
-  inspirations: InspirationBasic[]
+  inspirations: InspirationRow[]
   sort?: string | null
   order?: "asc" | "desc" | null
 }
@@ -54,12 +59,14 @@ export default function InspirationsTable({ inspirations, sort, order }: Inspira
               currentSort={sort}
               currentOrder={order}
               href={headerUrl}
+              className="hidden sm:table-cell"
             />
           </TableRow>
         </TableHeader>
         <TableBody>
           {inspirations.map((inspiration) => {
             const productCount = inspiration._count?.products || 0
+            const productPreviews = inspiration.products ?? []
 
             return (
               <TableRow key={inspiration.id}>
@@ -97,8 +104,42 @@ export default function InspirationsTable({ inspirations, sort, order }: Inspira
                   /{inspiration.slug}
                 </TableCell>
 
-                {/* Products Count */}
-                <TableCell className="text-muted-foreground">{productCount}</TableCell>
+                {/* Products */}
+                <TableCell className="hidden sm:table-cell">
+                  {productPreviews.length === 0 ? (
+                    <div className="text-muted-foreground">—</div>
+                  ) : (
+                    <div className="flex items-center">
+                      <div className="flex -space-x-2">
+                        {productPreviews.map((p) => (
+                          <div
+                            key={p.product.id}
+                            className="relative h-6 w-6 overflow-hidden rounded-sm ring-1 ring-border"
+                          >
+                            {p.product.images?.[0] ? (
+                              <Image
+                                src={p.product.images[0]}
+                                alt={p.product.name ?? ""}
+                                fill
+                                className="object-cover"
+                                sizes="24px"
+                              />
+                            ) : (
+                              <div className="flex h-full w-full items-center justify-center text-xs text-muted-foreground">
+                                —
+                              </div>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                      {productCount > productPreviews.length && (
+                        <span className="ml-2 text-xs text-muted-foreground">
+                          +{productCount - productPreviews.length}
+                        </span>
+                      )}
+                    </div>
+                  )}
+                </TableCell>
               </TableRow>
             )
           })}

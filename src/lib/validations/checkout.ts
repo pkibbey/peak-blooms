@@ -86,3 +86,21 @@ export const updateOrderItemPriceSchema = z.object({
 })
 
 export type UpdateOrderItemPriceInput = z.infer<typeof updateOrderItemPriceSchema>
+// Admin create order schema - for admins to manually create orders
+export const adminCreateOrderSchema = z.object({
+  userId: z.string().min(1, "User is required"),
+  deliveryAddressId: z.string().nullable(),
+  deliveryAddress: addressSchema.nullable(),
+  items: z
+    .array(
+      z.object({
+        productId: z.string().min(1, "Product is required"),
+        quantity: z.number().int().min(1, "Quantity must be at least 1"),
+        price: z.number().nonnegative("Price must be non-negative").optional(),
+      })
+    )
+    .min(1, "At least one item is required"),
+  notes: z.string().nullable().optional(),
+})
+
+export type AdminCreateOrderInput = z.infer<typeof adminCreateOrderSchema>

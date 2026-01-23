@@ -48,7 +48,14 @@ export default async function AdminCollectionsPage({ searchParams }: AdminCollec
 
   return (
     <>
-      <BackLink href="/admin" label="Dashboard" />
+      <div className="flex gap-2 justify-between">
+        <BackLink href="/admin" label="Dashboard" />
+        <Button
+          nativeButton={false}
+          render={<Link href="/admin/collections/new">New Collection</Link>}
+        />
+      </div>
+
       <div className="mb-8 flex items-center justify-between">
         <div>
           <h1 className="heading-1">Collections</h1>
@@ -56,10 +63,6 @@ export default async function AdminCollectionsPage({ searchParams }: AdminCollec
             Organize products into collections ({collections.length} total)
           </p>
         </div>
-        <Button
-          nativeButton={false}
-          render={<Link href="/admin/collections/new">Add New Collection</Link>}
-        />
       </div>
 
       {/* Collections Table */}

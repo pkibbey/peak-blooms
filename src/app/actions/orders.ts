@@ -7,6 +7,8 @@ import { db } from "@/lib/db"
 import type { CancelOrderResponse, OrderWithItems } from "@/lib/query-types"
 import { adjustPrice } from "@/lib/utils"
 import {
+  type AdminCreateOrderInput,
+  adminCreateOrderSchema,
   type CancelOrderInput,
   type CreateOrderInput,
   cancelOrderSchema,
@@ -348,6 +350,79 @@ export const updateOrderItemPriceAction = wrapAction(
       id: itemId,
       price,
       orderTotal: Math.round(newOrderTotal * 100) / 100,
+    }
+  }
+)
+/**
+ * Server action for admins to manually create orders
+ */
+export const adminCreateOrderAction = wrapAction(
+  async (data: AdminCreateOrderInput): Promise<OrderWithItems> => {
+    const user = await getCurrentUser()
+
+    if (!user || user.role !== "ADMIN") {
+      throw new Error("Unauthorized: You must be an admin to create orders")
+    }
+
+    const validatedData = adminCreateOrderSchema.parse(data)
+
+    // Verify the user exists
+    const targetUser = await db.user.findUnique({
+      where: { id: validatedData.userId },
+    })
+
+    if (!targetUser) {
+      throw new Error("User not found")
+    }
+
+    // Create the order
+    const order = await db.order.create({
+      data: {
+        userId: validatedData.userId,
+        status: "CART",
+        deliveryAddressId: validatedData.deliveryAddressId ?? undefined,
+        notes: validatedData.notes ?? null,
+      },
+    })
+
+    // Create order items
+    const createdItems = await Promise.all(
+      validatedData.items.map((item) =>
+        db.orderItem.create({
+          data: {
+            orderId: order.id,
+            productId: item.productId,
+            quantity: item.quantity,
+            price: item.price ?? 0, // 0 means market price to be set later
+          },
+          include: {
+            product: true,
+          },
+        })
+      )
+    )
+
+    // If a new delivery address is provided, create it and link it to the order
+    if (validatedData.deliveryAddress) {
+      const address = await db.address.create({
+        data: {
+          userId: validatedData.userId,
+          ...validatedData.deliveryAddress,
+        },
+      })
+
+      await db.order.update({
+        where: { id: order.id },
+        data: { deliveryAddressId: address.id },
+      })
+    }
+
+    revalidatePath("/admin/orders")
+
+    // Return the complete order with items
+    return {
+      ...order,
+      items: createdItems,
     }
   }
 )

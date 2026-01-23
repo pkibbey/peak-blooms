@@ -205,13 +205,13 @@ export function BatchGenerateImagesButton({
       >
         {isPending || progress.isRunning ? (
           <>
-            <LoaderCircle className="h-4 w-4 animate-spin mr-2" aria-hidden="true" />
+            <LoaderCircle className="h-4 w-4 animate-spin" aria-hidden="true" />
             Generating images...
           </>
         ) : (
           <>
-            <Sparkles className="mr-2 h-4 w-4" />
-            Next {totalToGenerate} Image{totalToGenerate !== 1 && "s"}
+            <Sparkles className="h-4 w-4" />
+            Image{totalToGenerate !== 1 && "s"}
           </>
         )}
       </Button>

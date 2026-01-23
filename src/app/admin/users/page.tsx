@@ -80,7 +80,13 @@ export default async function UsersPage({ searchParams }: AdminUsersPageProps) {
 
   return (
     <>
-      <BackLink href="/admin" label="Dashboard" />
+      <div className="flex gap-2 justify-between">
+        <BackLink href="/admin" label="Dashboard" />
+        <Link href="/admin/users/new">
+          <Button>New User</Button>
+        </Link>
+      </div>
+
       <div className="mb-8 flex items-start justify-between">
         <div>
           <h1 className="heading-1">User Management</h1>
@@ -89,9 +95,6 @@ export default async function UsersPage({ searchParams }: AdminUsersPageProps) {
             {approvedCount} approved)
           </p>
         </div>
-        <Link href="/admin/users/new">
-          <Button>New User</Button>
-        </Link>
       </div>
 
       <UsersTable users={users} sort={sort} order={sortOrder} />

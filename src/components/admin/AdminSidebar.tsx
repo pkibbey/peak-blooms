@@ -9,8 +9,6 @@ import {
   IconUser,
 } from "@/components/ui/icons"
 import { getTrackedDb } from "@/lib/db"
-import QuickActions from "./QuickActions"
-
 export default async function AdminSidebar() {
   const db = getTrackedDb(true)
 
@@ -22,97 +20,91 @@ export default async function AdminSidebar() {
   const inspirationCount = await db.inspiration.count()
 
   return (
-    <div className="space-y-4">
-      <nav className="rounded-lg border border-border p-4 bg-primary-foreground">
-        <h4 className="heading-4 mb-2">Navigation</h4>
+    <nav className="rounded-lg border border-border bg-primary-foreground px-4 py-3">
+      <ul className="flex flex-wrap items-center gap-4 text-sm">
+        <li>
+          <Link href="/admin" className="flex items-center gap-2 hover:underline">
+            <span className="flex items-center gap-2">
+              <IconStar className="h-4 w-4 text-muted-foreground" /> Dashboard
+            </span>
+          </Link>
+        </li>
 
-        <ul className="space-y-2 text-sm">
+        <li>
+          <Link href="/admin/orders" className="flex items-center gap-2 hover:underline">
+            <span className="flex items-center gap-2">
+              <IconClock className="h-4 w-4 text-muted-foreground" /> Orders
+            </span>
+            {pendingOrders > 0 && (
+              <Badge variant="secondary" className="ml-2">
+                {pendingOrders}
+              </Badge>
+            )}
+          </Link>
+        </li>
+
+        <li>
+          <Link href="/admin/products" className="flex items-center gap-2 hover:underline">
+            <span className="flex items-center gap-2">
+              <IconPackage className="h-4 w-4 text-muted-foreground" /> Products
+            </span>
+            {productCount > 0 && (
+              <Badge variant="secondary" className="ml-2">
+                {productCount}
+              </Badge>
+            )}
+          </Link>
+        </li>
+
+        <li>
+          <Link href="/admin/collections" className="flex items-center gap-2 hover:underline">
+            <span className="flex items-center gap-2">
+              <IconShoppingCart className="h-4 w-4 text-muted-foreground" /> Collections
+            </span>
+            {collectionCount > 0 && (
+              <Badge variant="secondary" className="ml-2">
+                {collectionCount}
+              </Badge>
+            )}
+          </Link>
+        </li>
+
+        <li>
+          <Link href="/admin/inspirations" className="flex items-center gap-2 hover:underline">
+            <span className="flex items-center gap-2">
+              <IconStar className="h-4 w-4 text-muted-foreground" /> Inspirations
+            </span>
+            {inspirationCount > 0 && (
+              <Badge variant="secondary" className="ml-2">
+                {inspirationCount}
+              </Badge>
+            )}
+          </Link>
+        </li>
+
+        <li>
+          <Link href="/admin/users" className="flex items-center gap-2 hover:underline">
+            <span className="flex items-center gap-2">
+              <IconUser className="h-4 w-4 text-muted-foreground" /> Users
+            </span>
+            {pendingApprovals > 0 && (
+              <Badge variant="secondary" className="ml-2">
+                {pendingApprovals}
+              </Badge>
+            )}
+          </Link>
+        </li>
+
+        {process.env.NODE_ENV === "development" && (
           <li>
-            <Link
-              href="/admin"
-              className="flex items-center justify-between w-full hover:underline"
-            >
+            <Link href="/admin/metrics" className="flex items-center gap-2 hover:underline">
               <span className="flex items-center gap-2">
-                <IconStar className="h-4 w-4 text-muted-foreground" /> Dashboard
+                <IconBarChart3 className="h-4 w-4 text-muted-foreground" /> Database Metrics
               </span>
             </Link>
           </li>
-
-          <li>
-            <Link
-              href="/admin/orders"
-              className="flex items-center justify-between w-full hover:underline"
-            >
-              <span className="flex items-center gap-2">
-                <IconClock className="h-4 w-4 text-muted-foreground" /> Orders
-              </span>
-              {pendingOrders > 0 && <Badge variant="secondary">{pendingOrders}</Badge>}
-            </Link>
-          </li>
-
-          <li>
-            <Link
-              href="/admin/products"
-              className="flex items-center justify-between w-full hover:underline"
-            >
-              <span className="flex items-center gap-2">
-                <IconPackage className="h-4 w-4 text-muted-foreground" /> Products
-              </span>
-              {productCount > 0 && <Badge variant="secondary">{productCount}</Badge>}
-            </Link>
-          </li>
-
-          <li>
-            <Link
-              href="/admin/collections"
-              className="flex items-center justify-between w-full hover:underline"
-            >
-              <span className="flex items-center gap-2">
-                <IconShoppingCart className="h-4 w-4 text-muted-foreground" /> Collections
-              </span>
-              {collectionCount > 0 && <Badge variant="secondary">{collectionCount}</Badge>}
-            </Link>
-          </li>
-
-          <li>
-            <Link
-              href="/admin/inspirations"
-              className="flex items-center justify-between w-full hover:underline"
-            >
-              <span className="flex items-center gap-2">
-                <IconStar className="h-4 w-4 text-muted-foreground" /> Inspirations
-              </span>
-              {inspirationCount > 0 && <Badge variant="secondary">{inspirationCount}</Badge>}
-            </Link>
-          </li>
-
-          <li>
-            <Link
-              href="/admin/users"
-              className="flex items-center justify-between w-full hover:underline"
-            >
-              <span className="flex items-center gap-2">
-                <IconUser className="h-4 w-4 text-muted-foreground" /> Users
-              </span>
-              {pendingApprovals > 0 && <Badge variant="secondary">{pendingApprovals}</Badge>}
-            </Link>
-          </li>
-
-          {process.env.NODE_ENV === "development" && (
-            <li>
-              <Link
-                href="/admin/metrics"
-                className="flex items-center justify-between w-full hover:underline"
-              >
-                <span className="flex items-center gap-2">
-                  <IconBarChart3 className="h-4 w-4 text-muted-foreground" /> Database Metrics
-                </span>
-              </Link>
-            </li>
-          )}
-        </ul>
-      </nav>
-      <QuickActions />
-    </div>
+        )}
+      </ul>
+    </nav>
   )
 }

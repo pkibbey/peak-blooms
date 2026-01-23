@@ -119,6 +119,7 @@ export default function UsersTable({ users, sort, order }: UsersTableProps) {
               currentSort={sort}
               currentOrder={order}
               href={headerUrl}
+              className="max-w-20 sm:max-w-none"
             />
             <SortableTableHead
               label="Email"
@@ -141,6 +142,7 @@ export default function UsersTable({ users, sort, order }: UsersTableProps) {
               currentSort={sort}
               currentOrder={order}
               href={headerUrl}
+              className="hidden sm:table-cell"
             />
             <SortableTableHead
               label="Status"
@@ -148,6 +150,7 @@ export default function UsersTable({ users, sort, order }: UsersTableProps) {
               currentSort={sort}
               currentOrder={order}
               href={headerUrl}
+              className="hidden lg:table-cell"
             />
             <SortableTableHead
               label="Joined"
@@ -164,8 +167,8 @@ export default function UsersTable({ users, sort, order }: UsersTableProps) {
           {users.map((user) => (
             <TableRow key={user.id}>
               {/* Name */}
-              <TableCell>
-                <p className="font-medium">{user.name || "—"}</p>
+              <TableCell className="max-w-20 sm:max-w-none">
+                <p className="font-medium truncate">{user.name || "—"}</p>
               </TableCell>
 
               {/* Email */}
@@ -179,7 +182,7 @@ export default function UsersTable({ users, sort, order }: UsersTableProps) {
               </TableCell>
 
               {/* Price Multiplier - Inline Editable */}
-              <TableCell>
+              <TableCell className="hidden sm:table-cell">
                 {editingId === user.id ? (
                   <div className="flex items-center gap-2">
                     <Input
@@ -221,7 +224,7 @@ export default function UsersTable({ users, sort, order }: UsersTableProps) {
               </TableCell>
 
               {/* Approval Status */}
-              <TableCell>
+              <TableCell className="hidden lg:table-cell">
                 <p className="text-sm">
                   {user.approved ? (
                     <span className="text-green-600 font-medium">Approved</span>
@@ -237,8 +240,8 @@ export default function UsersTable({ users, sort, order }: UsersTableProps) {
               </TableCell>
 
               {/* Actions */}
-              <TableCell className="text-right">
-                <div className="flex items-center justify-end gap-2">
+              <TableCell>
+                <div className="flex items-center gap-2">
                   {user.approved ? (
                     <Button
                       size="sm"

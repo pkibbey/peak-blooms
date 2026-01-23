@@ -1,7 +1,6 @@
 "use client"
 
 import { ChevronDown, X } from "lucide-react"
-import { useSearchParams } from "next/navigation"
 import { useCallback, useEffect, useState } from "react"
 import { FilterSection } from "@/components/filters/FilterSection"
 import { ColorSelector } from "@/components/site/ColorSelector"

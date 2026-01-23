@@ -33,7 +33,7 @@ interface ProductCardProps {
 
 const imageSizes = {
   xs: { container: "h-16 w-16", size: "64px" },
-  sm: { container: "h-24 w-24", size: "96px" },
+  sm: { container: "relative bottom-0 top-0 w-24", size: "96px" },
   md: { container: "h-36 w-full md:w-36", size: "144px" },
 }
 
@@ -146,7 +146,7 @@ export function ProductCard({
 
   return (
     <div
-      className={`group flex md:flex-row flex-col bg-background rounded-xs shadow-sm border transition-opacity ${
+      className={`group flex flex-col md:flex-row bg-background rounded-xs shadow-sm border transition-opacity ${
         isUpdating ? "opacity-60" : ""
       }`}
     >
@@ -170,7 +170,7 @@ export function ProductCard({
                 alt={product.name}
                 fill
                 sizes={sizeConfig.size}
-                className="object-cover md:rounded-l-sm rounded-t-sm md:rounded-t-none absolute inset-0 z-20 opacity-0 transition-opacity duration-300 group-hover:opacity-100"
+                className="object-cover rounded-tl-sm rounded-bl-sm  absolute inset-0 z-20 opacity-0 transition-opacity duration-300 group-hover:opacity-100"
               />
             )}
           </>
@@ -180,10 +180,10 @@ export function ProductCard({
       </Link>
 
       {/* Product Details */}
-      <div className="flex flex-1 flex-col px-4 py-3">
-        <div className="flex flex-col sm:flex-row justify-between items-start gap-3">
+      <div className="flex flex-1 flex-col px-3 py-2 overflow-hidden">
+        <div className="flex flex-col sm:flex-row justify-between items-start gap-2">
           <div className="min-w-0 flex-1">
-            <div className="flex sm:flex-col gap-2">
+            <div className="grid sm:flex-col gap-2 flex-wrap">
               <Link
                 href={`/shop/${product.slug}`}
                 className="font-semibold hover:text-primary transition-colors block truncate"
@@ -195,7 +195,7 @@ export function ProductCard({
                 {PRODUCT_TYPE_LABELS[product.productType]}
               </Badge>
             </div>
-            <p className="text-sm text-muted-foreground mt-1">{formatPrice(price)} each</p>
+            <p className="text-xs text-muted-foreground mt-2">{formatPrice(price)} each</p>
             {/* View Options Link */}
             {showSimilarLink && (
               <div className="mt-2">
@@ -207,7 +207,7 @@ export function ProductCard({
           </div>
           {/* Right Side: Price & Controls */}
           <div className="flex sm:flex-col sm:items-end w-full sm:w-auto justify-between sm:justify-end gap-3">
-            <p className="text-xl font-medium text-foreground">{formatPrice(lineTotal)}</p>
+            <p className="text-base font-medium text-foreground">{formatPrice(lineTotal)}</p>
             {showQuantityControl ? (
               <div className="flex flex-col items-end gap-4">
                 <QuantityStepper
