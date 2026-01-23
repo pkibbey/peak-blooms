@@ -74,7 +74,7 @@ export function QuantityStepper({
   }
 
   return (
-    <div className="flex gap-3">
+    <div className="flex gap-2 flex-wrap">
       <div className={cn("flex items-center", config.gap)}>
         <Button
           type="button"
@@ -83,7 +83,6 @@ export function QuantityStepper({
           onClick={handleDecrement}
           disabled={disabled || value <= min}
           aria-label="Decrease quantity"
-          className="hidden sm:flex"
         >
           <IconMinus className={config.iconSize} />
         </Button>
@@ -106,7 +105,6 @@ export function QuantityStepper({
           onClick={handleIncrement}
           disabled={disabled || value >= max}
           aria-label="Increase quantity"
-          className="hidden sm:flex"
         >
           <IconPlus className={config.iconSize} />
         </Button>

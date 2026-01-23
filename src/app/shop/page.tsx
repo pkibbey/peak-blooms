@@ -160,7 +160,7 @@ export default async function ShopPage({ searchParams }: ShopPageProps) {
           description="Browse our carefully curated selection of the highest quality, freshest flowers. Every arrangement meets our standards for excellence, backed by reliable local delivery and competitive wholesale pricing."
         />
 
-        <div className="grid gap-6 lg:gap-8 sm:grid-cols-[1fr_2fr]">
+        <div className="grid gap-6 lg:gap-8 sm:grid-cols-[236px_1fr]">
           {/* Sidebar Filters */}
           <aside className="shrink-0">
             <ShopFilters

@@ -1,6 +1,7 @@
 "use client"
 
 import { ChevronDown, X } from "lucide-react"
+import { useSearchParams } from "next/navigation"
 import { useCallback, useEffect, useState } from "react"
 import { FilterSection } from "@/components/filters/FilterSection"
 import { ColorSelector } from "@/components/site/ColorSelector"
@@ -27,6 +28,9 @@ export function ShopFilters({
       searchParamNames: {},
     })
 
+  const currentSearch = searchParams.get("search") || ""
+  const [searchTerm, setSearchTerm] = useState<string>(currentSearch)
+
   // Parse current filter state from URL
   const currentColors = searchParams.get("colors")?.split(",").filter(Boolean) || []
   const currentCollectionIds = searchParams.get("collectionIds")?.split(",").filter(Boolean) || []
@@ -43,6 +47,7 @@ export function ShopFilters({
 
   // Check if any filters are active
   const hasActiveFilters =
+    !!searchTerm ||
     selectedColors.length > 0 ||
     selectedCollectionIds.length > 0 ||
     !!priceMin ||
@@ -171,6 +176,7 @@ export function ShopFilters({
 
   // Clear all filters
   const handleClearAllFilters = useCallback(() => {
+    setSearchTerm("")
     setSelectedColors([])
     setSelectedCollectionIds([])
     setPriceMin("")
@@ -217,7 +223,7 @@ export function ShopFilters({
           className="space-y-4"
         >
           {/* Search Filter */}
-          <SearchInput />
+          <SearchInput searchTerm={searchTerm} setSearchTerm={setSearchTerm} />
 
           {/* Price Filter */}
           <FilterSection title="Price">
