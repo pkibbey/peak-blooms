@@ -160,127 +160,123 @@ export default async function ShopPage({ searchParams }: ShopPageProps) {
           description="Browse our carefully curated selection of the highest quality, freshest flowers. Every arrangement meets our standards for excellence, backed by reliable local delivery and competitive wholesale pricing."
         />
 
-        <div className="flex gap-6 lg:gap-8">
+        <div className="grid gap-6 lg:gap-8 sm:grid-cols-[1fr_2fr]">
           {/* Sidebar Filters */}
-          <aside className="hidden lg:block w-64 shrink-0">
+          <aside className="shrink-0">
             <ShopFilters
               availableColorIds={filterOptions.colorIds}
               availableCollections={filterOptions.collections}
             />
           </aside>
 
-          <div className="flex-1">
-            {/* Mobile Filters */}
-            <div className="flex flex-wrap gap-4 items-center justify-between">
-              <div className="flex flex-wrap gap-4 items-center flex-1 lg:hidden">
-                <ShopFilters
-                  availableColorIds={filterOptions.colorIds}
-                  availableCollections={filterOptions.collections}
-                />
-              </div>
-            </div>
-
-            {/* Products Info */}
-            <div className="flex gap-4 justify-between items-center mb-4">
-              {result.products.length > 0 && (
-                <p className="text-sm text-muted-foreground">
-                  Showing {result.offset + 1} to{" "}
-                  {Math.min(result.offset + ITEMS_PER_PAGE, result.total)} of {result.total}{" "}
-                  products
-                </p>
-              )}
-              {/* Pagination */}
-              {totalPages > 1 && (
-                <ShopPagination currentPage={page} totalPages={totalPages} searchParams={params} />
-              )}
-            </div>
-
-            {/* Products Grid or Table */}
-            {products.length === 0 ? (
-              <div className="flex justify-center items-center py-20">
-                <p className="text-muted-foreground">No products found matching your filters.</p>
-              </div>
-            ) : viewMode === "table" ? (
-              <>
-                <div className="rounded-md border mb-4 md:max-w-2xl">
-                  <Table className="w-full">
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead>Image</TableHead>
-                        <SortableTableHead
-                          label="Name"
-                          sortKey="name"
-                          currentSort={sort}
-                          currentOrder={order}
-                          href={`/shop?${headerUrl}`}
-                        />
-                        <SortableTableHead
-                          label="Description"
-                          sortKey="description"
-                          currentSort={sort}
-                          currentOrder={order}
-                          href={`/shop?${headerUrl}`}
-                          className="hidden md:table-cell"
-                        />
-                        <TableHead>Colors</TableHead>
-                        <SortableTableHead
-                          label="Price"
-                          sortKey="price"
-                          currentSort={sort}
-                          currentOrder={order}
-                          href={`/shop?${headerUrl}`}
-                        />
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {products.map((product) => (
-                        <ShopProductTableRow key={product.slug} product={product} user={user} />
-                      ))}
-                    </TableBody>
-                  </Table>
-                </div>
-
+          <div className="flex-1 flex flex-col gap-4">
+            <div>
+              {/* Products Info */}
+              <div className="flex gap-4 justify-between items-center mb-4">
+                {result.products.length > 0 && (
+                  <p className="text-sm text-muted-foreground">
+                    Showing {result.offset + 1} to{" "}
+                    {Math.min(result.offset + ITEMS_PER_PAGE, result.total)} of {result.total}{" "}
+                    products
+                  </p>
+                )}
                 {/* Pagination */}
                 {totalPages > 1 && (
-                  <div className="flex justify-end">
-                    <ShopPagination
-                      currentPage={page}
-                      totalPages={totalPages}
-                      searchParams={params}
-                    />
-                  </div>
+                  <ShopPagination
+                    currentPage={page}
+                    totalPages={totalPages}
+                    searchParams={params}
+                  />
                 )}
-              </>
-            ) : (
-              <>
-                <div className="grid grid-cols-2 gap-4 sm:gap-6 md:grid-cols-3 mb-8">
-                  {products.map((product) => {
-                    const cartData = cartItemMap[product.id] || { quantity: 0, itemId: undefined }
-                    return (
-                      <ProductCard
-                        key={product.slug}
-                        product={product}
-                        user={user}
-                        layout="grid"
-                        currentCartQuantity={cartData.quantity}
-                        cartItemId={cartData.itemId}
+              </div>
+
+              {/* Products Grid or Table */}
+              {products.length === 0 ? (
+                <div className="flex justify-center items-center py-20">
+                  <p className="text-muted-foreground">No products found matching your filters.</p>
+                </div>
+              ) : viewMode === "table" ? (
+                <>
+                  <div className="rounded-md border mb-4 md:max-w-2xl">
+                    <Table className="w-full">
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead>Image</TableHead>
+                          <SortableTableHead
+                            label="Name"
+                            sortKey="name"
+                            currentSort={sort}
+                            currentOrder={order}
+                            href={`/shop?${headerUrl}`}
+                          />
+                          <SortableTableHead
+                            label="Description"
+                            sortKey="description"
+                            currentSort={sort}
+                            currentOrder={order}
+                            href={`/shop?${headerUrl}`}
+                            className="hidden md:table-cell"
+                          />
+                          <TableHead>Colors</TableHead>
+                          <SortableTableHead
+                            label="Price"
+                            sortKey="price"
+                            currentSort={sort}
+                            currentOrder={order}
+                            href={`/shop?${headerUrl}`}
+                          />
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {products.map((product) => (
+                          <ShopProductTableRow key={product.slug} product={product} user={user} />
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </div>
+
+                  {/* Pagination */}
+                  {totalPages > 1 && (
+                    <div className="flex justify-end">
+                      <ShopPagination
+                        currentPage={page}
+                        totalPages={totalPages}
+                        searchParams={params}
                       />
-                    )
-                  })}
-                </div>
-
-                {/* Pagination */}
-                {totalPages > 1 && (
-                  <div className="flex justify-end">
-                    <ShopPagination
-                      currentPage={page}
-                      totalPages={totalPages}
-                      searchParams={params}
-                    />
+                    </div>
+                  )}
+                </>
+              ) : (
+                <>
+                  <div className="grid grid-cols-2 gap-4 sm:gap-6 lg:grid-cols-3 mb-8">
+                    {products.map((product) => {
+                      const cartData = cartItemMap[product.id] || { quantity: 0, itemId: undefined }
+                      return (
+                        <ProductCard
+                          key={product.slug}
+                          product={product}
+                          user={user}
+                          layout="grid"
+                          currentCartQuantity={cartData.quantity}
+                          cartItemId={cartData.itemId}
+                        />
+                      )
+                    })}
                   </div>
-                )}
-              </>
-            )}
+
+                  {/* Pagination */}
+                  {totalPages > 1 && (
+                    <div className="flex justify-end">
+                      <ShopPagination
+                        currentPage={page}
+                        totalPages={totalPages}
+                        searchParams={params}
+                      />
+                    </div>
+                  )}
+                </>
+              )}
+            </div>
           </div>
         </div>
       </div>

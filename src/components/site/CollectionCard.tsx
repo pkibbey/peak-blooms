@@ -57,7 +57,7 @@ export function CollectionCard({ collection }: CollectionCardProps) {
           render={
             <Link
               href={`/collections/${collection.slug}`}
-              className="inline-flex items-center justify-center gap-2"
+              className="inline-flex items-center justify-center gap-2 padding-inline-2"
             >
               View Collection
               <IconArrowRight aria-hidden="true" />

@@ -2,10 +2,10 @@
 
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useRouter } from "next/navigation"
+import { useRef, useState } from "react"
 import { useForm } from "react-hook-form"
 import { toast } from "sonner"
 import { updateProfileAction } from "@/app/actions/user-actions"
-import { Button } from "@/components/ui/button"
 import {
   Form,
   FormControl,
@@ -25,6 +25,8 @@ interface ProfileFormProps {
 
 export default function ProfileForm({ user }: ProfileFormProps) {
   const router = useRouter()
+  const [isSaving, setIsSaving] = useState(false)
+  const originalNameRef = useRef(user.name || "")
 
   const form = useForm<ProfileFormData>({
     resolver: zodResolver(profileSchema),
@@ -33,27 +35,9 @@ export default function ProfileForm({ user }: ProfileFormProps) {
     },
   })
 
-  const onSubmit = async (data: ProfileFormData) => {
-    try {
-      const res = await updateProfileAction(data)
-      if (!res.success) {
-        form.setError("root", {
-          message: res.error || "Failed to update profile. Please try again.",
-        })
-        return
-      }
-
-      toast.success("Profile updated successfully")
-      router.refresh()
-    } catch (err) {
-      toAppErrorClient(err, "Unable to save profile changes")
-      form.setError("root", { message: "Unable to save profile changes" })
-    }
-  }
-
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+      <form className="space-y-6">
         {form.formState.errors.root && (
           <div className="rounded-md bg-destructive/10 p-4 text-sm text-destructive">
             {form.formState.errors.root.message}
@@ -79,19 +63,52 @@ export default function ProfileForm({ user }: ProfileFormProps) {
             <FormItem>
               <FormLabel>Name</FormLabel>
               <FormControl>
-                <Input {...field} placeholder="Your name" />
+                <Input
+                  {...field}
+                  placeholder="Your name"
+                  disabled={isSaving}
+                  aria-busy={isSaving}
+                  onBlur={async () => {
+                    field.onBlur()
+
+                    const valid = await form.trigger("name")
+                    if (!valid) return
+
+                    const value = field.value ?? ""
+                    if (value === originalNameRef.current) return
+
+                    setIsSaving(true)
+                    try {
+                      const res = await updateProfileAction({ name: value })
+                      if (!res.success) {
+                        form.setError("root", {
+                          message: res.error || "Failed to update profile. Please try again.",
+                        })
+                        toast.error(res.error || "Failed to update profile. Please try again.")
+                        return
+                      }
+
+                      originalNameRef.current = value
+                      toast.success("Profile updated successfully")
+                      router.refresh()
+                    } catch (err) {
+                      toAppErrorClient(err, "Unable to save profile changes")
+                      form.setError("root", { message: "Unable to save profile changes" })
+                      toast.error("Unable to save profile changes")
+                    } finally {
+                      setIsSaving(false)
+                    }
+                  }}
+                />
               </FormControl>
               <FormMessage />
+
+              {isSaving && <p className="text-xs text-muted-foreground">Saving…</p>}
             </FormItem>
           )}
         />
 
-        {/* Actions */}
-        <div className="flex gap-4">
-          <Button type="submit" disabled={form.formState.isSubmitting}>
-            {form.formState.isSubmitting ? "Saving..." : "Save Changes"}
-          </Button>
-        </div>
+        {/* No explicit actions: saving happens on blur */}
       </form>
     </Form>
   )

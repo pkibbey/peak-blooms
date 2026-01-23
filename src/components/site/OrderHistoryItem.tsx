@@ -1,8 +1,8 @@
 import { ChevronRight } from "lucide-react"
-import Image from "next/image"
 import Link from "next/link"
 import { OrderStatusBadge } from "@/components/site/OrderStatusBadge"
 import ReorderButton from "@/components/site/ReorderButton"
+import { StackedImages } from "@/components/ui/StackedImages"
 import { calculateCartTotal } from "@/lib/cart-utils"
 import type { OrderWithItems } from "@/lib/query-types"
 import { formatDate, formatPrice } from "@/lib/utils"
@@ -36,35 +36,15 @@ export default function OrderHistoryItem({ order }: OrderHistoryItemProps) {
         </div>
 
         {/* Item Previews - Overlapping style */}
-        <div className="hidden md:flex -space-x-4 overflow-hidden py-1">
-          {order.items.slice(0, 4).map((item) => {
-            const productImage = item.productImageSnapshot ?? item.product?.images?.[0]
-            const productName = item.productNameSnapshot ?? item.product?.name ?? "Unknown Product"
-
-            return (
-              <div
-                key={item.id}
-                className="relative h-9 w-9 shrink-0 overflow-hidden rounded-full border-2 border-background bg-muted shadow-sm transition-transform group-hover:translate-x-1 first:group-hover:translate-x-0"
-              >
-                {productImage ? (
-                  <Image
-                    src={productImage}
-                    alt={productName}
-                    fill
-                    className="object-cover"
-                    sizes="36px"
-                  />
-                ) : (
-                  <div className="h-full w-full bg-muted" />
-                )}
-              </div>
-            )
-          })}
-          {order.items.length > 4 && (
-            <div className="relative h-9 w-9 shrink-0 rounded-full border-2 border-background bg-secondary flex items-center justify-center text-[10px] font-bold text-secondary-foreground shadow-sm transition-transform group-hover:translate-x-1">
-              +{order.items.length - 4}
-            </div>
-          )}
+        <div className="flex py-1">
+          <StackedImages
+            images={order.items.map((item) => ({
+              src: item.productImageSnapshot ?? item.product?.images?.[0],
+              alt: item.productNameSnapshot ?? item.product?.name ?? "Unknown Product",
+            }))}
+            maxDisplay={5}
+            size="sm"
+          />
         </div>
       </div>
 

@@ -10,7 +10,7 @@ export default function StaticHeroReliable() {
       title="Reliable, Efficient Wholesale Solutions"
       subtitle="We're committed to exceptional service, sustainable sourcing, and timely delivery. Your success is our mission—connect the world through the beauty of flowers with Peak Blooms."
       ctaText="Explore Boxlots"
-      ctaLink="/shop?productType=rose"
+      ctaLink="/shop?productType=ROSE"
       backgroundImage="/hero-images/boxlot2.png"
       textPosition="center"
     />

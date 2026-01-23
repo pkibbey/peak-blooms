@@ -2,7 +2,7 @@
 
 import { Search, X } from "lucide-react"
 import { useRouter, useSearchParams } from "next/navigation"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { useDebouncedCallback } from "@/lib/useDebouncedCallback"
 import { cn } from "@/lib/utils"
 import { Button } from "../ui/button"
@@ -14,6 +14,12 @@ export function SearchInput() {
   const router = useRouter()
   const currentSearch = searchParams.get("search") || ""
   const [searchTerm, setSearchTerm] = useState<string>(currentSearch)
+
+  useEffect(() => {
+    // Keep the local input in sync with the URL's `search` param so
+    // clearing filters that remove the param also clears the visible input.
+    setSearchTerm(currentSearch)
+  }, [currentSearch])
 
   // Debounced search handler for popover display (desktop)
   const handleSearch = useDebouncedCallback((term: unknown) => {
@@ -72,6 +78,8 @@ export function SearchInput() {
             onClick={clearSearch}
             className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
             aria-label="Clear search"
+            variant="outline"
+            size="icon-xs"
             type="button"
           >
             <X className="h-4 w-4" />
