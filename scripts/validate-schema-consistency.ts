@@ -59,7 +59,7 @@ function validateCartResponseFields() {
   const expectedFields = ["id", "orderNumber", "status", "notes", "items", "total"]
   const testCart: CartResponse = {
     id: "test",
-    orderNumber: 1,
+    orderNumber: String(1),
     status: "CART",
     notes: null,
     items: [],

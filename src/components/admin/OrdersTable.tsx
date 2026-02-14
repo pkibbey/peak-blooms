@@ -158,12 +158,7 @@ export default function OrdersTable({ orders, currentStatus, sort, order }: Orde
                       {formatPrice(calculateCartTotal(order.items))}
                     </TableCell>
                     <TableCell className="text-right">
-                      <NavLink
-                        variant="outline"
-                        size="sm"
-                        // nativeButton={false}
-                        href={`/admin/orders/${order.id}`}
-                      >
+                      <NavLink variant="outline" size="sm" href={`/admin/orders/${order.id}`}>
                         <IconEye className="h-4 w-4 mr-1" />
                         View
                       </NavLink>

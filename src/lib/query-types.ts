@@ -146,6 +146,7 @@ export type OrderWithItems = OrderGetPayload<{
         product: true
       }
     }
+    attachments: true
   }
 }>
 

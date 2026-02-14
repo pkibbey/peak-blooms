@@ -3,7 +3,9 @@
 ## Meeting notes
 - Add e2e tests to ensure complete site functionality
 - make sure user flow for sign up works
-
+- investigate withTiming functionality
+- Allow for historical price changes
+- Handle site error when the database is not connected
 
 ### 🌟 Next Steps
 

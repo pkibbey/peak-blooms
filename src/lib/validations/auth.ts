@@ -13,21 +13,21 @@ const userRoleEnum = z.enum(Role)
 
 // Approve user schema
 export const approveUserSchema = z.object({
-  userId: z.uuid("User ID must be a valid UUID"),
+  userId: z.string().min(1, "Invalid user ID"),
 })
 
 export type ApproveUserInput = z.infer<typeof approveUserSchema>
 
 // Unapprove user schema
 export const unapproveUserSchema = z.object({
-  userId: z.uuid("User ID must be a valid UUID"),
+  userId: z.string().min(1, "Invalid user ID"),
 })
 
 export type UnapproveUserInput = z.infer<typeof unapproveUserSchema>
 
 // Update user price multiplier schema
 export const updateUserPriceMultiplierSchema = z.object({
-  userId: z.uuid("User ID must be a valid UUID"),
+  userId: z.string().min(1, "Invalid user ID"),
   multiplier: z
     .number()
     .min(0.5, "Price multiplier must be at least 0.5")

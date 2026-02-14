@@ -21,6 +21,7 @@ export default async function OrderHistoryPage() {
           product: true,
         },
       },
+      attachments: true,
     },
   })
 

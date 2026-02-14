@@ -1,5 +1,7 @@
 import { notFound } from "next/navigation"
 import { AdminOrderPriceEditor } from "@/components/admin/AdminOrderPriceEditor"
+import { GenerateInvoiceButton } from "@/components/admin/GenerateInvoiceButton"
+import { OrderAttachmentsList } from "@/components/admin/OrderAttachmentsList"
 import OrderStatusForm from "@/components/admin/OrderStatusForm"
 import { AddressDisplay } from "@/components/site/AddressDisplay"
 import BackLink from "@/components/site/BackLink"
@@ -34,6 +36,7 @@ export default async function AdminOrderDetailPage({ params }: AdminOrderDetailP
         },
       },
       deliveryAddress: true,
+      attachments: true,
     },
   })
 
@@ -59,7 +62,18 @@ export default async function AdminOrderDetailPage({ params }: AdminOrderDetailP
         {/* Main Content */}
         <div className="lg:col-span-2 space-y-6">
           {/* Order Items */}
-          <AdminOrderPriceEditor order={order} />
+          <div className="space-y-6">
+            <AdminOrderPriceEditor order={order} />
+            {/* Invoices & Attachments */}
+            <div className="bg-background rounded-xs shadow-sm border p-6">
+              <h2 className="heading-3 mb-4">Invoices & Attachments</h2>
+              <div className="mb-4">
+                <GenerateInvoiceButton orderId={order.id} />
+              </div>
+
+              <OrderAttachmentsList attachments={order.attachments || []} />
+            </div>
+          </div>
 
           {/* Order Notes */}
           {order.notes && (

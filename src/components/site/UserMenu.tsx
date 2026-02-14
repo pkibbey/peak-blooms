@@ -92,6 +92,16 @@ export default function UserMenu({ user }: UserMenuProps) {
           </div>
 
           <div className="flex flex-col gap-1 py-1">
+            <DropdownMenuItem
+              className="focus:bg-secondary/50 focus:text-secondary-foreground"
+              nativeButton={false}
+              render={
+                <Link href="/account" className="flex items-center gap-2">
+                  <IconUser aria-hidden="true" />
+                  <span>Account settings</span>
+                </Link>
+              }
+            />
             {user.role === "ADMIN" && (
               <DropdownMenuItem
                 className="focus:bg-secondary/50 focus:text-secondary-foreground"
@@ -104,17 +114,6 @@ export default function UserMenu({ user }: UserMenuProps) {
                 }
               />
             )}
-
-            <DropdownMenuItem
-              className="focus:bg-secondary/50 focus:text-secondary-foreground"
-              nativeButton={false}
-              render={
-                <Link href="/account" className="flex items-center gap-2">
-                  <IconUser aria-hidden="true" />
-                  <span>Account settings</span>
-                </Link>
-              }
-            />
           </div>
 
           <DropdownMenuSeparator />

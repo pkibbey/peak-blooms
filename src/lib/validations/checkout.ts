@@ -66,26 +66,42 @@ export type BatchAddToCartInput = z.infer<typeof batchAddToCartSchema>
 
 // Order operation schemas
 export const cancelOrderSchema = z.object({
-  orderId: z.uuid("Invalid order ID"),
+  orderId: z.string().min(1, "Invalid order ID"),
   convertToCart: z.boolean().optional(),
 })
 
 export type CancelOrderInput = z.infer<typeof cancelOrderSchema>
 
 export const updateOrderStatusSchema = z.object({
-  orderId: z.uuid("Invalid order ID"),
+  orderId: z.string().min(1, "Invalid order ID"),
   status: z.enum(OrderStatus),
 })
 
 export type UpdateOrderStatusInput = z.infer<typeof updateOrderStatusSchema>
 
 export const updateOrderItemPriceSchema = z.object({
-  orderId: z.uuid("Invalid order ID"),
-  itemId: z.uuid("Invalid item ID"),
+  orderId: z.string().min(1, "Invalid order ID"),
+  itemId: z.string().min(1, "Invalid item ID"),
   price: z.number().nonnegative("Price must be non-negative"),
 })
 
 export type UpdateOrderItemPriceInput = z.infer<typeof updateOrderItemPriceSchema>
+
+/**
+ * Invoice generation / attachment schemas
+ */
+export const generateInvoiceSchema = z.object({
+  orderId: z.string().min(1, "Invalid order ID"),
+})
+
+export type GenerateInvoiceInput = z.infer<typeof generateInvoiceSchema>
+
+export const deleteOrderAttachmentSchema = z.object({
+  attachmentId: z.string().min(1, "Invalid attachment ID"),
+})
+
+export type DeleteOrderAttachmentInput = z.infer<typeof deleteOrderAttachmentSchema>
+
 // Admin create order schema - for admins to manually create orders
 export const adminCreateOrderSchema = z.object({
   userId: z.string().min(1, "User is required"),

@@ -60,7 +60,7 @@ export default async function AdminOrdersPage({ searchParams }: AdminOrdersPageP
   const sortOrder = order as "asc" | "desc" | undefined
   if (sort === "orderNumber") {
     orders.sort((a, b) => {
-      const comparison = a.orderNumber - b.orderNumber
+      const comparison = String(a.orderNumber).localeCompare(String(b.orderNumber))
       return sortOrder === "desc" ? -comparison : comparison
     })
   } else if (sort === "date") {

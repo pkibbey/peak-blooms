@@ -13,6 +13,11 @@ import {
   type CreateOrderInput,
   cancelOrderSchema,
   createOrderSchema,
+  type DeleteOrderAttachmentInput,
+  deleteOrderAttachmentSchema,
+  type GenerateInvoiceInput,
+  // invoice schemas
+  generateInvoiceSchema,
   type UpdateOrderItemPriceInput,
   type UpdateOrderStatusInput,
   updateOrderItemPriceSchema,
@@ -78,12 +83,16 @@ export const cancelOrderAction = wrapAction(
         },
       })
 
+      // Include attachments for the response
+      const attachments = await db.orderAttachment.findMany({ where: { orderId: updatedOrder.id } })
+
       revalidatePath("/cart")
       revalidatePath(`/account/order-history/${orderId}`)
 
       return {
         ...updatedOrder,
         items: order.items,
+        attachments,
       }
     } else {
       // Simply transition to CANCELLED
@@ -94,12 +103,18 @@ export const cancelOrderAction = wrapAction(
         },
       })
 
+      // Include attachments for the response
+      const attachments = await db.orderAttachment.findMany({
+        where: { orderId: cancelledOrder.id },
+      })
+
       revalidatePath(`/account/order-history/${orderId}`)
       revalidatePath("/account/order-history")
 
       return {
         ...cancelledOrder,
         items: order.items,
+        attachments,
       }
     }
   }
@@ -227,6 +242,7 @@ export const createOrderAction = wrapAction(
             product: true,
           },
         },
+        attachments: true,
       },
     })
 
@@ -292,6 +308,7 @@ export const updateOrderStatusAction = wrapAction(
             product: true,
           },
         },
+        attachments: true,
       },
     })
 
@@ -423,6 +440,103 @@ export const adminCreateOrderAction = wrapAction(
     return {
       ...order,
       items: createdItems,
+      attachments: [],
     }
   }
 )
+
+/**
+ * Server action to generate an invoice PDF for an order and attach it to the order.
+ * - Generates PDF with pdf-lib
+ * - Uploads to Vercel Blob using @vercel/blob/client (handleUploadUrl: /api/upload)
+ * - Persists an OrderAttachment record
+ */
+export const generateInvoiceAction = wrapAction(async (input: GenerateInvoiceInput) => {
+  const { orderId } = generateInvoiceSchema.parse(input)
+  const user = await getCurrentUser()
+
+  if (!user || user.role !== "ADMIN") {
+    throw new Error("Unauthorized: You must be an admin to generate invoices")
+  }
+
+  const order = await db.order.findUnique({
+    where: { id: orderId },
+    include: {
+      items: { include: { product: true } },
+      user: true,
+      deliveryAddress: true,
+    },
+  })
+
+  if (!order) throw new Error("Order not found")
+
+  const { generateInvoicePdfBuffer } = await import("@/app/actions/pdf")
+  const pdfBuffer = await generateInvoicePdfBuffer(order)
+
+  // Upload to Vercel Blob using server-safe APIs (avoid client-only `upload` which uses `location`)
+  const { generateClientTokenFromReadWriteToken, put } = await import("@vercel/blob/client")
+  const timestamp = Date.now()
+  const filename = `invoice_${order.orderNumber}_${timestamp}.pdf`
+
+  // Generate a short-lived client token (server-side) and upload the PDF directly
+  const clientToken = await generateClientTokenFromReadWriteToken({
+    pathname: filename,
+    // allow PDF mime
+    allowedContentTypes: ["application/pdf"],
+  })
+
+  const uploaded = await put(filename, pdfBuffer, {
+    access: "public",
+    token: clientToken,
+    contentType: "application/pdf",
+  })
+
+  // Persist attachment record (only rely on known/available values)
+  const attachment = await db.orderAttachment.create({
+    data: {
+      orderId: order.id,
+      url: uploaded.url,
+      key: null,
+      mime: "application/pdf",
+      size: pdfBuffer.length,
+    },
+  })
+
+  revalidatePath(`/admin/orders/${order.id}`)
+  revalidatePath("/admin/orders")
+
+  return attachment
+})
+
+/**
+ * Server action to delete an order attachment (blob + DB record)
+ */
+export const deleteOrderAttachmentAction = wrapAction(async (input: DeleteOrderAttachmentInput) => {
+  const { attachmentId } = deleteOrderAttachmentSchema.parse(input)
+  const user = await getCurrentUser()
+
+  if (!user || user.role !== "ADMIN") {
+    throw new Error("Unauthorized: You must be an admin to delete attachments")
+  }
+
+  const attachment = await db.orderAttachment.findUnique({ where: { id: attachmentId } })
+  if (!attachment) throw new Error("Attachment not found")
+
+  // Attempt blob deletion (best-effort)
+  try {
+    if (attachment.url?.includes("blob.vercel-storage.com")) {
+      const { deleteBlobAction } = await import("@/app/actions/blob")
+      await deleteBlobAction({ url: attachment.url })
+    }
+  } catch (err) {
+    // don't block deletion of DB record if blob delete failed
+    console.warn("Failed to delete blob for attachment:", err)
+  }
+
+  await db.orderAttachment.delete({ where: { id: attachmentId } })
+
+  revalidatePath(`/admin/orders/${attachment.orderId}`)
+  revalidatePath("/admin/orders")
+
+  return { id: attachmentId }
+})

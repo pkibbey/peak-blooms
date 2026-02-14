@@ -66,7 +66,7 @@ describe("Order Actions", () => {
   const mockOrder = {
     id: VALID_UUID,
     userId: mockUser.id,
-    orderNumber: 1,
+    orderNumber: String(1),
     status: "PENDING" as OrderStatus,
     notes: null,
     deliveryAddressId: VALID_UUID_2,
@@ -90,8 +90,8 @@ describe("Order Actions", () => {
       }
     })
 
-    it("should return error if order id is not uuid", async () => {
-      const result = await cancelOrderAction({ orderId: "not-a-uuid" })
+    it("should return validation error for missing/invalid order id", async () => {
+      const result = await cancelOrderAction({ orderId: "" })
       expect(result.success).toBe(false)
       if (!result.success) {
         expect(result.code).toBe("VALIDATION_ERROR")
@@ -192,8 +192,8 @@ describe("Order Actions", () => {
       }
     })
 
-    it("should return error for invalid Zod validation", async () => {
-      const result = await updateOrderStatusAction({ orderId: "not-a-uuid", status: "CONFIRMED" })
+    it("should return validation error for missing/invalid order id", async () => {
+      const result = await updateOrderStatusAction({ orderId: "", status: "CONFIRMED" })
       expect(result.success).toBe(false)
       if (!result.success) {
         expect(result.code).toBe("VALIDATION_ERROR")
@@ -234,9 +234,9 @@ describe("Order Actions", () => {
       }
     })
 
-    it("should return error for invalid Zod validation in updateOrderItemPriceAction", async () => {
+    it("should return validation error for missing/invalid order id in updateOrderItemPriceAction", async () => {
       const result = await updateOrderItemPriceAction({
-        orderId: "not-a-uuid",
+        orderId: "",
         itemId: VALID_UUID_3,
         price: 50,
       })

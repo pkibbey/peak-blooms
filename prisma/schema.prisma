@@ -180,7 +180,7 @@ model InspirationProduct {
 
 model Order {
   id                String      @id @default(cuid())
-  orderNumber       Int         @unique @default(autoincrement())
+  orderNumber       String      @unique @default(cuid())
   userId            String
   status            OrderStatus @default(CART)
   notes             String?
@@ -190,6 +190,7 @@ model Order {
   deliveryAddress   Address?    @relation("DeliveryAddress", fields: [deliveryAddressId], references: [id])
   user              User        @relation(fields: [userId], references: [id], onDelete: Cascade)
   items             OrderItem[]
+  attachments       OrderAttachment[]
 
   @@index([userId])
   @@index([orderNumber])
@@ -206,6 +207,20 @@ model OrderItem {
   productImageSnapshot  String?     // Captured at order time - allows display if product is deleted
   order                 Order  @relation(fields: [orderId], references: [id], onDelete: Cascade)
   product               Product @relation(fields: [productId], references: [id], onDelete: SetNull)
+
+  @@index([orderId])
+}
+
+model OrderAttachment {
+  id        String   @id @default(cuid())
+  orderId   String
+  url       String
+  key       String?
+  mime      String   @default("application/pdf")
+  size      Int?
+  createdAt DateTime @default(now())
+
+  order     Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
 
   @@index([orderId])
 }

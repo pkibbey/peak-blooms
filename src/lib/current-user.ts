@@ -9,7 +9,9 @@ import { getSession } from "./auth"
  * Better Auth provides user data directly in the session with custom fields
  */
 export const getCurrentUser = cache(async (): Promise<SessionUser | null> => {
-  const session = await getSession()
+  let session: Awaited<ReturnType<typeof getSession>> | null = null
+  // Let errors from getSession bubble up so callers/tests can detect auth failures
+  session = await getSession()
 
   if (!session?.user?.email) {
     return null

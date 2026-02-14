@@ -22,6 +22,7 @@ interface BackupData {
     order: unknown[]
     orderItem: unknown[]
     address: unknown[]
+    orderAttachment: unknown[]
     metric: unknown[]
   }
 }
@@ -61,6 +62,7 @@ async function backupDatabase(): Promise<void> {
       order,
       orderItem,
       address,
+      orderAttachment,
       metric,
     ] = await Promise.all([
       db.user.findMany(),
@@ -75,6 +77,7 @@ async function backupDatabase(): Promise<void> {
       db.order.findMany(),
       db.orderItem.findMany(),
       db.address.findMany(),
+      db.orderAttachment.findMany(),
       db.metric.findMany(),
     ])
 
@@ -96,6 +99,7 @@ async function backupDatabase(): Promise<void> {
           order: order.length,
           orderItem: orderItem.length,
           address: address.length,
+          orderAttachment: orderAttachment.length,
           metric: metric.length,
         },
       },
@@ -112,6 +116,7 @@ async function backupDatabase(): Promise<void> {
         order,
         orderItem,
         address,
+        orderAttachment,
         metric,
       },
     }
