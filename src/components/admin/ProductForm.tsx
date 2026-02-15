@@ -10,6 +10,7 @@ import {
   deleteProductAction,
   updateProductAction,
 } from "@/app/actions/products"
+import { AdminProductPriceHistory } from "@/components/admin/AdminProductPriceHistory"
 import { GenerateDescriptionButton } from "@/components/admin/GenerateDescriptionButton"
 import { ProductImageManager } from "@/components/admin/ProductImageManager"
 import SlugInput from "@/components/admin/SlugInput"
@@ -42,6 +43,15 @@ import { toAppErrorClient } from "@/lib/error-utils"
 import { PRODUCT_TYPE_LABELS, PRODUCT_TYPES } from "@/lib/product-types"
 import { type ProductFormData, productSchema } from "@/lib/validations/product"
 
+interface PriceHistoryItem {
+  id: string
+  productId: string
+  previousPrice: number
+  newPrice: number
+  changedAt: string
+  changedByUser?: { id: string | null; name?: string | null; email?: string | null } | null
+}
+
 interface ProductFormProps {
   collections: CollectionModel[]
   product?: {
@@ -56,9 +66,14 @@ interface ProductFormProps {
     productType?: ProductType
     featured: boolean
   }
+  productPriceHistory?: PriceHistoryItem[]
 }
 
-export default function ProductForm({ collections, product }: ProductFormProps) {
+export default function ProductForm({
+  collections,
+  product,
+  productPriceHistory,
+}: ProductFormProps) {
   const router = useRouter()
   const isEditing = !!product
 
@@ -367,6 +382,14 @@ export default function ProductForm({ collections, product }: ProductFormProps) 
             </FormItem>
           )}
         />
+
+        {/* Price history chart + recent changes (admin only) - always show when editing a product */}
+        {product && (
+          <AdminProductPriceHistory
+            history={productPriceHistory ?? []}
+            currentPrice={product.price}
+          />
+        )}
 
         {/* Featured */}
         <FormField

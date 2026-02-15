@@ -68,7 +68,7 @@ export default function ProductsTableRow({ product }: ProductRowProps) {
         access: "public",
         handleUploadUrl: "/api/upload",
         clientPayload: JSON.stringify({
-          folder: "products/generated",
+          folder: "generated/images",
           slug: product.name.toLowerCase().replace(/\s+/g, "-"),
           extension: "jpg",
         }),
@@ -128,7 +128,7 @@ export default function ProductsTableRow({ product }: ProductRowProps) {
         access: "public",
         handleUploadUrl: "/api/upload",
         clientPayload: JSON.stringify({
-          folder: "products/generated",
+          folder: "generated/images",
           slug: product.name.toLowerCase().replace(/\s+/g, "-"),
           extension: "jpg",
         }),

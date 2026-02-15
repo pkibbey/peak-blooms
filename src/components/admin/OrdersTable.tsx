@@ -1,7 +1,9 @@
 import Link from "next/link"
+import { DeleteOrderButton } from "@/components/admin/DeleteOrderButton"
+import ContactInfo from "@/components/site/ContactInfo"
 import NavLink from "@/components/site/NavLink"
 import { OrderStatusBadge } from "@/components/site/OrderStatusBadge"
-import { IconEye } from "@/components/ui/icons"
+import { IconEdit, IconEye } from "@/components/ui/icons"
 import { SortableTableHead } from "@/components/ui/SortableTableHead"
 import {
   Table,
@@ -136,14 +138,11 @@ export default function OrdersTable({ orders, currentStatus, sort, order }: Orde
                       </Link>
                     </TableCell>
                     <TableCell>
-                      <div>
-                        <p className="font-medium">{order.user.name || "—"}</p>
-                        {order.deliveryAddress && (
-                          <p className="text-sm text-muted-foreground">
-                            {order.deliveryAddress.email}
-                          </p>
-                        )}
-                      </div>
+                      <ContactInfo
+                        compact
+                        name={order.user.name || undefined}
+                        email={order.deliveryAddress?.email || undefined}
+                      />
                     </TableCell>
                     <TableCell className="hidden md:table-cell text-muted-foreground">
                       {formatDate(order.createdAt)}
@@ -158,10 +157,19 @@ export default function OrdersTable({ orders, currentStatus, sort, order }: Orde
                       {formatPrice(calculateCartTotal(order.items))}
                     </TableCell>
                     <TableCell className="text-right">
-                      <NavLink variant="outline" size="sm" href={`/admin/orders/${order.id}`}>
-                        <IconEye className="h-4 w-4 mr-1" />
-                        View
-                      </NavLink>
+                      <div className="flex items-center justify-end gap-2">
+                        <NavLink variant="outline" size="sm" href={`/admin/orders/${order.id}`}>
+                          <IconEye className="h-4 w-4 mr-1" />
+                          View
+                        </NavLink>
+
+                        <NavLink variant="ghost" size="sm" href={`/admin/orders/${order.id}`}>
+                          <IconEdit className="h-4 w-4 mr-1" />
+                          Edit items
+                        </NavLink>
+
+                        <DeleteOrderButton orderId={order.id} />
+                      </div>
                     </TableCell>
                   </TableRow>
                 )

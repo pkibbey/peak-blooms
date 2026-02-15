@@ -139,7 +139,7 @@ export function BatchGenerateImagesButton({
                   access: "public",
                   handleUploadUrl: "/api/upload",
                   clientPayload: JSON.stringify({
-                    folder: "products/generated",
+                    folder: "generated/images",
                     slug: product.name.toLowerCase().replace(/\s+/g, "-"),
                     extension: "jpg",
                   }),

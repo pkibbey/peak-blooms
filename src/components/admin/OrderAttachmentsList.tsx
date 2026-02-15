@@ -7,6 +7,7 @@ import { toast } from "sonner"
 import { deleteOrderAttachmentAction } from "@/app/actions/orders"
 import { Button } from "@/components/ui/button"
 import { toAppErrorClient } from "@/lib/error-utils"
+import { cn } from "@/lib/utils"
 
 type Attachment = {
   id: string
@@ -52,12 +53,20 @@ export function OrderAttachmentsList({ attachments }: OrderAttachmentsListProps)
     return <p className="text-sm text-muted-foreground italic">No attachments</p>
   }
 
+  // sort attachments newest-first (defensive; server also returns ordered attachments)
+  const sorted = [...attachments].sort(
+    (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+  )
+
   return (
     <div className="space-y-2">
-      {attachments.map((att) => (
+      {sorted.map((att, index) => (
         <div
           key={att.id}
-          className="flex items-center justify-between gap-3 p-2 border rounded-md bg-background"
+          className={cn(
+            "flex items-center justify-between gap-3 p-2 border rounded-md",
+            index === 0 ? "opacity-100" : "opacity-45 hover:opacity-100"
+          )}
         >
           <div className="flex items-center gap-3 min-w-0">
             <div className="rounded-sm bg-muted p-2">
@@ -70,12 +79,9 @@ export function OrderAttachmentsList({ attachments }: OrderAttachmentsListProps)
                 rel="noreferrer"
                 className="text-sm font-medium text-primary hover:underline block truncate"
               >
-                Invoice
+                Invoice {new Date(att.createdAt).toLocaleString()}
               </a>
-              <div className="text-xs text-muted-foreground">
-                {new Date(att.createdAt).toLocaleString()}{" "}
-                {att.size ? `• ${formatSize(att.size)}` : ""}
-              </div>
+              <div className="text-xs text-muted-foreground">{formatSize(att.size)}</div>
             </div>
           </div>
 

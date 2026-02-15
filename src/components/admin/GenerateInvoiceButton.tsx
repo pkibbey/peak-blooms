@@ -34,7 +34,7 @@ export function GenerateInvoiceButton({ orderId }: GenerateInvoiceButtonProps) {
   }
 
   return (
-    <Button onClick={handleGenerate} variant="outline" size="sm" type="button" disabled={isPending}>
+    <Button onClick={handleGenerate} size="sm" type="button" disabled={isPending}>
       {isPending ? (
         <>
           <LoaderCircle className="h-4 w-4 animate-spin" aria-hidden="true" />

@@ -1,5 +1,6 @@
 "use server"
 
+import { randomUUID } from "node:crypto"
 import { revalidatePath } from "next/cache"
 import type { ProductWhereInput } from "@/generated/models"
 import { getSession } from "@/lib/auth"
@@ -59,6 +60,46 @@ export const updateProductAction = wrapAction(
 
     if (!session?.user || session.user.role !== "ADMIN") {
       throw new Error("Unauthorized: You must be an admin to update products")
+    }
+
+    // Read existing price so we only create history when the numeric price actually changes
+    const existingProduct = await db.product.findUnique({ where: { id }, select: { price: true } })
+
+    if (existingProduct && existingProduct.price !== data.price) {
+      // Update product AND create a history entry in a single transaction
+      const historyId = randomUUID()
+      const [updatedProduct] = await db.$transaction([
+        db.product.update({
+          where: { id },
+          data: {
+            name: data.name,
+            slug: data.slug,
+            description: data.description,
+            images: data.images,
+            price: data.price,
+            colors: data.colors || [],
+            productType: data.productType,
+            featured: data.featured,
+            productCollections:
+              data.collectionIds !== null
+                ? {
+                    deleteMany: {},
+                    create: data.collectionIds.map((collectionId) => ({
+                      collectionId,
+                    })),
+                  }
+                : undefined,
+          },
+        }),
+        // Insert history row using a raw SQL statement (avoids referencing the generated client until you run migrations)
+        db.$executeRaw`
+          INSERT INTO "ProductPriceHistory" ("id","productId","previousPrice","newPrice","changedByUserId")
+          VALUES (${historyId}, ${id}, ${existingProduct.price}, ${data.price}, ${session.user.id})
+        `,
+      ])
+
+      revalidatePath("/admin/products")
+      return updatedProduct
     }
 
     const product = await db.product.update({

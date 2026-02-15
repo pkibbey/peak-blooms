@@ -3,6 +3,7 @@ import { notFound, redirect } from "next/navigation"
 import { AddressDisplay } from "@/components/site/AddressDisplay"
 import BackLink from "@/components/site/BackLink"
 import { CancelOrderButton } from "@/components/site/CancelOrderButton"
+import ContactInfo from "@/components/site/ContactInfo"
 import { OrderItemsCard } from "@/components/site/OrderItemsCard"
 import { OrderStatusBadge } from "@/components/site/OrderStatusBadge"
 import { OrderTimeline } from "@/components/site/OrderTimeline"
@@ -109,18 +110,14 @@ export default async function OrderDetailPage({ params }: OrderDetailPageProps) 
           {order.deliveryAddress && (
             <div className="bg-background rounded-xs shadow-sm border p-6">
               <h2 className="heading-3 mb-4">Contact Information</h2>
-              <div className="text-sm space-y-2">
-                <p>
-                  <span className="text-muted-foreground">Email:</span>{" "}
-                  <span className="font-medium">{order.deliveryAddress.email}</span>
-                </p>
-                {order.deliveryAddress.phone && (
-                  <p>
-                    <span className="text-muted-foreground">Phone:</span>{" "}
-                    <span className="font-medium">{order.deliveryAddress.phone}</span>
-                  </p>
-                )}
-              </div>
+              <ContactInfo
+                name={
+                  `${order.deliveryAddress.firstName || ""} ${order.deliveryAddress.lastName || ""}`.trim() ||
+                  undefined
+                }
+                email={order.deliveryAddress.email}
+                phone={order.deliveryAddress.phone}
+              />
             </div>
           )}
         </div>

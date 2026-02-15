@@ -87,6 +87,13 @@ export const updateOrderItemPriceSchema = z.object({
 
 export type UpdateOrderItemPriceInput = z.infer<typeof updateOrderItemPriceSchema>
 
+export const deleteOrderItemSchema = z.object({
+  orderId: z.string().min(1, "Invalid order ID"),
+  itemId: z.string().min(1, "Invalid item ID"),
+})
+
+export type DeleteOrderItemInput = z.infer<typeof deleteOrderItemSchema>
+
 /**
  * Invoice generation / attachment schemas
  */
@@ -120,3 +127,32 @@ export const adminCreateOrderSchema = z.object({
 })
 
 export type AdminCreateOrderInput = z.infer<typeof adminCreateOrderSchema>
+
+// Admin — add items to an existing order
+export const adminAddOrderItemsSchema = z.object({
+  orderId: z.string().min(1, "Invalid order ID"),
+  items: z
+    .array(
+      z.object({
+        productId: z.string().min(1, "Product is required"),
+        quantity: z.number().int().min(1, "Quantity must be at least 1"),
+      })
+    )
+    .min(1, "At least one item is required"),
+})
+export type AdminAddOrderItemsInput = z.infer<typeof adminAddOrderItemsSchema>
+
+// Admin — update quantity of an existing order item
+export const adminUpdateOrderItemQuantitySchema = z.object({
+  orderId: z.string().min(1, "Invalid order ID"),
+  itemId: z.string().min(1, "Invalid item ID"),
+  quantity: z.number().int().min(0, "Quantity must be 0 or greater"),
+})
+export type AdminUpdateOrderItemQuantityInput = z.infer<typeof adminUpdateOrderItemQuantitySchema>
+
+// Schema for deleting an order (admin only)
+export const deleteOrderSchema = z.object({
+  orderId: z.string().min(1, "Invalid order ID"),
+})
+
+export type DeleteOrderInput = z.infer<typeof deleteOrderSchema>

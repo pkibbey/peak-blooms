@@ -5,7 +5,9 @@ import { useState } from "react"
 import { useFieldArray, useForm } from "react-hook-form"
 import { toast } from "sonner"
 import { adminCreateOrderAction } from "@/app/actions/orders"
+import { UsersForm } from "@/components/admin/UsersForm"
 import { Button } from "@/components/ui/button"
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import {
   Form,
   FormControl,
@@ -25,11 +27,12 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
-import type { AddressModel, ProductModel, UserModel } from "@/generated/models"
+import type { AddressModel, ProductModel } from "@/generated/models"
 import { toAppErrorClient } from "@/lib/error-utils"
+import type { UserForAdmin } from "@/lib/query-types"
 
 interface OrderFormProps {
-  users: UserModel[]
+  users: UserForAdmin[]
   products: ProductModel[]
   addresses: (AddressModel & { user: { id: string; name: string | null } | null })[]
 }
@@ -62,6 +65,8 @@ interface OrderFormValues {
 export default function OrderForm({ users, products, addresses }: OrderFormProps) {
   const router = useRouter()
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [localUsers, setLocalUsers] = useState<UserForAdmin[]>(users)
+  const [isUserModalOpen, setIsUserModalOpen] = useState(false)
 
   const form = useForm<OrderFormValues>({
     defaultValues: {
@@ -151,7 +156,7 @@ export default function OrderForm({ users, products, addresses }: OrderFormProps
                 </FormControl>
                 <SelectPositioner>
                   <SelectContent>
-                    {users.map((user) => (
+                    {localUsers.map((user) => (
                       <SelectItem key={user.id} value={user.id}>
                         {user.name || user.email}
                       </SelectItem>
@@ -159,10 +164,35 @@ export default function OrderForm({ users, products, addresses }: OrderFormProps
                   </SelectContent>
                 </SelectPositioner>
               </Select>
+              <div className="mt-2">
+                <Button
+                  type="button"
+                  size="sm"
+                  variant="outline"
+                  onClick={() => setIsUserModalOpen(true)}
+                >
+                  Add new customer
+                </Button>
+              </div>
               <FormMessage />
             </FormItem>
           )}
         />
+        <Dialog open={isUserModalOpen} onOpenChange={setIsUserModalOpen}>
+          <DialogContent className="max-w-lg">
+            <DialogHeader>
+              <DialogTitle>Create new customer</DialogTitle>
+            </DialogHeader>
+            <UsersForm
+              onSuccess={(user) => {
+                setLocalUsers((prev) => [...prev, user])
+                form.setValue("userId", user.id)
+                setIsUserModalOpen(false)
+              }}
+              onCancel={() => setIsUserModalOpen(false)}
+            />
+          </DialogContent>
+        </Dialog>
 
         {/* Delivery Address Selection */}
         {selectedUserId && (

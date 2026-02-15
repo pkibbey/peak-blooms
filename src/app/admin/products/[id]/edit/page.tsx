@@ -47,6 +47,33 @@ export default async function EditProductPage({ params }: EditProductPageProps) 
     collectionIds: product.productCollections.map((pc) => pc.collectionId),
   }
 
+  // Fetch recent price history for this product (server-side)
+  const rawPriceHistory = await db.$queryRaw<
+    Array<{
+      id: string
+      productId: string
+      previousPrice: number
+      newPrice: number
+      changedAt: Date
+      note?: string | null
+      changedByUser: { id: string | null; name?: string | null; email?: string | null } | null
+    }>
+  >`
+    SELECT ph."id", ph."productId", ph."previousPrice", ph."newPrice", ph."changedAt", ph."note",
+      json_build_object('id', u."id", 'name', u."name", 'email', u."email") AS "changedByUser"
+    FROM "ProductPriceHistory" ph
+    LEFT JOIN "User" u ON u."id" = ph."changedByUserId"
+    WHERE ph."productId" = ${id}
+    ORDER BY ph."changedAt" DESC
+    LIMIT 100
+  `
+
+  // Serialize dates for client component
+  const serializedHistory = rawPriceHistory.map((h) => ({
+    ...h,
+    changedAt: h.changedAt.toISOString(),
+  }))
+
   return (
     <>
       <div className="flex items-center gap-2 mb-4">
@@ -84,7 +111,11 @@ export default async function EditProductPage({ params }: EditProductPageProps) 
       </div>
 
       <div className="rounded-lg border border-border p-6">
-        <ProductForm collections={collections} product={productForForm} />
+        <ProductForm
+          collections={collections}
+          product={productForForm}
+          productPriceHistory={serializedHistory}
+        />
       </div>
     </>
   )

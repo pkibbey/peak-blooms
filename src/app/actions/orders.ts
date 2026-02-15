@@ -7,14 +7,23 @@ import { db } from "@/lib/db"
 import type { CancelOrderResponse, OrderWithItems } from "@/lib/query-types"
 import { adjustPrice } from "@/lib/utils"
 import {
+  type AdminAddOrderItemsInput,
   type AdminCreateOrderInput,
+  type AdminUpdateOrderItemQuantityInput,
+  adminAddOrderItemsSchema,
   adminCreateOrderSchema,
+  adminUpdateOrderItemQuantitySchema,
   type CancelOrderInput,
   type CreateOrderInput,
   cancelOrderSchema,
   createOrderSchema,
   type DeleteOrderAttachmentInput,
+  // delete order (admin)
+  type DeleteOrderInput,
+  type DeleteOrderItemInput,
   deleteOrderAttachmentSchema,
+  deleteOrderItemSchema,
+  deleteOrderSchema,
   type GenerateInvoiceInput,
   // invoice schemas
   generateInvoiceSchema,
@@ -370,6 +379,179 @@ export const updateOrderItemPriceAction = wrapAction(
     }
   }
 )
+
+export const deleteOrderItemAction = wrapAction(
+  async (input: DeleteOrderItemInput): Promise<{ id: string; orderTotal: number }> => {
+    const { orderId, itemId } = deleteOrderItemSchema.parse(input)
+    const user = await getCurrentUser()
+
+    if (!user || user.role !== "ADMIN") {
+      throw new Error("Unauthorized: You must be an admin to delete order items")
+    }
+
+    // Fetch the order item
+    const orderItem = await db.orderItem.findFirst({ where: { id: itemId, orderId } })
+    if (!orderItem) {
+      throw new Error("Order item not found")
+    }
+
+    // Ensure parent order exists
+    const order = await db.order.findUnique({ where: { id: orderId } })
+    if (!order) {
+      throw new Error("Order not found")
+    }
+    // allow deleting individual order items regardless of order status
+
+    // Delete the order item
+    await db.orderItem.delete({ where: { id: itemId } })
+
+    // Recalculate order total from remaining items
+    const allItems = await db.orderItem.findMany({ where: { orderId } })
+    const newOrderTotal = allItems.reduce((sum, item) => {
+      if (item.price === 0) return sum
+      return sum + (item.price ?? 0) * item.quantity
+    }, 0)
+
+    revalidatePath("/admin/orders")
+    revalidatePath(`/admin/orders/${orderId}`)
+    if (order.status === "CART") revalidatePath("/cart")
+
+    return {
+      id: itemId,
+      orderTotal: Math.round(newOrderTotal * 100) / 100,
+    }
+  }
+)
+
+/**
+ * Admin: add one or more products to an existing order
+ * - increments quantity if item already exists
+ * - snapshots current product price using the order owner's priceMultiplier
+ */
+export const adminAddOrderItemsAction = wrapAction(async (input: AdminAddOrderItemsInput) => {
+  const { orderId, items } = adminAddOrderItemsSchema.parse(input)
+  const user = await getCurrentUser()
+
+  if (!user || user.role !== "ADMIN") {
+    throw new Error("Unauthorized: You must be an admin to add order items")
+  }
+
+  const order = await db.order.findUnique({ where: { id: orderId } })
+  if (!order) throw new Error("Order not found")
+
+  // Determine price multiplier for the order owner (default to 1.0)
+  const orderOwner = await db.user.findUnique({ where: { id: order.userId } })
+  const multiplier = orderOwner?.priceMultiplier ?? 1.0
+
+  // Process each requested product
+  for (const it of items) {
+    const product = await db.product.findUnique({ where: { id: it.productId } })
+    if (!product) throw new Error(`Product not found: ${it.productId}`)
+
+    const existing = await db.orderItem.findFirst({ where: { orderId, productId: product.id } })
+    if (existing) {
+      await db.orderItem.update({
+        where: { id: existing.id },
+        data: { quantity: existing.quantity + it.quantity },
+      })
+    } else {
+      await db.orderItem.create({
+        data: {
+          orderId,
+          productId: product.id,
+          quantity: it.quantity,
+          price: adjustPrice(product.price ?? 0, multiplier),
+          productNameSnapshot: product.name,
+          productImageSnapshot: product.images?.[0] ?? null,
+        },
+        include: { product: true },
+      })
+    }
+  }
+
+  const updatedOrder = await db.order.findUniqueOrThrow({
+    where: { id: orderId },
+    include: { items: { include: { product: true } }, attachments: true },
+  })
+
+  revalidatePath("/admin/orders")
+  revalidatePath(`/admin/orders/${orderId}`)
+  if (order.status === "CART") revalidatePath("/cart")
+
+  return updatedOrder
+})
+
+/**
+ * Admin: update quantity for an order item (0 => delete)
+ */
+export const adminUpdateOrderItemQuantityAction = wrapAction(
+  async (input: AdminUpdateOrderItemQuantityInput) => {
+    const { orderId, itemId, quantity } = adminUpdateOrderItemQuantitySchema.parse(input)
+    const user = await getCurrentUser()
+
+    if (!user || user.role !== "ADMIN") {
+      throw new Error("Unauthorized: You must be an admin to update order item quantities")
+    }
+
+    const item = await db.orderItem.findUnique({ where: { id: itemId }, include: { order: true } })
+    if (!item || item.orderId !== orderId) throw new Error("Order item not found")
+
+    if (quantity <= 0) {
+      await db.orderItem.delete({ where: { id: itemId } })
+    } else {
+      await db.orderItem.update({ where: { id: itemId }, data: { quantity } })
+    }
+
+    const updatedOrder = await db.order.findUniqueOrThrow({
+      where: { id: orderId },
+      include: { items: { include: { product: true } }, attachments: true },
+    })
+
+    revalidatePath("/admin/orders")
+    revalidatePath(`/admin/orders/${orderId}`)
+    if (updatedOrder.status === "CART") revalidatePath("/cart")
+
+    return updatedOrder
+  }
+)
+
+export const deleteOrderAction = wrapAction(
+  async (input: DeleteOrderInput): Promise<{ id: string }> => {
+    const { orderId } = deleteOrderSchema.parse(input)
+    const user = await getCurrentUser()
+
+    if (!user || user.role !== "ADMIN") {
+      throw new Error("Unauthorized: You must be an admin to delete orders")
+    }
+
+    const order = await db.order.findUnique({ where: { id: orderId } })
+    if (!order) {
+      throw new Error("Order not found")
+    }
+
+    // Prevent deleting orders that still have invoice attachments
+    const existingInvoices = await db.orderAttachment.findMany({
+      where: { orderId, mime: "application/pdf" },
+      take: 1,
+    })
+
+    if ((existingInvoices || []).length > 0) {
+      throw new Error(
+        "Conflict: Order has active invoices attached — delete invoices before deleting the order"
+      )
+    }
+
+    // Allow deleting orders regardless of status — invoices are checked above and will block deletion if present
+
+    await db.order.delete({ where: { id: orderId } })
+
+    revalidatePath("/admin/orders")
+    revalidatePath(`/admin/orders/${orderId}`)
+
+    return { id: orderId }
+  }
+)
+
 /**
  * Server action for admins to manually create orders
  */
@@ -470,6 +652,14 @@ export const generateInvoiceAction = wrapAction(async (input: GenerateInvoiceInp
 
   if (!order) throw new Error("Order not found")
 
+  // Prevent invoice generation when any order item is market-priced (price === 0)
+  const hasMarketPriceItems = (order.items || []).some((it) => it.price === 0)
+  if (hasMarketPriceItems) {
+    throw new Error(
+      "Conflict: Order contains market-priced items — set prices for all items before generating an invoice."
+    )
+  }
+
   const { generateInvoicePdfBuffer } = await import("@/app/actions/pdf")
   const pdfBuffer = await generateInvoicePdfBuffer(order)
 
@@ -477,15 +667,16 @@ export const generateInvoiceAction = wrapAction(async (input: GenerateInvoiceInp
   const { generateClientTokenFromReadWriteToken, put } = await import("@vercel/blob/client")
   const timestamp = Date.now()
   const filename = `invoice_${order.orderNumber}_${timestamp}.pdf`
+  const pathname = `generated/invoices/${filename}`
 
-  // Generate a short-lived client token (server-side) and upload the PDF directly
+  // Generate a short-lived client token (server-side) and upload the PDF directly into generated/invoices/
   const clientToken = await generateClientTokenFromReadWriteToken({
-    pathname: filename,
+    pathname,
     // allow PDF mime
     allowedContentTypes: ["application/pdf"],
   })
 
-  const uploaded = await put(filename, pdfBuffer, {
+  const uploaded = await put(pathname, pdfBuffer, {
     access: "public",
     token: clientToken,
     contentType: "application/pdf",

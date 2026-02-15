@@ -25,6 +25,7 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { toAppErrorClient } from "@/lib/error-utils"
+import type { UserForAdmin } from "@/lib/query-types"
 
 interface UsersFormValues {
   email: string
@@ -35,7 +36,13 @@ interface UsersFormValues {
   approved: boolean
 }
 
-export function UsersForm() {
+export function UsersForm({
+  onSuccess,
+  onCancel,
+}: {
+  onSuccess?: (user: UserForAdmin) => void
+  onCancel?: () => void
+}) {
   const router = useRouter()
   const [isSubmitting, setIsSubmitting] = useState(false)
 
@@ -66,8 +73,12 @@ export function UsersForm() {
         return
       }
       toast.success("User created successfully")
-      router.push("/admin/users")
-      router.refresh()
+      if (onSuccess) {
+        onSuccess(result.data)
+      } else {
+        router.push("/admin/users")
+        router.refresh()
+      }
     } catch (_error) {
       toAppErrorClient(_error, "Failed to create user")
     } finally {
@@ -97,9 +108,9 @@ export function UsersForm() {
           name="name"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Name</FormLabel>
+              <FormLabel>Name *</FormLabel>
               <FormControl>
-                <Input placeholder="John Doe" {...field} />
+                <Input placeholder="John Doe" required {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -111,9 +122,9 @@ export function UsersForm() {
           name="phone"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Phone</FormLabel>
+              <FormLabel>Phone *</FormLabel>
               <FormControl>
-                <Input placeholder="+1 (555) 000-0000" {...field} />
+                <Input placeholder="+1 (555) 000-0000" required {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -183,7 +194,11 @@ export function UsersForm() {
           <Button type="submit" disabled={isSubmitting}>
             {isSubmitting ? "Creating..." : "Create User"}
           </Button>
-          <Button type="button" variant="outline" onClick={() => router.back()}>
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => (onCancel ? onCancel() : router.back())}
+          >
             Cancel
           </Button>
         </div>
