@@ -27,20 +27,14 @@ export const addToCartSchema = z.object({
   quantity: z.number().int().min(1).max(999).default(1),
 })
 
-export type AddToCartInput = z.infer<typeof addToCartSchema>
-
 export const updateCartItemSchema = z.object({
   itemId: z.string().min(1, "Invalid item ID"),
   quantity: z.number().int().min(0).max(999),
 })
 
-export type UpdateCartItemInput = z.infer<typeof updateCartItemSchema>
-
 export const removeFromCartSchema = z.object({
   itemId: z.string().min(1, "Invalid item ID"),
 })
-
-export type RemoveFromCartInput = z.infer<typeof removeFromCartSchema>
 
 export const batchAddToCartSchema = z
   .object({
@@ -61,9 +55,6 @@ export const batchAddToCartSchema = z
       path: ["quantities"],
     }
   )
-
-export type BatchAddToCartInput = z.infer<typeof batchAddToCartSchema>
-
 // Order operation schemas
 export const cancelOrderSchema = z.object({
   orderId: z.string().min(1, "Invalid order ID"),

@@ -4,13 +4,12 @@
 - Add e2e tests to ensure complete site functionality
 - make sure user flow for sign up works
 - investigate withTiming functionality
-- The price isn't being populated when creating a new order from admin
+- Create a friendly order ID, comprising of the userID, and 4 characters of the orderID (must be unique)
 
 #### Edit Product page
 - If you create a new order from admin, it should skip cart step
 - Allow editing the address field, when an admin user is editing the address field
 - Add a button to click and email the PDF to the contact email
-
 
 ### 🌟 Next Steps
 
