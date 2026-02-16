@@ -5,10 +5,12 @@ import { useState } from "react"
 import { toast } from "sonner"
 import {
   approveUserAction,
+  deleteUserAction,
   unapproveUserAction,
   updateUserPriceMultiplierAction,
 } from "@/app/actions/admin-users"
 import { Button } from "@/components/ui/button"
+import { IconTrash } from "@/components/ui/icons"
 import { Input } from "@/components/ui/input"
 import { SortableTableHead } from "@/components/ui/SortableTableHead"
 import {
@@ -260,6 +262,34 @@ export default function UsersTable({ users, sort, order }: UsersTableProps) {
                       Approve
                     </Button>
                   )}
+
+                  <Button
+                    size="sm"
+                    variant="outline-destructive"
+                    onClick={async () => {
+                      if (!confirm("Delete this user? This action cannot be undone.")) return
+
+                      setLoadingId(user.id)
+                      try {
+                        const res = await deleteUserAction({ userId: user.id })
+                        if (!res.success) {
+                          toast.error(res.error)
+                          return
+                        }
+
+                        toast.success("User deleted")
+                        router.push("/admin/users")
+                        router.refresh()
+                      } catch (_error) {
+                        toAppErrorClient(_error, "Failed to delete user")
+                      } finally {
+                        setLoadingId(null)
+                      }
+                    }}
+                    disabled={loadingId === user.id}
+                  >
+                    <IconTrash className="h-4 w-4" />
+                  </Button>
                 </div>
               </TableCell>
             </TableRow>

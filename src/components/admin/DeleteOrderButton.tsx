@@ -44,8 +44,7 @@ export function DeleteOrderButton({ orderId, hasAttachments = false }: DeleteOrd
 
   return (
     <Button size="sm" variant="outline-destructive" onClick={handleDelete} disabled={isPending}>
-      <IconTrash className="h-4 w-4 mr-1" />
-      Delete
+      <IconTrash className="h-4 w-4" />
     </Button>
   )
 }

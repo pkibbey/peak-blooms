@@ -54,40 +54,95 @@ import {
   createOrderAction,
   deleteOrderAction,
   deleteOrderItemAction,
+  generateInvoiceAction,
   updateOrderItemPriceAction,
   updateOrderStatusAction,
-  generateInvoiceAction,
 } from "./orders"
 
 const VALID_UUID = "550e8400-e29b-41d4-a716-446655440001"
 const VALID_UUID_2 = "550e8400-e29b-41d4-a716-446655440002"
 const VALID_UUID_3 = "550e8400-e29b-41d4-a716-446655440003"
 
-describe("Order Actions", () => {
-  const mockUser = {
+// Mock Factory Defaults with full Prisma model properties
+const createMockDefaults = (baseDate = new Date()) => ({
+  user: (overrides = {}) => ({
     id: "user-1",
     email: "test@example.com",
+    emailVerified: false,
+    name: "Test User",
+    image: null,
     approved: true,
     role: Role.CUSTOMER,
     priceMultiplier: 1.0,
-  }
+    createdAt: baseDate,
+    updatedAt: baseDate,
+    ...overrides,
+  }),
 
-  const mockAdminUser = {
-    ...mockUser,
+  adminUser: (overrides = {}) => ({
+    id: "admin-1",
+    email: "admin@example.com",
+    emailVerified: false,
+    name: "Admin User",
+    image: null,
+    approved: true,
     role: Role.ADMIN,
-  }
+    priceMultiplier: 1.0,
+    createdAt: baseDate,
+    updatedAt: baseDate,
+    ...overrides,
+  }),
 
-  const mockOrder = {
+  order: (overrides = {}) => ({
     id: VALID_UUID,
-    userId: mockUser.id,
-    orderNumber: String(1),
+    userId: "user-1",
+    orderNumber: "1",
     status: "PENDING" as OrderStatus,
     notes: null,
     deliveryAddressId: VALID_UUID_2,
-    createdAt: new Date(),
-    updatedAt: new Date(),
+    createdAt: baseDate,
+    updatedAt: baseDate,
     items: [],
-  }
+    ...overrides,
+  }),
+
+  orderItem: (overrides = {}) => ({
+    id: VALID_UUID_3,
+    orderId: VALID_UUID,
+    productId: VALID_UUID_2,
+    quantity: 1,
+    price: 50,
+    productNameSnapshot: null,
+    productImageSnapshot: null,
+    ...overrides,
+  }),
+
+  address: (overrides = {}) => ({
+    id: VALID_UUID_2,
+    userId: "user-1",
+    firstName: "John",
+    lastName: "Doe",
+    company: "Company",
+    street1: "123 Main St",
+    street2: null,
+    city: "Boston",
+    state: "MA",
+    zip: "02101",
+    country: "US",
+    email: "john@example.com",
+    phone: "+12065550100",
+    isDefault: false,
+    createdAt: baseDate,
+    ...overrides,
+  }),
+})
+
+describe("Order Actions", () => {
+  const baseDate = new Date()
+  const mockDefaults = createMockDefaults(baseDate)
+  const mockUser = mockDefaults.user()
+  const mockAdminUser = mockDefaults.adminUser()
+  const mockOrder = mockDefaults.order()
 
   beforeEach(() => {
     vi.resetAllMocks()
@@ -113,8 +168,9 @@ describe("Order Actions", () => {
     })
 
     it("should return error if order is not PENDING", async () => {
-      const confirmedOrder = { ...mockOrder, status: "CONFIRMED" as OrderStatus }
-      vi.mocked(db.order.findFirst).mockResolvedValueOnce(confirmedOrder)
+      vi.mocked(db.order.findFirst).mockResolvedValueOnce(
+        mockDefaults.order({ status: "CONFIRMED" as OrderStatus })
+      )
       const result = await cancelOrderAction({ orderId: VALID_UUID })
       expect(result.success).toBe(false)
       if (!result.success) {
@@ -124,8 +180,10 @@ describe("Order Actions", () => {
 
     it("should cancel PENDING order successfully", async () => {
       vi.mocked(db.order.findFirst).mockResolvedValueOnce(mockOrder)
-      vi.mocked(db.order.update).mockResolvedValueOnce({ ...mockOrder, status: "CANCELLED" })
-      vi.mocked(db.orderItem.update).mockResolvedValue({} as never)
+      vi.mocked(db.order.update).mockResolvedValueOnce(
+        mockDefaults.order({ status: "CANCELLED" as OrderStatus })
+      )
+      vi.mocked(db.orderItem.update).mockResolvedValue(mockDefaults.orderItem())
 
       const result = await cancelOrderAction({ orderId: VALID_UUID })
       expect(result.success).toBe(true)
@@ -135,16 +193,17 @@ describe("Order Actions", () => {
     })
 
     it("should convert to cart successfully and clear snapshots", async () => {
-      const orderWithItems = {
-        ...mockOrder,
-        items: [{ id: "item-1", productNameSnapshot: "Roses" }],
-      }
-      vi.mocked(db.order.findFirst).mockResolvedValueOnce(orderWithItems as never)
-      vi.mocked(db.orderItem.update).mockResolvedValue({} as never)
-      vi.mocked(db.order.update).mockResolvedValueOnce({
-        ...orderWithItems,
-        status: "CART",
-      } as never)
+      const orderWithItems = mockDefaults.order({
+        items: [mockDefaults.orderItem({ id: "item-1", productNameSnapshot: "Roses" })],
+      })
+      vi.mocked(db.order.findFirst).mockResolvedValueOnce(orderWithItems)
+      vi.mocked(db.orderItem.update).mockResolvedValue(mockDefaults.orderItem())
+      vi.mocked(db.order.update).mockResolvedValueOnce(
+        mockDefaults.order({
+          items: orderWithItems.items,
+          status: "CART" as OrderStatus,
+        })
+      )
 
       const result = await cancelOrderAction({ orderId: VALID_UUID, convertToCart: true })
       expect(result.success).toBe(true)
@@ -193,11 +252,12 @@ describe("Order Actions", () => {
 
     it("should update status successfully", async () => {
       vi.mocked(db.order.findUnique).mockResolvedValueOnce(mockOrder)
-      vi.mocked(db.order.update).mockResolvedValueOnce({ ...mockOrder, status: "CONFIRMED" })
-      vi.mocked(db.order.findUniqueOrThrow).mockResolvedValueOnce({
-        ...mockOrder,
-        status: "CONFIRMED",
-      })
+      vi.mocked(db.order.update).mockResolvedValueOnce(
+        mockDefaults.order({ status: "CONFIRMED" as OrderStatus })
+      )
+      vi.mocked(db.order.findUniqueOrThrow).mockResolvedValueOnce(
+        mockDefaults.order({ status: "CONFIRMED" as OrderStatus })
+      )
 
       const result = await updateOrderStatusAction({ orderId: VALID_UUID, status: "CONFIRMED" })
       expect(result.success).toBe(true)
@@ -216,25 +276,19 @@ describe("Order Actions", () => {
   })
 
   describe("updateOrderItemPriceAction", () => {
-    const mockItem = {
-      id: VALID_UUID_3,
-      orderId: VALID_UUID,
-      productId: VALID_UUID_2,
-      quantity: 2,
-      price: 0,
-    }
+    const mockItem = mockDefaults.orderItem()
 
     beforeEach(() => {
       vi.mocked(getCurrentUser).mockResolvedValue(mockAdminUser)
     })
 
     it("should update price and recalculate total including market prices", async () => {
-      vi.mocked(db.orderItem.findFirst).mockResolvedValueOnce(mockItem as never)
-      vi.mocked(db.orderItem.update).mockResolvedValueOnce({ ...mockItem, price: 50 } as never)
+      vi.mocked(db.orderItem.findFirst).mockResolvedValueOnce(mockItem)
+      vi.mocked(db.orderItem.update).mockResolvedValueOnce(mockDefaults.orderItem({ price: 50 }))
       vi.mocked(db.orderItem.findMany).mockResolvedValueOnce([
-        { ...mockItem, price: 50, quantity: 2 },
-        { id: "item-2", price: 0, quantity: 1 },
-      ] as never)
+        mockDefaults.orderItem({ quantity: 2, price: 50 }),
+        mockDefaults.orderItem({ id: "item-2", price: 0, quantity: 1 }),
+      ])
 
       const result = await updateOrderItemPriceAction({
         orderId: VALID_UUID,
@@ -262,7 +316,7 @@ describe("Order Actions", () => {
     })
 
     it("should return error when order item not found", async () => {
-      vi.mocked(db.orderItem.findFirst).mockResolvedValueOnce(null as never)
+      vi.mocked(db.orderItem.findFirst).mockResolvedValueOnce(null)
 
       const result = await updateOrderItemPriceAction({
         orderId: VALID_UUID,
@@ -367,12 +421,11 @@ describe("Order Actions", () => {
     })
 
     it("should allow deleting orders regardless of status when no invoices", async () => {
-      vi.mocked(db.order.findUnique).mockResolvedValueOnce({
-        id: VALID_UUID,
-        status: "PENDING",
-      } as never)
-      vi.mocked(db.orderAttachment.findMany).mockResolvedValueOnce([] as never)
-      vi.mocked(db.order.delete).mockResolvedValueOnce({ id: VALID_UUID } as never)
+      vi.mocked(db.order.findUnique).mockResolvedValueOnce(
+        mockDefaults.order({ status: "PENDING" as OrderStatus })
+      )
+      vi.mocked(db.orderAttachment.findMany).mockResolvedValueOnce([])
+      vi.mocked(db.order.delete).mockResolvedValueOnce(mockDefaults.order())
 
       const result = await deleteOrderAction({ orderId: VALID_UUID })
       expect(result.success).toBe(true)
@@ -382,13 +435,20 @@ describe("Order Actions", () => {
     })
 
     it("should prevent delete when there are invoice attachments", async () => {
-      vi.mocked(db.order.findUnique).mockResolvedValueOnce({
-        id: VALID_UUID,
-        status: "CART",
-      } as never)
+      vi.mocked(db.order.findUnique).mockResolvedValueOnce(
+        mockDefaults.order({ status: "CART" as OrderStatus })
+      )
       vi.mocked(db.orderAttachment.findMany).mockResolvedValueOnce([
-        { id: "att-1", orderId: VALID_UUID, mime: "application/pdf" },
-      ] as never)
+        {
+          id: "att-1",
+          orderId: VALID_UUID,
+          url: "https://example.com/invoice.pdf",
+          key: null,
+          mime: "application/pdf",
+          size: 1024,
+          createdAt: baseDate,
+        },
+      ])
 
       const result = await deleteOrderAction({ orderId: VALID_UUID })
       expect(result.success).toBe(false)
@@ -399,12 +459,11 @@ describe("Order Actions", () => {
     })
 
     it("should delete order successfully when status is CART and no invoices", async () => {
-      vi.mocked(db.order.findUnique).mockResolvedValueOnce({
-        id: VALID_UUID,
-        status: "CART",
-      } as never)
-      vi.mocked(db.orderAttachment.findMany).mockResolvedValueOnce([] as never)
-      vi.mocked(db.order.delete).mockResolvedValueOnce({ id: VALID_UUID } as never)
+      vi.mocked(db.order.findUnique).mockResolvedValueOnce(
+        mockDefaults.order({ status: "CART" as OrderStatus })
+      )
+      vi.mocked(db.orderAttachment.findMany).mockResolvedValueOnce([])
+      vi.mocked(db.order.delete).mockResolvedValueOnce(mockDefaults.order())
       const result = await deleteOrderAction({ orderId: VALID_UUID })
       expect(result.success).toBe(true)
       if (result.success) {
@@ -419,11 +478,11 @@ describe("Order Actions", () => {
     })
 
     it("should prevent invoice generation when order contains market-priced items", async () => {
-      vi.mocked(db.order.findUnique).mockResolvedValueOnce({
-        id: VALID_UUID,
-        orderNumber: "1",
-        items: [{ id: "i1", price: 0, quantity: 1 }],
-      } as any)
+      vi.mocked(db.order.findUnique).mockResolvedValueOnce(
+        mockDefaults.order({
+          items: [mockDefaults.orderItem({ id: "i1", price: 0, quantity: 1 })],
+        })
+      )
 
       const result = await generateInvoiceAction({ orderId: VALID_UUID })
       expect(result.success).toBe(false)
@@ -434,19 +493,23 @@ describe("Order Actions", () => {
     })
 
     it("should generate invoice when all items have prices", async () => {
-      vi.mocked(db.order.findUnique).mockResolvedValueOnce({
-        id: VALID_UUID,
-        orderNumber: "1",
-        items: [{ id: "i1", price: 10, quantity: 1 }],
-        user: { id: "user-1", email: "test@example.com" },
-        deliveryAddress: { firstName: "A", lastName: "B" },
-      } as any)
+      vi.mocked(db.order.findUnique).mockResolvedValueOnce(
+        mockDefaults.order({
+          user: mockUser,
+          deliveryAddress: mockDefaults.address(),
+          items: [mockDefaults.orderItem({ id: "i1", price: 10, quantity: 1 })],
+        })
+      )
 
       vi.mocked(db.orderAttachment.create).mockResolvedValueOnce({
         id: "att-1",
         orderId: VALID_UUID,
         url: "https://blob.vercel-storage.com/generated/invoices/invoice.pdf",
-      } as any)
+        key: null,
+        mime: "application/pdf",
+        size: null,
+        createdAt: baseDate,
+      })
 
       const result = await generateInvoiceAction({ orderId: VALID_UUID })
       expect(result.success).toBe(true)
@@ -466,7 +529,7 @@ describe("Order Actions", () => {
       const result = await (await import("./orders")).adminAddOrderItemsAction({
         orderId: VALID_UUID,
         items: [{ productId: VALID_UUID_2, quantity: 1 }],
-      } as any)
+      })
       expect(result.success).toBe(false)
       if (!result.success) expect(result.code).toBe("UNAUTHORIZED")
     })
@@ -475,7 +538,7 @@ describe("Order Actions", () => {
       const result = await (await import("./orders")).adminAddOrderItemsAction({
         orderId: "",
         items: [],
-      } as any)
+      })
       expect(result.success).toBe(false)
       if (!result.success) expect(result.code).toBe("VALIDATION_ERROR")
     })
@@ -485,48 +548,50 @@ describe("Order Actions", () => {
       const result = await (await import("./orders")).adminAddOrderItemsAction({
         orderId: VALID_UUID,
         items: [{ productId: VALID_UUID_2, quantity: 1 }],
-      } as any)
+      })
       expect(result.success).toBe(false)
       if (!result.success) expect(result.code).toBe("NOT_FOUND")
     })
 
     it("should create new order item when none exists", async () => {
-      vi.mocked(db.order.findUnique).mockResolvedValueOnce({
-        id: VALID_UUID,
-        userId: mockUser.id,
-      } as any)
-      vi.mocked(db.user.findUnique).mockResolvedValueOnce({ priceMultiplier: 1.0 } as any)
+      vi.mocked(db.order.findUnique).mockResolvedValueOnce(mockDefaults.order())
+      vi.mocked(db.user.findUnique).mockResolvedValueOnce(mockDefaults.user())
       vi.mocked(db.product.findUnique).mockResolvedValueOnce({
         id: VALID_UUID_2,
         price: 20,
         name: "Roses",
         images: ["img.jpg"],
-      } as any)
-      vi.mocked(db.orderItem.findFirst).mockResolvedValueOnce(null as never)
-      vi.mocked(db.orderItem.create).mockResolvedValueOnce({
-        id: "new-item",
-        productId: VALID_UUID_2,
-        quantity: 3,
-        price: 20,
-      } as any)
-      vi.mocked(db.order.findUniqueOrThrow).mockResolvedValueOnce({
-        id: VALID_UUID,
-        items: [
-          {
-            id: "new-item",
-            productId: VALID_UUID_2,
-            quantity: 3,
-            price: 20,
-            product: { id: VALID_UUID_2, name: "Roses" },
-          },
-        ],
-        attachments: [],
-      } as any)
+        description: "Beautiful roses",
+        createdAt: baseDate,
+        updatedAt: baseDate,
+        deletedAt: null,
+        slug: "roses",
+        colors: [],
+        featured: false,
+        productType: "FLOWER",
+      })
+      vi.mocked(db.orderItem.findFirst).mockResolvedValueOnce(null)
+      vi.mocked(db.orderItem.create).mockResolvedValueOnce(
+        mockDefaults.orderItem({ id: "new-item", quantity: 3, price: 20 })
+      )
+      vi.mocked(db.order.findUniqueOrThrow).mockResolvedValueOnce(
+        mockDefaults.order({
+          items: [
+            mockDefaults.orderItem({
+              id: "new-item",
+              quantity: 3,
+              price: 20,
+              product: { id: VALID_UUID_2, name: "Roses" },
+            }),
+          ],
+          attachments: [],
+        })
+      )
 
       const result = await (await import("./orders")).adminAddOrderItemsAction({
         orderId: VALID_UUID,
         items: [{ productId: VALID_UUID_2, quantity: 3 }],
-      } as any)
+      })
 
       expect(result.success).toBe(true)
       if (result.success) {
@@ -536,41 +601,46 @@ describe("Order Actions", () => {
     })
 
     it("should increment existing item quantity", async () => {
-      vi.mocked(db.order.findUnique).mockResolvedValueOnce({
-        id: VALID_UUID,
-        userId: mockUser.id,
-      } as any)
-      vi.mocked(db.user.findUnique).mockResolvedValueOnce({ priceMultiplier: 1.0 } as any)
+      vi.mocked(db.order.findUnique).mockResolvedValueOnce(mockDefaults.order())
+      vi.mocked(db.user.findUnique).mockResolvedValueOnce(mockDefaults.user())
       vi.mocked(db.product.findUnique).mockResolvedValueOnce({
         id: VALID_UUID_2,
         price: 10,
         name: "Roses",
         images: [],
-      } as any)
-      vi.mocked(db.orderItem.findFirst).mockResolvedValueOnce({
-        id: "existing",
-        productId: VALID_UUID_2,
-        quantity: 2,
-      } as any)
-      vi.mocked(db.orderItem.update).mockResolvedValueOnce({ id: "existing", quantity: 5 } as any)
-      vi.mocked(db.order.findUniqueOrThrow).mockResolvedValueOnce({
-        id: VALID_UUID,
-        items: [
-          {
-            id: "existing",
-            productId: VALID_UUID_2,
-            quantity: 5,
-            price: 10,
-            product: { id: VALID_UUID_2, name: "Roses" },
-          },
-        ],
-        attachments: [],
-      } as any)
+        description: "Roses for arrangements",
+        createdAt: baseDate,
+        updatedAt: baseDate,
+        deletedAt: null,
+        slug: "roses",
+        colors: [],
+        featured: false,
+        productType: "FLOWER",
+      })
+      vi.mocked(db.orderItem.findFirst).mockResolvedValueOnce(
+        mockDefaults.orderItem({ id: "existing", quantity: 2 })
+      )
+      vi.mocked(db.orderItem.update).mockResolvedValueOnce(
+        mockDefaults.orderItem({ id: "existing", quantity: 5 })
+      )
+      vi.mocked(db.order.findUniqueOrThrow).mockResolvedValueOnce(
+        mockDefaults.order({
+          items: [
+            mockDefaults.orderItem({
+              id: "existing",
+              quantity: 5,
+              price: 10,
+              product: { id: VALID_UUID_2, name: "Roses" },
+            }),
+          ],
+          attachments: [],
+        })
+      )
 
       const result = await (await import("./orders")).adminAddOrderItemsAction({
         orderId: VALID_UUID,
         items: [{ productId: VALID_UUID_2, quantity: 3 }],
-      } as any)
+      })
 
       expect(result.success).toBe(true)
       if (result.success) {
@@ -590,7 +660,7 @@ describe("Order Actions", () => {
         orderId: VALID_UUID,
         itemId: VALID_UUID_3,
         quantity: 2,
-      } as any)
+      })
       expect(result.success).toBe(false)
       if (!result.success) expect(result.code).toBe("UNAUTHORIZED")
     })
@@ -600,66 +670,62 @@ describe("Order Actions", () => {
         orderId: "",
         itemId: "",
         quantity: -1,
-      } as any)
+      })
       expect(result.success).toBe(false)
       if (!result.success) expect(result.code).toBe("VALIDATION_ERROR")
     })
 
     it("should return not found when item missing", async () => {
-      vi.mocked(db.orderItem.findUnique).mockResolvedValueOnce(null as never)
+      vi.mocked(db.orderItem.findUnique).mockResolvedValueOnce(null)
       const result = await (await import("./orders")).adminUpdateOrderItemQuantityAction({
         orderId: VALID_UUID,
         itemId: VALID_UUID_3,
         quantity: 2,
-      } as any)
+      })
       expect(result.success).toBe(false)
       if (!result.success) expect(result.code).toBe("NOT_FOUND")
     })
 
     it("should update quantity successfully", async () => {
-      vi.mocked(db.orderItem.findUnique).mockResolvedValueOnce({
-        id: VALID_UUID_3,
-        orderId: VALID_UUID,
-        quantity: 1,
-      } as any)
-      vi.mocked(db.orderItem.update).mockResolvedValueOnce({
-        id: VALID_UUID_3,
-        orderId: VALID_UUID,
-        quantity: 4,
-      } as any)
-      vi.mocked(db.order.findUniqueOrThrow).mockResolvedValueOnce({
-        id: VALID_UUID,
-        items: [{ id: VALID_UUID_3, quantity: 4, product: { id: VALID_UUID_2, name: "Roses" } }],
-        attachments: [],
-      } as any)
+      vi.mocked(db.orderItem.findUnique).mockResolvedValueOnce(
+        mockDefaults.orderItem({ quantity: 1 })
+      )
+      vi.mocked(db.orderItem.update).mockResolvedValueOnce(mockDefaults.orderItem({ quantity: 4 }))
+      vi.mocked(db.order.findUniqueOrThrow).mockResolvedValueOnce(
+        mockDefaults.order({
+          items: [
+            mockDefaults.orderItem({
+              quantity: 4,
+              product: { id: VALID_UUID_2, name: "Roses" },
+            }),
+          ],
+          attachments: [],
+        })
+      )
 
       const result = await (await import("./orders")).adminUpdateOrderItemQuantityAction({
         orderId: VALID_UUID,
         itemId: VALID_UUID_3,
         quantity: 4,
-      } as any)
+      })
       expect(result.success).toBe(true)
       if (result.success) expect(result.data?.items?.[0].quantity).toBe(4)
     })
 
     it("should delete item when quantity is 0", async () => {
-      vi.mocked(db.orderItem.findUnique).mockResolvedValueOnce({
-        id: VALID_UUID_3,
-        orderId: VALID_UUID,
-        quantity: 1,
-      } as any)
-      vi.mocked(db.orderItem.delete).mockResolvedValueOnce({ id: VALID_UUID_3 } as any)
-      vi.mocked(db.order.findUniqueOrThrow).mockResolvedValueOnce({
-        id: VALID_UUID,
-        items: [],
-        attachments: [],
-      } as any)
+      vi.mocked(db.orderItem.findUnique).mockResolvedValueOnce(
+        mockDefaults.orderItem({ quantity: 1 })
+      )
+      vi.mocked(db.orderItem.delete).mockResolvedValueOnce(mockDefaults.orderItem())
+      vi.mocked(db.order.findUniqueOrThrow).mockResolvedValueOnce(
+        mockDefaults.order({ items: [], attachments: [] })
+      )
 
       const result = await (await import("./orders")).adminUpdateOrderItemQuantityAction({
         orderId: VALID_UUID,
         itemId: VALID_UUID_3,
         quantity: 0,
-      } as any)
+      })
       expect(result.success).toBe(true)
       if (result.success) expect(result.data?.items?.length).toBe(0)
     })
@@ -673,19 +739,29 @@ describe("Order Actions", () => {
       notes: "Test note",
     }
 
-    const mockCart = {
-      ...mockOrder,
+    const mockCart = mockDefaults.order({
       id: "cart-1",
       status: "CART" as OrderStatus,
       items: [
-        {
+        mockDefaults.orderItem({
           id: VALID_UUID_3,
-          productId: VALID_UUID_2,
+          product: {
+            id: VALID_UUID_2,
+            name: "Roses",
+            sku: "ROSE-001",
+            description: "Beautiful roses",
+            price: 150,
+            images: ["roses.jpg"],
+            type: "CUT_FLOWER",
+            collectionId: null,
+            isArchived: false,
+            createdAt: baseDate,
+            updatedAt: baseDate,
+          },
           quantity: 2,
-          product: { id: VALID_UUID_2, name: "Roses", image: "roses.jpg", price: 150 },
-        },
+        }),
       ],
-    }
+    })
 
     it("should return error if user not approved", async () => {
       vi.mocked(getCurrentUser).mockResolvedValueOnce({ ...mockUser, approved: false })
@@ -706,7 +782,7 @@ describe("Order Actions", () => {
     })
 
     it("should return error if existing address not found", async () => {
-      vi.mocked(db.order.findFirst).mockResolvedValueOnce(mockCart as never)
+      vi.mocked(db.order.findFirst).mockResolvedValueOnce(mockCart)
       vi.mocked(db.address.findFirst).mockResolvedValueOnce(null)
       const result = await createOrderAction(validData)
       expect(result.success).toBe(false)
@@ -716,17 +792,15 @@ describe("Order Actions", () => {
     })
 
     it("should create order with existing address", async () => {
-      vi.mocked(db.order.findFirst).mockResolvedValueOnce(mockCart as never)
-      vi.mocked(db.orderItem.update).mockResolvedValue({} as never)
-      vi.mocked(db.address.findFirst).mockResolvedValueOnce({
-        id: VALID_UUID_2,
-        userId: mockUser.id,
-      } as never)
-      vi.mocked(db.order.findUniqueOrThrow).mockResolvedValueOnce({
-        ...mockCart,
-        status: "PENDING",
-      } as never)
-      vi.mocked(db.order.update).mockResolvedValueOnce({ ...mockCart, status: "PENDING" } as never)
+      vi.mocked(db.order.findFirst).mockResolvedValueOnce(mockCart)
+      vi.mocked(db.orderItem.update).mockResolvedValue(mockDefaults.orderItem())
+      vi.mocked(db.address.findFirst).mockResolvedValueOnce(mockDefaults.address())
+      vi.mocked(db.order.findUniqueOrThrow).mockResolvedValueOnce(
+        mockDefaults.order({ status: "PENDING" as OrderStatus })
+      )
+      vi.mocked(db.order.update).mockResolvedValueOnce(
+        mockDefaults.order({ status: "PENDING" as OrderStatus })
+      )
 
       const result = await createOrderAction(validData)
       expect(result.success).toBe(true)
@@ -736,21 +810,15 @@ describe("Order Actions", () => {
     })
 
     it("should include notes if provided", async () => {
-      vi.mocked(db.order.findFirst).mockResolvedValueOnce(mockCart as never)
-      vi.mocked(db.orderItem.update).mockResolvedValue({} as never)
-      vi.mocked(db.address.findFirst).mockResolvedValueOnce({
-        id: VALID_UUID_2,
-        userId: mockUser.id,
-      } as never)
-      vi.mocked(db.order.findUniqueOrThrow).mockResolvedValueOnce({
-        ...mockCart,
-        status: "PENDING",
-      } as never)
-      vi.mocked(db.order.update).mockResolvedValueOnce({
-        ...mockCart,
-        status: "PENDING",
-        notes: "Test note",
-      } as never)
+      vi.mocked(db.order.findFirst).mockResolvedValueOnce(mockCart)
+      vi.mocked(db.orderItem.update).mockResolvedValue(mockDefaults.orderItem())
+      vi.mocked(db.address.findFirst).mockResolvedValueOnce(mockDefaults.address())
+      vi.mocked(db.order.findUniqueOrThrow).mockResolvedValueOnce(
+        mockDefaults.order({ status: "PENDING" as OrderStatus })
+      )
+      vi.mocked(db.order.update).mockResolvedValueOnce(
+        mockDefaults.order({ status: "PENDING" as OrderStatus, notes: "Test note" })
+      )
 
       await createOrderAction({ ...validData, notes: "Test note" })
       expect(db.order.update).toHaveBeenCalledWith(
@@ -761,28 +829,57 @@ describe("Order Actions", () => {
     })
 
     it("should handle market items and multiplier in createOrderAction", async () => {
-      const marketCart = {
-        ...mockCart,
+      const marketCart = mockDefaults.order({
+        id: "cart-1",
+        status: "CART" as OrderStatus,
         items: [
-          { ...mockCart.items[0], product: { ...mockCart.items[0].product, price: 0 } },
-          { id: "item-2", productId: VALID_UUID_3, quantity: 1, product: { id: "p2", price: 100 } },
+          mockDefaults.orderItem({
+            id: VALID_UUID_3,
+            product: {
+              id: VALID_UUID_2,
+              name: "Roses",
+              price: 0,
+              sku: "ROSE-001",
+              description: "Market priced roses",
+              images: ["roses.jpg"],
+              type: "CUT_FLOWER",
+              collectionId: null,
+              isArchived: false,
+              createdAt: baseDate,
+              updatedAt: baseDate,
+            },
+            quantity: 2,
+          }),
+          mockDefaults.orderItem({
+            id: "item-2",
+            productId: VALID_UUID_3,
+            product: {
+              id: VALID_UUID_3,
+              name: "Tulips",
+              price: 100,
+              sku: "TULIP-001",
+              description: "Premium tulips",
+              images: [],
+              type: "CUT_FLOWER",
+              collectionId: null,
+              isArchived: false,
+              createdAt: baseDate,
+              updatedAt: baseDate,
+            },
+            quantity: 1,
+          }),
         ],
-      }
-      vi.mocked(getCurrentUser).mockResolvedValueOnce({ ...mockUser, priceMultiplier: 1.5 })
-      vi.mocked(db.order.findFirst).mockResolvedValueOnce(marketCart as never)
-      vi.mocked(db.orderItem.update).mockResolvedValue({} as never)
-      vi.mocked(db.address.findFirst).mockResolvedValueOnce({
-        id: VALID_UUID_2,
-        userId: mockUser.id,
-      } as never)
-      vi.mocked(db.order.findUniqueOrThrow).mockResolvedValueOnce({
-        ...marketCart,
-        status: "PENDING",
-      } as never)
-      vi.mocked(db.order.update).mockResolvedValueOnce({
-        ...marketCart,
-        status: "PENDING",
-      } as never)
+      })
+      vi.mocked(getCurrentUser).mockResolvedValueOnce(mockDefaults.user({ priceMultiplier: 1.5 }))
+      vi.mocked(db.order.findFirst).mockResolvedValueOnce(marketCart)
+      vi.mocked(db.orderItem.update).mockResolvedValue(mockDefaults.orderItem())
+      vi.mocked(db.address.findFirst).mockResolvedValueOnce(mockDefaults.address())
+      vi.mocked(db.order.findUniqueOrThrow).mockResolvedValueOnce(
+        mockDefaults.order({ status: "PENDING" as OrderStatus })
+      )
+      vi.mocked(db.order.update).mockResolvedValueOnce(
+        mockDefaults.order({ status: "PENDING" as OrderStatus })
+      )
 
       await createOrderAction(validData)
       expect(db.orderItem.update).toHaveBeenCalledWith(
@@ -793,7 +890,7 @@ describe("Order Actions", () => {
     })
 
     it("should create order with new address", async () => {
-      const newAddr = {
+      const newAddr = mockDefaults.address({
         firstName: "A",
         lastName: "B",
         company: "Company",
@@ -805,20 +902,33 @@ describe("Order Actions", () => {
         phone: "+12065550100",
         email: "a@b.com",
         country: "US",
-      }
-      vi.mocked(db.order.findFirst).mockResolvedValueOnce(mockCart as never)
-      vi.mocked(db.orderItem.update).mockResolvedValue({} as never)
-      vi.mocked(db.address.create).mockResolvedValueOnce({ id: "address-new" } as never)
-      vi.mocked(db.order.findUniqueOrThrow).mockResolvedValueOnce({
-        ...mockCart,
-        status: "PENDING",
-      } as never)
-      vi.mocked(db.order.update).mockResolvedValueOnce({ ...mockCart, status: "PENDING" } as never)
+      })
+      vi.mocked(db.order.findFirst).mockResolvedValueOnce(mockCart)
+      vi.mocked(db.orderItem.update).mockResolvedValue(mockDefaults.orderItem())
+      vi.mocked(db.address.create).mockResolvedValueOnce(newAddr)
+      vi.mocked(db.order.findUniqueOrThrow).mockResolvedValueOnce(
+        mockDefaults.order({ status: "PENDING" as OrderStatus })
+      )
+      vi.mocked(db.order.update).mockResolvedValueOnce(
+        mockDefaults.order({ status: "PENDING" as OrderStatus })
+      )
 
       const result = await createOrderAction({
         ...validData,
         deliveryAddressId: null,
-        deliveryAddress: newAddr,
+        deliveryAddress: {
+          firstName: "A",
+          lastName: "B",
+          company: "Company",
+          street1: "S",
+          street2: "",
+          city: "C",
+          state: "S",
+          zip: "12345",
+          phone: "+12065550100",
+          email: "a@b.com",
+          country: "US",
+        },
       })
       expect(result.success).toBe(true)
       if (result.success) {
@@ -828,7 +938,7 @@ describe("Order Actions", () => {
     })
 
     it("should save new address to user if saveDeliveryAddress is true", async () => {
-      const newAddr = {
+      const newAddr = mockDefaults.address({
         firstName: "A",
         lastName: "B",
         company: "Company",
@@ -840,20 +950,33 @@ describe("Order Actions", () => {
         phone: "+12065550100",
         email: "a@b.com",
         country: "US",
-      }
-      vi.mocked(db.order.findFirst).mockResolvedValueOnce(mockCart as never)
-      vi.mocked(db.orderItem.update).mockResolvedValue({} as never)
-      vi.mocked(db.address.create).mockResolvedValueOnce({ id: "address-new" } as never)
-      vi.mocked(db.order.findUniqueOrThrow).mockResolvedValueOnce({
-        ...mockCart,
-        status: "PENDING",
-      } as never)
-      vi.mocked(db.order.update).mockResolvedValueOnce({ ...mockCart, status: "PENDING" } as never)
+      })
+      vi.mocked(db.order.findFirst).mockResolvedValueOnce(mockCart)
+      vi.mocked(db.orderItem.update).mockResolvedValue(mockDefaults.orderItem())
+      vi.mocked(db.address.create).mockResolvedValueOnce(newAddr)
+      vi.mocked(db.order.findUniqueOrThrow).mockResolvedValueOnce(
+        mockDefaults.order({ status: "PENDING" as OrderStatus })
+      )
+      vi.mocked(db.order.update).mockResolvedValueOnce(
+        mockDefaults.order({ status: "PENDING" as OrderStatus })
+      )
 
       await createOrderAction({
         ...validData,
         deliveryAddressId: null,
-        deliveryAddress: newAddr,
+        deliveryAddress: {
+          firstName: "A",
+          lastName: "B",
+          company: "Company",
+          street1: "S",
+          street2: "",
+          city: "C",
+          state: "S",
+          zip: "12345",
+          phone: "+12065550100",
+          email: "a@b.com",
+          country: "US",
+        },
         saveDeliveryAddress: true,
       })
       expect(db.address.create).toHaveBeenCalledWith(

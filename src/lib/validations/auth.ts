@@ -50,3 +50,10 @@ export const createUserSchema = z.object({
 })
 
 export type CreateUserInput = z.infer<typeof createUserSchema>
+
+// Delete user schema
+export const deleteUserSchema = z.object({
+  userId: z.string().min(1, "Invalid user ID"),
+})
+
+export type DeleteUserInput = z.infer<typeof deleteUserSchema>

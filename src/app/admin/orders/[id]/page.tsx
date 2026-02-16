@@ -1,6 +1,5 @@
 import { notFound } from "next/navigation"
 import AdminOrderItemsEditor from "@/components/admin/AdminOrderItemsEditor"
-import { AdminOrderPriceEditor } from "@/components/admin/AdminOrderPriceEditor"
 import { DeleteOrderButton } from "@/components/admin/DeleteOrderButton"
 import { GenerateInvoiceButton } from "@/components/admin/GenerateInvoiceButton"
 import { OrderAttachmentsList } from "@/components/admin/OrderAttachmentsList"
@@ -10,6 +9,7 @@ import BackLink from "@/components/site/BackLink"
 import ContactInfo from "@/components/site/ContactInfo"
 import { OrderStatusBadge } from "@/components/site/OrderStatusBadge"
 import type { OrderStatus } from "@/generated/enums"
+import { getCurrentUser } from "@/lib/current-user"
 import { getTrackedDb } from "@/lib/db"
 import { formatDate } from "@/lib/utils"
 
@@ -23,7 +23,7 @@ export default async function AdminOrderDetailPage({ params }: AdminOrderDetailP
   const { id } = await params
 
   // Fetch the order and products (products used by ProductMultiSelect)
-  const [order, products] = await Promise.all([
+  const [order, products, user] = await Promise.all([
     db.order.findUnique({
       where: { id },
       include: {
@@ -45,6 +45,7 @@ export default async function AdminOrderDetailPage({ params }: AdminOrderDetailP
       },
     }),
     db.product.findMany({ orderBy: { name: "asc" } }),
+    getCurrentUser(),
   ])
 
   if (!order) {
@@ -70,8 +71,7 @@ export default async function AdminOrderDetailPage({ params }: AdminOrderDetailP
         <div className="lg:col-span-2 space-y-6">
           {/* Order Items */}
           <div className="space-y-6">
-            <AdminOrderItemsEditor order={order} products={products} />
-            <AdminOrderPriceEditor order={order} />
+            <AdminOrderItemsEditor order={order} products={products} user={user} />
 
             {/* Invoices & Attachments */}
             <div className="bg-background rounded-xs shadow-sm border p-6">

@@ -10,6 +10,23 @@ import fs from "node:fs/promises"
 import path from "node:path"
 import { PDFDocument, rgb, StandardFonts } from "pdf-lib"
 
+export async function computeOrderTax(order: {
+  items?: Array<{ price?: number | null; quantity?: number | null }> | null
+  deliveryAddress?: { state?: string | null } | null
+}) {
+  const CA_SALES_TAX_RATE = 0.0725 // 7.25%
+  const subtotal = (order.items || []).reduce(
+    (s, it) => s + (it?.price ?? 0) * (it?.quantity ?? 0),
+    0
+  )
+
+  // Company is located in California — always apply CA sales tax
+  const isCalifornia = true
+  const tax = +(subtotal * CA_SALES_TAX_RATE).toFixed(2)
+  const taxLabel = `Tax (CA ${(CA_SALES_TAX_RATE * 100).toFixed(2)}%):`
+  return { subtotal, tax, taxLabel, isCalifornia }
+}
+
 export async function generateInvoicePdfBuffer(order: {
   orderNumber?: string | number
   items: Array<{
@@ -254,11 +271,17 @@ export async function generateInvoicePdfBuffer(order: {
 
   y = tableTopY - headerHeight - 8
 
-  // Items rows
+  // Items rows — sort alphabetically by product name/snapshot for predictable print order
+  const sortedItems = [...order.items].sort((a, b) => {
+    const aName = (a.productNameSnapshot || a.product?.name || "").toLowerCase()
+    const bName = (b.productNameSnapshot || b.product?.name || "").toLowerCase()
+    return aName.localeCompare(bName)
+  })
+
   let subtotal = 0
   const rowHeight = 18
   const itemFontSize = 10
-  for (const item of order.items) {
+  for (const item of sortedItems) {
     const unit = item.price ?? 0
     const quantity = item.quantity ?? 0
     const lineTotal = unit * quantity
@@ -303,18 +326,13 @@ export async function generateInvoicePdfBuffer(order: {
 
   y -= 8
 
-  // calculate tax (apply standard California sales tax when shipping to CA)
-  const CA_SALES_TAX_RATE = 0.0725 // 7.25%
-  const shippingState = (order.deliveryAddress?.state || "").trim().toLowerCase()
-  const isCalifornia = shippingState === "ca" || shippingState === "california"
-  const tax = isCalifornia ? +(subtotal * CA_SALES_TAX_RATE).toFixed(2) : 0
+  const { tax, taxLabel } = await computeOrderTax(order)
   const total = +(subtotal + tax).toFixed(2)
-  const taxLabel = isCalifornia ? `Tax (CA ${(CA_SALES_TAX_RATE * 100).toFixed(2)}%):` : "Tax:"
 
   // Totals column (right-aligned)
   const rightColStart = tableRight - 200
-  const labelSize = 12
-  const valueSize = 12
+  const labelSize = 10
+  const valueSize = 10
 
   const drawRightValue = (label: string, value: string, yy: number) => {
     page.drawText(label, { x: rightColStart, y: yy, size: labelSize, font, color: black })
@@ -331,7 +349,7 @@ export async function generateInvoicePdfBuffer(order: {
   drawRightValue("Subtotal:", `$${subtotal.toFixed(2)}`, y)
   y -= 18
   drawRightValue(taxLabel, `$${tax.toFixed(2)}`, y)
-  y -= 22
+  y -= 18
   drawRightValue("Total:", `$${total.toFixed(2)}`, y)
 
   // Disclaimer paragraph near bottom

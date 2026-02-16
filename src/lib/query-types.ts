@@ -168,6 +168,12 @@ export type OrderItemWithProduct = OrderItemGetPayload<{
 }>
 
 /**
+ * AdminOrderItem: alias used by admin UI components for order item rows.
+ * Kept as an explicit export to make UI props self-documenting.
+ */
+export type AdminOrderItem = OrderItemWithProduct
+
+/**
  * OrderItemWithOrder: Single order item with parent order reference
  * Use when: Item-level operations that need order context
  */

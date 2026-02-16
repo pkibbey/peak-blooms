@@ -5,6 +5,7 @@ import { useState } from "react"
 import { useFieldArray, useForm } from "react-hook-form"
 import { toast } from "sonner"
 import { adminCreateOrderAction } from "@/app/actions/orders"
+import OrderProductsPicker from "@/components/admin/OrderProductsPicker"
 import { UsersForm } from "@/components/admin/UsersForm"
 import { Button } from "@/components/ui/button"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
@@ -151,7 +152,19 @@ export default function OrderForm({ users, products, addresses }: OrderFormProps
               <Select value={field.value} onValueChange={field.onChange}>
                 <FormControl>
                   <SelectTrigger>
-                    <SelectValue placeholder="Select a customer" />
+                    {/* show friendly label (name or email) in trigger instead of raw id */}
+                    <span
+                      data-slot="select-value"
+                      className={!field.value ? "text-muted-foreground" : "truncate"}
+                    >
+                      {field.value
+                        ? localUsers.find((u) => u.id === field.value)?.name ||
+                          localUsers.find((u) => u.id === field.value)?.email ||
+                          field.value
+                        : "Select a customer"}
+                    </span>
+                    {/* keep the real Select value for accessibility/internal state but hide it visually */}
+                    <SelectValue className="sr-only" />
                   </SelectTrigger>
                 </FormControl>
                 <SelectPositioner>
@@ -421,6 +434,27 @@ export default function OrderForm({ users, products, addresses }: OrderFormProps
               Add Item
             </Button>
           </div>
+
+          <OrderProductsPicker
+            products={products}
+            onAdd={(items) => {
+              const currentItems = form.getValues("items") || []
+
+              for (const sel of items) {
+                const existingIndex = currentItems.findIndex(
+                  (it) => it.productId === sel.productId && it.productId !== ""
+                )
+
+                if (existingIndex !== -1) {
+                  const currentQty = Number(currentItems[existingIndex].quantity || 0)
+                  form.setValue(`items.${existingIndex}.quantity`, currentQty + sel.quantity)
+                } else {
+                  append({ productId: sel.productId, quantity: sel.quantity, price: "" })
+                }
+              }
+            }}
+            disabled={isSubmitting}
+          />
 
           {fields.map((field, index) => (
             <div key={field.id} className="p-4 border rounded-lg space-y-4">

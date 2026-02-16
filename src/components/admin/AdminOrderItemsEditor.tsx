@@ -7,57 +7,36 @@ import {
   adminUpdateOrderItemQuantityAction,
   deleteOrderItemAction,
 } from "@/app/actions/orders"
-import ProductMultiSelect from "@/components/admin/ProductMultiSelect"
-import { Button } from "@/components/ui/button"
-import { IconPlus, IconTrash } from "@/components/ui/icons"
-import { QuantityStepper } from "@/components/ui/QuantityStepper"
+import AdminOrderItemRow from "@/components/admin/AdminOrderItemRow"
+import OrderProductsPicker from "@/components/admin/OrderProductsPicker"
 import type { ProductModel } from "@/generated/models"
 import { toAppErrorClient } from "@/lib/error-utils"
-import type { OrderWithItems } from "@/lib/query-types"
+import type { AdminOrderItem, OrderWithItems, SessionUser } from "@/lib/query-types"
 
 interface AdminOrderItemsEditorProps {
   order: OrderWithItems
   products: ProductModel[]
-  onItemsUpdated?: (items: OrderWithItems["items"]) => void
+  onItemsUpdated?: (items: AdminOrderItem[]) => void
+  user?: SessionUser | null
 }
 
 export default function AdminOrderItemsEditor({
   order,
   products,
   onItemsUpdated,
+  user = null,
 }: AdminOrderItemsEditorProps) {
-  const [localItems, setLocalItems] = useState(() => order.items ?? [])
-  const [selectedIds, setSelectedIds] = useState<string[]>([])
-  const [productSelections, setProductSelections] = useState<
-    { productId: string; quantity: number }[]
-  >([])
-  const [isPending, startTransition] = useTransition()
-
-  const handleAddSelected = () => {
-    if (productSelections.length === 0) {
-      toast.error("Select at least one product to add")
-      return
-    }
-
-    startTransition(async () => {
-      try {
-        const res = await adminAddOrderItemsAction({ orderId: order.id, items: productSelections })
-        if (!res || !res.success) {
-          toast.error(res?.error || "Failed to add items")
-          return
-        }
-
-        const updatedOrder = res.data
-        setLocalItems(updatedOrder.items ?? [])
-        setSelectedIds([])
-        setProductSelections([])
-        onItemsUpdated?.(updatedOrder.items ?? [])
-        toast.success("Items added")
-      } catch (err) {
-        toAppErrorClient(err, "Failed to add items")
-      }
+  const sortItemsByName = (items: AdminOrderItem[] = []) =>
+    [...items].sort((a, b) => {
+      const aName = (a.product?.name ?? a.productNameSnapshot ?? "").toLowerCase()
+      const bName = (b.product?.name ?? b.productNameSnapshot ?? "").toLowerCase()
+      return aName.localeCompare(bName)
     })
-  }
+
+  const [localItems, setLocalItems] = useState<AdminOrderItem[]>(() =>
+    sortItemsByName(order.items ?? [])
+  )
+  const [isPending, startTransition] = useTransition()
 
   const handleQuantityChange = (itemId: string, newQty: number) => {
     startTransition(async () => {
@@ -73,8 +52,9 @@ export default function AdminOrderItemsEditor({
         }
 
         const updatedOrder = res.data
-        setLocalItems(updatedOrder.items ?? [])
-        onItemsUpdated?.(updatedOrder.items ?? [])
+        const sorted = sortItemsByName(updatedOrder.items ?? [])
+        setLocalItems(sorted)
+        onItemsUpdated?.(sorted)
         toast.success("Quantity updated")
       } catch (err) {
         toAppErrorClient(err, "Failed to update quantity")
@@ -93,9 +73,13 @@ export default function AdminOrderItemsEditor({
           return
         }
 
-        // remove from local items
-        setLocalItems((prev) => prev.filter((i) => i.id !== itemId))
-        onItemsUpdated?.(localItems.filter((i) => i.id !== itemId))
+        // remove from local items and notify parent with the updated array (avoid stale closure)
+        setLocalItems((prev) => {
+          const next = prev.filter((i) => i.id !== itemId)
+          const sorted = sortItemsByName(next)
+          onItemsUpdated?.(sorted)
+          return sorted
+        })
         toast.success("Item removed")
       } catch (err) {
         toAppErrorClient(err, "Failed to delete item")
@@ -109,64 +93,39 @@ export default function AdminOrderItemsEditor({
 
       <div className="space-y-4">
         {localItems.map((item) => (
-          <div
+          <AdminOrderItemRow
             key={item.id}
-            className="flex items-center justify-between p-3 border rounded-xs hover:bg-neutral-50"
-          >
-            <div className="flex-1 min-w-0">
-              <p className="truncate font-medium">
-                {item.product ? item.product.name : (item.productNameSnapshot ?? "Unknown product")}
-              </p>
-              <p className="text-sm text-muted-foreground">{item.product?.slug ?? ""}</p>
-            </div>
-
-            <div className="flex items-center gap-3">
-              <QuantityStepper
-                value={item.quantity}
-                onChange={(q) => handleQuantityChange(item.id, q)}
-                size="sm"
-                min={0}
-              />
-              <Button
-                size="sm"
-                variant="outline-destructive"
-                onClick={() =>
-                  handleDelete(item.id, item.product?.name ?? item.productNameSnapshot)
-                }
-                disabled={isPending}
-                aria-label={`Delete item ${item.product?.name ?? item.productNameSnapshot}`}
-              >
-                <IconTrash className="h-4 w-4" />
-              </Button>
-            </div>
-          </div>
+            item={item}
+            onQuantityChange={handleQuantityChange}
+            onDelete={handleDelete}
+            disabled={isPending}
+            user={user}
+          />
         ))}
 
-        <div className="pt-3 border-t">
-          <h3 className="font-semibold mb-3">Add products</h3>
-          <ProductMultiSelect
-            products={products}
-            selectedIds={selectedIds}
-            onChange={setSelectedIds}
-            productSelections={productSelections}
-            onSelectionsChange={setProductSelections}
-          />
+        <OrderProductsPicker
+          products={products}
+          onAdd={(items) => {
+            startTransition(async () => {
+              try {
+                const res = await adminAddOrderItemsAction({ orderId: order.id, items })
+                if (!res || !res.success) {
+                  toast.error(res?.error || "Failed to add items")
+                  return
+                }
 
-          <div className="mt-4 flex gap-2">
-            <Button onClick={handleAddSelected} disabled={isPending}>
-              <IconPlus className="mr-2 h-4 w-4" /> Add selected items
-            </Button>
-            <Button
-              variant="ghost"
-              onClick={() => {
-                setSelectedIds([])
-                setProductSelections([])
-              }}
-            >
-              Clear selection
-            </Button>
-          </div>
-        </div>
+                const updatedOrder = res.data
+                const sorted = sortItemsByName(updatedOrder.items ?? [])
+                setLocalItems(sorted)
+                onItemsUpdated?.(sorted)
+                toast.success("Items added")
+              } catch (err) {
+                toAppErrorClient(err, "Failed to add items")
+              }
+            })
+          }}
+          disabled={isPending}
+        />
       </div>
     </div>
   )

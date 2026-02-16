@@ -99,14 +99,6 @@ export default function OrdersTable({ orders, currentStatus, sort, order }: Orde
                   className="hidden md:table-cell"
                 />
                 <SortableTableHead
-                  label="Items"
-                  sortKey="items"
-                  currentSort={sort}
-                  currentOrder={order}
-                  href={headerUrl}
-                  className="hidden lg:table-cell"
-                />
-                <SortableTableHead
                   label="Status"
                   sortKey="status"
                   currentSort={sort}
@@ -147,9 +139,6 @@ export default function OrdersTable({ orders, currentStatus, sort, order }: Orde
                     <TableCell className="hidden md:table-cell text-muted-foreground">
                       {formatDate(order.createdAt)}
                     </TableCell>
-                    <TableCell className="hidden lg:table-cell text-muted-foreground">
-                      {order._count.items}
-                    </TableCell>
                     <TableCell className="hidden md:table-cell">
                       <OrderStatusBadge status={order.status} />
                     </TableCell>
@@ -159,13 +148,11 @@ export default function OrdersTable({ orders, currentStatus, sort, order }: Orde
                     <TableCell className="text-right">
                       <div className="flex items-center justify-end gap-2">
                         <NavLink variant="outline" size="sm" href={`/admin/orders/${order.id}`}>
-                          <IconEye className="h-4 w-4 mr-1" />
-                          View
+                          <IconEye className="h-4 w-4" />
                         </NavLink>
 
-                        <NavLink variant="ghost" size="sm" href={`/admin/orders/${order.id}`}>
-                          <IconEdit className="h-4 w-4 mr-1" />
-                          Edit items
+                        <NavLink variant="outline" size="sm" href={`/admin/orders/${order.id}`}>
+                          <IconEdit className="h-4 w-4" />
                         </NavLink>
 
                         <DeleteOrderButton orderId={order.id} />
