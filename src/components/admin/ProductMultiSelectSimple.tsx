@@ -93,7 +93,7 @@ export default function ProductMultiSelectSimple({
         disabled={disabled}
       />
 
-      <div className="max-h-96 overflow-y-auto rounded-md border border-border">
+      <div className="max-h-46 overflow-y-auto rounded-md border border-border">
         {filteredProducts.length === 0 ? (
           <p className="p-4 text-center text-sm text-muted-foreground">No products found</p>
         ) : (

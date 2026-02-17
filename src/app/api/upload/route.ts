@@ -2,7 +2,7 @@ import { type HandleUploadBody, handleUpload } from "@vercel/blob/client"
 import { getSession } from "@/lib/auth"
 import { wrapRoute } from "@/server/error-handler"
 
-const ALLOWED_CONTENT_TYPES = ["image/jpeg", "image/png", "image/webp"]
+const ALLOWED_CONTENT_TYPES = ["image/jpeg", "image/png", "image/webp", "application/pdf"]
 
 const MAX_FILE_SIZE = 5 * 1024 * 1024 // 5 MB
 

@@ -1,7 +1,9 @@
 import Link from "next/link"
+import { DeleteOrderButton } from "@/components/admin/DeleteOrderButton"
+import ContactInfo from "@/components/site/ContactInfo"
 import NavLink from "@/components/site/NavLink"
 import { OrderStatusBadge } from "@/components/site/OrderStatusBadge"
-import { IconEye } from "@/components/ui/icons"
+import { IconEdit, IconEye } from "@/components/ui/icons"
 import { SortableTableHead } from "@/components/ui/SortableTableHead"
 import {
   Table,
@@ -76,7 +78,7 @@ export default function OrdersTable({ orders, currentStatus, sort, order }: Orde
               <TableRow>
                 <SortableTableHead
                   label="Order"
-                  sortKey="orderNumber"
+                  sortKey="friendlyId"
                   currentSort={sort}
                   currentOrder={order}
                   href={headerUrl}
@@ -95,14 +97,6 @@ export default function OrdersTable({ orders, currentStatus, sort, order }: Orde
                   currentOrder={order}
                   href={headerUrl}
                   className="hidden md:table-cell"
-                />
-                <SortableTableHead
-                  label="Items"
-                  sortKey="items"
-                  currentSort={sort}
-                  currentOrder={order}
-                  href={headerUrl}
-                  className="hidden lg:table-cell"
                 />
                 <SortableTableHead
                   label="Status"
@@ -132,24 +126,18 @@ export default function OrdersTable({ orders, currentStatus, sort, order }: Orde
                         href={`/admin/orders/${order.id}`}
                         className="font-medium text-primary hover:underline"
                       >
-                        {order.orderNumber}
+                        {order.friendlyId}
                       </Link>
                     </TableCell>
                     <TableCell>
-                      <div>
-                        <p className="font-medium">{order.user.name || "—"}</p>
-                        {order.deliveryAddress && (
-                          <p className="text-sm text-muted-foreground">
-                            {order.deliveryAddress.email}
-                          </p>
-                        )}
-                      </div>
+                      <ContactInfo
+                        compact
+                        name={order.user.name || undefined}
+                        email={order.deliveryAddress?.email || undefined}
+                      />
                     </TableCell>
                     <TableCell className="hidden md:table-cell text-muted-foreground">
                       {formatDate(order.createdAt)}
-                    </TableCell>
-                    <TableCell className="hidden lg:table-cell text-muted-foreground">
-                      {order._count.items}
                     </TableCell>
                     <TableCell className="hidden md:table-cell">
                       <OrderStatusBadge status={order.status} />
@@ -158,15 +146,17 @@ export default function OrdersTable({ orders, currentStatus, sort, order }: Orde
                       {formatPrice(calculateCartTotal(order.items))}
                     </TableCell>
                     <TableCell className="text-right">
-                      <NavLink
-                        variant="outline"
-                        size="sm"
-                        // nativeButton={false}
-                        href={`/admin/orders/${order.id}`}
-                      >
-                        <IconEye className="h-4 w-4 mr-1" />
-                        View
-                      </NavLink>
+                      <div className="flex items-center justify-end gap-2">
+                        <NavLink variant="outline" size="sm" href={`/admin/orders/${order.id}`}>
+                          <IconEye className="h-4 w-4" />
+                        </NavLink>
+
+                        <NavLink variant="outline" size="sm" href={`/admin/orders/${order.id}`}>
+                          <IconEdit className="h-4 w-4" />
+                        </NavLink>
+
+                        <DeleteOrderButton orderId={order.id} />
+                      </div>
                     </TableCell>
                   </TableRow>
                 )

@@ -33,7 +33,7 @@ function applyMultiplierToInspiration(
  */
 export async function getInspirationsWithCounts(): Promise<InspirationBasic[]> {
   return withTiming("getInspirationsWithCounts", {}, async () => {
-    return db.inspiration.findMany({
+    return await db.inspiration.findMany({
       where: {
         products: {
           every: {

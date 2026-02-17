@@ -1185,25 +1185,25 @@
       "addToCartSchema → CartResponse": {
         "inputFields": ["productId", "quantity"],
         "returnType": "CartResponse",
-        "returnFields": ["id", "orderNumber", "status", "notes", "items", "total"],
+        "returnFields": ["id", "friendlyId", "status", "notes", "items", "total"],
         "notes": "Returns full cart after add operation"
       },
       "updateCartItemSchema → CartResponse": {
         "inputFields": ["itemId", "quantity"],
         "returnType": "CartResponse",
-        "returnFields": ["id", "orderNumber", "status", "notes", "items", "total"],
+        "returnFields": ["id", "friendlyId", "status", "notes", "items", "total"],
         "notes": "Returns full cart after update"
       },
       "removeFromCartSchema → CartResponse": {
         "inputFields": ["itemId"],
         "returnType": "CartResponse",
-        "returnFields": ["id", "orderNumber", "status", "notes", "items", "total"],
+        "returnFields": ["id", "friendlyId", "status", "notes", "items", "total"],
         "notes": "Returns full cart after removal"
       },
       "batchAddToCartSchema → CartResponse": {
         "inputFields": ["productIds", "quantities"],
         "returnType": "CartResponse",
-        "returnFields": ["id", "orderNumber", "status", "notes", "items", "total"],
+        "returnFields": ["id", "friendlyId", "status", "notes", "items", "total"],
         "notes": "Returns full cart after batch add"
       },
       "cancelOrderSchema → CancelOrderResponse": {

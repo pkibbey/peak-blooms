@@ -57,8 +57,12 @@ export async function getSession() {
     return await auth.api.getSession({
       headers: await headers(),
     })
-  } catch (error) {
+    // biome-ignore lint/suspicious/noExplicitAny: typed `any` used for error logging
+  } catch (error: any) {
     console.error("❌ Failed to get session:", error instanceof Error ? error.message : error)
+    if (error?.name) console.error("❌ error.name:", error.name)
+    if (error?.code) console.error("❌ error.code:", error.code)
+    if (error?.meta) console.error("❌ error.meta:", error.meta)
     throw error
   }
 }

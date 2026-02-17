@@ -146,6 +146,7 @@ export type OrderWithItems = OrderGetPayload<{
         product: true
       }
     }
+    attachments: true
   }
 }>
 
@@ -165,6 +166,12 @@ export type OrderItemWithProduct = OrderItemGetPayload<{
     product: true
   }
 }>
+
+/**
+ * AdminOrderItem: alias used by admin UI components for order item rows.
+ * Kept as an explicit export to make UI props self-documenting.
+ */
+export type AdminOrderItem = OrderItemWithProduct
 
 /**
  * OrderItemWithOrder: Single order item with parent order reference
@@ -307,10 +314,8 @@ export type AppResult<T> = { success: true; data: T } | AppError
  * Includes the cart with adjusted items and calculated total
  * Used by cart action functions to return consistent cart data
  */
-export type CartResponse = Pick<
-  OrderGetPayload<true>,
-  "id" | "orderNumber" | "status" | "notes"
-> & {
+export type CartResponse = Pick<OrderGetPayload<true>, "id" | "status" | "notes"> & {
+  friendlyId: string
   items: CartItemData[]
   total: number
 }

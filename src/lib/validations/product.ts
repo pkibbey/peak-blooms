@@ -37,17 +37,6 @@ const createProductSchema = z.object({
   featured: z.boolean().default(false),
 })
 
-export type CreateProductInput = Omit<
-  ProductUncheckedCreateInput,
-  | "inspirations"
-  | "orderItems"
-  | "productCollections"
-  | "createdAt"
-  | "updatedAt"
-  | "deletedAt"
-  | "colors"
-> & { colors?: string[] | null }
-
 // Product operation schemas for API requests
 export const updateProductSchema = createProductSchema.extend({
   id: z.string().min(1, "Invalid product ID"),

@@ -8,12 +8,7 @@ export default async function FeaturedCollections() {
   let collections: CollectionBasic[] = []
   try {
     collections = await getFeaturedCollections()
-  } catch (error) {
-    // Log server-side error and continue with empty list to avoid crashing the page
-    // withTiming already logs the DAL error at error level, but we log here for clarity
-    // and to make sure rendering still proceeds.
-    // eslint-disable-next-line no-console
-    console.error("Failed to load featured collections:", error)
+  } catch (_error) {
     collections = []
   }
 

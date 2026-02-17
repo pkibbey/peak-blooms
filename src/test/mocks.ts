@@ -65,6 +65,15 @@ export function createMockPrismaClient() {
       updateMany: vi.fn(),
       deleteMany: vi.fn(),
     },
+    orderAttachment: {
+      findUnique: vi.fn(),
+      findMany: vi.fn().mockResolvedValue([]),
+      create: vi.fn(),
+      update: vi.fn(),
+      delete: vi.fn(),
+      deleteMany: vi.fn(),
+      updateMany: vi.fn(),
+    },
     orderItem: {
       findUnique: vi.fn(),
       findMany: vi.fn(),
@@ -205,7 +214,7 @@ export function mockCartWithItems(overrides?: Partial<CartWithItems>): CartWithI
   const cartId = overrides?.id || "test-order-id"
   return {
     id: cartId as string,
-    orderNumber: 1,
+    friendlyId: overrides?.friendlyId ?? `test-user-id-${String(cartId).slice(-4)}`,
     userId: "test-user-id",
     status: "CART" as const,
     notes: null,
@@ -217,6 +226,7 @@ export function mockCartWithItems(overrides?: Partial<CartWithItems>): CartWithI
         orderId: cartId as string,
       }),
     ],
+    attachments: [],
     ...overrides,
   }
 }
@@ -228,13 +238,16 @@ export function mockCartWithItems(overrides?: Partial<CartWithItems>): CartWithI
 export function mockOrder(overrides?: Record<string, unknown>) {
   return {
     id: "test-order-id",
-    orderNumber: 1,
+    friendlyId: overrides?.friendlyId
+      ? `test-user-id-${String("test-order-id").slice(-4)}`
+      : "test-user-mock-order",
     userId: "test-user-id",
     status: "CART" as const,
     notes: null,
     createdAt: new Date("2025-01-15"),
     updatedAt: new Date("2025-01-15"),
     deliveryAddressId: null,
+    attachments: [],
     ...overrides,
   }
 }

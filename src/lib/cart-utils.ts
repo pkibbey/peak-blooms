@@ -43,16 +43,26 @@ function adjustPriceMultiplier(price: number, multiplier: number): number {
   return Math.round(price * multiplier * 100) / 100
 }
 
+/**
+ * Result type when `product.price` has been adjusted to a `number`.
+ * - Preserves all other keys on the original item and product types.
+ */
+type AdjustedProduct<P> = P extends object ? Omit<P, "price"> & { price: number } : P
+
+type AdjustedItem<T> = T extends { product?: infer P | null }
+  ? Omit<T, "product"> & { product: P extends object ? AdjustedProduct<P> | null : P | null }
+  : T
+
 export function applyPriceMultiplierToItems<
-  T extends { product?: { price: number; [key: string]: unknown } | null },
->(items: T[], multiplier: number): T[] {
+  T extends { product?: { price?: number | null } | null },
+>(items: T[], multiplier: number): Array<AdjustedItem<T>> {
   return items.map((item) => ({
     ...item,
     product: item.product
-      ? {
+      ? ({
           ...item.product,
-          price: adjustPriceMultiplier(item.product.price, multiplier),
-        }
+          price: adjustPriceMultiplier(item.product.price ?? 0, multiplier),
+        } as AdjustedProduct<NonNullable<typeof item.product>>)
       : null,
-  }))
+  })) as Array<AdjustedItem<T>>
 }

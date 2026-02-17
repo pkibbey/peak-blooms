@@ -60,7 +60,7 @@ export function CancelOrderButton({ order }: CancelOrderButtonProps) {
 
   return (
     <div className="flex flex-col gap-2 p-4 bg-red-50 border border-red-200 rounded-xs">
-      <p className="text-sm font-medium text-red-900">Cancel Order #{order.orderNumber}?</p>
+      <p className="text-sm font-medium text-red-900">Cancel Order #{order.friendlyId}?</p>
       <p className="text-xs text-red-700">Choose what you'd like to do:</p>
       <div className="flex gap-2 mt-2">
         <Button

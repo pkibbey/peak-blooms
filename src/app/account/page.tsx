@@ -40,6 +40,7 @@ export default async function AccountPage({
           product: true,
         },
       },
+      attachments: true,
     },
     take: ITEMS_PER_PAGE,
     skip: (currentPage - 1) * ITEMS_PER_PAGE,

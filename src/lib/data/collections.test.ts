@@ -9,6 +9,9 @@ vi.mock("@/lib/db", () => ({
 
 vi.mock("@/lib/utils", () => ({
   adjustPrice: vi.fn((price: number, multiplier: number) => price * multiplier),
+  makeFriendlyOrderId: vi.fn(
+    (userId: string, orderId: string) => `${userId}-${String(orderId).slice(-4)}`
+  ),
 }))
 
 vi.mock("./logger", () => ({

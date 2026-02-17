@@ -28,7 +28,7 @@ export default function OrderHistoryItem({ order }: OrderHistoryItemProps) {
             href={`/account/order-history/${order.id}`}
             className="font-semibold text-sm hover:underline truncate"
           >
-            {order.orderNumber}
+            {order.friendlyId}
           </Link>
           <span className="text-[10px] uppercase tracking-wider text-muted-foreground font-medium">
             {formatDate(order.createdAt)}

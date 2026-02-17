@@ -1,10 +1,15 @@
 import { notFound } from "next/navigation"
-import { AdminOrderPriceEditor } from "@/components/admin/AdminOrderPriceEditor"
+import AdminOrderItemsEditor from "@/components/admin/AdminOrderItemsEditor"
+import { DeleteOrderButton } from "@/components/admin/DeleteOrderButton"
+import { GenerateInvoiceButton } from "@/components/admin/GenerateInvoiceButton"
+import { OrderAttachmentsList } from "@/components/admin/OrderAttachmentsList"
 import OrderStatusForm from "@/components/admin/OrderStatusForm"
 import { AddressDisplay } from "@/components/site/AddressDisplay"
 import BackLink from "@/components/site/BackLink"
+import ContactInfo from "@/components/site/ContactInfo"
 import { OrderStatusBadge } from "@/components/site/OrderStatusBadge"
 import type { OrderStatus } from "@/generated/enums"
+import { getCurrentUser } from "@/lib/current-user"
 import { getTrackedDb } from "@/lib/db"
 import { formatDate } from "@/lib/utils"
 
@@ -17,25 +22,31 @@ export default async function AdminOrderDetailPage({ params }: AdminOrderDetailP
 
   const { id } = await params
 
-  // Fetch the order
-  const order = await db.order.findUnique({
-    where: { id },
-    include: {
-      user: {
-        select: {
-          id: true,
-          email: true,
-          name: true,
+  // Fetch the order and products (products used by ProductMultiSelect)
+  const [order, products, user] = await Promise.all([
+    db.order.findUnique({
+      where: { id },
+      include: {
+        user: {
+          select: {
+            id: true,
+            email: true,
+            name: true,
+          },
         },
-      },
-      items: {
-        include: {
-          product: true,
+        items: {
+          include: {
+            product: true,
+          },
         },
+        deliveryAddress: true,
+        // return attachments with newest first so invoices appear most-recent-on-top
+        attachments: { orderBy: { createdAt: "desc" } },
       },
-      deliveryAddress: true,
-    },
-  })
+    }),
+    db.product.findMany({ orderBy: { name: "asc" } }),
+    getCurrentUser(),
+  ])
 
   if (!order) {
     notFound()
@@ -48,7 +59,7 @@ export default async function AdminOrderDetailPage({ params }: AdminOrderDetailP
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
         <div>
           <div className="flex items-center gap-3 mb-2">
-            <h1 className="heading-1">Order {order.orderNumber}</h1>
+            <h1 className="heading-1">Order {order.friendlyId}</h1>
             <OrderStatusBadge status={order.status as OrderStatus} className="text-sm" />
           </div>
           <p className="text-muted-foreground">Placed on {formatDate(order.createdAt)}</p>
@@ -59,7 +70,19 @@ export default async function AdminOrderDetailPage({ params }: AdminOrderDetailP
         {/* Main Content */}
         <div className="lg:col-span-2 space-y-6">
           {/* Order Items */}
-          <AdminOrderPriceEditor order={order} />
+          <div className="space-y-6">
+            <AdminOrderItemsEditor order={order} products={products} user={user} />
+
+            {/* Invoices & Attachments */}
+            <div className="bg-background rounded-xs shadow-sm border p-6">
+              <h2 className="heading-3 mb-4">Invoices & Attachments</h2>
+              <div className="mb-4">
+                <GenerateInvoiceButton orderId={order.id} />
+              </div>
+
+              <OrderAttachmentsList attachments={order.attachments || []} />
+            </div>
+          </div>
 
           {/* Order Notes */}
           {order.notes && (
@@ -81,28 +104,21 @@ export default async function AdminOrderDetailPage({ params }: AdminOrderDetailP
           {/* Customer Info */}
           <div className="bg-background rounded-xs shadow-sm border p-6">
             <h2 className="heading-3 mb-4">Customer</h2>
-            <div className="text-sm space-y-2">
-              <p className="font-medium">{order.user.name || "—"}</p>
-              <p className="text-muted-foreground">{order.user.email}</p>
-            </div>
+            <ContactInfo name={order.user.name || undefined} email={order.user.email} />
           </div>
 
           {/* Contact Information */}
           {order.deliveryAddress && (
             <div className="bg-background rounded-xs shadow-sm border p-6">
-              <h2 className="heading-3 mb-4">Contact</h2>
-              <div className="text-sm space-y-2">
-                <p>
-                  <span className="text-muted-foreground">Email:</span>{" "}
-                  <span className="font-medium">{order.deliveryAddress.email}</span>
-                </p>
-                {order.deliveryAddress.phone && (
-                  <p>
-                    <span className="text-muted-foreground">Phone:</span>{" "}
-                    <span className="font-medium">{order.deliveryAddress.phone}</span>
-                  </p>
-                )}
-              </div>
+              <h2 className="heading-3 mb-4">Delivery Contact</h2>
+              <ContactInfo
+                name={
+                  `${order.deliveryAddress.firstName || ""} ${order.deliveryAddress.lastName || ""}`.trim() ||
+                  undefined
+                }
+                email={order.deliveryAddress.email}
+                phone={order.deliveryAddress.phone}
+              />
             </div>
           )}
 
@@ -113,6 +129,17 @@ export default async function AdminOrderDetailPage({ params }: AdminOrderDetailP
               <AddressDisplay address={order.deliveryAddress} />
             </div>
           )}
+
+          {/* Delete order (admin) */}
+          <div className="bg-background rounded-xs shadow-sm border p-6">
+            <h2 className="heading-3 mb-4">Danger Zone</h2>
+            <div className="flex items-center gap-2">
+              <DeleteOrderButton
+                orderId={order.id}
+                hasAttachments={(order.attachments || []).length > 0}
+              />
+            </div>
+          </div>
         </div>
       </div>
     </>

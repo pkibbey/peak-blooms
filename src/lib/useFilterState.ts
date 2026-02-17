@@ -1,7 +1,7 @@
 import { useRouter, useSearchParams } from "next/navigation"
 import { useCallback } from "react"
 
-export interface FilterStateOptions {
+interface FilterStateOptions {
   searchParamNames: Record<string, string>
   basePath: string
 }

@@ -25,6 +25,9 @@ vi.mock("next/headers", () => ({
 
 vi.mock("@/lib/utils", () => ({
   isValidPriceMultiplier: vi.fn((m) => m >= 0.5 && m <= 2.0),
+  makeFriendlyOrderId: vi.fn(
+    (userId: string, orderId: string) => `${userId}-${String(orderId).slice(-4)}`
+  ),
 }))
 
 import { auth, invalidateUserSessions } from "@/lib/auth"
@@ -395,6 +398,101 @@ describe("Admin User Actions", () => {
           priceMultiplier: userData.priceMultiplier,
         },
         select: expect.any(Object),
+      })
+    })
+
+    // --- deleteUserAction tests ---
+    describe("deleteUserAction", () => {
+      it("should delete user successfully", async () => {
+        vi.mocked(auth.api.getSession).mockResolvedValue(mockAdminSession)
+        vi.mocked(db.user.delete).mockResolvedValueOnce(mockUser)
+
+        const result = await (await import("./admin-users")).deleteUserAction({
+          userId: mockUser.id,
+        })
+
+        expect(result.success).toBe(true)
+        if (result.success) {
+          expect(result.data.id).toBe(mockUser.id)
+        }
+        expect(db.user.delete).toHaveBeenCalledWith({
+          where: { id: mockUser.id },
+          select: expect.any(Object),
+        })
+        expect(invalidateUserSessions).toHaveBeenCalledWith(mockUser.id)
+      })
+
+      it("should not allow deleting self", async () => {
+        vi.mocked(auth.api.getSession).mockResolvedValue(mockAdminSession)
+
+        const result = await (await import("./admin-users")).deleteUserAction({
+          userId: mockAdminSession.user.id,
+        })
+
+        expect(result.success).toBe(false)
+        if (!result.success) {
+          expect(result.error).toContain("Cannot delete yourself")
+        }
+      })
+
+      it("should refuse to delete users who have invoices attached", async () => {
+        vi.mocked(auth.api.getSession).mockResolvedValue(mockAdminSession)
+        // Simulate an order that has a PDF invoice attached
+        vi.mocked(db.order.findFirst).mockResolvedValueOnce({
+          id: "order-with-invoice",
+          createdAt: new Date(),
+          updatedAt: new Date(),
+          userId: "1",
+          friendlyId: "friendlystring_1",
+          status: "PENDING",
+          notes: null,
+          deliveryAddressId: null,
+        })
+
+        const result = await (await import("./admin-users")).deleteUserAction({
+          userId: mockUser.id,
+        })
+
+        expect(result.success).toBe(false)
+        if (!result.success) {
+          expect(result.error).toContain("invoices attached")
+        }
+        // Ensure we never attempt to delete the user record when invoices exist
+        expect(db.user.delete).not.toHaveBeenCalled()
+      })
+
+      it("should return error if not admin", async () => {
+        vi.mocked(auth.api.getSession).mockResolvedValue(mockUserSession)
+        const result = await (await import("./admin-users")).deleteUserAction({
+          userId: mockUser.id,
+        })
+        expect(result.success).toBe(false)
+        if (!result.success) {
+          expect(result.code).toBe("UNAUTHORIZED")
+        }
+      })
+
+      it("should return error if no session", async () => {
+        vi.mocked(auth.api.getSession).mockResolvedValue(null)
+        const result = await (await import("./admin-users")).deleteUserAction({
+          userId: mockUser.id,
+        })
+        expect(result.success).toBe(false)
+        if (!result.success) {
+          expect(result.code).toBe("UNAUTHORIZED")
+        }
+      })
+
+      it("should return error on db failure", async () => {
+        vi.mocked(auth.api.getSession).mockResolvedValue(mockAdminSession)
+        vi.mocked(db.user.delete).mockRejectedValueOnce(new Error("DB Error"))
+        const result = await (await import("./admin-users")).deleteUserAction({
+          userId: mockUser.id,
+        })
+        expect(result.success).toBe(false)
+        if (!result.success) {
+          expect(result.error).toContain("DB Error")
+        }
       })
     })
 

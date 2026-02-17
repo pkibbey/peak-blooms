@@ -99,7 +99,8 @@ export default async function AdminSidebar() {
           <li>
             <Link href="/admin/metrics" className="flex items-center gap-2 hover:underline">
               <span className="flex items-center gap-2">
-                <IconBarChart3 className="h-4 w-4 text-muted-foreground" /> Database Metrics
+                <IconBarChart3 className="h-4 w-4 text-muted-foreground" />
+                Metrics
               </span>
             </Link>
           </li>

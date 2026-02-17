@@ -13,5 +13,3 @@ export const recordMetricSchema = z.object({
   name: z.string().min(1, "Metric name is required"),
   duration: z.number().positive("Duration must be positive"),
 })
-
-export type RecordMetricInput = z.infer<typeof recordMetricSchema>

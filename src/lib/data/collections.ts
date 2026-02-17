@@ -32,7 +32,7 @@ function applyMultiplierToCollection(
  */
 export async function getAllCollections(): Promise<CollectionBasic[]> {
   return withTiming("getAllCollections", {}, async () => {
-    return db.collection.findMany({
+    return await db.collection.findMany({
       orderBy: { name: "asc" },
       include: { _count: { select: { productCollections: true } } },
     })
@@ -44,7 +44,7 @@ export async function getAllCollections(): Promise<CollectionBasic[]> {
  */
 export async function getFeaturedCollections(): Promise<CollectionBasic[]> {
   return withTiming("getFeaturedCollections", {}, async () => {
-    return db.collection.findMany({
+    return await db.collection.findMany({
       where: { featured: true },
       orderBy: { name: "asc" },
       include: { _count: { select: { productCollections: true } } },

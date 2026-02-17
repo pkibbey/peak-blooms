@@ -21,6 +21,7 @@ interface BackupData {
     order: unknown[]
     orderItem: unknown[]
     address: unknown[]
+    orderAttachment: unknown[]
     metric: unknown[]
   }
 }
@@ -53,23 +54,38 @@ async function restoreDatabase(backupFilePath: string): Promise<void> {
     console.log("Press Ctrl+C to cancel. Proceeding in 3 seconds...\n")
     await new Promise((resolve) => setTimeout(resolve, 3000))
 
-    // Delete all data in reverse dependency order
+    // Delete all data in dependency-safe SEQUENCE (children first)
     console.log("🗑️  Clearing existing data...")
-    await Promise.all([
-      db.metric.deleteMany(),
-      db.inspirationProduct.deleteMany(),
-      db.inspiration.deleteMany(),
-      db.orderItem.deleteMany(),
-      db.order.deleteMany(),
-      db.address.deleteMany(),
-      db.productCollection.deleteMany(),
-      db.product.deleteMany(),
-      db.collection.deleteMany(),
-      db.verification.deleteMany(),
-      db.session.deleteMany(),
-      db.account.deleteMany(),
-      db.user.deleteMany(),
-    ])
+
+    // Metrics (no FK dependencies)
+    await db.metric.deleteMany()
+
+    // Attachments and line items (depend on orders/products)
+    await db.orderAttachment.deleteMany()
+    await db.orderItem.deleteMany()
+
+    // Orders (depend on users, addresses)
+    await db.order.deleteMany()
+
+    // Relation/junction tables referencing products/collections/inspirations
+    await db.inspirationProduct.deleteMany()
+    await db.productCollection.deleteMany()
+
+    // Product and collection tables
+    await db.product.deleteMany()
+    await db.collection.deleteMany()
+
+    // Addresses (orders cleared earlier)
+    await db.address.deleteMany()
+
+    // Auth/session tables
+    await db.verification.deleteMany()
+    await db.session.deleteMany()
+    await db.account.deleteMany()
+
+    // Finally users
+    await db.user.deleteMany()
+
     console.log("✅ Database cleared\n")
 
     // Restore data in correct dependency order
@@ -133,6 +149,11 @@ async function restoreDatabase(backupFilePath: string): Promise<void> {
     if (backup.tables.orderItem.length > 0) {
       await db.orderItem.createMany({ data: backup.tables.orderItem as any })
       console.log(`   ✓ OrderItem: ${backup.tables.orderItem.length} records`)
+    }
+
+    if (backup.tables.orderAttachment.length > 0) {
+      await db.orderAttachment.createMany({ data: backup.tables.orderAttachment as any })
+      console.log(`   ✓ OrderAttachment: ${backup.tables.orderAttachment.length} records`)
     }
 
     if (backup.tables.metric.length > 0) {

@@ -8,43 +8,45 @@ datasource db {
 }
 
 model User {
-  id            String         @id @default(cuid())
-  email         String         @unique
-  emailVerified Boolean        @default(false)
+  id            String   @id @default(cuid())
+  email         String   @unique
+  emailVerified Boolean  @default(false)
   name          String?
   image         String?
-  createdAt     DateTime       @default(now())
-  updatedAt     DateTime       @updatedAt
-  
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
   // Custom fields for Peak Blooms
-  approved        Boolean       @default(false)
-  role            Role          @default(CUSTOMER)
-  priceMultiplier Float         @default(1.0)
-  
-  accounts       Account[]
-  sessions       Session[]
-  verifications  Verification[]
-  addresses      Address[]
-  orders         Order[]
+  approved        Boolean @default(false)
+  role            Role    @default(CUSTOMER)
+  priceMultiplier Float   @default(1.0)
+
+  accounts              Account[]
+  sessions              Session[]
+  verifications         Verification[]
+  addresses             Address[]
+  orders                Order[]
+  /// Relation: product price history entries created by this user (admin changes)
+  productPriceHistories ProductPriceHistory[]
 }
 
 model Account {
-  id                       String  @id @default(cuid())
-  accountId                String
-  providerId               String
-  userId                   String
-  accessToken              String?
-  refreshToken             String?
-  idToken                  String?
-  accessTokenExpiresAt     DateTime?
-  refreshTokenExpiresAt    DateTime?
-  scope                    String?
-  password                 String?
-  createdAt                DateTime @default(now())
-  updatedAt                DateTime @updatedAt
-  
+  id                    String    @id @default(cuid())
+  accountId             String
+  providerId            String
+  userId                String
+  accessToken           String?
+  refreshToken          String?
+  idToken               String?
+  accessTokenExpiresAt  DateTime?
+  refreshTokenExpiresAt DateTime?
+  scope                 String?
+  password              String?
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-  
+
   @@unique([providerId, accountId])
   @@index([userId])
 }
@@ -58,90 +60,91 @@ model Session {
   ipAddress String?
   userAgent String?
   userId    String
-  
+
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-  
+
   @@index([userId])
 }
 
 model Verification {
-  id        String   @id @default(cuid())
+  id         String   @id @default(cuid())
   identifier String
-  value     String
-  expiresAt DateTime
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  userId    String?
-  
+  value      String
+  expiresAt  DateTime
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  userId     String?
+
   user User? @relation(fields: [userId], references: [id], onDelete: Cascade)
-  
+
   @@unique([identifier, value])
   @@index([userId])
 }
 
 model Address {
-  id             String   @id @default(cuid())
-  userId         String?
-  firstName      String
-  lastName       String
-  company        String
-  street1        String
-  street2        String?
-  city           String
-  state          String
-  zip            String
-  country        String   @default("US")
-  email          String
-  phone          String   @default("")
-  isDefault      Boolean  @default(false)
-  createdAt      DateTime @default(now())
-  user           User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
-  orders         Order[]  @relation("DeliveryAddress")
+  id        String   @id @default(cuid())
+  userId    String?
+  firstName String
+  lastName  String
+  company   String
+  street1   String
+  street2   String?
+  city      String
+  state     String
+  zip       String
+  country   String   @default("US")
+  email     String
+  phone     String   @default("")
+  isDefault Boolean  @default(false)
+  createdAt DateTime @default(now())
+  user      User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  orders    Order[]  @relation("DeliveryAddress")
 
   @@index([userId])
 }
 
 model Collection {
-  id          String    @id @default(cuid())
-  name        String    @unique
-  slug        String    @unique
-  image       String?
-  description String?
-  featured    Boolean   @default(false)
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
+  id                 String              @id @default(cuid())
+  name               String              @unique
+  slug               String              @unique
+  image              String?
+  description        String?
+  featured           Boolean             @default(false)
+  createdAt          DateTime            @default(now())
+  updatedAt          DateTime            @updatedAt
   productCollections ProductCollection[]
 }
 
 model Inspiration {
-  id              String               @id @default(cuid())
-  name            String
-  slug            String               @unique
-  subtitle        String
-  image           String
-  excerpt         String
-  text            String
-  createdAt       DateTime             @default(now())
-  updatedAt       DateTime             @updatedAt
-  products        InspirationProduct[]
+  id        String               @id @default(cuid())
+  name      String
+  slug      String               @unique
+  subtitle  String
+  image     String
+  excerpt   String
+  text      String
+  createdAt DateTime             @default(now())
+  updatedAt DateTime             @updatedAt
+  products  InspirationProduct[]
 }
 
 model Product {
-  id           String               @id @default(cuid())
-  name         String
-  slug         String               @unique
-  description  String?
-  images       String[]             @default([])  // Array of product image URLs, ordered by display preference
-  price        Float                @default(0) // 0 indicates market price (determined at checkout/delivery)
-  colors       String[]             // Array of color IDs (references COLORS object in lib/colors.ts)
-  featured     Boolean              @default(false)
-  productType  ProductType          @default(FLOWER)
-  deletedAt    DateTime?            // Soft delete timestamp - NULL means active
-  createdAt    DateTime             @default(now())
-  updatedAt    DateTime             @updatedAt
-  inspirations InspirationProduct[]
-  orderItems   OrderItem[]
-  productCollections ProductCollection[]
+  id                    String                @id @default(cuid())
+  name                  String
+  slug                  String                @unique
+  description           String?
+  images                String[]              @default([]) // Array of product image URLs, ordered by display preference
+  price                 Float                 @default(0) // 0 indicates market price (determined at checkout/delivery)
+  colors                String[] // Array of color IDs (references COLORS object in lib/colors.ts)
+  featured              Boolean               @default(false)
+  productType           ProductType           @default(FLOWER)
+  deletedAt             DateTime? // Soft delete timestamp - NULL means active
+  createdAt             DateTime              @default(now())
+  updatedAt             DateTime              @updatedAt
+  inspirations          InspirationProduct[]
+  orderItems            OrderItem[]
+  productCollections    ProductCollection[]
+  productPriceHistories ProductPriceHistory[]
 
   @@index([slug])
   @@index([createdAt])
@@ -152,13 +155,13 @@ model Product {
 }
 
 model ProductCollection {
-  id           String    @id @default(cuid())
+  id           String   @id @default(cuid())
   productId    String
   collectionId String
-  createdAt    DateTime  @default(now())
+  createdAt    DateTime @default(now())
 
-  product      Product    @relation(fields: [productId], references: [id], onDelete: Cascade)
-  collection   Collection @relation(fields: [collectionId], references: [id], onDelete: Cascade)
+  product    Product    @relation(fields: [productId], references: [id], onDelete: Cascade)
+  collection Collection @relation(fields: [collectionId], references: [id], onDelete: Cascade)
 
   @@unique([productId, collectionId])
   @@index([collectionId])
@@ -179,43 +182,76 @@ model InspirationProduct {
 }
 
 model Order {
-  id                String      @id @default(cuid())
-  orderNumber       Int         @unique @default(autoincrement())
+  id                String            @id @default(cuid())
+  friendlyId        String            @unique
   userId            String
-  status            OrderStatus @default(CART)
+  status            OrderStatus       @default(CART)
   notes             String?
   deliveryAddressId String?
-  createdAt         DateTime    @default(now())
-  updatedAt         DateTime    @updatedAt
-  deliveryAddress   Address?    @relation("DeliveryAddress", fields: [deliveryAddressId], references: [id])
-  user              User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt         DateTime          @default(now())
+  updatedAt         DateTime          @updatedAt
+  deliveryAddress   Address?          @relation("DeliveryAddress", fields: [deliveryAddressId], references: [id])
+  user              User              @relation(fields: [userId], references: [id], onDelete: Cascade)
   items             OrderItem[]
+  attachments       OrderAttachment[]
 
   @@index([userId])
-  @@index([orderNumber])
   @@index([status])
+  @@index([friendlyId])
 }
 
 model OrderItem {
-  id                    String @id @default(cuid())
-  orderId               String
-  productId             String
-  quantity              Int
-  price                 Float       @default(0) // 0 indicates market price - to be set by admin or at delivery
-  productNameSnapshot   String?     // Captured at order time - allows display if product is deleted
-  productImageSnapshot  String?     // Captured at order time - allows display if product is deleted
-  order                 Order  @relation(fields: [orderId], references: [id], onDelete: Cascade)
-  product               Product @relation(fields: [productId], references: [id], onDelete: SetNull)
+  id                   String  @id @default(cuid())
+  orderId              String
+  productId            String
+  quantity             Int
+  price                Float   @default(0) // 0 indicates market price - to be set by admin or at delivery
+  productNameSnapshot  String? // Captured at order time - allows display if product is deleted
+  productImageSnapshot String? // Captured at order time - allows display if product is deleted
+  order                Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  product              Product @relation(fields: [productId], references: [id], onDelete: SetNull)
+
+  @@index([orderId])
+}
+
+// Product price history records each time an admin updates a product's price.
+// - previousPrice / newPrice are stored as Float to match `Product.price`.
+// - changedByUserId is nullable so automated or legacy changes can be recorded.
+model ProductPriceHistory {
+  id              String   @id @default(cuid())
+  productId       String
+  previousPrice   Float
+  newPrice        Float
+  changedByUserId String?
+  changedAt       DateTime @default(now())
+  note            String?
+
+  product       Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  changedByUser User?   @relation(fields: [changedByUserId], references: [id], onDelete: SetNull)
+
+  @@index([productId, changedAt])
+}
+
+model OrderAttachment {
+  id        String   @id @default(cuid())
+  orderId   String
+  url       String
+  key       String?
+  mime      String   @default("application/pdf")
+  size      Int?
+  createdAt DateTime @default(now())
+
+  order Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
 
   @@index([orderId])
 }
 
 model Metric {
-  id        String      @id @default(cuid())
+  id        String     @id @default(cuid())
   type      MetricType
   name      String
   duration  Float
-  createdAt DateTime    @default(now())
+  createdAt DateTime   @default(now())
 
   @@index([type])
   @@index([createdAt])

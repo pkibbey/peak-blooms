@@ -1,6 +1,7 @@
 "use client"
 
 import { useEffect } from "react"
+import DatabaseDown from "@/components/site/DatabaseDown"
 import { reportError } from "@/lib/client-logger"
 
 interface ErrorBoundaryProps {
@@ -13,6 +14,20 @@ export function ErrorBoundary({ error, reset }: ErrorBoundaryProps) {
     // Report the error to console in dev mode
     reportError(error)
   }, [error])
+
+  // Heuristic detection for database/connectivity errors
+  const _msg = `${error?.message ?? ""} ${error?.stack ?? ""}`.toLowerCase()
+  const dbErrorPatterns = [
+    "failed to connect to database",
+    "econnrefused",
+    "p1001",
+    "prismaclientinitializationerror",
+  ]
+  const isDatabaseError = dbErrorPatterns.some((p) => _msg.includes(p))
+
+  if (isDatabaseError) {
+    return <DatabaseDown onRetry={reset} />
+  }
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-white px-4">

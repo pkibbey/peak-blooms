@@ -3,7 +3,13 @@
 ## Meeting notes
 - Add e2e tests to ensure complete site functionality
 - make sure user flow for sign up works
+- investigate withTiming functionality
 
+
+#### Edit Product page
+- If you create a new order from admin, it should skip cart step
+- Allow editing the address field, when an admin user is editing the address field
+- Add a button to click and email the PDF to the contact email
 
 ### 🌟 Next Steps
 

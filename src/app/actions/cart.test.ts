@@ -70,6 +70,7 @@ describe("Cart Actions", () => {
     id: CART_ID,
     userId: USER_ID,
     status: "CART",
+    friendlyId: null,
   })
 
   beforeEach(() => {

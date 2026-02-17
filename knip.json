@@ -39,7 +39,6 @@
   "ignoreIssues": {
     "src/generated/**": ["exports", "types"],
     "src/lib/types/**": ["types"],
-    "src/lib/validations/**": ["types"],
     "public/**": ["files"]
   },
   "ignoreDependencies": ["postcss"],

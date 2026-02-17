@@ -58,9 +58,9 @@ export default async function AdminOrdersPage({ searchParams }: AdminOrdersPageP
 
   // Client-side sort based on params
   const sortOrder = order as "asc" | "desc" | undefined
-  if (sort === "orderNumber") {
+  if (sort === "friendlyId") {
     orders.sort((a, b) => {
-      const comparison = a.orderNumber - b.orderNumber
+      const comparison = String(a.friendlyId).localeCompare(String(b.friendlyId))
       return sortOrder === "desc" ? -comparison : comparison
     })
   } else if (sort === "date") {

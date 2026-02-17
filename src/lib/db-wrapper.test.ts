@@ -10,10 +10,14 @@ vi.mock("@/lib/metrics", () => ({
   captureSeedMetric: vi.fn().mockResolvedValue(undefined),
 }))
 
+import type { DefaultArgs } from "@prisma/client/runtime/client"
 import { ProductType, Role } from "@/generated/enums"
+import type { GetOrderAggregateType, OrderAggregateArgs } from "@/generated/models"
 import { db } from "@/lib/db"
 import { captureSeedMetric } from "@/lib/metrics"
 import { createTrackedDb } from "./db-wrapper"
+
+type AggregateOrder = GetOrderAggregateType<OrderAggregateArgs<DefaultArgs>>
 
 describe("Database Wrapper", () => {
   beforeEach(() => {
@@ -398,26 +402,44 @@ describe("Database Wrapper", () => {
     it("should handle aggregate operations", async () => {
       const trackedDb = createTrackedDb(db, "USER_QUERY")
 
-      // Ensure the mock has aggregate
+      // Ensure the mock has aggregate (use properly-typed AggregateOrder)
+      const aggregateResult: AggregateOrder = {
+        _count: {
+          id: 10,
+          friendlyId: 10,
+          userId: 10,
+          status: 10,
+          notes: 10,
+          deliveryAddressId: 10,
+          createdAt: 10,
+          updatedAt: 10,
+          _all: 10,
+        },
+        _min: {
+          id: null,
+          friendlyId: null,
+          userId: null,
+          status: null,
+          notes: null,
+          deliveryAddressId: null,
+          createdAt: null,
+          updatedAt: null,
+        },
+        _max: {
+          id: null,
+          friendlyId: null,
+          userId: null,
+          status: null,
+          notes: null,
+          deliveryAddressId: null,
+          createdAt: null,
+          updatedAt: null,
+        },
+      }
+
       if (!vi.mocked(db.order.aggregate)) {
-        const aggregateResult: { _count: { id: number } } = {
-          _count: { id: 10 },
-        }
         vi.mocked(db).order.aggregate = vi.fn().mockResolvedValueOnce(aggregateResult)
       } else {
-        const aggregateResult: {
-          _count: { id: number }
-          _avg: { orderNumber: number }
-          _sum: { orderNumber: number }
-          _min: { orderNumber: number }
-          _max: { orderNumber: number }
-        } = {
-          _count: { id: 10 },
-          _avg: { orderNumber: 10 },
-          _sum: { orderNumber: 10 },
-          _min: { orderNumber: 10 },
-          _max: { orderNumber: 10 },
-        }
         vi.mocked(db.order.aggregate).mockResolvedValueOnce(aggregateResult)
       }
 

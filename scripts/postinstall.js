@@ -2,7 +2,7 @@ import { spawnSync } from "node:child_process"
 
 const env = process.env.NODE_ENV || "development"
 const isProd = env === "production"
-const scriptName = isProd ? "db:generate:prod" : "db:generate:dev"
+const scriptName = isProd ? "generate:prod" : "generate"
 
 console.log(`postinstall: NODE_ENV=${env}; running npm run ${scriptName}`)
 
