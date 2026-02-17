@@ -47,16 +47,16 @@ Database helpers (use the provided npm scripts):
 
 ```bash
 # apply migrations and push schema for local dev
-npm run db:migrate:dev
+npm run migrate
 
 # generate Prisma client
-npm run db:generate:dev
+npm run generate
 
 # seed the development database
-npm run db:seed:dev
+npm run seed
 
 # open Prisma Studio
-npm run db:studio:dev
+npm run studio
 ```
 
 Other useful scripts:

@@ -56,10 +56,10 @@ function validateSessionUserFields() {
  * Validate that CartResponse has expected structure
  */
 function validateCartResponseFields() {
-  const expectedFields = ["id", "orderNumber", "status", "notes", "items", "total"]
+  const expectedFields = ["id", "friendlyId", "status", "notes", "items", "total"]
   const testCart: CartResponse = {
     id: "test",
-    orderNumber: String(1),
+    friendlyId: "test-friendly-id",
     status: "CART",
     notes: null,
     items: [],

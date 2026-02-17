@@ -42,7 +42,7 @@ export default function ReorderButton({ order }: ReorderButtonProps) {
 
       const totalUnits = quantities.reduce((s: number, q: number) => s + q, 0)
       toast.success(
-        `Added ${totalUnits} item${totalUnits !== 1 ? "s" : ""} from order ${order.orderNumber} to your cart`
+        `Added ${totalUnits} item${totalUnits !== 1 ? "s" : ""} from order ${order.friendlyId} to your cart`
       )
       // Use full page navigation to ensure cart state is updated on client and server
       window.location.href = "/cart"

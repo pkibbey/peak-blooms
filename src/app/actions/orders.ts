@@ -5,7 +5,7 @@ import { calculateMinimumTotal } from "@/lib/cart-utils"
 import { getCurrentUser } from "@/lib/current-user"
 import { db } from "@/lib/db"
 import type { CancelOrderResponse, OrderWithItems } from "@/lib/query-types"
-import { adjustPrice } from "@/lib/utils"
+import { adjustPrice, makeFriendlyOrderId } from "@/lib/utils"
 import {
   type AdminAddOrderItemsInput,
   type AdminCreateOrderInput,
@@ -255,12 +255,18 @@ export const createOrderAction = wrapAction(
       },
     })
 
+    const friendly = await makeFriendlyOrderId(user.id, cart.id, async (candidate) =>
+      Boolean(await db.order.findUnique({ where: { friendlyId: candidate } }))
+    )
+
     await db.order.update({
       where: { id: cart.id },
       data: {
         status: "PENDING",
         notes: notes || null,
         deliveryAddressId: finalDeliveryAddressId,
+        // Persist the generated friendlyId
+        friendlyId: friendly,
       },
     })
 
@@ -579,10 +585,18 @@ export const adminCreateOrderAction = wrapAction(
       data: {
         userId: validatedData.userId,
         status: "CART",
+        friendlyId: "",
         deliveryAddressId: validatedData.deliveryAddressId ?? undefined,
         notes: validatedData.notes ?? null,
       },
     })
+
+    // Persist friendlyId for admin-created orders (auto-retries handled by helper)
+    const friendly = await makeFriendlyOrderId(validatedData.userId, order.id, async (candidate) =>
+      Boolean(await db.order.findUnique({ where: { friendlyId: candidate } }))
+    )
+
+    await db.order.update({ where: { id: order.id }, data: { friendlyId: friendly } })
 
     // Create order items
     const createdItems = await Promise.all(
@@ -666,10 +680,10 @@ export const generateInvoiceAction = wrapAction(async (input: GenerateInvoiceInp
   // Upload to Vercel Blob using server-safe APIs (avoid client-only `upload` which uses `location`)
   const { generateClientTokenFromReadWriteToken, put } = await import("@vercel/blob/client")
   const timestamp = Date.now()
-  const filename = `invoice_${order.orderNumber}_${timestamp}.pdf`
+  const filename = `invoice_${order.friendlyId}_${timestamp}.pdf`
   const pathname = `generated/invoices/${filename}`
 
-  // Generate a short-lived client token (server-side) and upload the PDF directly into generated/invoices/
+  // Generate a short-lived client token (server-side) and upload the PDF directly into generated/invoices!
   const clientToken = await generateClientTokenFromReadWriteToken({
     pathname,
     // allow PDF mime

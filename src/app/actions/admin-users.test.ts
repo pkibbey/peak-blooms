@@ -25,6 +25,9 @@ vi.mock("next/headers", () => ({
 
 vi.mock("@/lib/utils", () => ({
   isValidPriceMultiplier: vi.fn((m) => m >= 0.5 && m <= 2.0),
+  makeFriendlyOrderId: vi.fn(
+    (userId: string, orderId: string) => `${userId}-${String(orderId).slice(-4)}`
+  ),
 }))
 
 import { auth, invalidateUserSessions } from "@/lib/auth"
@@ -440,7 +443,7 @@ describe("Admin User Actions", () => {
           createdAt: new Date(),
           updatedAt: new Date(),
           userId: "1",
-          orderNumber: "1",
+          friendlyId: "friendlystring_1",
           status: "PENDING",
           notes: null,
           deliveryAddressId: null,

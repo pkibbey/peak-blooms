@@ -59,7 +59,7 @@ export default async function AdminOrderDetailPage({ params }: AdminOrderDetailP
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
         <div>
           <div className="flex items-center gap-3 mb-2">
-            <h1 className="heading-1">Order {order.orderNumber}</h1>
+            <h1 className="heading-1">Order {order.friendlyId}</h1>
             <OrderStatusBadge status={order.status as OrderStatus} className="text-sm" />
           </div>
           <p className="text-muted-foreground">Placed on {formatDate(order.createdAt)}</p>

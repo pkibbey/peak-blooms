@@ -214,7 +214,7 @@ export function mockCartWithItems(overrides?: Partial<CartWithItems>): CartWithI
   const cartId = overrides?.id || "test-order-id"
   return {
     id: cartId as string,
-    orderNumber: String(overrides?.orderNumber ?? "1"),
+    friendlyId: overrides?.friendlyId ?? `test-user-id-${String(cartId).slice(-4)}`,
     userId: "test-user-id",
     status: "CART" as const,
     notes: null,
@@ -238,7 +238,9 @@ export function mockCartWithItems(overrides?: Partial<CartWithItems>): CartWithI
 export function mockOrder(overrides?: Record<string, unknown>) {
   return {
     id: "test-order-id",
-    orderNumber: String(overrides?.orderNumber ?? "1"),
+    friendlyId: overrides?.friendlyId
+      ? `test-user-id-${String("test-order-id").slice(-4)}`
+      : "test-user-mock-order",
     userId: "test-user-id",
     status: "CART" as const,
     notes: null,

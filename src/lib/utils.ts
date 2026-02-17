@@ -72,3 +72,47 @@ export function formatDate(date: Date | string): string {
 
   return format(dateObj, "MMM d, yyyy")
 }
+
+/**
+ * Build a generic friendly id from a prefix and an identifier.
+ * - prefix: arbitrary string (e.g. user id)
+ * - id: canonical id to derive suffix from (e.g. order id)
+ * - suffixLength: number of characters from the end of `id` to include
+ * - attempt: optional numeric suffix for collision retries
+ *
+ * Example: buildFriendlyId('user-1', '550e8400-e29b-41d4-a716-446655440001')
+ *          => 'user-1-0001'
+ */
+export function buildFriendlyId(prefix: string, id: string, suffixLength = 4, attempt = 0) {
+  const suffix = id.slice(-suffixLength)
+  const base = `${prefix}-${suffix}`
+  return attempt === 0 ? base : `${base}-${attempt}`
+}
+
+/**
+ * Backwards-compatible order-specific helper that delegates to `buildFriendlyId`.
+ * Keeps existing public API (`makeFriendlyOrderId`) while providing a reusable
+ * generic implementation that can be used across other resources.
+ */
+export async function makeFriendlyOrderId(
+  userId: string,
+  orderId: string,
+  attemptOrIsTaken?: number | ((candidate: string) => Promise<boolean> | boolean)
+): Promise<string> {
+  // If a numeric attempt is provided, just delegate to buildFriendlyId
+  if (typeof attemptOrIsTaken === "number" || attemptOrIsTaken === undefined) {
+    const attempt = (attemptOrIsTaken as number) || 0
+    return buildFriendlyId(userId, orderId, 4, attempt)
+  }
+
+  // Otherwise treat the third arg as an `isTaken` function and retry until available
+  const isTaken = attemptOrIsTaken as (candidate: string) => Promise<boolean> | boolean
+  const MAX_ATTEMPTS = 100
+  for (let attempt = 0; attempt < MAX_ATTEMPTS; attempt++) {
+    const candidate = buildFriendlyId(userId, orderId, 4, attempt)
+    const taken = await Promise.resolve(isTaken(candidate))
+    if (!taken) return candidate
+  }
+
+  throw new Error("Failed to generate unique friendlyId after maximum attempts")
+}

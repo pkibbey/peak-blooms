@@ -1,10 +1,12 @@
 "use server"
 
+import { randomUUID } from "node:crypto"
 import { revalidatePath } from "next/cache"
 import { applyPriceMultiplierToItems, calculateCartTotal } from "@/lib/cart-utils"
 import { getCurrentUser } from "@/lib/current-user"
 import { db } from "@/lib/db"
-import type { CartResponse, SessionUser } from "@/lib/query-types"
+import type { CartResponse, CartWithItems, SessionUser } from "@/lib/query-types"
+import { makeFriendlyOrderId } from "@/lib/utils"
 import {
   addToCartSchema,
   batchAddToCartSchema,
@@ -18,11 +20,17 @@ import { wrapAction } from "@/server/error-handler"
  * Returns cart with prices adjusted by user's price multiplier
  * A cart is an Order with status = 'CART'
  */
-async function createCart(user: SessionUser) {
+async function createCart(user: SessionUser): Promise<CartWithItems | null> {
+  // Prisma now requires `friendlyId` at create time. Use a unique temporary
+  // placeholder and immediately replace it with the deterministic value once
+  // we have the order id.
+  const tempFriendly = `tmp-${randomUUID()}`
+
   const newCart = await db.order.create({
     data: {
       userId: user.id,
       status: "CART",
+      friendlyId: tempFriendly,
     },
     include: {
       items: {
@@ -30,26 +38,45 @@ async function createCart(user: SessionUser) {
           product: true,
         },
       },
+      attachments: true,
     },
   })
 
   if (!newCart) return null
 
+  // Persist a deterministic friendlyId: <userId>-<4charsOfOrderId>
+  // makeFriendlyOrderId will retry with attempt suffixes until an unused value is found.
+  const friendly = await makeFriendlyOrderId(user.id, newCart.id, async (candidate) =>
+    Boolean(await db.order.findUnique({ where: { friendlyId: candidate } }))
+  )
+
+  // Persist friendlyId but continue using the object returned from create()
+  await db.order.update({ where: { id: newCart.id }, data: { friendlyId: friendly } })
+
+  const cartWithFriendly = { ...newCart, friendlyId: friendly }
   const multiplier = user.priceMultiplier ?? 1.0
-  const adjustedItems = applyPriceMultiplierToItems(newCart.items, multiplier)
-  const sortedItems = adjustedItems.sort((a, b) => a.product.name.localeCompare(b.product.name))
+  const adjustedItems = applyPriceMultiplierToItems(
+    cartWithFriendly.items,
+    multiplier
+  ) as unknown as CartWithItems["items"]
 
   return {
-    ...newCart,
-    items: sortedItems,
+    ...cartWithFriendly,
+    items: adjustedItems,
   }
 }
 
 /**
  * Sort cart items by product name
  */
-function sortCartItems<T extends { product: { name: string } }>(items: T[]): T[] {
-  return items.sort((a, b) => a.product.name.localeCompare(b.product.name))
+function sortCartItems<T extends { product?: { name: string } | null }>(
+  items: T[]
+): Array<T & { product: NonNullable<T["product"]> }> {
+  // Filter out any items that are missing product snapshots then sort
+  const filtered = items.filter((i): i is T & { product: NonNullable<T["product"]> } =>
+    Boolean(i.product)
+  )
+  return filtered.sort((a, b) => a.product.name.localeCompare(b.product.name))
 }
 
 /**
@@ -97,6 +124,15 @@ export const addToCartAction = wrapAction(async (input: unknown): Promise<CartRe
     }
   }
 
+  // Ensure cart has a persisted friendlyId (handle legacy/missing rows)
+  if (cart && !cart.friendlyId) {
+    const generatedFriendly = await makeFriendlyOrderId(user.id, cart.id, async (candidate) =>
+      Boolean(await db.order.findUnique({ where: { friendlyId: candidate } }))
+    )
+    await db.order.update({ where: { id: cart.id }, data: { friendlyId: generatedFriendly } })
+    cart = { ...cart, friendlyId: generatedFriendly }
+  }
+
   // 6. Update or create order item
   const existingItem = await db.orderItem.findFirst({
     where: { orderId: cart.id, productId },
@@ -137,7 +173,7 @@ export const addToCartAction = wrapAction(async (input: unknown): Promise<CartRe
   revalidatePath("/cart")
   return {
     id: updatedCart.id,
-    orderNumber: updatedCart.orderNumber,
+    friendlyId: updatedCart.friendlyId,
     status: updatedCart.status,
     notes: updatedCart.notes,
     items: sortedItems,
@@ -203,7 +239,7 @@ export const updateCartItemAction = wrapAction(async (input: unknown): Promise<C
   revalidatePath("/cart")
   return {
     id: updatedCart.id,
-    orderNumber: updatedCart.orderNumber,
+    friendlyId: updatedCart.friendlyId,
     status: updatedCart.status,
     notes: updatedCart.notes,
     items: sortedItems,
@@ -260,7 +296,7 @@ export const removeFromCartAction = wrapAction(async (input: unknown): Promise<C
   revalidatePath("/cart")
   return {
     id: updatedCart.id,
-    orderNumber: updatedCart.orderNumber,
+    friendlyId: updatedCart.friendlyId,
     status: updatedCart.status,
     notes: updatedCart.notes,
     items: sortedItems,
@@ -309,7 +345,7 @@ export const clearCartAction = wrapAction(async (): Promise<CartResponse> => {
   revalidatePath("/cart")
   return {
     id: updatedCart.id,
-    orderNumber: updatedCart.orderNumber,
+    friendlyId: updatedCart.friendlyId,
     status: updatedCart.status,
     notes: updatedCart.notes,
     items: [],
@@ -334,7 +370,7 @@ export const getCartAction = wrapAction(async (): Promise<CartResponse | null> =
   }
 
   // 3. Get existing cart without creating one
-  const cart = await db.order.findFirst({
+  let cart = await db.order.findFirst({
     where: { userId: user.id, status: "CART" },
     orderBy: { createdAt: "desc" },
     include: {
@@ -348,6 +384,15 @@ export const getCartAction = wrapAction(async (): Promise<CartResponse | null> =
     return null
   }
 
+  // Ensure cart has a persisted friendlyId (handle legacy/missing rows)
+  if (!cart.friendlyId) {
+    const generatedFriendly = await makeFriendlyOrderId(user.id, cart.id, async (candidate) =>
+      Boolean(await db.order.findUnique({ where: { friendlyId: candidate } }))
+    )
+    await db.order.update({ where: { id: cart.id }, data: { friendlyId: generatedFriendly } })
+    cart = { ...cart, friendlyId: generatedFriendly }
+  }
+
   // 4. Return cart with adjusted prices
   const adjustedItems = applyPriceMultiplierToItems(cart.items, user.priceMultiplier ?? 1.0)
   const sortedItems = sortCartItems(adjustedItems)
@@ -355,7 +400,7 @@ export const getCartAction = wrapAction(async (): Promise<CartResponse | null> =
 
   return {
     id: cart.id,
-    orderNumber: cart.orderNumber,
+    friendlyId: cart.friendlyId,
     status: cart.status,
     notes: cart.notes,
     items: sortedItems,
@@ -398,6 +443,15 @@ export const batchAddToCartAction = wrapAction(async (input: unknown): Promise<C
     if (!cart) {
       throw new Error("Failed to create cart")
     }
+  }
+
+  // Ensure cart has a persisted friendlyId (handle legacy/missing rows)
+  if (cart && !cart.friendlyId) {
+    const generatedFriendly = await makeFriendlyOrderId(user.id, cart.id, async (candidate) =>
+      Boolean(await db.order.findUnique({ where: { friendlyId: candidate } }))
+    )
+    await db.order.update({ where: { id: cart.id }, data: { friendlyId: generatedFriendly } })
+    cart = { ...cart, friendlyId: generatedFriendly }
   }
 
   // 5. Determine per-item quantities
@@ -460,7 +514,7 @@ export const batchAddToCartAction = wrapAction(async (input: unknown): Promise<C
   revalidatePath("/cart")
   return {
     id: updatedCart.id,
-    orderNumber: updatedCart.orderNumber,
+    friendlyId: updatedCart.friendlyId,
     status: updatedCart.status,
     notes: updatedCart.notes,
     items: sortedItems,

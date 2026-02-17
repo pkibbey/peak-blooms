@@ -17,21 +17,21 @@
     "postinstall": "node ./scripts/postinstall.js",
     "knip": "dotenv -e .env.local -- knip",
     "check": "npm run lint && npm run typecheck && npm run test",
-    "db:push:dev": "dotenv -e .env.local -- prisma db push",
-    "db:generate:dev": "dotenv -e .env.local -- prisma generate",
-    "db:generate:prod": "prisma generate",
-    "db:migrate:dev": "dotenv -e .env.local -- prisma migrate dev",
-    "db:migrate:prod": "dotenv -e .env.prod -- prisma migrate dev",
-    "db:reset:dev": "dotenv -e .env.local -- prisma migrate reset --force",
-    "db:reset:prod": "dotenv -e .env.prod -- prisma migrate reset --force",
-    "db:seed:dev": "dotenv -e .env.local -- prisma db seed",
-    "db:seed:prod": "dotenv -e .env.prod -- prisma db seed",
-    "db:studio:dev": "dotenv -e .env.local -- prisma studio",
-    "db:studio:prod": "dotenv -e .env.prod -- prisma studio",
-    "db:backup:dev": "BACKUP_ENV=dev dotenv -e .env.local -- tsx scripts/backup-database.ts",
-    "db:backup:prod": "BACKUP_ENV=prod dotenv -e .env.prod -- tsx scripts/backup-database.ts",
-    "db:restore:dev": "dotenv -e .env.local -- tsx scripts/restore-database.ts",
-    "db:restore:prod": "dotenv -e .env.prod -- tsx scripts/restore-database.ts",
+    "push": "dotenv -e .env.local -- prisma db push",
+    "generate": "dotenv -e .env.local -- prisma generate",
+    "generate:prod": "prisma generate",
+    "migrate": "dotenv -e .env.local -- prisma migrate dev",
+    "migrate:prod": "dotenv -e .env.prod -- prisma migrate dev",
+    "reset": "dotenv -e .env.local -- prisma migrate reset --force",
+    "reset:prod": "dotenv -e .env.prod -- prisma migrate reset --force",
+    "seed": "dotenv -e .env.local -- prisma db seed",
+    "seed:prod": "dotenv -e .env.prod -- prisma db seed",
+    "studio": "dotenv -e .env.local -- prisma studio",
+    "studio:prod": "dotenv -e .env.prod -- prisma studio",
+    "backup": "BACKUP_ENV=dev dotenv -e .env.local -- tsx scripts/backup-database.ts",
+    "backup:prod": "BACKUP_ENV=prod dotenv -e .env.prod -- tsx scripts/backup-database.ts",
+    "restore": "dotenv -e .env.local -- tsx scripts/restore-database.ts",
+    "restore:prod": "dotenv -e .env.prod -- tsx scripts/restore-database.ts",
     "generate:schema": "tsx scripts/generate-api-schema.ts",
     "prepare": "husky"
   },
@@ -94,7 +94,7 @@
     ]
   },
   "engines": {
-    "node": ">=24.0.0",
-    "npm": ">=11.0.0"
+    "node": "24.x",
+    "npm": "11.x"
   }
 }

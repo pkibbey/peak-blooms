@@ -406,7 +406,7 @@ describe("Database Wrapper", () => {
       const aggregateResult: AggregateOrder = {
         _count: {
           id: 10,
-          orderNumber: 10,
+          friendlyId: 10,
           userId: 10,
           status: 10,
           notes: 10,
@@ -417,7 +417,7 @@ describe("Database Wrapper", () => {
         },
         _min: {
           id: null,
-          orderNumber: null,
+          friendlyId: null,
           userId: null,
           status: null,
           notes: null,
@@ -427,7 +427,7 @@ describe("Database Wrapper", () => {
         },
         _max: {
           id: null,
-          orderNumber: null,
+          friendlyId: null,
           userId: null,
           status: null,
           notes: null,

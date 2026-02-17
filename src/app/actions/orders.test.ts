@@ -15,6 +15,9 @@ vi.mock("@/lib/utils", () => ({
   adjustPrice: vi.fn((price, multiplier) => {
     return Math.round(price * multiplier * 100) / 100
   }),
+  makeFriendlyOrderId: vi.fn(
+    (userId: string, orderId: string) => `${userId}-${String(orderId).slice(-4)}`
+  ),
 }))
 
 vi.mock("next/cache", () => ({
@@ -64,7 +67,7 @@ const VALID_UUID_2 = "550e8400-e29b-41d4-a716-446655440002"
 const VALID_UUID_3 = "550e8400-e29b-41d4-a716-446655440003"
 
 // Mock Factory Defaults with full Prisma model properties
-const createMockDefaults = (baseDate = new Date()) => ({
+const d = (baseDate = new Date()) => ({
   user: (overrides = {}) => ({
     id: "user-1",
     email: "test@example.com",
@@ -96,7 +99,7 @@ const createMockDefaults = (baseDate = new Date()) => ({
   order: (overrides = {}) => ({
     id: VALID_UUID,
     userId: "user-1",
-    orderNumber: "1",
+    friendlyId: "friendly-id-1",
     status: "PENDING" as OrderStatus,
     notes: null,
     deliveryAddressId: VALID_UUID_2,
@@ -139,7 +142,7 @@ const createMockDefaults = (baseDate = new Date()) => ({
 
 describe("Order Actions", () => {
   const baseDate = new Date()
-  const mockDefaults = createMockDefaults(baseDate)
+  const mockDefaults = d(baseDate)
   const mockUser = mockDefaults.user()
   const mockAdminUser = mockDefaults.adminUser()
   const mockOrder = mockDefaults.order()
@@ -803,6 +806,7 @@ describe("Order Actions", () => {
       )
 
       const result = await createOrderAction(validData)
+      console.log("DEBUG createOrderAction result:", result)
       expect(result.success).toBe(true)
       if (result.success) {
         expect(result.data?.status).toBe("PENDING")

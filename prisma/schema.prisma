@@ -183,7 +183,7 @@ model InspirationProduct {
 
 model Order {
   id                String            @id @default(cuid())
-  orderNumber       String            @unique @default(cuid())
+  friendlyId        String            @unique
   userId            String
   status            OrderStatus       @default(CART)
   notes             String?
@@ -196,8 +196,8 @@ model Order {
   attachments       OrderAttachment[]
 
   @@index([userId])
-  @@index([orderNumber])
   @@index([status])
+  @@index([friendlyId])
 }
 
 model OrderItem {

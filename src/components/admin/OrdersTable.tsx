@@ -78,7 +78,7 @@ export default function OrdersTable({ orders, currentStatus, sort, order }: Orde
               <TableRow>
                 <SortableTableHead
                   label="Order"
-                  sortKey="orderNumber"
+                  sortKey="friendlyId"
                   currentSort={sort}
                   currentOrder={order}
                   href={headerUrl}
@@ -126,7 +126,7 @@ export default function OrdersTable({ orders, currentStatus, sort, order }: Orde
                         href={`/admin/orders/${order.id}`}
                         className="font-medium text-primary hover:underline"
                       >
-                        {order.orderNumber}
+                        {order.friendlyId}
                       </Link>
                     </TableCell>
                     <TableCell>

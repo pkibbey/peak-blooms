@@ -1,12 +1,14 @@
 import { describe, expect, it } from "vitest"
 import {
   adjustPrice,
+  buildFriendlyId,
   cn,
   formatDate,
   formatPrice,
   isValidPriceMultiplier,
   MAX_PRICE_MULTIPLIER,
   MIN_PRICE_MULTIPLIER,
+  makeFriendlyOrderId,
 } from "@/lib/utils"
 
 describe("cn - className merger", () => {
@@ -142,5 +144,27 @@ describe("formatDate - date formatting", () => {
     expect(formatDate("2025-01-01")).toBeTruthy()
     expect(formatDate("2025-12-31")).toBeTruthy()
     expect(formatDate("Jan 1, 2025")).toBeTruthy()
+  })
+})
+
+// ---------------------------------------------------------------------------
+// Friendly ID helpers
+// ---------------------------------------------------------------------------
+
+describe("buildFriendlyId / makeFriendlyOrderId", () => {
+  it("should generate a deterministic friendly id from prefix + id suffix", () => {
+    const result = buildFriendlyId("user-1", "550e8400-e29b-41d4-a716-446655440001")
+    expect(result).toBe("user-1-0001")
+  })
+
+  it("should append attempt suffix when attempt > 0", () => {
+    const result = buildFriendlyId("user-1", "order-abcdef", 4, 2)
+    expect(result).toBe("user-1-cdef-2")
+  })
+
+  it("makeFriendlyOrderId should delegate to buildFriendlyId", async () => {
+    const a = await makeFriendlyOrderId("user-99", "order-xyz123")
+    const b = buildFriendlyId("user-99", "order-xyz123", 4)
+    expect(a).toBe(b)
   })
 })

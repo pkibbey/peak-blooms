@@ -28,7 +28,6 @@ export async function computeOrderTax(order: {
 }
 
 export async function generateInvoicePdfBuffer(order: {
-  orderNumber?: string | number
   items: Array<{
     productNameSnapshot?: string | null
     product?: { name?: string | null }

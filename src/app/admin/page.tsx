@@ -29,7 +29,7 @@ export default async function AdminDashboard() {
     ...recentOrders.map((o) => ({
       id: o.id,
       type: "order",
-      title: `Order ${o.orderNumber} placed`,
+      title: `Order ${o.friendlyId} placed`,
       subtitle: `${o.user?.name ?? o.user?.email ?? "Unknown"}`,
       createdAt: o.createdAt.toISOString(),
       href: `/admin/orders/${o.id}`,
