@@ -46,7 +46,7 @@ try {
   } as unknown as PrismaClient
 }
 
-if (process.env.NODE_ENV !== "production") globalForPrisma.prisma = baseDb
+if (process.env.NODE_ENV === "production") globalForPrisma.prisma = baseDb
 
 /**
  * Default database client (untracked, used when tracking context is not needed)
