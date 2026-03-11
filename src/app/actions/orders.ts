@@ -348,13 +348,20 @@ export const updateOrderItemPriceAction = wrapAction(
       throw new Error("You must be an admin to update order item prices")
     }
 
-    // Fetch the order item
+    // Fetch the order item along with its parent order so we can enforce
+    // that modifications are only allowed while the order is still a cart.
     const orderItem = await db.orderItem.findFirst({
       where: { id: itemId, orderId },
+      include: { order: true },
     })
 
     if (!orderItem) {
       throw new Error("Order item not found")
+    }
+
+    // Only allow price edits while the order remains in CART status.
+    if (orderItem.order.status !== "CART") {
+      throw new Error("Cannot change item price after order has been placed")
     }
 
     // Update the order item price

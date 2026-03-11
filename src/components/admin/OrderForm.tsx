@@ -30,12 +30,16 @@ import {
 import { Textarea } from "@/components/ui/textarea"
 import type { AddressModel, ProductModel } from "@/generated/models"
 import { toAppErrorClient } from "@/lib/error-utils"
-import type { UserForAdmin } from "@/lib/query-types"
+import type { SessionUser, UserForAdmin } from "@/lib/query-types"
 
 interface OrderFormProps {
   users: UserForAdmin[]
   products: ProductModel[]
   addresses: (AddressModel & { user: { id: string; name: string | null } | null })[]
+  /**
+   * Current session user (should be an admin when the form is used in admin UI)
+   */
+  user?: SessionUser | null
 }
 
 interface OrderFormValues {
@@ -63,7 +67,7 @@ interface OrderFormValues {
   notes: string
 }
 
-export default function OrderForm({ users, products, addresses }: OrderFormProps) {
+export default function OrderForm({ users, products, addresses, user = null }: OrderFormProps) {
   const router = useRouter()
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [localUsers, setLocalUsers] = useState<UserForAdmin[]>(users)
@@ -453,7 +457,7 @@ export default function OrderForm({ users, products, addresses }: OrderFormProps
 
         {/* Order Items */}
         <div className="space-y-4">
-          <div className="flex justify-between items-center">
+          <div className="flex items-end justify-between">
             <FormLabel>Order Items *</FormLabel>
             <Button
               type="button"
@@ -479,7 +483,7 @@ export default function OrderForm({ users, products, addresses }: OrderFormProps
 
                 return (
                   <ProductCard
-                    key={`${it.productId}-${i}`}
+                    key={`${it.productId}`}
                     product={product}
                     quantity={Number(it.quantity) || 1}
                     imageSize="sm"
@@ -487,6 +491,11 @@ export default function OrderForm({ users, products, addresses }: OrderFormProps
                     onQuantityChange={(q) => form.setValue(`items.${i}.quantity`, q)}
                     onRemove={() => remove(i)}
                     isUpdating={isSubmitting}
+                    allowPriceEdit={true}
+                    onPriceChange={(newPrice) =>
+                      form.setValue(`items.${i}.price`, String(newPrice))
+                    }
+                    user={user} // ensure admin privileges propagate for price editing
                   />
                 )
               })}

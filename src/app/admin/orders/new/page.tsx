@@ -1,6 +1,7 @@
 import OrderForm from "@/components/admin/OrderForm"
 import BackLink from "@/components/site/BackLink"
 import type { AddressModel } from "@/generated/models"
+import { getCurrentUser } from "@/lib/current-user"
 import { getTrackedDb } from "@/lib/db"
 
 export const metadata = {
@@ -9,6 +10,9 @@ export const metadata = {
 
 export default async function NewOrderPage() {
   const db = getTrackedDb(true)
+
+  // the new order form runs client-side but needs to know the current user
+  const user = await getCurrentUser()
 
   const [users, products, addresses] = await Promise.all([
     db.user.findMany({
@@ -44,7 +48,7 @@ export default async function NewOrderPage() {
       </div>
 
       <div className="rounded-lg border border-border p-6">
-        <OrderForm users={users} products={products} addresses={castedAddresses} />
+        <OrderForm users={users} products={products} addresses={castedAddresses} user={user} />
       </div>
     </>
   )

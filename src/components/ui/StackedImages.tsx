@@ -33,9 +33,9 @@ export const StackedImages: React.FC<StackedImagesProps> = ({
         {remaining > 0 ? `, ${remaining} more` : ""}
       </span>
 
-      {display.map((img, idx) => (
+      {display.map((img) => (
         <div
-          key={`${img.src ?? "placeholder"}-${idx}`}
+          key={`${img.src ?? "placeholder"}-${img.alt}`}
           className={cn(
             "relative shrink-0 overflow-hidden rounded-full border-2 border-background bg-muted shadow-sm transition-transform",
             sizeClass

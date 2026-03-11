@@ -132,7 +132,7 @@ export default async function AdminOrderDetailPage({ params }: AdminOrderDetailP
 
           {/* Delete order (admin) */}
           <div className="bg-background rounded-xs shadow-sm border p-6">
-            <h2 className="heading-3 mb-4">Danger Zone</h2>
+            <h2 className="heading-3 mb-4">Delete Order</h2>
             <div className="flex items-center gap-2">
               <DeleteOrderButton
                 orderId={order.id}

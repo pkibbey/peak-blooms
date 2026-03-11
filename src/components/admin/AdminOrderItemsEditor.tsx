@@ -6,6 +6,7 @@ import {
   adminAddOrderItemsAction,
   adminUpdateOrderItemQuantityAction,
   deleteOrderItemAction,
+  updateOrderItemPriceAction,
 } from "@/app/actions/orders"
 import AdminOrderItemRow from "@/components/admin/AdminOrderItemRow"
 import OrderProductsPicker from "@/components/admin/OrderProductsPicker"
@@ -62,6 +63,33 @@ export default function AdminOrderItemsEditor({
     })
   }
 
+  const handlePriceChange = (itemId: string, newPrice: number) => {
+    startTransition(async () => {
+      try {
+        const res = await updateOrderItemPriceAction({
+          orderId: order.id,
+          itemId,
+          price: newPrice,
+        })
+        if (!res || !res.success) {
+          toast.error(res?.error || "Failed to update price")
+          return
+        }
+
+        // update local copy with new price
+        setLocalItems((prev) => {
+          const next = prev.map((i) => (i.id === itemId ? { ...i, price: newPrice } : i))
+          const sorted = sortItemsByName(next)
+          onItemsUpdated?.(sorted)
+          return sorted
+        })
+        toast.success("Price updated")
+      } catch (err) {
+        toAppErrorClient(err, "Failed to update price")
+      }
+    })
+  }
+
   const handleDelete = (itemId: string, name?: string) => {
     if (!confirm(`Delete "${name ?? "item"}"? This cannot be undone.`)) return
 
@@ -97,6 +125,8 @@ export default function AdminOrderItemsEditor({
             key={item.id}
             item={item}
             onQuantityChange={handleQuantityChange}
+            onPriceChange={handlePriceChange}
+            allowPriceEdit={order.status === "CART"}
             onDelete={handleDelete}
             disabled={isPending}
             user={user}

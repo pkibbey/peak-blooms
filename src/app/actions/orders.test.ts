@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from "vitest"
 import { type OrderStatus, Role } from "@/generated/enums"
-import { createMockPrismaClient } from "@/test/mocks"
+import { createMockPrismaClient, mockOrderItemWithOrder } from "@/test/mocks"
 
 // Mock dependencies - must be before imports
 vi.mock("@/lib/db", () => ({
@@ -230,6 +230,75 @@ describe("Order Actions", () => {
     })
   })
 
+  describe("adminCreateOrderAction", () => {
+    beforeEach(() => {
+      vi.mocked(getCurrentUser).mockResolvedValue(mockAdminUser)
+    })
+
+    it("should require admin", async () => {
+      vi.mocked(getCurrentUser).mockResolvedValueOnce(mockUser)
+      const result = await (await import("./orders")).adminCreateOrderAction({
+        userId: VALID_UUID,
+        items: [{ productId: VALID_UUID_2, quantity: 1, price: 10 }],
+      })
+      expect(result.success).toBe(false)
+      if (!result.success) expect(result.code).toBe("UNAUTHORIZED")
+    })
+
+    it("should validate input", async () => {
+      const result = await (await import("./orders")).adminCreateOrderAction({
+        userId: "",
+        items: [],
+      })
+      expect(result.success).toBe(false)
+      if (!result.success) expect(result.code).toBe("VALIDATION_ERROR")
+    })
+
+    it("should accept minimal payload without delivery info", async () => {
+      // ensure schema doesn't require address fields when omitted
+      const result = await (await import("./orders")).adminCreateOrderAction({
+        userId: VALID_UUID,
+        items: [{ productId: VALID_UUID_2, quantity: 1 }],
+      })
+      // mocks need to be set up similar to the previous successful test
+      expect(result.success).toBe(false)
+      if (!result.success) {
+        // this call will fail because we didn't mock DB interactions here –
+        // we're only verifying validation passes, so a failure after that is
+        // acceptable.  We're just checking that the code isn't VALIDATION_ERROR.
+        expect(result.code).not.toBe("VALIDATION_ERROR")
+      }
+    })
+
+    it("should create the order and respect provided item prices", async () => {
+      // mocks for user lookup and order creation
+      vi.mocked(db.user.findUnique).mockResolvedValueOnce(mockDefaults.user())
+      vi.mocked(db.order.create).mockResolvedValueOnce(mockDefaults.order({ id: VALID_UUID }))
+      vi.mocked(db.order.update).mockResolvedValueOnce(mockDefaults.order({ id: VALID_UUID }))
+
+      const createdItem = mockDefaults.orderItem({
+        id: "item-1",
+        quantity: 2,
+        price: 123.45,
+        product: { id: VALID_UUID_2, name: "Roses" },
+      })
+      vi.mocked(db.orderItem.create).mockResolvedValueOnce(createdItem)
+      vi.mocked(db.order.findUniqueOrThrow).mockResolvedValueOnce(
+        mockDefaults.order({ id: VALID_UUID, items: [createdItem], attachments: [] })
+      )
+
+      const result = await (await import("./orders")).adminCreateOrderAction({
+        userId: VALID_UUID,
+        items: [{ productId: VALID_UUID_2, quantity: 2, price: 123.45 }],
+      })
+
+      expect(result.success).toBe(true)
+      if (result.success) {
+        expect(result.data?.items?.[0].price).toBe(123.45)
+      }
+    })
+  })
+
   describe("updateOrderStatusAction", () => {
     beforeEach(() => {
       vi.mocked(getCurrentUser).mockResolvedValue(mockAdminUser)
@@ -279,14 +348,19 @@ describe("Order Actions", () => {
   })
 
   describe("updateOrderItemPriceAction", () => {
-    const mockItem = mockDefaults.orderItem()
+    // const mockItem = mockDefaults.orderItem() // unused, previous refactor
 
     beforeEach(() => {
       vi.mocked(getCurrentUser).mockResolvedValue(mockAdminUser)
     })
 
     it("should update price and recalculate total including market prices", async () => {
-      vi.mocked(db.orderItem.findFirst).mockResolvedValueOnce(mockItem)
+      // return an item belonging to a cart-order so the status guard passes
+      const cartItem = mockOrderItemWithOrder({
+        orderId: VALID_UUID,
+        order: { status: "CART" },
+      })
+      vi.mocked(db.orderItem.findFirst).mockResolvedValueOnce(cartItem)
       vi.mocked(db.orderItem.update).mockResolvedValueOnce(mockDefaults.orderItem({ price: 50 }))
       vi.mocked(db.orderItem.findMany).mockResolvedValueOnce([
         mockDefaults.orderItem({ quantity: 2, price: 50 }),
@@ -330,6 +404,29 @@ describe("Order Actions", () => {
       expect(result.success).toBe(false)
       if (!result.success) {
         expect(result.code).toBe("NOT_FOUND")
+      }
+    })
+
+    it("should reject price changes when order status is not CART", async () => {
+      // return an item with an order in a non-cart state
+      const itemWithOrder = mockOrderItemWithOrder({
+        orderId: VALID_UUID,
+        order: { status: "CONFIRMED" },
+      })
+      vi.mocked(db.orderItem.findFirst).mockResolvedValueOnce(itemWithOrder)
+
+      const result = await updateOrderItemPriceAction({
+        orderId: VALID_UUID,
+        itemId: VALID_UUID_3,
+        price: 20,
+      })
+
+      expect(result.success).toBe(false)
+      if (!result.success) {
+        // action throws a generic error; depending on environment it may come
+        // through as SERVER_ERROR or UNKNOWN.
+        expect(["UNKNOWN", "SERVER_ERROR"]).toContain(result.code)
+        expect(result.error).toMatch(/Cannot change item price/)
       }
     })
   })

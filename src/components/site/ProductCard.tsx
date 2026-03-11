@@ -4,6 +4,7 @@ import { Pencil } from "lucide-react"
 import Image from "next/image"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
+import { useEffect, useState } from "react"
 import { ProductControls } from "@/components/site/ProductControls"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -29,6 +30,10 @@ interface ProductCardProps {
   onQuantityChange?: (newQuantity: number) => void
   onRemove?: () => void
   isUpdating?: boolean
+
+  // admin price editing
+  allowPriceEdit?: boolean
+  onPriceChange?: (newPrice: number) => void
 }
 
 const imageSizes = {
@@ -50,9 +55,33 @@ export function ProductCard({
   onQuantityChange,
   onRemove,
   isUpdating = false,
+  allowPriceEdit = false,
+  onPriceChange,
 }: ProductCardProps) {
   const router = useRouter()
   const isAdmin = user?.role === "ADMIN"
+
+  // price editing state (hooks must run unconditionally)
+  const basePrice = product.price
+  const [priceStr, setPriceStr] = useState(basePrice.toFixed(2))
+
+  useEffect(() => {
+    setPriceStr(basePrice.toFixed(2))
+  }, [basePrice])
+
+  const price = parseFloat(priceStr)
+  const lineTotal = price !== 0 ? price * quantity : 0
+
+  const handlePriceBlur = () => {
+    const val = parseFloat(priceStr)
+    if (Number.isNaN(val) || val < 0) {
+      setPriceStr(price.toFixed(2))
+      return
+    }
+    if (onPriceChange && val !== basePrice) {
+      onPriceChange(val)
+    }
+  }
 
   const handleEditClick = (e: React.MouseEvent) => {
     e.preventDefault()
@@ -138,10 +167,6 @@ export function ProductCard({
     )
   }
 
-  // Stacked Layout - renders as a list item (cart/order context)
-  const price = product.price
-  const lineTotal = price !== 0 ? price * quantity : 0
-
   const sizeConfig = imageSizes[imageSize]
 
   return (
@@ -195,19 +220,40 @@ export function ProductCard({
                 {PRODUCT_TYPE_LABELS[product.productType]}
               </Badge>
             </div>
-            <p className="text-xs text-muted-foreground mt-2">{formatPrice(price)} each</p>
-            {/* View Options Link */}
-            {showSimilarLink && (
-              <div className="mt-2">
-                <Link href={`/shop/${product.slug}`} className="text-sm text-primary underline">
-                  View similar options →
-                </Link>
-              </div>
-            )}
+            <div className="flex items-center gap-2 mt-2">
+              {allowPriceEdit && isAdmin ? (
+                <>
+                  <input
+                    type="number"
+                    step="0.01"
+                    min="0"
+                    className="w-20 input input-xs"
+                    value={priceStr}
+                    onChange={(e) => setPriceStr(e.target.value)}
+                    onBlur={handlePriceBlur}
+                    disabled={isUpdating}
+                  />
+                  <span className="text-xs text-muted-foreground">each</span>
+                </>
+              ) : (
+                <p className="text-xs text-muted-foreground">{formatPrice(price)} each</p>
+              )}
+              {/* View Options Link */}
+              {showSimilarLink && (
+                <div className="mt-2">
+                  <Link href={`/shop/${product.slug}`} className="text-sm text-primary underline">
+                    View similar options →
+                  </Link>
+                </div>
+              )}
+            </div>
           </div>
           {/* Right Side: Price & Controls */}
           <div className="flex sm:flex-col sm:items-end w-full sm:w-auto justify-between sm:justify-end gap-3">
             <p className="text-base font-medium text-foreground">{formatPrice(lineTotal)}</p>
+            {allowPriceEdit && isAdmin && (
+              <p className="text-xs text-muted-foreground">(editable)</p>
+            )}
             {showQuantityControl ? (
               <div className="flex flex-col items-end gap-4">
                 <QuantityStepper

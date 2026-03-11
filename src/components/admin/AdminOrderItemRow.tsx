@@ -7,6 +7,8 @@ import type { AdminOrderItem, SessionUser } from "@/lib/query-types"
 interface AdminOrderItemRowProps {
   item: AdminOrderItem
   onQuantityChange: (itemId: string, newQty: number) => void
+  onPriceChange?: (itemId: string, newPrice: number) => void
+  allowPriceEdit?: boolean
   onDelete: (itemId: string, name?: string) => void
   disabled?: boolean
   user?: SessionUser | null
@@ -15,6 +17,8 @@ interface AdminOrderItemRowProps {
 export default function AdminOrderItemRow({
   item,
   onQuantityChange,
+  onPriceChange,
+  allowPriceEdit = false,
   onDelete,
   disabled = false,
   user = null,
@@ -46,6 +50,8 @@ export default function AdminOrderItemRow({
       onRemove={() => onDelete(item.id, productName)}
       user={user}
       isUpdating={disabled}
+      allowPriceEdit={allowPriceEdit}
+      onPriceChange={onPriceChange ? (newPrice) => onPriceChange(item.id, newPrice) : undefined}
     />
   )
 }

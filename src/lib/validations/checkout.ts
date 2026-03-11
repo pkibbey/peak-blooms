@@ -103,8 +103,12 @@ export type DeleteOrderAttachmentInput = z.infer<typeof deleteOrderAttachmentSch
 // Admin create order schema - for admins to manually create orders
 export const adminCreateOrderSchema = z.object({
   userId: z.string().min(1, "User is required"),
-  deliveryAddressId: z.string().nullable(),
-  deliveryAddress: addressSchema.nullable(),
+  // optional delivery info for admins; they may create orders without specifying
+  // an address, so these fields are only validated when present. Previously the
+  // schema treated them as required (even if null), which caused validation
+  // failures when the caller omitted them entirely.
+  deliveryAddressId: z.string().min(1, "Invalid address ID").nullable().optional(),
+  deliveryAddress: addressSchema.nullable().optional(),
   items: z
     .array(
       z.object({
