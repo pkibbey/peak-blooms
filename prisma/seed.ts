@@ -15,7 +15,8 @@ if (!connectionString) {
 
 console.log("Connecting to database...")
 const pool = new Pool({ connectionString })
-const adapter = new PrismaPg(pool)
+// biome-ignore lint/suspicious/noExplicitAny: Prisma
+const adapter = new PrismaPg(pool as unknown as any)
 const prisma = new PrismaClient({ adapter })
 
 // Helper function to capture metrics directly to database
@@ -410,6 +411,7 @@ async function main() {
         const order1 = await tx.order.create({
           data: {
             userId: approvedCustomer.id,
+            friendlyId: "seed-order-1",
             status: "DELIVERED",
             createdAt: order1Date,
             deliveryAddressId: deliveryAddress1.id,
@@ -445,6 +447,7 @@ async function main() {
         const order2 = await tx.order.create({
           data: {
             userId: approvedCustomer.id,
+            friendlyId: "seed-order-2",
             status: "CONFIRMED",
             createdAt: order2Date,
             deliveryAddressId: deliveryAddress2.id,

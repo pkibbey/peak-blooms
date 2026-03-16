@@ -12,9 +12,11 @@ import { Label } from "../ui/label"
 export function SearchInput({
   searchTerm,
   setSearchTerm,
+  basePath = "/shop",
 }: {
   searchTerm: string
   setSearchTerm: Dispatch<SetStateAction<string>>
+  basePath?: string
 }) {
   const searchParams = useSearchParams()
   const router = useRouter()
@@ -34,7 +36,7 @@ export function SearchInput({
     // Reset to page 1 when search changes
     params.set("page", "1")
 
-    router.push(`/shop?${params.toString()}`, { scroll: false })
+    router.push(`${basePath}?${params.toString()}`, { scroll: false })
   }, 300)
 
   const onInputChange = (value: string) => {
@@ -47,7 +49,7 @@ export function SearchInput({
     const params = new URLSearchParams(searchParams.toString())
     params.delete("search")
     params.set("page", "1")
-    router.push(`/shop?${params.toString()}`, { scroll: false })
+    router.push(`${basePath}?${params.toString()}`, { scroll: false })
   }
 
   return (

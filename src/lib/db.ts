@@ -16,7 +16,7 @@ const createPrismaClient = () => {
 
   try {
     const pool = new Pool({ connectionString })
-    const adapter = new PrismaPg(pool)
+    const adapter = new PrismaPg(pool as unknown as ConstructorParameters<typeof PrismaPg>[0])
     return new PrismaClient({
       adapter,
       log: ["warn", "error"],

@@ -19,7 +19,8 @@ if (!connectionString) {
 
 console.log("Connecting to database...")
 const pool = new Pool({ connectionString })
-const adapter = new PrismaPg(pool)
+// biome-ignore lint/suspicious/noExplicitAny: Prisma
+const adapter = new PrismaPg(pool as unknown as any)
 const prisma = new PrismaClient({ adapter })
 
 // Helper function to capture metrics directly to database

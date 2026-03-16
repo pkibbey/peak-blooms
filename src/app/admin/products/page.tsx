@@ -26,6 +26,7 @@ export default async function AdminProductsPage({ searchParams }: AdminProductsP
   const order = typeof params?.order === "string" ? (params.order as "asc" | "desc") : "asc"
 
   // Parse filter params
+  const search = typeof params?.search === "string" ? params.search : ""
   const filterDescription = params?.filterDescription as "has" | "missing" | undefined
   const filterImages = params?.filterImages as "has" | "missing" | undefined
   const types = params?.types
@@ -49,6 +50,7 @@ export default async function AdminProductsPage({ searchParams }: AdminProductsP
           : "name",
       order,
       // Pass filter options
+      search,
       filterDescription,
       filterImages,
       types,
@@ -62,6 +64,7 @@ export default async function AdminProductsPage({ searchParams }: AdminProductsP
   const countResult = await getProductsForCount(
     {
       // Apply filters to count (only missing descriptions)
+      search,
       filterDescription: "missing",
       filterImages,
       types,
@@ -76,6 +79,7 @@ export default async function AdminProductsPage({ searchParams }: AdminProductsP
   const countResultImages = await getProductsForCount(
     {
       // Apply filters to count (only missing images)
+      search,
       filterImages: "missing",
       filterDescription,
       types,
@@ -96,12 +100,30 @@ export default async function AdminProductsPage({ searchParams }: AdminProductsP
     })
   }
 
-  // Build URL for table headers (preserves sort & order params)
+  // Build URL for table headers (preserves filters + sort/order)
   const baseUrl = "/admin/products"
-  const headerUrl = `${baseUrl}?sort=${sort || ""}&order=${order || ""}`
+  const headerParams = new URLSearchParams()
+  Object.entries(params).forEach(([key, value]) => {
+    if (typeof value === "string") {
+      headerParams.set(key, value)
+    } else if (Array.isArray(value)) {
+      value.forEach((v) => {
+        headerParams.append(key, v)
+      })
+    }
+  })
+  headerParams.set("sort", sort || "")
+  headerParams.set("order", order || "")
+  headerParams.delete("page")
+  const headerUrl = `${baseUrl}?${headerParams.toString()}`
 
   // Check if any filters are active
-  const hasActiveFilters = !!(filterDescription || filterImages || (types && types.length > 0))
+  const hasActiveFilters = !!(
+    search.trim() ||
+    filterDescription ||
+    filterImages ||
+    (types && types.length > 0)
+  )
 
   // Get all product types for filter options
   const allProductTypes = Object.values(ProductType).sort()

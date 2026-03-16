@@ -60,6 +60,7 @@ export default function InspirationForm({ products, inspiration }: InspirationFo
   // Track original image URL to clean up old blob when image changes
   const [originalImage] = useState(inspiration?.image || "")
   const [isDeleting, setIsDeleting] = useState(false)
+  const [isSubmitting, setIsSubmitting] = useState(false)
 
   // Product selection state (managed outside react-hook-form for ProductMultiSelect compatibility)
   const [selectedProductIds, setSelectedProductIds] = useState<string[]>(
@@ -128,8 +129,13 @@ export default function InspirationForm({ products, inspiration }: InspirationFo
   }
 
   const onSubmit = async (data: InspirationFormData) => {
+    setIsSubmitting(true)
     startTransition(async () => {
-      await saveForm(data)
+      try {
+        await saveForm(data)
+      } finally {
+        setIsSubmitting(false)
+      }
     })
   }
 
@@ -335,6 +341,11 @@ export default function InspirationForm({ products, inspiration }: InspirationFo
 
         {/* Actions */}
         <div className="flex gap-4 justify-end">
+          {!isEditing && (
+            <Button type="submit" disabled={isSubmitting}>
+              {isSubmitting ? "Creating..." : "Create inspiration"}
+            </Button>
+          )}
           {isEditing && (
             <Button
               type="button"

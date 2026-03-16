@@ -28,8 +28,8 @@ import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import type { CollectionModel, ProductModel } from "@/generated/models"
 import { toAppErrorClient } from "@/lib/error-utils"
-import { useDebouncedCallback } from "@/lib/useDebouncedCallback"
 import { saveOnBlur } from "@/lib/saveOnBlur"
+import { useDebouncedCallback } from "@/lib/useDebouncedCallback"
 import { type CollectionFormData, collectionSchema } from "@/lib/validations/collection"
 
 // Collection type with product count and associations for form display
@@ -51,6 +51,7 @@ export default function CollectionForm({ collection, products = [] }: Collection
   // Track original image URL to clean up old blob when image changes
   const [originalImage] = useState(collection?.image || "")
   const [isDeleting, setIsDeleting] = useState(false)
+  const [isSubmitting, setIsSubmitting] = useState(false)
 
   // Product selection state
   const [selectedProductIds, setSelectedProductIds] = useState<string[]>(
@@ -108,8 +109,13 @@ export default function CollectionForm({ collection, products = [] }: Collection
   }
 
   const onSubmit = async (data: CollectionFormData) => {
+    setIsSubmitting(true)
     startTransition(async () => {
-      await saveForm(data)
+      try {
+        await saveForm(data)
+      } finally {
+        setIsSubmitting(false)
+      }
     })
   }
 
@@ -285,6 +291,11 @@ export default function CollectionForm({ collection, products = [] }: Collection
 
         {/* Actions */}
         <div className="flex gap-4 justify-end">
+          {!isEditing && (
+            <Button type="submit" disabled={isSubmitting}>
+              {isSubmitting ? "Creating..." : "Create collection"}
+            </Button>
+          )}
           {isEditing && (
             <Button
               type="button"

@@ -78,6 +78,7 @@ export default function ProductForm({
   const isEditing = !!product
 
   const [isDeleting, setIsDeleting] = useState(false)
+  const [isSaving, setIsSaving] = useState(false)
 
   const form = useForm<ProductFormData>({
     resolver: zodResolver(productSchema),
@@ -146,9 +147,14 @@ export default function ProductForm({
   }
 
   const onSubmit = async (data: ProductFormData) => {
-    await saveForm(data)
-    router.push("/admin/products")
-    router.refresh()
+    setIsSaving(true)
+    try {
+      await saveForm(data)
+      router.push("/admin/products")
+      router.refresh()
+    } finally {
+      setIsSaving(false)
+    }
   }
 
   const handleBlur = async () => {
@@ -449,8 +455,17 @@ export default function ProductForm({
         />
 
         {/* Actions */}
-        {isEditing && (
-          <div className="flex gap-4 justify-end">
+        <div className="flex gap-4 justify-end">
+          <Button type="submit" disabled={isSaving}>
+            {isSaving
+              ? isEditing
+                ? "Saving..."
+                : "Creating..."
+              : isEditing
+                ? "Save changes"
+                : "Create product"}
+          </Button>
+          {isEditing && (
             <Button
               type="button"
               variant="outline-destructive"
@@ -460,8 +475,8 @@ export default function ProductForm({
               <IconTrash className="inline-block" />
               {isDeleting ? "Deleting..." : "Delete"}
             </Button>
-          </div>
-        )}
+          )}
+        </div>
       </form>
     </Form>
   )

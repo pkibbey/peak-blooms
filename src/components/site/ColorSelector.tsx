@@ -8,6 +8,8 @@ interface ColorSelectorProps {
   onChange: (colors: string[]) => void
   showLabel?: boolean
   compact?: boolean
+  /** Optional list of color IDs to render; defaults to all supported colors */
+  colorIds?: readonly string[]
 }
 
 export function ColorSelector({
@@ -15,6 +17,7 @@ export function ColorSelector({
   onChange,
   showLabel = true,
   compact = false,
+  colorIds = COLOR_IDS,
 }: ColorSelectorProps) {
   const handleColorClick = (colorId: string) => {
     const updated = selectedColors.includes(colorId)
@@ -27,7 +30,7 @@ export function ColorSelector({
     <div className="flex flex-col gap-2">
       {showLabel && <span className="text-sm font-medium">Colors</span>}
       <div className={cn("flex flex-wrap gap-2", compact && "gap-1")}>
-        {COLOR_IDS.map((colorId) => {
+        {colorIds.map((colorId) => {
           const color = COLOR_MAP.get(colorId)
           if (!color) return null
           const isActive = selectedColors.includes(colorId)
