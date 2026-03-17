@@ -4,6 +4,18 @@ import { nextCookies } from "better-auth/next-js"
 import { headers } from "next/headers"
 import { db } from "./db"
 
+const baseURL =
+  process.env.BETTER_AUTH_URL ??
+  process.env.NEXT_PUBLIC_APP_URL ??
+  (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : "http://localhost:3000")
+
+if (process.env.NODE_ENV === "production" && baseURL.startsWith("http://localhost")) {
+  console.warn(
+    "⚠️ Better Auth baseURL is falling back to localhost in production. " +
+      "Set BETTER_AUTH_URL or NEXT_PUBLIC_APP_URL in your environment variables."
+  )
+}
+
 const auth = betterAuth({
   database: prismaAdapter(db, {
     provider: "postgresql",
@@ -21,7 +33,7 @@ const auth = betterAuth({
     },
   },
   appName: "Peak Blooms",
-  baseURL: process.env.BETTER_AUTH_URL,
+  baseURL,
   basePath: "/api/auth",
   secret: process.env.BETTER_AUTH_SECRET,
   session: {
