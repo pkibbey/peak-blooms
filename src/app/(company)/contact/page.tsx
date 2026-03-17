@@ -33,10 +33,10 @@ export default function ContactPage() {
             <div>
               <h3 className="font-semibold text-base mb-1">Email</h3>
               <a
-                href="mailto:hello@peakblooms.com"
+                href="mailto:peakbloomsd@gmail.com"
                 className="text-base text-[#B45F68] hover:underline break-all"
               >
-                hello@peakblooms.com
+                peakbloomsd@gmail.com
               </a>
               <p className="text-sm text-muted-foreground mt-1">
                 Best for detailed questions, order inquiries, and partnership opportunities. We
@@ -49,8 +49,8 @@ export default function ContactPage() {
             <IconPhone className="h-5 w-5 text-[#1F332E] mt-1 shrink-0" />
             <div>
               <h3 className="font-semibold text-base mb-1">Phone</h3>
-              <a href="tel:6199321139" className="text-base text-[#B45F68] hover:underline">
-                (619) 932-1139
+              <a href="tel:8583949420" className="text-base text-[#B45F68] hover:underline">
+                (858) 394-9420
               </a>
               <p className="text-sm text-muted-foreground mt-1">
                 Call us for urgent matters or to discuss your wholesale needs. Available

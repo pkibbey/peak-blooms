@@ -53,7 +53,7 @@ export default async function PendingApprovalPage() {
               nativeButton={false}
               render={
                 <a
-                  href="mailto:hello@peakblooms.com?subject=Account%20Approval%20Request"
+                  href="mailto:peakbloomsd@gmail.com?subject=Account%20Approval%20Request"
                   className="inline-flex items-center gap-2"
                 >
                   <IconMail aria-hidden="true" />
@@ -64,7 +64,7 @@ export default async function PendingApprovalPage() {
             <div className="text-sm text-muted-foreground">
               Or call us at{" "}
               <a href="tel:+16199321139" className="font-medium hover:underline">
-                (619) 932-1139
+                (858) 394-9420
               </a>
             </div>
           </div>

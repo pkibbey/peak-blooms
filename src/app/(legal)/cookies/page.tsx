@@ -103,12 +103,12 @@ export default function CookiesPage() {
         <div className="space-y-1 text-sm">
           <p className="text-base text-foreground">
             Reach out to our team at{" "}
-            <a href="mailto:hello@peakblooms.com" className="text-[#B45F68] hover:underline">
-              hello@peakblooms.com
+            <a href="mailto:peakbloomsd@gmail.com" className="text-[#B45F68] hover:underline">
+              peakbloomsd@gmail.com
             </a>{" "}
             or call{" "}
-            <a href="tel:6199321139" className="text-[#B45F68] hover:underline">
-              (619) 932-1139
+            <a href="tel:8583949420" className="text-[#B45F68] hover:underline">
+              (858) 394-9420
             </a>
             . We're here to help!
           </p>

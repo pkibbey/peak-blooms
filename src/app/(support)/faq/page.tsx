@@ -45,12 +45,12 @@ const faqs: FAQItem[] = [
       <>
         Yes, we can often accommodate rush orders depending on availability and timing. Contact us
         directly at{" "}
-        <a href="mailto:hello@peakblooms.com" className="text-[#B45F68] hover:underline">
-          hello@peakblooms.com
+        <a href="mailto:peakbloomsd@gmail.com" className="text-[#B45F68] hover:underline">
+          peakbloomsd@gmail.com
         </a>{" "}
         or{" "}
-        <a href="tel:6199321139" className="text-[#B45F68] hover:underline">
-          (619) 932-1139
+        <a href="tel:8583949420" className="text-[#B45F68] hover:underline">
+          (858) 394-9420
         </a>{" "}
         to discuss your urgent needs. Our team will do our best to help you.
       </>
@@ -103,12 +103,12 @@ export default function FAQPage() {
         <h2 className="text-2xl font-semibold font-serif">Didn't find your answer?</h2>
         <p className="text-base text-foreground">
           Reach out to our team at{" "}
-          <a href="mailto:hello@peakblooms.com" className="text-[#B45F68] hover:underline">
-            hello@peakblooms.com
+          <a href="mailto:peakbloomsd@gmail.com" className="text-[#B45F68] hover:underline">
+            peakbloomsd@gmail.com
           </a>{" "}
           or call{" "}
-          <a href="tel:6199321139" className="text-[#B45F68] hover:underline">
-            (619) 932-1139
+          <a href="tel:8583949420" className="text-[#B45F68] hover:underline">
+            (858) 394-9420
           </a>
           . We're here to help!
         </p>

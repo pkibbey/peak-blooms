@@ -2,6 +2,7 @@ import type { Metadata } from "next"
 import { Geist, Geist_Mono, Playfair_Display, Raleway } from "next/font/google"
 import { Toaster } from "sonner"
 import "./globals.css"
+import { Analytics } from "@vercel/analytics/next"
 import Footer from "@/components/site/Footer"
 import Nav from "@/components/site/Nav"
 import { NewsletterBanner } from "@/components/site/NewsletterBanner"
@@ -44,6 +45,7 @@ export default async function RootLayout({
         <NewsletterBanner />
         <Footer />
         <Toaster position="bottom-center" richColors />
+        <Analytics />
       </body>
     </html>
   )

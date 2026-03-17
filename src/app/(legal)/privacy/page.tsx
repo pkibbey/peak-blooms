@@ -141,7 +141,7 @@ export default function PrivacyPage() {
           </li>
         </ul>
         <p className="mt-3 text-base text-foreground leading-relaxed">
-          To exercise any of these rights, please contact us at hello@peakblooms.com.
+          To exercise any of these rights, please contact us at peakbloomsd@gmail.com.
         </p>
       </section>
 
@@ -195,15 +195,15 @@ export default function PrivacyPage() {
           <p>
             <strong>Email</strong>
             {" - "}
-            <a href="mailto:hello@peakblooms.com" className="text-[#B45F68] hover:underline">
-              hello@peakblooms.com
+            <a href="mailto:peakbloomsd@gmail.com" className="text-[#B45F68] hover:underline">
+              peakbloomsd@gmail.com
             </a>
           </p>
           <p>
             <strong>Phone</strong>
             {" - "}
-            <a href="tel:6199321139" className="text-[#B45F68] hover:underline">
-              (619) 932-1139
+            <a href="tel:8583949420" className="text-[#B45F68] hover:underline">
+              (858) 394-9420
             </a>
           </p>
         </div>

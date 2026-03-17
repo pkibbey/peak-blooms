@@ -38,7 +38,7 @@ export default async function UnauthorizedPage() {
                 className="w-full"
                 nativeButton={false}
                 render={
-                  <a href="mailto:hello@peakblooms.com?subject=Admin%20Access%20Request">
+                  <a href="mailto:peakbloomsd@gmail.com?subject=Admin%20Access%20Request">
                     Request Admin Access
                   </a>
                 }

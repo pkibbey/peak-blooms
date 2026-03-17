@@ -28,20 +28,20 @@ export default function Footer() {
             <div className="mt-4 flex items-center gap-4 text-sm text-muted-foreground">
               <IconMail aria-hidden="true" />
               <a
-                href="mailto:hello@peakblooms.com"
+                href="mailto:peakbloomsd@gmail.com"
                 className="text-sm text-muted-foreground hover:text-foreground hover:underline"
               >
-                hello@peakblooms.com
+                peakbloomsd@gmail.com
               </a>
             </div>
 
             <div className="mt-3 flex items-center gap-4 text-sm text-muted-foreground">
               <IconPhone aria-hidden="true" />
               <a
-                href="tel:6199321139"
+                href="tel:8583949420"
                 className="text-sm text-muted-foreground hover:text-foreground hover:underline"
               >
-                (619) 932-1139
+                (858) 394-9420
               </a>
             </div>
 
