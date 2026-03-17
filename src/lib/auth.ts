@@ -9,6 +9,8 @@ const baseURL =
   process.env.NEXT_PUBLIC_APP_URL ??
   (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : "http://localhost:3000")
 
+console.log("baseURL: ", baseURL)
+
 if (process.env.NODE_ENV === "production" && baseURL.startsWith("http://localhost")) {
   console.warn(
     "⚠️ Better Auth baseURL is falling back to localhost in production. " +
@@ -35,6 +37,7 @@ const auth = betterAuth({
   appName: "Peak Blooms",
   baseURL,
   basePath: "/api/auth",
+  trustedOrigins: ["http://peakblooms.com"],
   secret: process.env.BETTER_AUTH_SECRET,
   session: {
     expiresIn: 60 * 60 * 24 * 7, // 7 days
