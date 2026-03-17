@@ -37,7 +37,10 @@ const auth = betterAuth({
   appName: "Peak Blooms",
   baseURL,
   basePath: "/api/auth",
-  trustedOrigins: ["http://peakblooms.com"],
+  trustedOrigins: [
+    "http://peakblooms.com",
+    ...(process.env.VERCEL_URL ? [`https://${process.env.VERCEL_URL}`] : []),
+  ],
   secret: process.env.BETTER_AUTH_SECRET,
   session: {
     expiresIn: 60 * 60 * 24 * 7, // 7 days
