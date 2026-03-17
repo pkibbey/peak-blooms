@@ -38,7 +38,7 @@ const auth = betterAuth({
   baseURL,
   basePath: "/api/auth",
   trustedOrigins: [
-    "http://peakblooms.com",
+    "https://localhost:3000",
     ...(process.env.VERCEL_URL ? [`https://${process.env.VERCEL_URL}`] : []),
   ],
   secret: process.env.BETTER_AUTH_SECRET,
