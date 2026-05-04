@@ -8,6 +8,8 @@ export default async function FeaturedProducts() {
   const multiplier = user?.priceMultiplier ?? 1.0
   const products = await getFeaturedProducts(multiplier, 4)
 
+  if (!products.length) return null
+
   return (
     <div className="flex flex-col items-center justify-start bg-background py-16 font-sans">
       <div className="w-full max-w-5xl px-6">

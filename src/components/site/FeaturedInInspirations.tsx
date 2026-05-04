@@ -12,9 +12,7 @@ interface FeaturedInInspirationsProps {
 }
 
 export function FeaturedInInspirations({ inspirations }: FeaturedInInspirationsProps) {
-  if (!inspirations || inspirations.length === 0) {
-    return null
-  }
+  if (!inspirations.length) return null
 
   // Extract unique inspirations from the join table entries
   const uniqueInspirations = inspirations.reduce((acc, isp) => {
