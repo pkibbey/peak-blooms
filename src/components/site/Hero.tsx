@@ -90,11 +90,11 @@ export default function Hero({
           />
 
           {/* Mobile fallback: single-color overlay for legibility */}
-          <div className="absolute inset-0 z-5 bg-black/70 md:hidden" />
+          <div className="absolute inset-0 z-5 bg-black/60 md:hidden" />
         </>
       )}
       {/* Center gradient */}
-      {alignment === "center" && <div className="absolute inset-0 z-5 bg-black/70" />}
+      {alignment === "center" && <div className="absolute inset-0 z-5 bg-black/60" />}
       <div className="relative z-10 max-w-5xl mx-auto px-6 py-16 md:py-20">
         <div className={`flex flex-col md:flex-row gap-6 ${alignmentClasses.container}`}>
           {/* Content - placement controlled by textPosition */}
