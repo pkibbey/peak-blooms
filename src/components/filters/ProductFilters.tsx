@@ -12,9 +12,9 @@ import type { ProductType } from "@/generated/enums"
 import { PRODUCT_TYPE_LABELS, PRODUCT_TYPES } from "@/lib/product-types"
 import { useFilterState } from "@/lib/useFilterState"
 
-export type ProductTypeSelectionMode = "single" | "multiple"
+type ProductTypeSelectionMode = "single" | "multiple"
 
-export interface ProductFiltersProps {
+interface ProductFiltersProps {
   /** Base route for navigation (used as the prefix for query params updates) */
   basePath: string
   /** Whether to show the search input */

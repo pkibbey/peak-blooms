@@ -12,6 +12,8 @@ export default async function FeaturedCollections() {
     collections = []
   }
 
+  if (!collections.length) return null
+
   return (
     <div className="flex flex-col items-center justify-start bg-background py-16 font-sans">
       <div className="w-full max-w-5xl px-6">
