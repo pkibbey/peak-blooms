@@ -84,22 +84,22 @@ export default function Hero({
             style={{
               background:
                 alignment === "left"
-                  ? "linear-gradient(to right, rgba(0,0,0,0.6) 20%, rgba(0,0,0,0) 70%)"
-                  : "linear-gradient(to left, rgba(0,0,0,0.6) 20%, rgba(0,0,0,0) 70%)",
+                  ? "linear-gradient(to right, rgba(0,0,0,0.9) 25%, rgba(0,0,0,0) 70%)"
+                  : "linear-gradient(to left, rgba(0,0,0,0.9) 25%, rgba(0,0,0,0) 70%)",
             }}
           />
 
           {/* Mobile fallback: single-color overlay for legibility */}
-          <div className="absolute inset-0 z-5 bg-black/50 md:hidden" />
+          <div className="absolute inset-0 z-5 bg-black/70 md:hidden" />
         </>
       )}
       {/* Center gradient */}
-      {alignment === "center" && <div className="absolute inset-0 z-5 bg-black/50" />}
+      {alignment === "center" && <div className="absolute inset-0 z-5 bg-black/70" />}
       <div className="relative z-10 max-w-5xl mx-auto px-6 py-16 md:py-20">
         <div className={`flex flex-col md:flex-row gap-6 ${alignmentClasses.container}`}>
           {/* Content - placement controlled by textPosition */}
           <div
-            className={`flex flex-col justify-center ${alignmentClasses.width} ${alignmentClasses.text}`}
+            className={`flex flex-col gap-2 justify-center ${alignmentClasses.width} ${alignmentClasses.text}`}
           >
             <h1 className="text-4xl md:text-5xl font-extrabold text-white font-serif">{title}</h1>
             <p className="mt-3 text-lg text-white/80">{subtitle}</p>

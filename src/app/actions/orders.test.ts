@@ -903,7 +903,6 @@ describe("Order Actions", () => {
       )
 
       const result = await createOrderAction(validData)
-      console.log("DEBUG createOrderAction result:", result)
       expect(result.success).toBe(true)
       if (result.success) {
         expect(result.data?.status).toBe("PENDING")

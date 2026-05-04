@@ -9,8 +9,6 @@ const baseURL =
   process.env.NEXT_PUBLIC_APP_URL ??
   (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : "http://localhost:3000")
 
-console.log("baseURL: ", baseURL)
-
 if (process.env.NODE_ENV === "production" && baseURL.startsWith("http://localhost")) {
   console.warn(
     "⚠️ Better Auth baseURL is falling back to localhost in production. " +

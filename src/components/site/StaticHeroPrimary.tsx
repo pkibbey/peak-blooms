@@ -11,7 +11,7 @@ export default function StaticHeroPrimary() {
       subtitle="Partner with Peak Blooms for the highest quality, freshest flowers. Competitive wholesale pricing, sustainable sourcing, and reliable local delivery—built for florists, retailers, and event planners."
       ctaText="Browse Catalog"
       ctaLink="/shop"
-      backgroundImage="/hero-images/welcome.png"
+      backgroundImage="/hero-images/flower-market.jpeg"
       textPosition="left"
     />
   )
